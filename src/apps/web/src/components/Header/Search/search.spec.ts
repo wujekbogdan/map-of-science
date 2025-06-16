@@ -1,5 +1,5 @@
 import { describe, it, expect } from "@map-of-science/vitest";
-import { Concept, DataPoint } from "../../../api/model";
+import { Concept, DataPoint, YoutubeVideo } from "../../../api/model";
 import { createLabelsCollection, search } from "./search.ts";
 
 const map = {
@@ -230,13 +230,14 @@ const options = {
   map,
   dataPoints: new Map<number, DataPoint[]>(),
   concepts: new Map<number, Concept[]>(),
+  youtube: new Map<string, YoutubeVideo[]>(),
 } as never; // TODO: Fix this type
 
 // TODO: Add tests for points
 // https://github.com/wujekbogdan/map-of-science/issues/60
 describe("mapModel", () => {
   it("should map and flatten the model", () => {
-    const model = createLabelsCollection(map);
+    const model = createLabelsCollection(map, new Map());
     expect(model).toMatchSnapshot();
   });
 
@@ -267,27 +268,30 @@ describe("mapModel", () => {
       },
     });
 
-    const model = createLabelsCollection({
-      layer1: {
-        children: phrases.map((phrase) => ({
-          path: el(phrase),
-        })),
-      },
-      layer2: {
-        children: phrases.map((phrase) => ({
-          path: el(phrase),
-        })),
-      },
-      layer3: {
-        groups: [
-          {
-            children: phrases.map((phrase) => ({
-              rect: el(phrase),
-            })),
-          },
-        ],
-      },
-    } as typeof map); // Cast to avoid providing all properties
+    const model = createLabelsCollection(
+      {
+        layer1: {
+          children: phrases.map((phrase) => ({
+            path: el(phrase),
+          })),
+        },
+        layer2: {
+          children: phrases.map((phrase) => ({
+            path: el(phrase),
+          })),
+        },
+        layer3: {
+          groups: [
+            {
+              children: phrases.map((phrase) => ({
+                rect: el(phrase),
+              })),
+            },
+          ],
+        },
+      } as typeof map,
+      new Map(),
+    ); // Cast to avoid providing all properties
 
     const normalized = [
       "zazolc gesla jazn",
@@ -333,6 +337,7 @@ describe("search", () => {
           id: "path186",
           label: "Symbole-bity-sygnały",
           normalizedLabel: "symbole-bity-sygnaly",
+          videosCount: 0,
         },
       ],
       points: [],
@@ -358,6 +363,7 @@ describe("search", () => {
           id: "path186",
           label: "Symbole-bity-sygnały",
           normalizedLabel: "symbole-bity-sygnaly",
+          videosCount: 0,
         },
       ],
       points: [],

@@ -94,7 +94,9 @@ const OptionRow = memo(
             type: "regular",
           };
 
-    const tokens = [...props.tokens, videosCountToken].filter(Boolean);
+    const tokens = [...props.tokens, videosCountToken].filter(
+      Boolean,
+    ) as Token[];
 
     return (
       <ComboboxOption $focus={props.focus} $selected={props.selected}>
