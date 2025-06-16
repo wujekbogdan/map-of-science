@@ -68,6 +68,6 @@ export const YoutubeVideoSchema = (z: typeof zod) =>
       reference: data.reference,
       articleLink: data.article_link,
       segmentName: data.segment_name,
-      labelId: data.classification,
+      labelIds: data.classification.split("|"),
     }));
 export type YoutubeVideo = zod.infer<ReturnType<typeof YoutubeVideoSchema>>;
