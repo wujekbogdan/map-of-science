@@ -29,6 +29,7 @@ export type Option =
   | (OptionBase & {
       type: "label";
       boundingBox: BoundingBox;
+      videosCount: number;
     })
   | (OptionBase & {
       type: "point";
@@ -80,14 +81,27 @@ type OptionRowProps = {
   selected: boolean;
   tokens: Token[];
   type: "query" | "label" | "point";
+  videosCount?: number;
 };
 
 const OptionRow = memo(
-  (props: OptionRowProps) => (
-    <ComboboxOption $focus={props.focus} $selected={props.selected}>
-      <Label tokens={props.tokens} type={props.type} />
-    </ComboboxOption>
-  ),
+  (props: OptionRowProps) => {
+    const videosCountToken =
+      props.videosCount === undefined
+        ? undefined
+        : {
+            text: ` [${i18n("Filmy na YouTube:")} ${props.videosCount}]`,
+            type: "regular",
+          };
+
+    const tokens = [...props.tokens, videosCountToken].filter(Boolean);
+
+    return (
+      <ComboboxOption $focus={props.focus} $selected={props.selected}>
+        <Label tokens={tokens} type={props.type} />
+      </ComboboxOption>
+    );
+  },
   (prev, next) => {
     return (
       prev.id === next.id &&
@@ -198,6 +212,11 @@ export const Dropdown = (props: Dropdown) => {
                         focus={focus}
                         selected={selected}
                         tokens={option.tokens}
+                        videosCount={
+                          option.type === "label"
+                            ? option.videosCount
+                            : undefined
+                        }
                       />
                     )}
                   </ComboboxOptionHeadless>

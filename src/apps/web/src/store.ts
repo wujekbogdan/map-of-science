@@ -17,6 +17,7 @@ type Size = {
 const partialDefaults = {
   dataPoints: new Map<number, DataPoint>(),
   concepts: new Map<number, Concept>(),
+  youtubeVideos: new Map<string, YoutubeVideo[]>(),
   pointsToHighlight: [] as number[],
   zoomStepFactor: 1.6,
   mapSize: {
@@ -96,6 +97,9 @@ export const useStore = create(
     },
     setConcepts: (concepts: Map<number, Concept>) => {
       set({ concepts });
+    },
+    setYoutubeVideos: (youtubeVideos: Map<string, YoutubeVideo[]>) => {
+      set({ youtubeVideos });
     },
     setPointsToHighlight: (clusterIds: number[]) => {
       set({ pointsToHighlight: clusterIds });

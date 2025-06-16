@@ -73,15 +73,10 @@ export const loadData = async () => {
   const labelToVideos = new Map<string, YoutubeVideo[]>(
     Object.entries(
       (await loadingYoutubeData).reduce<Record<string, YoutubeVideo[]>>(
-        (acc, video) => {
-          return video.labelIds.reduce<Record<string, YoutubeVideo[]>>(
-            (innerAcc, labelId) => ({
-              ...innerAcc,
-              [labelId]: [...(innerAcc[labelId] ?? []), video],
-            }),
-            acc,
-          );
-        },
+        (acc, video) => ({
+          ...acc,
+          [video.labelId]: [...(acc[video.labelId] ?? []), video],
+        }),
         {},
       ),
     ),

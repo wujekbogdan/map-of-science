@@ -19,30 +19,36 @@ export const LocalArticle = ({ html, videos }: Props) => {
         // from local markdown files we control.
       }
       {html && <Article dangerouslySetInnerHTML={{ __html: html }} />}
-      {videos.length > 0 && (
-        <Videos>
+      <Videos>
+        {videos.length > 0 ? (
+          <>
+            <ListHeader>
+              {i18n(`Powiązane fragmenty "Czytamy Naturę" na YouTube`)}
+            </ListHeader>
+            <List>
+              {videos.map((video) => (
+                <ListItem key={video.videoId}>
+                  <Link
+                    href={video.segmentUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <VideoHeader>{video.segmentName}</VideoHeader>
+                    <Thumbnail
+                      src={youtubeIdToImage(video.videoId)}
+                      alt={video.segmentName}
+                    />
+                  </Link>
+                </ListItem>
+              ))}
+            </List>
+          </>
+        ) : (
           <ListHeader>
-            {i18n(`Powiązane fragmenty "Czytamy Naturę" na YouTube`)}
+            {i18n(`Brak powiązanych filmów "Czytamy Naturę"`)}
           </ListHeader>
-          <List>
-            {videos.map((video) => (
-              <ListItem key={video.videoId}>
-                <Link
-                  href={video.segmentUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <VideoHeader>{video.segmentName}</VideoHeader>
-                  <Thumbnail
-                    src={youtubeIdToImage(video.videoId)}
-                    alt={video.segmentName}
-                  />
-                </Link>
-              </ListItem>
-            ))}
-          </List>
-        </Videos>
-      )}
+        )}
+      </Videos>
     </>
   );
 };

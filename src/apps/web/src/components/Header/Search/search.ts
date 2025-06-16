@@ -1,6 +1,6 @@
 import { normalizeSync } from "normalize-diacritics";
 import { MapSvgRepresentation } from "../../../../vite-plugin/svg-map-parser.ts";
-import { Concept, DataPoint } from "../../../api/model";
+import { Concept, DataPoint, YoutubeVideo } from "../../../api/model";
 
 export type LabelModel = {
   id: string;
@@ -11,6 +11,7 @@ export type LabelModel = {
     max: { x: number; y: number };
     center: { x: number; y: number };
   };
+  videosCount: number;
 };
 
 type ConceptWithClustersModel = {
@@ -48,18 +49,25 @@ const mapPath = (
   boundingBox: path.boundingBox,
 });
 
-export const createLabelsCollection = (map: MapSvgRepresentation) => [
-  ...map.layer1.children.map(({ path }) => mapPath(path)),
-  ...map.layer2.children.map(({ path }) => mapPath(path)),
-  ...map.layer3.groups.flatMap((group) =>
-    group.children.map(({ rect }) => ({
-      id: rect.id,
-      label: rect.label.replace("#", ""),
-      normalizedLabel: normalize(rect.label),
-      boundingBox: rect.boundingBox,
-    })),
-  ),
-];
+export const createLabelsCollection = (
+  map: MapSvgRepresentation,
+  youtube: Map<string, YoutubeVideo[]>,
+) =>
+  [
+    ...map.layer1.children.map(({ path }) => mapPath(path)),
+    ...map.layer2.children.map(({ path }) => mapPath(path)),
+    ...map.layer3.groups.flatMap((group) =>
+      group.children.map(({ rect }) => ({
+        id: rect.id,
+        label: rect.label.replace("#", ""),
+        normalizedLabel: normalize(rect.label),
+        boundingBox: rect.boundingBox,
+      })),
+    ),
+  ].map((label) => ({
+    ...label,
+    videosCount: youtube.get(label.label)?.length ?? 0,
+  }));
 
 export const createClustersByConcept = (
   dataPoints: Map<number, DataPoint>,
@@ -100,12 +108,16 @@ type Options = {
   map: MapSvgRepresentation;
   dataPoints: Map<number, DataPoint>;
   concepts: Map<number, Concept>;
+  youtube: Map<string, YoutubeVideo[]>;
 };
 
 export const search = (options: Options, phrase: string) => {
   const labelsCollection =
     cachedLabelsCollection ??
-    (cachedLabelsCollection = createLabelsCollection(options.map));
+    (cachedLabelsCollection = createLabelsCollection(
+      options.map,
+      options.youtube,
+    ));
   const clustersByConcept =
     cachedClustersByConcept ??
     (cachedClustersByConcept = createClustersByConcept(
