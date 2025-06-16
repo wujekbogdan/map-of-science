@@ -40,7 +40,7 @@ export const Search = () => {
           points: [],
         };
 
-      const result = worker.search(
+      return worker.search(
         {
           map,
           dataPoints,
@@ -49,7 +49,6 @@ export const Search = () => {
         },
         query,
       );
-      return result;
     },
   );
 
@@ -180,6 +179,10 @@ export const Search = () => {
     }
   };
 
+  const onReset = () => {
+    setPointsToHighlight([]);
+  };
+
   return (
     <Form
       onSubmit={(e) => {
@@ -191,6 +194,7 @@ export const Search = () => {
         options={dropdownOptions}
         onInput={onInput}
         onSelect={onSelectionChange}
+        onReset={onReset}
       />
     </Form>
   );
