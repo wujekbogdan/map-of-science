@@ -1,4 +1,5 @@
 export const config = {
   devTool: import.meta.env.VITE_DEV_TOOL_ENABLED === "true",
-  namespace: "1b671a64-40d5-491e-99b0-da01ff1f3341",
+  namespace: "10b3c450-44d5-42f0-9fda-31000717d0fb",
+  LANG: "pl-PL", // TODO: Make it dynamic based on the user language preference
 } as const;

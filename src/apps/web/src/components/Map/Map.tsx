@@ -9,14 +9,13 @@ import {
   DataPoint as Point,
   YoutubeVideo,
 } from "../../api/model";
+import { config } from "../../config.ts";
 import { useArticleStore, useStore } from "../../store.ts";
 import { useD3Zoom } from "../../useD3Zoom.ts";
 import { useLayersOpacity } from "../../useLayersOpacity.ts";
 import { DataPoints } from "./DataPoints/DataPoints.tsx";
 import Label, { OnLabelClick } from "./Label.tsx";
 import mapSvg from "./map.svg";
-
-const LANG = "pl-PL"; // TODO: Make it dynamic based on the user language preference
 
 const filterDataByViewport = (
   dataPoints: Point[],
@@ -151,7 +150,7 @@ export default function Map(props: Props) {
       return {
         ...label,
         key: label.id,
-        text: props.labelsI18n.get(label.id)?.[LANG] ?? label.id,
+        text: props.labelsI18n.get(label.id)?.[config.LANG] ?? label.id,
         fontSize,
         opacity: labelOpacity,
         videos: props.youtube.get(label.id) ?? [],
@@ -221,7 +220,6 @@ export default function Map(props: Props) {
     // Let's sort it out so that we can rely on calculated values only.
     const SCALE_FACTOR = svgScaleFactor;
     const offset = svgOffset;
-
     const scale = SCALE_FACTOR * transform.k;
     const scaledWidth = viewBox.width * scale;
     const scaledHeight = viewBox.height * scale;
@@ -245,29 +243,24 @@ export default function Map(props: Props) {
       width={props.size.width}
       height={props.size.height}
     >
-      <g transform={transformValue} opacity={opacity.layer1}>
-        <g>
-          <DataPoints points={dataInViewport} concepts={props.concepts} />
-          <DataPoints
-            points={highlightedPoints}
-            forcedSize={true}
-            concepts={props.concepts}
+      <g transform={transformValue}>
+        <DataPoints points={dataInViewport} concepts={props.concepts} />
+        <DataPoints
+          points={highlightedPoints}
+          forcedSize={true}
+          concepts={props.concepts}
+        />
+        {labelsScaled.map((label) => (
+          <Label
+            {...label}
+            id={label.key}
+            key={label.key}
+            onClick={({ text, videos }) => {
+              setVideos(videos);
+              void fetchLocalArticle(text);
+            }}
           />
-        </g>
-
-        <g>
-          {labelsScaled.map((label) => (
-            <Label
-              {...label}
-              id={label.key}
-              key={label.key}
-              onClick={({ text, videos }) => {
-                setVideos(videos);
-                void fetchLocalArticle(text);
-              }}
-            />
-          ))}
-        </g>
+        ))}
       </g>
     </MapSvg>
   );

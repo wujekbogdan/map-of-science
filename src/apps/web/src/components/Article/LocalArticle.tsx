@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import { YoutubeVideo } from "../../api/model";
+import { config } from "../../config.ts";
 import { i18n } from "../../i18n.ts";
 
 type Props = {
@@ -9,6 +10,10 @@ type Props = {
 
 const youtubeIdToImage = (videoId: string) => {
   return `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`;
+};
+
+const formatDate = (date: string) => {
+  return new Intl.DateTimeFormat(config.LANG).format(new Date(date));
 };
 
 export const LocalArticle = ({ html, videos }: Props) => {
@@ -33,7 +38,8 @@ export const LocalArticle = ({ html, videos }: Props) => {
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    <VideoHeader>{video.segmentName}</VideoHeader>
+                    <VideoHeader>{video.segmentName} </VideoHeader>
+                    <VideoDate>{formatDate(video.date)}</VideoDate>
                     <Thumbnail
                       src={youtubeIdToImage(video.videoId)}
                       alt={video.segmentName}
@@ -83,11 +89,21 @@ const ListItem = styled.li`
 
 const Link = styled.a`
   display: block;
+  text-decoration: none;
 `;
 
-const VideoHeader = styled.h3``;
+const VideoHeader = styled.h3`
+  color: #9b5b9b;
+  margin-bottom: 0;
+`;
+
+const VideoDate = styled.span`
+  font-size: 10px;
+  color: #666;
+`;
 
 const Thumbnail = styled.img`
+  margin-top: 12px;
   display: block;
   border-radius: 3px;
   border: 1px solid #eee;
