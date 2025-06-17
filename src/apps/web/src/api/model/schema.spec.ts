@@ -3,7 +3,7 @@ import { fileURLToPath } from "node:url";
 import { z } from "zod";
 import { ZodSchema } from "zod";
 import { describe, it, expect } from "@map-of-science/vitest";
-import { DataSchema, ConceptSchema, CityLabelSchema } from ".";
+import { DataSchema, ConceptSchema, AreaLabelSchema } from ".";
 import { setCollector } from "../../csv/collector.ts";
 import { parse as csvParse } from "../../csv/parse.ts";
 
@@ -71,9 +71,9 @@ describe("schema", () => {
     });
   });
 
-  describe("labels.tsv", () => {
-    it("should parse labels labels.tsv", async () => {
-      const [firstItem] = await parse("labels.tsv", CityLabelSchema(z));
+  describe("area_labels.tsv", () => {
+    it("should parse labels area_labels.tsv", async () => {
+      const [firstItem] = await parse("labels.tsv", AreaLabelSchema(z));
       expect(firstItem).toEqual({
         clusterId: 3988,
         label: "Osobowość i różnice międzyosobnicze zwierząt",

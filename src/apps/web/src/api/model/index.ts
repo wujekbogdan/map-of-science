@@ -7,19 +7,33 @@ export const ConceptSchema = (z: typeof zod) =>
   });
 export type Concept = zod.infer<ReturnType<typeof ConceptSchema>>;
 
-export const CityLabelSchema = (z: typeof zod) =>
+export const AreaLabelSchema = (z: typeof zod) =>
   z
     .object({
-      cluster_id: z.coerce.number(),
-      label: z.string(),
+      id: z.string(),
+      x: z.coerce.number(),
+      y: z.coerce.number(),
+      level: z.preprocess(
+        (val) => Number(val),
+        z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4)]),
+      ),
+      cluster_id: z.union([z.literal("null"), z.string()]),
     })
-    .transform((data) => ({
-      clusterId: data.cluster_id,
-      label: data.label,
+    .transform(({ cluster_id, ...rest }) => ({
+      ...rest,
+      clusterId: cluster_id === "null" ? null : parseInt(cluster_id, 10),
     }));
-export type CityLabel = zod.infer<ReturnType<typeof CityLabelSchema>>;
+export type AreaLabel = zod.infer<ReturnType<typeof AreaLabelSchema>>;
 
-export const DataSchema = (z: typeof zod, labels: Map<number, CityLabel>) =>
+export const AreaLabelI18nSchema = (z: typeof zod) =>
+  z.object({
+    id: z.string(),
+    "pl-PL": z.string(),
+    "en-US": z.string(),
+  });
+export type AreaLabelI18n = zod.infer<ReturnType<typeof AreaLabelI18nSchema>>;
+
+export const DataSchema = (z: typeof zod) =>
   z
     .object({
       cluster_id: z.coerce.number(),
@@ -38,7 +52,6 @@ export const DataSchema = (z: typeof zod, labels: Map<number, CityLabel>) =>
       clusterCategory: data.cluster_category,
       growthRating: data.growth_rating,
       keyConcepts: data.key_concepts.split(",").map((id) => Number(id)),
-      cityLabel: labels.get(data.cluster_id)?.label ?? null,
     }));
 export type DataPoint = zod.infer<ReturnType<typeof DataSchema>>;
 

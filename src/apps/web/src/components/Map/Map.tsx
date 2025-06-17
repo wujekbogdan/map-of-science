@@ -2,14 +2,21 @@ import { ZoomTransform } from "d3";
 import { CSSProperties, useMemo, useRef, useState } from "react";
 import styled from "styled-components";
 import { useShallow } from "zustand/react/shallow";
-import { MapSvgRepresentation } from "../../../vite-plugin/svg-map-parser.ts";
-import { Concept, DataPoint as Point, YoutubeVideo } from "../../api/model";
+import {
+  AreaLabel,
+  AreaLabelI18n,
+  Concept,
+  DataPoint as Point,
+  YoutubeVideo,
+} from "../../api/model";
 import { useArticleStore, useStore } from "../../store.ts";
 import { useD3Zoom } from "../../useD3Zoom.ts";
 import { useLayersOpacity } from "../../useLayersOpacity.ts";
-import backgroundImage from "../map-background.svg";
 import { DataPoints } from "./DataPoints/DataPoints.tsx";
 import Label, { OnLabelClick } from "./Label.tsx";
+import mapSvg from "./map.svg";
+
+const LANG = "pl-PL"; // TODO: Make it dynamic based on the user language preference
 
 const filterDataByViewport = (
   dataPoints: Point[],
@@ -43,17 +50,12 @@ const filterDataByViewport = (
 };
 
 type Props = {
-  map: MapSvgRepresentation;
   size: {
     width: number;
     height: number;
   };
-  cityLabels: {
-    label: string;
-    clusterId: number;
-    x: number;
-    y: number;
-  }[];
+  labels: Map<string, AreaLabel>;
+  labelsI18n: Map<string, AreaLabelI18n>;
   dataPoints: Map<number, Point>;
   concepts: Map<number, Concept>;
   youtube: Map<string, YoutubeVideo[]>;
@@ -63,7 +65,7 @@ type Props = {
 };
 
 export default function Map(props: Props) {
-  const { map, cityLabels } = props;
+  const { labels } = props;
   const [
     scaleFactor,
     fontSize,
@@ -107,35 +109,6 @@ export default function Map(props: Props) {
   const transformValue = transform ? transform.toString() : "";
   const opacity = useLayersOpacity(zoom);
 
-  // TODO: move to the model and display labels conditionally in the JSX rather than rendering an empty text element
-  // https://github.com/users/wujekbogdan/projects/1/views/1?pane=issue&itemId=110651849
-  const replaceHash = (str: string) =>
-    str.startsWith("#") ? str.replace("#", "") : "";
-
-  const getLabelPropsByPath = (
-    path: (typeof map.layer1.children)[number]["path"],
-  ) => {
-    const { x, y } = path.boundingBox.center;
-
-    return {
-      key: path.id + path.label,
-      x: x,
-      y: y,
-      text: replaceHash(path.label),
-    };
-  };
-
-  const getLabelPropsByRect = (
-    rect: (typeof map.layer3.groups)[number]["children"][number]["rect"],
-  ) => {
-    return {
-      key: rect.id + rect.label,
-      x: rect.boundingBox.center.x,
-      y: rect.boundingBox.center.y,
-      text: replaceHash(rect.label),
-    };
-  };
-
   const scaleFontSize = (size: number) => {
     const baseScaleFactor = 1 / zoom;
     const factor = Math.sqrt(
@@ -154,55 +127,49 @@ export default function Map(props: Props) {
     layer4: scaleFontSize(fontSize.layer4),
   };
 
-  const cityLabelsScaled = useMemo(() => {
-    return cityLabels.map((label) => {
-      return {
-        key: label.clusterId.toString(),
-        x: label.x,
-        y: label.y,
-        text: label.label,
-        fontSize: scaledFontSize.layer4,
-        opacity: opacity.layer4,
-        level: 4,
-      } as const;
-    });
-  }, [cityLabels, scaledFontSize.layer4, opacity]);
-
-  const labels = [
-    ...map.layer1.children.map(
-      ({ path }) =>
-        ({
-          ...getLabelPropsByPath(path),
+  const labelsScaled = useMemo(() => {
+    return [...labels.values()].map((label) => {
+      const { fontSize, opacity: labelOpacity } = {
+        1: {
           fontSize: scaledFontSize.layer1,
           opacity: opacity.layer1,
-          level: 1,
-        }) as const,
-    ),
-    ...map.layer2.children.map(
-      ({ path }) =>
-        ({
-          ...getLabelPropsByPath(path),
+        },
+        2: {
           fontSize: scaledFontSize.layer2,
           opacity: opacity.layer2,
-          level: 2,
-        }) as const,
-    ),
-    ...map.layer3.groups.flatMap((group) =>
-      group.children.map(
-        ({ rect }) =>
-          ({
-            ...getLabelPropsByRect(rect),
-            fontSize: scaledFontSize.layer3,
-            opacity: opacity.layer3,
-            level: 3,
-          }) as const,
-      ),
-    ),
-    ...cityLabelsScaled,
-  ].map((label) => ({
-    ...label,
-    videos: props.youtube.get(label.text) ?? [],
-  }));
+        },
+        3: {
+          fontSize: scaledFontSize.layer3,
+          opacity: opacity.layer3,
+        },
+        4: {
+          fontSize: scaledFontSize.layer4,
+          opacity: opacity.layer4,
+        },
+      }[label.level];
+
+      return {
+        ...label,
+        key: label.id,
+        text: props.labelsI18n.get(label.id)?.[LANG] ?? label.id,
+        fontSize,
+        opacity: labelOpacity,
+        videos: props.youtube.get(label.id) ?? [],
+      };
+    });
+  }, [
+    labels,
+    opacity.layer1,
+    opacity.layer2,
+    opacity.layer3,
+    opacity.layer4,
+    props.labelsI18n,
+    props.youtube,
+    scaledFontSize.layer1,
+    scaledFontSize.layer2,
+    scaledFontSize.layer3,
+    scaledFontSize.layer4,
+  ]);
 
   const dataInViewport = useMemo(() => {
     return !transform
@@ -262,7 +229,7 @@ export default function Map(props: Props) {
     const bgY = transform.y + offset.y * transform.k - scaledHeight / 2;
 
     return {
-      backgroundImage: `url(${backgroundImage})`,
+      backgroundImage: `url(${mapSvg})`,
       backgroundRepeat: "no-repeat",
       backgroundSize: `${scaledWidth}px ${scaledHeight}px`,
       backgroundPosition: `${bgX}px ${bgY}px`,
@@ -289,7 +256,7 @@ export default function Map(props: Props) {
         </g>
 
         <g>
-          {labels.map((label) => (
+          {labelsScaled.map((label) => (
             <Label
               {...label}
               id={label.key}

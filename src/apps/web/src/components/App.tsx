@@ -2,7 +2,6 @@ import { useCallback } from "react";
 import styled from "styled-components";
 import useSWR from "swr";
 import { useShallow } from "zustand/react/shallow";
-import map from "../../asset/foreground.svg?parse";
 import { loadData } from "../api/worker.ts";
 import { config } from "../config.ts";
 import { i18n } from "../i18n.ts";
@@ -56,11 +55,11 @@ function App() {
            * undefined. It's just an issue with SWR typing. SWR doesn't narrow
            * the type of data based on the isLoading value.
            * */
-          cityLabels={data?.cityLabels ?? []}
+          labels={data?.labels ?? new Map()}
           dataPoints={data?.dataPoints ?? new Map()}
           concepts={data?.concepts ?? new Map()}
           youtube={data?.youtube ?? new Map()}
-          map={map}
+          labelsI18n={data?.labelsI18n ?? new Map()}
         />
       )}
 
