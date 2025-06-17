@@ -64,10 +64,13 @@ describe("schema", () => {
 
   describe("area_labels.tsv", () => {
     it("should parse labels area_labels.tsv", async () => {
-      const [firstItem] = await parse("labels.tsv", AreaLabelSchema(z));
+      const [firstItem] = await parse("area_labels.tsv", AreaLabelSchema(z));
       expect(firstItem).toEqual({
-        clusterId: 3988,
-        label: "Osobowość i różnice międzyosobnicze zwierząt",
+        id: "5ed40bc1-cf8f-5067-87df-2382b03048f4",
+        x: -8.441680160507701,
+        y: 31.819944878207195,
+        level: 1,
+        clusterId: null,
       });
     });
   });
