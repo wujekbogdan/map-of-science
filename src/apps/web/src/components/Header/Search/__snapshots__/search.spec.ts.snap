@@ -20,6 +20,7 @@ exports[`mapModel > should map and flatten the model 1`] = `
     "id": "path186",
     "label": "Symbole-bity-sygnały",
     "normalizedLabel": "symbole-bity-sygnaly",
+    "videosCount": 0,
   },
   {
     "boundingBox": {
@@ -39,6 +40,7 @@ exports[`mapModel > should map and flatten the model 1`] = `
     "id": "path187",
     "label": "Społeczeństwo",
     "normalizedLabel": "spoleczenstwo",
+    "videosCount": 0,
   },
   {
     "boundingBox": {
@@ -58,6 +60,7 @@ exports[`mapModel > should map and flatten the model 1`] = `
     "id": "path1",
     "label": "Komputery i komunikacja",
     "normalizedLabel": "komputery i komunikacja",
+    "videosCount": 0,
   },
   {
     "boundingBox": {
@@ -77,6 +80,7 @@ exports[`mapModel > should map and flatten the model 1`] = `
     "id": "path2",
     "label": "Bakterie i choroby zakaźne",
     "normalizedLabel": "bakterie i choroby zakazne",
+    "videosCount": 0,
   },
   {
     "boundingBox": {
@@ -96,6 +100,7 @@ exports[`mapModel > should map and flatten the model 1`] = `
     "id": "rect31",
     "label": "Urządzenia mechaniczne",
     "normalizedLabel": "urzadzenia mechaniczne",
+    "videosCount": 0,
   },
   {
     "boundingBox": {
@@ -115,6 +120,7 @@ exports[`mapModel > should map and flatten the model 1`] = `
     "id": "rect27",
     "label": "Robotyka",
     "normalizedLabel": "robotyka",
+    "videosCount": 0,
   },
   {
     "boundingBox": {
@@ -134,6 +140,7 @@ exports[`mapModel > should map and flatten the model 1`] = `
     "id": "rect32",
     "label": "Asfalt",
     "normalizedLabel": "asfalt",
+    "videosCount": 0,
   },
 ]
 `;

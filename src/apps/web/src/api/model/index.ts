@@ -41,3 +41,33 @@ export const DataSchema = (z: typeof zod, labels: Map<number, CityLabel>) =>
       cityLabel: labels.get(data.cluster_id)?.label ?? null,
     }));
 export type DataPoint = zod.infer<ReturnType<typeof DataSchema>>;
+
+export const YoutubeVideoSchema = (z: typeof zod) =>
+  z
+    .object({
+      video_id: z.string(),
+      video_title: z.string(),
+      date: z.string().datetime(),
+      segment_number: z.string(),
+      segment_timestamp: z.string(),
+      segment_url: z.string().url(),
+      segment_topic: z.string(),
+      reference: z.string(),
+      article_link: z.string().url(),
+      segment_name: z.string(),
+      classification: z.string(),
+    })
+    .transform((data) => ({
+      videoId: data.video_id,
+      videoTitle: data.video_title,
+      date: data.date,
+      segmentNumber: parseInt(data.segment_number.replace(")", "").trim(), 10),
+      segmentTimestamp: data.segment_timestamp,
+      segmentUrl: data.segment_url,
+      segmentTopic: data.segment_topic,
+      reference: data.reference,
+      articleLink: data.article_link,
+      segmentName: data.segment_name,
+      labelIds: data.classification.split("|"),
+    }));
+export type YoutubeVideo = zod.infer<ReturnType<typeof YoutubeVideoSchema>>;

@@ -10,6 +10,7 @@ type Props = {
   tokens?: Token[];
   type: "query" | "label" | "point";
   children?: ReactNode;
+  videosCount?: number;
 };
 
 const Label = ({ tokens, type, children }: Props) => {

@@ -12,16 +12,23 @@ const worker = new ComlinkWorker<typeof import("./search.ts")>(
 );
 
 export const Search = () => {
-  const [setDesiredZoom, setPointsToHighlight, mapSize, dataPoints, concepts] =
-    useStore(
-      useShallow((s) => [
-        s.setDesiredZoom,
-        s.setPointsToHighlight,
-        s.mapSize,
-        s.dataPoints,
-        s.concepts,
-      ]),
-    );
+  const [
+    setDesiredZoom,
+    setPointsToHighlight,
+    mapSize,
+    dataPoints,
+    concepts,
+    youtube,
+  ] = useStore(
+    useShallow((s) => [
+      s.setDesiredZoom,
+      s.setPointsToHighlight,
+      s.mapSize,
+      s.dataPoints,
+      s.concepts,
+      s.youtubeVideos,
+    ]),
+  );
   const [searchTerm, setSearchTerm] = useState("");
 
   const { data: results, isLoading } = useSWR(
@@ -33,15 +40,15 @@ export const Search = () => {
           points: [],
         };
 
-      const result = worker.search(
+      return worker.search(
         {
           map,
           dataPoints,
           concepts,
+          youtube,
         },
         query,
       );
-      return result;
     },
   );
 
@@ -105,12 +112,13 @@ export const Search = () => {
   };
 
   const dropdownOptions = [
-    ...labels.map(({ id, label, boundingBox }) => ({
+    ...labels.map(({ id, label, boundingBox, videosCount }) => ({
       type: "label" as const,
       id,
       label,
       keyword: label,
       boundingBox,
+      videosCount,
     })),
     ...points.map(({ id, name, clusters }) => {
       // TODO: Consider moving cords to the model, but getting cords here is more efficient
@@ -171,6 +179,10 @@ export const Search = () => {
     }
   };
 
+  const onReset = () => {
+    setPointsToHighlight([]);
+  };
+
   return (
     <Form
       onSubmit={(e) => {
@@ -182,6 +194,7 @@ export const Search = () => {
         options={dropdownOptions}
         onInput={onInput}
         onSelect={onSelectionChange}
+        onReset={onReset}
       />
     </Form>
   );
