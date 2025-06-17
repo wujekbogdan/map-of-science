@@ -11,7 +11,7 @@ import { useWindowSize } from "../useWindowSize.ts";
 import { Article } from "./Article/Article.tsx";
 import { DevTool } from "./DevTool.tsx";
 import { Header } from "./Header/Header.tsx";
-import MapComponent from "./Map";
+import MapComponent from "./Map/Map.tsx";
 
 const Loader = () => {
   return <LoadingWrapper>{i18n("Ładowanie danych...")}</LoadingWrapper>;

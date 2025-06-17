@@ -2,57 +2,14 @@ import { ZoomTransform } from "d3";
 import { CSSProperties, useMemo, useRef, useState } from "react";
 import styled from "styled-components";
 import { useShallow } from "zustand/react/shallow";
-import { MapSvgRepresentation } from "../../vite-plugin/svg-map-parser.ts";
-import { Concept, DataPoint as Point, YoutubeVideo } from "../api/model";
-import { useArticleStore, useStore } from "../store";
-import { useD3Zoom } from "../useD3Zoom.ts";
-import { useLayersOpacity } from "../useLayersOpacity.ts";
+import { MapSvgRepresentation } from "../../../vite-plugin/svg-map-parser.ts";
+import { Concept, DataPoint as Point, YoutubeVideo } from "../../api/model";
+import { useArticleStore, useStore } from "../../store.ts";
+import { useD3Zoom } from "../../useD3Zoom.ts";
+import { useLayersOpacity } from "../../useLayersOpacity.ts";
+import backgroundImage from "../map-background.svg";
 import { DataPoints } from "./DataPoints/DataPoints.tsx";
-import backgroundImage from "./map-background.svg";
-import "./map.css";
-
-type Label = {
-  id: string;
-  x: number;
-  y: number;
-  text: string;
-  fontSize: number;
-  opacity: number;
-  level: 1 | 2 | 3 | 4;
-  videos: YoutubeVideo[];
-  onClick?: OnLabelClick;
-};
-
-type OnLabelClick = (label: Pick<Label, "text" | "x" | "y" | "videos">) => void;
-
-const Label = (props: Label) => {
-  const onClick = props.onClick
-    ? () => {
-        props.onClick?.({
-          text: props.text,
-          x: props.x,
-          y: props.y,
-          videos: props.videos,
-        });
-      }
-    : undefined;
-
-  return (
-    <LabelText
-      display={props.opacity ? "block" : "none"}
-      textAnchor="middle"
-      alignmentBaseline="middle"
-      x={props.x}
-      y={props.y}
-      $fontSize={props.fontSize}
-      $opacity={props.opacity}
-      $level={props.level}
-      onClick={onClick}
-    >
-      {props.text}
-    </LabelText>
-  );
-};
+import Label, { OnLabelClick } from "./Label.tsx";
 
 const filterDataByViewport = (
   dataPoints: Point[],
@@ -247,21 +204,23 @@ export default function Map(props: Props) {
     videos: props.youtube.get(label.text) ?? [],
   }));
 
-  const dataInViewport = !transform
-    ? []
-    : filterDataByViewport(
-        [...props.dataPoints.values()],
-        transform,
-        maxDataPointsInViewport,
-        props.size,
-      );
+  const dataInViewport = useMemo(() => {
+    return !transform
+      ? []
+      : filterDataByViewport(
+          [...props.dataPoints.values()],
+          transform,
+          maxDataPointsInViewport,
+          props.size,
+        );
+  }, [maxDataPointsInViewport, props.dataPoints, props.size, transform]);
 
-  const HighlightedPoints = useMemo(() => {
+  const highlightedPoints = useMemo(() => {
     const pointsToHighlight = clustersToHighlight
       .map((id) => props.dataPoints.get(id))
       .filter((point) => point !== undefined);
 
-    const inViewport = !transform
+    return !transform
       ? []
       : filterDataByViewport(
           pointsToHighlight,
@@ -269,21 +228,7 @@ export default function Map(props: Props) {
           Infinity,
           props.size,
         );
-
-    return (
-      <DataPoints
-        points={inViewport}
-        forcedSize={true}
-        concepts={props.concepts}
-      />
-    );
-  }, [
-    clustersToHighlight,
-    transform,
-    props.size,
-    props.concepts,
-    props.dataPoints,
-  ]);
+  }, [clustersToHighlight, transform, props.size, props.dataPoints]);
 
   const backgroundStyles = useMemo(() => {
     if (!transform) {
@@ -326,18 +271,21 @@ export default function Map(props: Props) {
 
   return (
     <MapSvg
+      ref={svgRoot}
       style={backgroundStyles}
       $visibility={mapVisibility}
-      ref={svgRoot}
+      $zoom={zoom}
       width={props.size.width}
       height={props.size.height}
-      $zoom={zoom}
     >
       <g transform={transformValue} opacity={opacity.layer1}>
         <g>
           <DataPoints points={dataInViewport} concepts={props.concepts} />
-
-          {HighlightedPoints}
+          <DataPoints
+            points={highlightedPoints}
+            forcedSize={true}
+            concepts={props.concepts}
+          />
         </g>
 
         <g>
@@ -368,49 +316,24 @@ const MapSvg = styled.svg.attrs<{
 }))`
   visibility: ${(props) => props.$visibility};
   display: block;
-`;
 
-const labelFillColor = ($level: 1 | 2 | 3 | 4) => {
-  switch ($level) {
-    case 1:
-      return "rgb(153, 91, 153)";
-    case 2:
-      return "rgb(57, 57, 57)";
-    case 3:
-      return "rgb(101, 91, 153)";
-    default:
-      return "inherit";
+  .fil0 {
+    fill: #4b9232;
   }
-};
 
-const LabelText = styled.text.attrs<{
-  $fontSize: number;
-  $opacity: number;
-}>((props) => ({
-  style: {
-    fontSize: `${props.$fontSize.toString()}px`,
-    opacity: props.$opacity,
-  },
-}))<{
-  $level: 1 | 2 | 3 | 4;
-}>`
-  cursor: pointer;
-  font-weight: bold;
-  // TODO: It can be, very likely, replaced with a simplified text-shadow
-  text-shadow:
-    0 0 1px #f2efe9,
-    0 0 2px #f2efe9,
-    0 0 5px #f2efe9,
-    0 0 5px #f2efe9,
-    0 0 5px #f2efe9,
-    0 0 5px #f2efe9,
-    0 0 5px #f2efe9,
-    0 0 5px #f2efe9,
-    0 0 5px #f2efe9,
-    0 0 5px #f2efe9;
-  fill: ${(props) => labelFillColor(props.$level)};
+  .fil4 {
+    fill: #5aa53d;
+  }
 
-  &:hover {
-    fill: #4a90e2;
+  .fil1 {
+    fill: #7dbc62;
+  }
+
+  .fil2 {
+    fill: #a3c796;
+  }
+
+  .fil3 {
+    fill: #d6ebce;
   }
 `;
