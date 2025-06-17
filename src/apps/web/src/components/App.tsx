@@ -17,19 +17,30 @@ const Loader = () => {
 };
 
 function App() {
-  const [setMapSize, setDataPoints, setConcepts, setYoutubeVideos] = useStore(
+  const [
+    setMapSize,
+    setDataPoints,
+    setConcepts,
+    setYoutubeVideos,
+    setLabels,
+    setLabelsI18n,
+  ] = useStore(
     useShallow((s) => [
       s.setMapSize,
       s.setDataPoints,
       s.setConcepts,
       s.setYoutubeVideos,
+      s.setLabels,
+      s.setLabelsI18n,
     ]),
   );
   const { data, isLoading } = useSWR("data", loadData, {
-    onSuccess: ({ dataPoints, concepts, youtube }) => {
+    onSuccess: ({ dataPoints, concepts, youtube, labels, labelsI18n }) => {
       setDataPoints(dataPoints);
       setConcepts(concepts);
       setYoutubeVideos(youtube);
+      setLabels(labels);
+      setLabelsI18n(labelsI18n);
     },
   });
 

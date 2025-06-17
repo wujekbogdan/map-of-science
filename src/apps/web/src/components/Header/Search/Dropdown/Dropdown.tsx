@@ -29,7 +29,9 @@ type OptionBase = {
 export type Option =
   | (OptionBase & {
       type: "label";
-      boundingBox: BoundingBox;
+      level: 1 | 2 | 3 | 4;
+      x: number;
+      y: number;
       videosCount: number;
     })
   | (OptionBase & {
