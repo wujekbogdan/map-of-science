@@ -1,5 +1,22 @@
 # @map-of-science/web
 
+## 1.15.0
+
+### Minor Changes
+
+- 9000df8: Replace the old manually edited `foreground.svg` with a new SVG generated based on cluster data produced by an experimental Canvas map renderer. See:: https://github.com/wujekbogdan/map-of-science/pull/73
+
+  The old `foreground.svg` image is still being used, but only as a source of label information.
+
+- 8a327cc: Add the ability to select all data points that match the search query.
+- d82eaab: Assign "Czytamy Naturę" YouTube videos to map labels.
+
+### Patch Changes
+
+- 96139e3: Fix a bug causing search results not to be unique.
+- 74fd765: Move `typescript-plugin-css-modules` to the root `tsconfig.json` since plugins in referenced configs are not applied.
+- 77f1557: Add `eslint` dependency explicitly due to the recently introduced `autoInstallPeers: false` setting in pnpm.
+
 ## 1.14.0
 
 ### Minor Changes
