@@ -38,9 +38,9 @@ type ShapeOptions = {
   forcedSize: boolean;
   mode: Mode;
   growthRatingColors: {
-    start: [number, number, number];
-    middle: [number, number, number];
-    end: [number, number, number];
+    start: RGB;
+    middle: RGB;
+    end: RGB;
   };
 };
 
@@ -48,21 +48,30 @@ const classes = (classList: string[]) => classList.join(" ");
 
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
-const interpolateColor = (c1: number[], c2: number[], t: number) =>
-  c1.map((v, i) => Math.round(lerp(v, c2[i], t)));
+const interpolateColor = (c1: RGB, c2: RGB, t: number): RGB => ({
+  r: Math.round(lerp(c1.r, c2.r, t)),
+  g: Math.round(lerp(c1.g, c2.g, t)),
+  b: Math.round(lerp(c1.b, c2.b, t)),
+});
+
+type RGB = { r: number; g: number; b: number };
 
 const getGradientColor = (
-  value: number,
-  start: number[],
-  middle: number[],
-  end: number[],
+  growthRating: number,
+  colors: {
+    start: RGB;
+    middle: RGB;
+    end: RGB;
+  },
 ) => {
-  const t = value / 100;
+  const t = growthRating / 100;
   const [from, to, localT] =
-    t < 0.5 ? [start, middle, t * 2] : [middle, end, (t - 0.5) * 2];
+    t < 0.5
+      ? [colors.start, colors.middle, t * 2]
+      : [colors.middle, colors.end, (t - 0.5) * 2];
 
-  const color = interpolateColor(from, to, localT);
-  return `rgb(${color.join(",")})`;
+  const rgb = interpolateColor(from, to, localT);
+  return `rgb(${rgb.r},${rgb.g},${rgb.b})`;
 };
 
 const Shape = (options: ShapeOptions) => {
@@ -84,13 +93,9 @@ const Shape = (options: ShapeOptions) => {
       ]
     : [css.circle, colorClass, css[`level-${level.toString()}`]];
 
-  const start = growthRatingColors.start;
-  const middle = growthRatingColors.middle;
-  const end = growthRatingColors.end;
-
   const style =
     mode === "growth"
-      ? { fill: getGradientColor(point.growthRating, start, middle, end) }
+      ? { fill: getGradientColor(point.growthRating, growthRatingColors) }
       : undefined;
   return <circle className={classes(classList)} cx={x} cy={y} style={style} />;
 };

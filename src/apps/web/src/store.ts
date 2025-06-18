@@ -20,18 +20,34 @@ type Size = {
   height: number;
 };
 
-type Color = [number, number, number];
+type RGB = {
+  r: number;
+  g: number;
+  b: number;
+};
 type Colors = {
-  start: Color;
-  middle: Color;
-  end: Color;
+  start: RGB;
+  middle: RGB;
+  end: RGB;
 };
 
 const partialDefaults = {
   growthRatingColors: {
-    start: [24, 100, 171] as Color,
-    middle: [255, 255, 255] as Color,
-    end: [201, 42, 42] as Color,
+    start: {
+      r: 24,
+      g: 100,
+      b: 171,
+    },
+    middle: {
+      r: 255,
+      g: 255,
+      b: 255,
+    },
+    end: {
+      r: 201,
+      g: 42,
+      b: 42,
+    },
   },
   dataPoints: new Map<number, DataPoint>(),
   concepts: new Map<number, Concept>(),

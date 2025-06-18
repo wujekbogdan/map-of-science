@@ -4,6 +4,12 @@ import { useShallow } from "zustand/react/shallow";
 import { i18n } from "../i18n.ts";
 import { useStore } from "../store.ts";
 
+type RGB = {
+  r: number;
+  g: number;
+  b: number;
+};
+
 const hexToRgb = (hex: string) => {
   hex = hex
     .replace(/^#/, "")
@@ -18,7 +24,8 @@ const hexToRgb = (hex: string) => {
   };
 };
 
-const rgbToHex = (r: number, g: number, b: number) => {
+const rgbToHex = (color: RGB) => {
+  const { r, g, b } = color;
   return "#" + [r, g, b].map((x) => x.toString(16).padStart(2, "0")).join("");
 };
 
@@ -70,21 +77,9 @@ export const DevTool = () => {
   };
 
   const colorInputValues = {
-    start: rgbToHex(
-      growthRatingColors.start[0],
-      growthRatingColors.start[1],
-      growthRatingColors.start[2],
-    ),
-    middle: rgbToHex(
-      growthRatingColors.middle[0],
-      growthRatingColors.middle[1],
-      growthRatingColors.middle[2],
-    ),
-    end: rgbToHex(
-      growthRatingColors.end[0],
-      growthRatingColors.end[1],
-      growthRatingColors.end[2],
-    ),
+    start: rgbToHex(growthRatingColors.start),
+    middle: rgbToHex(growthRatingColors.middle),
+    end: rgbToHex(growthRatingColors.end),
   };
 
   const setGrowthRatingColor = (
