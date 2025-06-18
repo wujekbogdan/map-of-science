@@ -29,9 +29,9 @@ type Colors = {
 
 const partialDefaults = {
   growthRatingColors: {
-    start: [0, 0, 255] as Color,
+    start: [24, 100, 171] as Color,
     middle: [255, 255, 255] as Color,
-    end: [255, 0, 0] as Color,
+    end: [201, 42, 42] as Color,
   },
   dataPoints: new Map<number, DataPoint>(),
   concepts: new Map<number, Concept>(),
