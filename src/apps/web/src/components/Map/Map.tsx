@@ -1,6 +1,7 @@
 import { ZoomTransform } from "d3";
 import { CSSProperties, useMemo, useRef, useState } from "react";
 import styled from "styled-components";
+import useSWR from "swr";
 import { useShallow } from "zustand/react/shallow";
 import {
   AreaLabel,
@@ -15,7 +16,10 @@ import { useD3Zoom } from "../../useD3Zoom.ts";
 import { useLayersOpacity } from "../../useLayersOpacity.ts";
 import { DataPoints } from "./DataPoints/DataPoints.tsx";
 import Label, { OnLabelClick } from "./Label.tsx";
-import mapSvg from "./map.svg";
+
+const fetchMapSvg = async () => {
+  return (await import("./map.svg")).default;
+};
 
 const filterDataByViewport = (
   dataPoints: Point[],
@@ -93,6 +97,8 @@ export default function Map(props: Props) {
   const [mapVisibility, setMapVisibility] = useState<"visible" | "hidden">(
     "hidden",
   );
+  const { data: mapSvgUrl } = useSWR("map-svg", fetchMapSvg);
+
   const { transform, zoom } = useD3Zoom({
     svg: svgRoot,
     initialZoom: {
@@ -196,8 +202,8 @@ export default function Map(props: Props) {
         );
   }, [clustersToHighlight, transform, props.size, props.dataPoints]);
 
-  const backgroundStyles = useMemo(() => {
-    if (!transform) {
+  const mapSvgBackgroundCss = useMemo(() => {
+    if (!transform || !mapSvgUrl) {
       return {};
     }
 
@@ -227,17 +233,17 @@ export default function Map(props: Props) {
     const bgY = transform.y + offset.y * transform.k - scaledHeight / 2;
 
     return {
-      backgroundImage: `url(${mapSvg})`,
+      backgroundImage: `url(${mapSvgUrl})`,
       backgroundRepeat: "no-repeat",
       backgroundSize: `${scaledWidth}px ${scaledHeight}px`,
       backgroundPosition: `${bgX}px ${bgY}px`,
     };
-  }, [transform, svgOffset, svgScaleFactor]);
+  }, [transform, svgOffset, svgScaleFactor, mapSvgUrl]);
 
   return (
     <MapSvg
       ref={svgRoot}
-      style={backgroundStyles}
+      style={mapSvgBackgroundCss}
       $visibility={mapVisibility}
       $zoom={zoom}
       width={props.size.width}
