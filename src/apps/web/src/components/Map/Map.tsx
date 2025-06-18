@@ -18,7 +18,14 @@ import { DataPoints } from "./DataPoints/DataPoints.tsx";
 import Label, { OnLabelClick } from "./Label.tsx";
 
 const fetchMapSvg = async () => {
-  return (await import("./map.svg")).default;
+  // At this point only the URL is resolved, the SVG is not yet loaded.
+  const url = (await import("./map.svg")).default;
+
+  // We need to ensure that the SVG is loaded before we return the URL.
+  const img = new Image();
+  img.src = url;
+  await img.decode();
+  return url;
 };
 
 const filterDataByViewport = (
