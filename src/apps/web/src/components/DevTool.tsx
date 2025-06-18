@@ -4,6 +4,24 @@ import { useShallow } from "zustand/react/shallow";
 import { i18n } from "../i18n.ts";
 import { useStore } from "../store.ts";
 
+const hexToRgb = (hex: string) => {
+  hex = hex
+    .replace(/^#/, "")
+    .split("")
+    .map((x) => x + x)
+    .join("");
+  const num = parseInt(hex, 16);
+  return {
+    r: (num >> 16) & 255,
+    g: (num >> 8) & 255,
+    b: num & 255,
+  };
+};
+
+const rgbToHex = (r: number, g: number, b: number) => {
+  return "#" + [r, g, b].map((x) => x.toString(16).padStart(2, "0")).join("");
+};
+
 export const DevTool = () => {
   const [visibility, setVisibility] = useState<"collapsed" | "expanded">(
     "collapsed",
@@ -23,6 +41,8 @@ export const DevTool = () => {
     svgOffset,
     setSvgOffset,
     setSvgScaleFactor,
+    growthRatingColors,
+    setGrowthRatingColors,
   ] = useStore(
     useShallow((state) => [
       state.currentZoom?.scale.toFixed(2) ?? 1,
@@ -38,6 +58,8 @@ export const DevTool = () => {
       state.temp__svgOffset,
       state.temp__setSvgOffset,
       state.temp__setSvgScaleFactor,
+      state.growthRatingColors,
+      state.setGrowthRatingColors,
     ]),
   );
   const layers = ["layer1", "layer2", "layer3", "layer4"] as const;
@@ -45,6 +67,35 @@ export const DevTool = () => {
 
   const onMinimizeClick = () => {
     setVisibility(visibility === "expanded" ? "collapsed" : "expanded");
+  };
+
+  const colorInputValues = {
+    start: rgbToHex(
+      growthRatingColors.start[0],
+      growthRatingColors.start[1],
+      growthRatingColors.start[2],
+    ),
+    middle: rgbToHex(
+      growthRatingColors.middle[0],
+      growthRatingColors.middle[1],
+      growthRatingColors.middle[2],
+    ),
+    end: rgbToHex(
+      growthRatingColors.end[0],
+      growthRatingColors.end[1],
+      growthRatingColors.end[2],
+    ),
+  };
+
+  const setGrowthRatingColor = (
+    color: keyof typeof colorInputValues,
+    value: string,
+  ) => {
+    const rgb = hexToRgb(value);
+    setGrowthRatingColors({
+      ...growthRatingColors,
+      [color]: [rgb.r, rgb.g, rgb.b],
+    });
   };
 
   return (
@@ -185,6 +236,49 @@ export const DevTool = () => {
                       ...svgOffset,
                       y: Number(e.target.value),
                     });
+                  }}
+                />
+              </FormControl>
+            </P>
+          </Panel>
+
+          <Panel>
+            <Header>{i18n("Growth mode colors")}</Header>
+            <P>
+              <FormControl>
+                <Label>{i18n("Start")}</Label>
+                <Input
+                  type="color"
+                  value={colorInputValues.start}
+                  onInput={(e) => {
+                    e.preventDefault();
+                    setGrowthRatingColor("start", e.currentTarget.value);
+                  }}
+                />
+              </FormControl>
+            </P>
+            <P>
+              <FormControl>
+                <Label>{i18n("Mid")}</Label>
+                <Input
+                  type="color"
+                  value={colorInputValues.middle}
+                  onInput={(e) => {
+                    e.preventDefault();
+                    setGrowthRatingColor("middle", e.currentTarget.value);
+                  }}
+                />
+              </FormControl>
+            </P>
+            <P>
+              <FormControl>
+                <Label>{i18n("End")}</Label>
+                <Input
+                  type="color"
+                  value={colorInputValues.end}
+                  onInput={(e) => {
+                    e.preventDefault();
+                    setGrowthRatingColor("end", e.currentTarget.value);
                   }}
                 />
               </FormControl>

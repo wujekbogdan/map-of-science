@@ -9,8 +9,9 @@ import {
 } from "@floating-ui/react";
 import { useState } from "react";
 import { createPortal } from "react-dom";
+import { useShallow } from "zustand/react/shallow";
 import { Concept, DataPoint as Point } from "../../../api/model";
-import { useArticleStore } from "../../../store.ts";
+import { useArticleStore, useStore } from "../../../store.ts";
 import { DataPointDetails } from "./DataPointDetails.tsx";
 import css from "./DataPoints.module.scss";
 
@@ -36,6 +37,11 @@ type ShapeOptions = {
   point: Point;
   forcedSize: boolean;
   mode: Mode;
+  growthRatingColors: {
+    start: [number, number, number];
+    middle: [number, number, number];
+    end: [number, number, number];
+  };
 };
 
 const classes = (classList: string[]) => classList.join(" ");
@@ -60,7 +66,7 @@ const getGradientColor = (
 };
 
 const Shape = (options: ShapeOptions) => {
-  const { point, forcedSize, mode } = options;
+  const { point, forcedSize, mode, growthRatingColors } = options;
   const { x, y } = point;
   const config = configByThreshold.find(
     ({ min }) => point.numRecentArticles >= min,
@@ -78,9 +84,9 @@ const Shape = (options: ShapeOptions) => {
       ]
     : [css.circle, colorClass, css[`level-${level.toString()}`]];
 
-  const start = [0, 0, 255];
-  const middle = [255, 255, 255];
-  const end = [255, 0, 0];
+  const start = growthRatingColors.start;
+  const middle = growthRatingColors.middle;
+  const end = growthRatingColors.end;
 
   const style =
     mode === "growth"
@@ -90,6 +96,9 @@ const Shape = (options: ShapeOptions) => {
 };
 
 export const DataPoints = ({ points, concepts, forcedSize, mode }: Props) => {
+  const [growthRatingColors] = useStore(
+    useShallow((state) => [state.growthRatingColors]),
+  );
   const setRemoteArticleId = useArticleStore(
     ({ setRemoteArticleId }) => setRemoteArticleId,
   );
@@ -142,7 +151,12 @@ export const DataPoints = ({ points, concepts, forcedSize, mode }: Props) => {
               ? getReferenceProps()
               : {})}
           >
-            <Shape point={point} forcedSize={!!forcedSize} mode={mode} />
+            <Shape
+              point={point}
+              forcedSize={!!forcedSize}
+              mode={mode}
+              growthRatingColors={growthRatingColors}
+            />
           </g>
         );
       })}
