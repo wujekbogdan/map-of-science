@@ -3,7 +3,7 @@ import { fileURLToPath } from "node:url";
 import { z } from "zod";
 import { ZodSchema } from "zod";
 import { describe, it, expect } from "@map-of-science/vitest";
-import { DataSchema, ConceptSchema, CityLabelSchema } from ".";
+import { DataSchema, ConceptSchema, AreaLabelSchema } from ".";
 import { setCollector } from "../../csv/collector.ts";
 import { parse as csvParse } from "../../csv/parse.ts";
 
@@ -27,14 +27,7 @@ const parse = async (name: string, schema: ZodSchema) => {
 describe("schema", () => {
   describe("data.tsv", () => {
     it("should parse data.tsv with labels, including a null label case", async () => {
-      const labels = new Map<number, { clusterId: number; label: string }>([
-        [84872, { clusterId: 84872, label: "Tech Innovations" }],
-      ]);
-
-      const [withLabel, withoutLabel] = await parse(
-        "data.tsv",
-        DataSchema(z, labels),
-      );
+      const [withLabel, withoutLabel] = await parse("data.tsv", DataSchema(z));
 
       expect([withLabel, withoutLabel]).toEqual([
         {
@@ -45,7 +38,6 @@ describe("schema", () => {
           clusterCategory: 5,
           growthRating: 15.43,
           keyConcepts: [198432, 37537, 12177, 43800, 43431],
-          cityLabel: "Tech Innovations",
         },
         {
           clusterId: 72062,
@@ -55,7 +47,6 @@ describe("schema", () => {
           clusterCategory: 5,
           growthRating: 3.22,
           keyConcepts: [40293, 71377, 120209, 90737, 67314],
-          cityLabel: null,
         },
       ]);
     });
@@ -71,12 +62,15 @@ describe("schema", () => {
     });
   });
 
-  describe("labels.tsv", () => {
-    it("should parse labels labels.tsv", async () => {
-      const [firstItem] = await parse("labels.tsv", CityLabelSchema(z));
+  describe("area_labels.tsv", () => {
+    it("should parse labels area_labels.tsv", async () => {
+      const [firstItem] = await parse("area_labels.tsv", AreaLabelSchema(z));
       expect(firstItem).toEqual({
-        clusterId: 3988,
-        label: "Osobowość i różnice międzyosobnicze zwierząt",
+        id: "5ed40bc1-cf8f-5067-87df-2382b03048f4",
+        x: -8.441680160507701,
+        y: 31.819944878207195,
+        level: 1,
+        clusterId: null,
       });
     });
   });

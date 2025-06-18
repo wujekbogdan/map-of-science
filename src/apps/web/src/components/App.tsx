@@ -2,7 +2,6 @@ import { useCallback } from "react";
 import styled from "styled-components";
 import useSWR from "swr";
 import { useShallow } from "zustand/react/shallow";
-import map from "../../asset/foreground.svg?parse";
 import { loadData } from "../api/worker.ts";
 import { config } from "../config.ts";
 import { i18n } from "../i18n.ts";
@@ -11,26 +10,37 @@ import { useWindowSize } from "../useWindowSize.ts";
 import { Article } from "./Article/Article.tsx";
 import { DevTool } from "./DevTool.tsx";
 import { Header } from "./Header/Header.tsx";
-import MapComponent from "./Map";
+import MapComponent from "./Map/Map.tsx";
 
 const Loader = () => {
   return <LoadingWrapper>{i18n("Ładowanie danych...")}</LoadingWrapper>;
 };
 
 function App() {
-  const [setMapSize, setDataPoints, setConcepts, setYoutubeVideos] = useStore(
+  const [
+    setMapSize,
+    setDataPoints,
+    setConcepts,
+    setYoutubeVideos,
+    setLabels,
+    setLabelsI18n,
+  ] = useStore(
     useShallow((s) => [
       s.setMapSize,
       s.setDataPoints,
       s.setConcepts,
       s.setYoutubeVideos,
+      s.setLabels,
+      s.setLabelsI18n,
     ]),
   );
   const { data, isLoading } = useSWR("data", loadData, {
-    onSuccess: ({ dataPoints, concepts, youtube }) => {
+    onSuccess: ({ dataPoints, concepts, youtube, labels, labelsI18n }) => {
       setDataPoints(dataPoints);
       setConcepts(concepts);
       setYoutubeVideos(youtube);
+      setLabels(labels);
+      setLabelsI18n(labelsI18n);
     },
   });
 
@@ -56,11 +66,11 @@ function App() {
            * undefined. It's just an issue with SWR typing. SWR doesn't narrow
            * the type of data based on the isLoading value.
            * */
-          cityLabels={data?.cityLabels ?? []}
+          labels={data?.labels ?? new Map()}
           dataPoints={data?.dataPoints ?? new Map()}
           concepts={data?.concepts ?? new Map()}
           youtube={data?.youtube ?? new Map()}
-          map={map}
+          labelsI18n={data?.labelsI18n ?? new Map()}
         />
       )}
 

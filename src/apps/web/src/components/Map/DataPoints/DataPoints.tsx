@@ -9,8 +9,8 @@ import {
 } from "@floating-ui/react";
 import { useState } from "react";
 import { createPortal } from "react-dom";
-import { Concept, DataPoint as Point } from "../../api/model";
-import { useArticleStore } from "../../store.ts";
+import { Concept, DataPoint as Point } from "../../../api/model";
+import { useArticleStore } from "../../../store.ts";
 import { DataPointDetails } from "./DataPointDetails.tsx";
 import css from "./DataPoints.module.scss";
 

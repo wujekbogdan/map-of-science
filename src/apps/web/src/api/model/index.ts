@@ -7,19 +7,33 @@ export const ConceptSchema = (z: typeof zod) =>
   });
 export type Concept = zod.infer<ReturnType<typeof ConceptSchema>>;
 
-export const CityLabelSchema = (z: typeof zod) =>
+export const AreaLabelSchema = (z: typeof zod) =>
   z
     .object({
-      cluster_id: z.coerce.number(),
-      label: z.string(),
+      id: z.string(),
+      x: z.coerce.number(),
+      y: z.coerce.number(),
+      level: z.preprocess(
+        (val) => Number(val),
+        z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4)]),
+      ),
+      cluster_id: z.union([z.literal("null"), z.string()]),
     })
-    .transform((data) => ({
-      clusterId: data.cluster_id,
-      label: data.label,
+    .transform(({ cluster_id, ...rest }) => ({
+      ...rest,
+      clusterId: cluster_id === "null" ? null : parseInt(cluster_id, 10),
     }));
-export type CityLabel = zod.infer<ReturnType<typeof CityLabelSchema>>;
+export type AreaLabel = zod.infer<ReturnType<typeof AreaLabelSchema>>;
 
-export const DataSchema = (z: typeof zod, labels: Map<number, CityLabel>) =>
+export const AreaLabelI18nSchema = (z: typeof zod) =>
+  z.object({
+    id: z.string(),
+    "pl-PL": z.string(),
+    "en-US": z.string(),
+  });
+export type AreaLabelI18n = zod.infer<ReturnType<typeof AreaLabelI18nSchema>>;
+
+export const DataSchema = (z: typeof zod) =>
   z
     .object({
       cluster_id: z.coerce.number(),
@@ -38,7 +52,6 @@ export const DataSchema = (z: typeof zod, labels: Map<number, CityLabel>) =>
       clusterCategory: data.cluster_category,
       growthRating: data.growth_rating,
       keyConcepts: data.key_concepts.split(",").map((id) => Number(id)),
-      cityLabel: labels.get(data.cluster_id)?.label ?? null,
     }));
 export type DataPoint = zod.infer<ReturnType<typeof DataSchema>>;
 
@@ -48,12 +61,7 @@ export const YoutubeVideoSchema = (z: typeof zod) =>
       video_id: z.string(),
       video_title: z.string(),
       date: z.string().datetime(),
-      segment_number: z.string(),
-      segment_timestamp: z.string(),
       segment_url: z.string().url(),
-      segment_topic: z.string(),
-      reference: z.string(),
-      article_link: z.string().url(),
       segment_name: z.string(),
       classification: z.string(),
     })
@@ -61,12 +69,7 @@ export const YoutubeVideoSchema = (z: typeof zod) =>
       videoId: data.video_id,
       videoTitle: data.video_title,
       date: data.date,
-      segmentNumber: parseInt(data.segment_number.replace(")", "").trim(), 10),
-      segmentTimestamp: data.segment_timestamp,
       segmentUrl: data.segment_url,
-      segmentTopic: data.segment_topic,
-      reference: data.reference,
-      articleLink: data.article_link,
       segmentName: data.segment_name,
       labelIds: data.classification.split("|"),
     }));

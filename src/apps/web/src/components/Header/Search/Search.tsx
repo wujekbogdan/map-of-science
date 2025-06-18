@@ -3,7 +3,6 @@ import { useState, useMemo } from "react";
 import styled from "styled-components";
 import useSWR from "swr";
 import { useShallow } from "zustand/react/shallow";
-import map from "../../../../asset/foreground.svg?parse";
 import { useStore } from "../../../store.ts";
 import { BoundingBox, Dropdown, Option } from "./Dropdown/Dropdown.tsx";
 
@@ -19,6 +18,8 @@ export const Search = () => {
     dataPoints,
     concepts,
     youtube,
+    areaLabels,
+    labelsI18n,
   ] = useStore(
     useShallow((s) => [
       s.setDesiredZoom,
@@ -27,13 +28,15 @@ export const Search = () => {
       s.dataPoints,
       s.concepts,
       s.youtubeVideos,
+      s.labels,
+      s.labelsI18n,
     ]),
   );
   const [searchTerm, setSearchTerm] = useState("");
 
   const { data: results, isLoading } = useSWR(
-    searchTerm ? [map, searchTerm] : null,
-    async ([map, query]) => {
+    searchTerm ? [searchTerm] : null,
+    async ([query]) => {
       if (!query)
         return {
           labels: [],
@@ -42,7 +45,8 @@ export const Search = () => {
 
       return worker.search(
         {
-          map,
+          labels: areaLabels,
+          labelsI18n,
           dataPoints,
           concepts,
           youtube,
@@ -112,13 +116,15 @@ export const Search = () => {
   };
 
   const dropdownOptions = [
-    ...labels.map(({ id, label, boundingBox, videosCount }) => ({
+    ...labels.map(({ id, label, videosCount, x, y, level }) => ({
       type: "label" as const,
       id,
       label,
       keyword: label,
-      boundingBox,
       videosCount,
+      x,
+      y,
+      level,
     })),
     ...points.map(({ id, name, clusters }) => {
       // TODO: Consider moving cords to the model, but getting cords here is more efficient
@@ -164,10 +170,27 @@ export const Search = () => {
     });
   };
 
+  const zoomToArea = (args: { level: 1 | 2 | 3 | 4; x: number; y: number }) => {
+    const zoom = {
+      1: 4,
+      2: 15,
+      3: 40,
+      4: 50,
+    }[args.level];
+    const x = -args.x * zoom + mapSize.width / 2;
+    const y = -args.y * zoom + mapSize.height / 2;
+
+    setDesiredZoom({
+      x: x,
+      y: y,
+      scale: zoom,
+    });
+  };
+
   const onSelectionChange = (option: Option) => {
     if (option.type === "label") {
       setPointsToHighlight([]);
-      zoomToBoundingBox(option.boundingBox);
+      zoomToArea(option);
       return;
     }
 

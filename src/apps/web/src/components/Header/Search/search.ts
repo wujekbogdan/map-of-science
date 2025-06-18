@@ -1,18 +1,14 @@
 import { normalizeSync } from "normalize-diacritics";
-import { MapSvgRepresentation } from "../../../../vite-plugin/svg-map-parser.ts";
-import { Concept, DataPoint, YoutubeVideo } from "../../../api/model";
+import {
+  AreaLabel,
+  AreaLabelI18n,
+  Concept,
+  DataPoint,
+  YoutubeVideo,
+} from "../../../api/model";
+import { config } from "../../../config.ts";
 
-export type LabelModel = {
-  id: string;
-  label: string;
-  normalizedLabel: string;
-  boundingBox: {
-    min: { x: number; y: number };
-    max: { x: number; y: number };
-    center: { x: number; y: number };
-  };
-  videosCount: number;
-};
+export type LabelModel = ReturnType<typeof createLabelsCollection>[number];
 
 type ConceptWithClustersModel = {
   id: number;
@@ -40,34 +36,20 @@ let cachedClustersByConcept: Map<ConceptId, ConceptWithClustersModel> | null =
 const normalize = (str: string) =>
   normalizeSync(str.replace("#", "").toLowerCase());
 
-const mapPath = (
-  path: MapSvgRepresentation["layer1"]["children"][number]["path"],
-) => ({
-  id: path.id,
-  label: path.label.replace("#", ""),
-  normalizedLabel: normalize(path.label),
-  boundingBox: path.boundingBox,
-});
-
 export const createLabelsCollection = (
-  map: MapSvgRepresentation,
+  labels: Map<string, AreaLabel>,
+  labelsI18n: Map<string, AreaLabelI18n>,
   youtube: Map<string, YoutubeVideo[]>,
 ) =>
-  [
-    ...map.layer1.children.map(({ path }) => mapPath(path)),
-    ...map.layer2.children.map(({ path }) => mapPath(path)),
-    ...map.layer3.groups.flatMap((group) =>
-      group.children.map(({ rect }) => ({
-        id: rect.id,
-        label: rect.label.replace("#", ""),
-        normalizedLabel: normalize(rect.label),
-        boundingBox: rect.boundingBox,
-      })),
-    ),
-  ].map((label) => ({
-    ...label,
-    videosCount: youtube.get(label.label)?.length ?? 0,
-  }));
+  [...labels.values()].map((label) => {
+    const name = labelsI18n.get(label.id)?.[config.LANG] ?? label.id;
+    return {
+      ...label,
+      label: name,
+      normalizedLabel: normalize(name),
+      videosCount: youtube.get(label.id)?.length ?? 0,
+    };
+  });
 
 export const createClustersByConcept = (
   dataPoints: Map<number, DataPoint>,
@@ -105,7 +87,8 @@ export const createClustersByConcept = (
 };
 
 type Options = {
-  map: MapSvgRepresentation;
+  labels: Map<string, AreaLabel>;
+  labelsI18n: Map<string, AreaLabelI18n>;
   dataPoints: Map<number, DataPoint>;
   concepts: Map<number, Concept>;
   youtube: Map<string, YoutubeVideo[]>;
@@ -115,7 +98,8 @@ export const search = (options: Options, phrase: string) => {
   const labelsCollection =
     cachedLabelsCollection ??
     (cachedLabelsCollection = createLabelsCollection(
-      options.map,
+      options.labels,
+      options.labelsI18n,
       options.youtube,
     ));
   const clustersByConcept =

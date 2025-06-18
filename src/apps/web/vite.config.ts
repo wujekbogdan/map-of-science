@@ -3,7 +3,6 @@ import { defineConfig, loadEnv } from "vite";
 import checker from "vite-plugin-checker";
 import { comlink } from "vite-plugin-comlink";
 import svgr from "vite-plugin-svgr";
-import svgMapParser from "./vite-plugin/svg-map-parser";
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd());
@@ -19,7 +18,6 @@ export default defineConfig(({ mode }) => {
       }),
       react(),
       comlink(),
-      svgMapParser(),
       svgr(),
     ],
     base: env.VITE_BASE_URL,
