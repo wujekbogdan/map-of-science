@@ -48,15 +48,23 @@ export const loadData = async () => {
     ),
   );
 
-  // TODO: Indexing videos by labelId isn't great. We need to give labels proper ids.
   const labelToVideos = new Map<string, YoutubeVideo[]>(
     Object.entries(
       youtube.reduce<Record<string, YoutubeVideo[]>>((acc, video) => {
         return video.labelIds.reduce<Record<string, YoutubeVideo[]>>(
-          (innerAcc, labelId) => ({
-            ...innerAcc,
-            [labelId]: [...(innerAcc[labelId] ?? []), video],
-          }),
+          (innerAcc, labelId) => {
+            const existingVideos = innerAcc[labelId] ?? [];
+            const videoExists = existingVideos.some(
+              (existingVideo) => existingVideo.videoId === video.videoId,
+            );
+
+            return {
+              ...innerAcc,
+              [labelId]: videoExists
+                ? existingVideos
+                : [...existingVideos, video],
+            };
+          },
           acc,
         );
       }, {}),
