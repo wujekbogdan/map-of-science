@@ -18,13 +18,14 @@ export const Header = () => {
 const offset = "12px";
 
 const SearchWrap = styled.div`
+  background: rgba(255, 255, 255, 0.8);
   position: fixed;
-  top: ${offset};
-  left: ${offset};
+  padding: ${offset};
+  width: 100%;
 `;
 
 const ZoomControlsWrap = styled.div`
+  top: 84px;
   position: fixed;
-  top: ${offset};
   right: ${offset};
 `;

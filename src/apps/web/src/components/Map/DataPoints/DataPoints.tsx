@@ -14,10 +14,13 @@ import { useArticleStore } from "../../../store.ts";
 import { DataPointDetails } from "./DataPointDetails.tsx";
 import css from "./DataPoints.module.scss";
 
+type Mode = "growth" | "regular";
+
 type Props = {
   concepts: Map<number, Concept>;
   forcedSize?: boolean;
   points: Point[];
+  mode: Mode;
 };
 
 const configByThreshold = [
@@ -32,27 +35,61 @@ const configByThreshold = [
 type ShapeOptions = {
   point: Point;
   forcedSize: boolean;
+  mode: Mode;
 };
 
 const classes = (classList: string[]) => classList.join(" ");
 
+const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+
+const interpolateColor = (c1: number[], c2: number[], t: number) =>
+  c1.map((v, i) => Math.round(lerp(v, c2[i], t)));
+
+const getGradientColor = (
+  value: number,
+  start: number[],
+  middle: number[],
+  end: number[],
+) => {
+  const t = value / 100;
+  const [from, to, localT] =
+    t < 0.5 ? [start, middle, t * 2] : [middle, end, (t - 0.5) * 2];
+
+  const color = interpolateColor(from, to, localT);
+  return `rgb(${color.join(",")})`;
+};
+
 const Shape = (options: ShapeOptions) => {
-  const { point, forcedSize } = options;
+  const { point, forcedSize, mode } = options;
   const { x, y } = point;
   const config = configByThreshold.find(
     ({ min }) => point.numRecentArticles >= min,
   );
   const level =
     config?.level ?? configByThreshold[configByThreshold.length - 1].level;
+  const colorClass = mode === "regular" ? css.circleRegular : "";
 
   const classList = forcedSize
-    ? [css.circle, css[`level-${level.toString()}`], css.searchResults]
-    : [css.circle, css[`level-${level.toString()}`]];
+    ? [
+        css.circle,
+        colorClass,
+        css[`level-${level.toString()}`],
+        css.searchResults,
+      ]
+    : [css.circle, colorClass, css[`level-${level.toString()}`]];
 
-  return <circle className={classes(classList)} cx={x} cy={y} />;
+  const start = [0, 0, 255];
+  const middle = [255, 255, 255];
+  const end = [255, 0, 0];
+
+  const style =
+    mode === "growth"
+      ? { fill: getGradientColor(point.growthRating, start, middle, end) }
+      : undefined;
+  return <circle className={classes(classList)} cx={x} cy={y} style={style} />;
 };
 
-export const DataPoints = ({ points, concepts, forcedSize }: Props) => {
+export const DataPoints = ({ points, concepts, forcedSize, mode }: Props) => {
   const setRemoteArticleId = useArticleStore(
     ({ setRemoteArticleId }) => setRemoteArticleId,
   );
@@ -105,7 +142,7 @@ export const DataPoints = ({ points, concepts, forcedSize }: Props) => {
               ? getReferenceProps()
               : {})}
           >
-            <Shape point={point} forcedSize={!!forcedSize} />
+            <Shape point={point} forcedSize={!!forcedSize} mode={mode} />
           </g>
         );
       })}

@@ -27,11 +27,17 @@ $duration: 0.3s;
   opacity: 1;
   vector-effect: non-scaling-stroke;
   stroke-width: 1;
-  fill: $fill-color;
-  stroke: $stroke-color;
-  
+
   &:hover {
     cursor: pointer;
+  }
+}
+
+.circleRegular {
+  fill: $fill-color;
+  stroke: $stroke-color;
+
+  &:hover {
     fill: $purple;
     stroke: $white;
   }

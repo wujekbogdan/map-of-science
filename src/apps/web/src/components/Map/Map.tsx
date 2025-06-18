@@ -259,11 +259,16 @@ export default function Map(props: Props) {
       height={props.size.height}
     >
       <g transform={transformValue}>
-        <DataPoints points={dataInViewport} concepts={props.concepts} />
+        <DataPoints
+          points={dataInViewport}
+          concepts={props.concepts}
+          mode="growth"
+        />
         <DataPoints
           points={highlightedPoints}
           forcedSize={true}
           concepts={props.concepts}
+          mode="growth"
         />
         {labelsScaled.map((label) => (
           <Label
