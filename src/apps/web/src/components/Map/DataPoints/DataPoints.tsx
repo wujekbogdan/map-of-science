@@ -11,7 +11,7 @@ import { useState } from "react";
 import { createPortal } from "react-dom";
 import { useShallow } from "zustand/react/shallow";
 import { Concept, DataPoint as Point } from "../../../api/model";
-import { useArticleStore, useStore } from "../../../store.ts";
+import { useArticleStore, useStore, RGB } from "../../../store.ts";
 import { DataPointDetails } from "./DataPointDetails.tsx";
 import css from "./DataPoints.module.scss";
 
@@ -53,8 +53,6 @@ const interpolateColor = (c1: RGB, c2: RGB, t: number): RGB => ({
   g: Math.round(lerp(c1.g, c2.g, t)),
   b: Math.round(lerp(c1.b, c2.b, t)),
 });
-
-type RGB = { r: number; g: number; b: number };
 
 const getGradientColor = (
   growthRating: number,

@@ -2,13 +2,7 @@ import { useState } from "react";
 import styled from "styled-components";
 import { useShallow } from "zustand/react/shallow";
 import { i18n } from "../i18n.ts";
-import { useStore } from "../store.ts";
-
-type RGB = {
-  r: number;
-  g: number;
-  b: number;
-};
+import { useStore, RGB } from "../store.ts";
 
 const hexToRgb = (hex: string) => {
   hex = hex

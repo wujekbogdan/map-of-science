@@ -20,11 +20,12 @@ type Size = {
   height: number;
 };
 
-type RGB = {
+export type RGB = {
   r: number;
   g: number;
   b: number;
 };
+
 type Colors = {
   start: RGB;
   middle: RGB;
