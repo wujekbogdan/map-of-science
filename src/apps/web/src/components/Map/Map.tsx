@@ -22,10 +22,12 @@ const fetchMapSvg = async () => {
   const url = (await import("./map.svg")).default;
 
   // We need to ensure that the SVG is loaded before we return the URL.
-  const img = new Image();
-  img.src = url;
-  await img.decode();
-  return url;
+  return new Promise<string>((resolve, reject) => {
+    const img = new Image();
+    img.src = url;
+    img.onload = () => resolve(url);
+    img.onerror = reject;
+  });
 };
 
 const filterDataByViewport = (
