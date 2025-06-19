@@ -20,7 +20,14 @@ const hexToRgb = (hex: string) => {
 
 const rgbToHex = (color: RGB) => {
   const { r, g, b } = color;
-  return "#" + [r, g, b].map((x) => x.toString(16).padStart(2, "0")).join("");
+  return (
+    "#" +
+    [r, g, b]
+      .map((x) => {
+        return x.toString(16).padStart(2, "0");
+      })
+      .join("")
+  );
 };
 
 export const DevTool = () => {
@@ -80,11 +87,15 @@ export const DevTool = () => {
     color: keyof typeof colorInputValues,
     value: string,
   ) => {
-    const rgb = hexToRgb(value);
-    setGrowthRatingColors({
-      ...growthRatingColors,
-      [color]: [rgb.r, rgb.g, rgb.b],
-    });
+    try {
+      const rgb = hexToRgb(value);
+      setGrowthRatingColors({
+        ...growthRatingColors,
+        [color]: rgb,
+      });
+    } catch (error) {
+      console.error("Invalid color value:", value, error);
+    }
   };
 
   return (
