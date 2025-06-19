@@ -111,7 +111,7 @@ export const DevTool = () => {
         <Panels>
           <Panel>
             <Header>{i18n("Data")}</Header>
-            <P>
+            <Section>
               <FormControl>
                 <Label>{i18n("Visible data points limit")}</Label>
                 <Input
@@ -122,17 +122,17 @@ export const DevTool = () => {
                   }}
                 />
               </FormControl>
-            </P>
-            <P>
+            </Section>
+            <Section>
               <Label>{i18n("Current Zoom")}</Label>
               <span>{zoom}</span>
-            </P>
+            </Section>
           </Panel>
 
           <Panel>
             <Header>{i18n("Font Sizes")}</Header>
             {layers.map((layer, index) => (
-              <P key={layer}>
+              <Section key={layer}>
                 <FormControl>
                   <Label>
                     {i18n("Layer")} {index + 1}
@@ -145,14 +145,14 @@ export const DevTool = () => {
                     }}
                   />
                 </FormControl>
-              </P>
+              </Section>
             ))}
           </Panel>
 
           <Panel>
             <Header>{i18n("Scale Factor")}</Header>
             {scaleFactors.map((factor) => (
-              <P key={factor}>
+              <Section key={factor}>
                 <FormControl>
                   <Label>{factor}</Label>
                   <Input
@@ -163,13 +163,13 @@ export const DevTool = () => {
                     }}
                   />
                 </FormControl>
-              </P>
+              </Section>
             ))}
           </Panel>
 
           <Panel>
             <Header>{i18n("Zoom")}</Header>
-            <P>
+            <Section>
               <FormControl>
                 <Label>{i18n("Zoom scale factor")}</Label>
                 <Input
@@ -180,16 +180,16 @@ export const DevTool = () => {
                   }}
                 />
               </FormControl>
-            </P>
-            <P>
+            </Section>
+            <Section>
               <Label>{i18n("Current Zoom")}</Label>
               <span>{zoom}</span>
-            </P>
+            </Section>
           </Panel>
 
           <Panel>
             <Header>{i18n("SVG")}</Header>
-            <P>
+            <Section>
               <FormControl>
                 <Label>{i18n("SVG scale factor")}</Label>
                 <Input
@@ -203,8 +203,8 @@ export const DevTool = () => {
                   }}
                 />
               </FormControl>
-            </P>
-            <P>
+            </Section>
+            <Section>
               <FormControl>
                 <Label>{i18n("SVG offset X")}</Label>
                 <Input
@@ -221,8 +221,8 @@ export const DevTool = () => {
                   }}
                 />
               </FormControl>
-            </P>
-            <P>
+            </Section>
+            <Section>
               <FormControl>
                 <Label>{i18n("SVG offset Y")}</Label>
                 <Input
@@ -239,16 +239,15 @@ export const DevTool = () => {
                   }}
                 />
               </FormControl>
-            </P>
+            </Section>
           </Panel>
 
           <Panel>
             <Header>{i18n("Growth mode colors")}</Header>
-            <P>
+            <Section>
               <FormControl>
                 <Label>{i18n("Start")}</Label>
-                <Input
-                  type="color"
+                <ColorInput
                   value={colorInputValues.start}
                   onInput={(e) => {
                     e.preventDefault();
@@ -256,12 +255,11 @@ export const DevTool = () => {
                   }}
                 />
               </FormControl>
-            </P>
-            <P>
+            </Section>
+            <Section>
               <FormControl>
                 <Label>{i18n("Mid")}</Label>
-                <Input
-                  type="color"
+                <ColorInput
                   value={colorInputValues.middle}
                   onInput={(e) => {
                     e.preventDefault();
@@ -269,12 +267,11 @@ export const DevTool = () => {
                   }}
                 />
               </FormControl>
-            </P>
-            <P>
+            </Section>
+            <Section>
               <FormControl>
                 <Label>{i18n("End")}</Label>
-                <Input
-                  type="color"
+                <ColorInput
                   value={colorInputValues.end}
                   onInput={(e) => {
                     e.preventDefault();
@@ -282,7 +279,7 @@ export const DevTool = () => {
                   }}
                 />
               </FormControl>
-            </P>
+            </Section>
           </Panel>
         </Panels>
       )}
@@ -346,17 +343,22 @@ const Header = styled.h3`
 
 const Panels = styled.div`
   margin: 12px 12px 0;
-  overflow: hidden;
+  padding: 0 0 12px 0;
 `;
 
 const Panel = styled.div`
   margin: 16px 0;
+
   &:first-child {
     margin-top: 0;
   }
+
+  &:last-child {
+    margin-bottom: 0;
+  }
 `;
 
-const P = styled.p`
+const Section = styled.div`
   margin: 4px 0 8px;
 `;
 
@@ -373,4 +375,8 @@ const Input = styled.input`
   margin: 0 0 8px;
   padding: 4px;
   display: block;
+`;
+
+const ColorInput = styled.input.attrs({ type: "color" })`
+  width: 100%;
 `;
