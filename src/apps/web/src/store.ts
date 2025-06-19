@@ -32,7 +32,10 @@ type Colors = {
   end: RGB;
 };
 
+type MapMode = "regular" | "growth";
+
 const partialDefaults = {
+  mapMode: "regular" as MapMode,
   growthRatingColors: {
     start: {
       r: 24,
@@ -151,6 +154,9 @@ export const useStore = create(
       set({
         growthRatingColors: colors,
       });
+    },
+    setMapMode: (mode: MapMode) => {
+      set({ mapMode: mode });
     },
     temp__setSvgScaleFactor: (svgScaleFactor: number) => {
       set({ temp__svgScaleFactor: svgScaleFactor });
