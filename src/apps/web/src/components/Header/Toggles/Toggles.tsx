@@ -24,8 +24,8 @@ const useTooltip = () => {
   });
   const { styles } = useTransitionStyles(context, {
     duration: { open: 300, close: 0 },
-    initial: { opacity: 0 },
-    open: { opacity: 1 },
+    initial: { opacity: 0, pointerEvents: "none" },
+    open: { opacity: 1, pointerEvents: "auto" },
   });
   const hover = useHover(context);
   const { getReferenceProps, getFloatingProps } = useInteractions([hover]);
