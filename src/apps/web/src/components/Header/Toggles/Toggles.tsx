@@ -7,7 +7,7 @@ import {
   useInteractions,
   useTransitionStyles,
 } from "@floating-ui/react";
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 import styled from "styled-components";
 import { useShallow } from "zustand/react/shallow";
 import { i18n } from "../../../i18n.ts";
@@ -52,6 +52,22 @@ const Toggles = () => {
       s.setMaxDataPointsInViewport,
     ]),
   );
+  const [clusterInput, setClusterInputValue] = useState(
+    String(maxDataPointsInViewport),
+  );
+  const clusterInputRange = {
+    min: 1,
+    max: 3000,
+  };
+  const isClusterCountValid = (() => {
+    const num = Number(clusterInput);
+    return (
+      clusterInput !== "" &&
+      !isNaN(num) &&
+      num >= clusterInputRange.min &&
+      num <= clusterInputRange.max
+    );
+  })();
 
   const modeTooltip = useTooltip();
   const clusterCountTooltip = useTooltip();
@@ -60,6 +76,25 @@ const Toggles = () => {
     { value: "regular", label: i18n("Standardowy") },
     { value: "growth", label: i18n("Wskaźnik rozwoju") },
   ] as const;
+
+  const onClusterInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setClusterInputValue(val);
+
+    const num = Number(val);
+    if (
+      val !== "" &&
+      !isNaN(num) &&
+      num >= clusterInputRange.min &&
+      num <= clusterInputRange.max
+    ) {
+      setMaxDataPointsInViewport(num);
+    }
+  };
+
+  const onClusterInputBlur = () => {
+    setClusterInputValue(maxDataPointsInViewport.toString());
+  };
 
   return (
     <Wrap>
@@ -88,15 +123,15 @@ const Toggles = () => {
         <TogglesListItem>
           <Label htmlFor="cluster-count">{i18n("Liczba klastrów")}</Label>
           <Input
+            $invalid={!isClusterCountValid}
             id="cluster-count"
-            value={maxDataPointsInViewport}
+            value={clusterInput}
             type="number"
-            min={300}
-            max={3000}
+            min={clusterInputRange.min}
+            max={clusterInputRange.max}
             step={100}
-            onChange={(e) => {
-              setMaxDataPointsInViewport(Number(e.target.value));
-            }}
+            onChange={onClusterInputChange}
+            onBlur={onClusterInputBlur}
           />
           <Info
             ref={clusterCountTooltip.refs.setReference}
@@ -129,7 +164,7 @@ const Toggles = () => {
         <P>{i18n("Liczba klastrów wyświetlana jednocześnie na mapie.")}</P>
         <P>
           {i18n(
-            "Nie zalecamy zbyt dużych wartości, ponieważ może to spowodować problemy z wydajnością",
+            "Obecnie maksymalna wartość to 3000. Nie zalecamy zbyt dużych wartości, ponieważ wydajność renderowania mapy wtedy znacznie spada.",
           )}
         </P>
         <P>
@@ -155,9 +190,10 @@ const Label = styled.label`
   margin-right: 12px;
 `;
 
-const Input = styled.input`
+const Input = styled.input<{ $invalid?: boolean }>`
   padding: 12px;
-  border: 1px solid #ededed;
+  border: 1px solid ${({ $invalid }) => ($invalid ? "crimson" : "#ededed")};
+  background-color: ${({ $invalid }) => ($invalid ? "#fff6f6" : "white")};
 `;
 
 const Select = styled.select`
