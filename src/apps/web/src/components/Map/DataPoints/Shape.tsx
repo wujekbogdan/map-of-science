@@ -63,7 +63,14 @@ export const Shape = (options: ShapeOptions) => {
       ? { fill: getGradientColor(point.growthRating, growthRatingColors) }
       : undefined;
 
-  return <circle className={classes(classList)} cx={x} cy={y} style={style} />;
+  return (
+    <>
+      {uniformStyle && (
+        <circle className={css.ripple} cx={x} cy={y} style={style} />
+      )}
+      <circle className={classes(classList)} cx={x} cy={y} style={style} />
+    </>
+  );
 };
 
 export default Shape;
