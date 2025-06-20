@@ -251,6 +251,7 @@ export const Dropdown = (props: Dropdown) => {
 };
 
 const Wrapper = styled.div`
+  position: relative;
   display: flex;
 `;
 

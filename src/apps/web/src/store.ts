@@ -31,7 +31,6 @@ type Colors = {
   middle: RGB;
   end: RGB;
 };
-
 type MapMode = "regular" | "growth";
 
 const partialDefaults = {

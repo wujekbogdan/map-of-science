@@ -268,7 +268,7 @@ export default function Map(props: Props) {
         />
         <DataPoints
           points={highlightedPoints}
-          forcedSize={true}
+          uniformStyle={true}
           concepts={props.concepts}
           mode={mapMode}
         />

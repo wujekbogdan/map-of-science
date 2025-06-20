@@ -19,24 +19,29 @@ type Mode = "growth" | "regular";
 
 type Props = {
   concepts: Map<number, Concept>;
-  forcedSize?: boolean;
+  uniformStyle?: boolean;
   points: Point[];
   mode: Mode;
 };
 
-const configByThreshold = [
-  { min: 2001, level: 1 },
-  { min: 1001, level: 2 },
-  { min: 501, level: 3 },
-  { min: 201, level: 4 },
-  { min: 51, level: 5 },
-  { min: 0, level: 6 },
-] as const;
+const getLevelByArticlesCount = (articlesCount: number) => {
+  if (articlesCount > 2000) return 1;
+  if (articlesCount > 1000) return 2;
+  if (articlesCount > 500) return 3;
+  if (articlesCount > 200) return 4;
+  if (articlesCount >= 50) return 5;
+  return 6;
+};
 
 type ShapeOptions = {
-  point: Point;
-  forcedSize: boolean;
+  point: {
+    growthRating: number;
+    x: number;
+    y: number;
+  };
+  uniformStyle: boolean;
   mode: Mode;
+  level: 1 | 2 | 3 | 4 | 5 | 6;
   growthRatingColors: {
     start: RGB;
     middle: RGB;
@@ -73,32 +78,25 @@ const getGradientColor = (
 };
 
 const Shape = (options: ShapeOptions) => {
-  const { point, forcedSize, mode, growthRatingColors } = options;
+  const { point, uniformStyle, mode, growthRatingColors, level } = options;
   const { x, y } = point;
-  const config = configByThreshold.find(
-    ({ min }) => point.numRecentArticles >= min,
-  );
-  const level =
-    config?.level ?? configByThreshold[configByThreshold.length - 1].level;
-  const colorClass = mode === "regular" ? css.circleRegular : "";
+  const colorClasses =
+    mode === "regular" ? [css.outline, css.fill] : css.outline;
+  const sizeClass = css[`level-${level.toString()}`];
+  const classList = uniformStyle
+    ? [css.circle, ...colorClasses, sizeClass, css.searchResults]
+    : [css.circle, ...colorClasses, sizeClass];
 
-  const classList = forcedSize
-    ? [
-        css.circle,
-        colorClass,
-        css[`level-${level.toString()}`],
-        css.searchResults,
-      ]
-    : [css.circle, colorClass, css[`level-${level.toString()}`]];
-
+  // TODO: It might be more efficient to simply precalculate 100 CSS classes with SCSS
   const style =
     mode === "growth"
       ? { fill: getGradientColor(point.growthRating, growthRatingColors) }
       : undefined;
+
   return <circle className={classes(classList)} cx={x} cy={y} style={style} />;
 };
 
-export const DataPoints = ({ points, concepts, forcedSize, mode }: Props) => {
+export const DataPoints = ({ points, concepts, uniformStyle, mode }: Props) => {
   const [growthRatingColors] = useStore(
     useShallow((state) => [state.growthRatingColors]),
   );
@@ -155,8 +153,13 @@ export const DataPoints = ({ points, concepts, forcedSize, mode }: Props) => {
               : {})}
           >
             <Shape
-              point={point}
-              forcedSize={!!forcedSize}
+              level={getLevelByArticlesCount(point.numRecentArticles)}
+              point={{
+                growthRating: point.growthRating,
+                x: point.x,
+                y: point.y,
+              }}
+              uniformStyle={!!uniformStyle}
               mode={mode}
               growthRatingColors={growthRatingColors}
             />

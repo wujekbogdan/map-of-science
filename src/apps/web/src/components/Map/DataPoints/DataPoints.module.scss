@@ -2,7 +2,7 @@
 $white: #fff;
 $purple: #9b5b9b;
 
-$stroke-color: black;
+$stroke-color: #333;
 $fill-color: white;
 $hover-fill-color: #9b5b9b;
 $hover-stroke-color: #9b5b9b;
@@ -33,13 +33,19 @@ $duration: 0.3s;
   }
 }
 
-.circleRegular {
-  fill: $fill-color;
+.outline {
   stroke: $stroke-color;
 
   &:hover {
-    fill: $purple;
     stroke: $white;
+  }
+}
+
+.fill {
+  fill: $fill-color;
+
+  &:hover {
+    fill: $purple;
   }
 }
 
