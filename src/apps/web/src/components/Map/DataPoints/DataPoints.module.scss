@@ -108,5 +108,6 @@ $duration: 0.3s;
 .ripple {
   fill: #fff;
   animation: rippleIn 1s ease-out;
+  animation-delay: .3s;
   transform-origin: center;
 }
