@@ -51,7 +51,7 @@ export const Shape = (options: ShapeOptions) => {
   const { point, uniformStyle, mode, growthRatingColors, level } = options;
   const { x, y } = point;
   const colorClasses =
-    mode === "regular" ? [css.outline, css.fill] : css.outline;
+    mode === "regular" ? [css.outline, css.fill] : [css.outline];
   const sizeClass = css[`level-${level.toString()}`];
   const classList = uniformStyle
     ? [css.circle, ...colorClasses, sizeClass, css.searchResults]
