@@ -86,6 +86,7 @@ export default function Map(props: Props) {
     clustersToHighlight,
     svgScaleFactor,
     svgOffset,
+    mapMode,
   ] = useStore(
     useShallow((s) => [
       s.scaleFactor,
@@ -95,6 +96,7 @@ export default function Map(props: Props) {
       s.pointsToHighlight,
       s.temp__svgScaleFactor,
       s.temp__svgOffset,
+      s.mapMode,
     ]),
   );
 
@@ -259,11 +261,16 @@ export default function Map(props: Props) {
       height={props.size.height}
     >
       <g transform={transformValue}>
-        <DataPoints points={dataInViewport} concepts={props.concepts} />
+        <DataPoints
+          points={dataInViewport}
+          concepts={props.concepts}
+          mode={mapMode}
+        />
         <DataPoints
           points={highlightedPoints}
-          forcedSize={true}
+          uniformStyle={true}
           concepts={props.concepts}
+          mode={mapMode}
         />
         {labelsScaled.map((label) => (
           <Label

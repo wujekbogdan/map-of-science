@@ -1,13 +1,17 @@
 import styled from "styled-components";
 import { Search } from "./Search/Search.tsx";
+import Toggles from "./Toggles/Toggles.tsx";
 import { ZoomControls } from "./ZoomControls/ZoomControls.tsx";
 
 export const Header = () => {
   return (
     <>
-      <SearchWrap>
+      <TopBar>
         <Search />
-      </SearchWrap>
+        <TogglesWrap>
+          <Toggles />
+        </TogglesWrap>
+      </TopBar>
       <ZoomControlsWrap>
         <ZoomControls />
       </ZoomControlsWrap>
@@ -17,14 +21,22 @@ export const Header = () => {
 
 const offset = "12px";
 
-const SearchWrap = styled.div`
+const TopBar = styled.div`
+  background: rgba(255, 255, 255, 0.8);
   position: fixed;
-  top: ${offset};
-  left: ${offset};
+  padding: ${offset};
+  width: 100%;
+  display: flex;
+  align-items: center;
+  z-index: 1;
+`;
+
+const TogglesWrap = styled.div`
+  margin-left: auto;
 `;
 
 const ZoomControlsWrap = styled.div`
+  top: 84px;
   position: fixed;
-  top: ${offset};
   right: ${offset};
 `;

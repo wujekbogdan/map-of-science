@@ -41,7 +41,7 @@ export const DataSchema = (z: typeof zod) =>
       y: z.coerce.number(),
       num_recent_articles: z.coerce.number(),
       cluster_category: z.coerce.number(),
-      growth_rating: z.coerce.number(),
+      growth_rating: z.coerce.number().min(0).max(100),
       key_concepts: z.string(),
     })
     .transform((data) => ({

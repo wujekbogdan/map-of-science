@@ -251,6 +251,7 @@ export const Dropdown = (props: Dropdown) => {
 };
 
 const Wrapper = styled.div`
+  position: relative;
   display: flex;
 `;
 
@@ -266,14 +267,12 @@ const ComboboxInput = styled(ComboboxInputHeadless).attrs<{
   placeholder: props.placeholder ?? "",
   autoComplete: props.autoComplete ?? "",
 }))<{ $open: boolean }>`
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-
   font-size: 16px;
   box-sizing: border-box;
   position: relative;
   width: 100%;
   padding: 12px;
-  border-width: ${({ $open }) => ($open ? "2px 2px 0 2px" : "2px")};
+  border-width: 2px;
   border-style: solid;
   border-color: ${(props) =>
     props.$open ? "#9B5B9B #9B5B9B #fff #9B5B9B" : "#9B5B9B"};
@@ -293,6 +292,7 @@ const ComboboxOptions = styled(ComboboxOptionsHeadless)`
   border-radius: 0 0 4px 4px;
   border: 2px solid #9b5b9b;
   border-top-width: 0;
+  margin-top: -2px;
 `;
 
 const NoResults = styled.div`

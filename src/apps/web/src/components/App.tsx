@@ -99,6 +99,8 @@ const DevToolsWrapper = styled.div`
   position: fixed;
   bottom: 0;
   right: 0;
+  max-height: 100vh;
+  overflow-y: auto;
 `;
 
 const LoadingWrapper = styled.div`

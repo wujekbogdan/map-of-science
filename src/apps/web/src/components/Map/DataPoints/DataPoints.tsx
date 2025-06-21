@@ -9,50 +9,41 @@ import {
 } from "@floating-ui/react";
 import { useState } from "react";
 import { createPortal } from "react-dom";
+import { useShallow } from "zustand/react/shallow";
 import { Concept, DataPoint as Point } from "../../../api/model";
-import { useArticleStore } from "../../../store.ts";
+import { useArticleStore, useStore } from "../../../store.ts";
 import { DataPointDetails } from "./DataPointDetails.tsx";
 import css from "./DataPoints.module.scss";
+import Shape from "./Shape.tsx";
+
+type Mode = "growth" | "regular";
 
 type Props = {
   concepts: Map<number, Concept>;
-  forcedSize?: boolean;
+  uniformStyle?: boolean;
   points: Point[];
+  mode: Mode;
 };
 
-const configByThreshold = [
-  { min: 2001, level: 1 },
-  { min: 1001, level: 2 },
-  { min: 501, level: 3 },
-  { min: 201, level: 4 },
-  { min: 51, level: 5 },
-  { min: 0, level: 6 },
-] as const;
-
-type ShapeOptions = {
-  point: Point;
-  forcedSize: boolean;
+const getLevelByArticlesCount = (articlesCount: number) => {
+  if (articlesCount > 2000) return 1;
+  if (articlesCount > 1000) return 2;
+  if (articlesCount > 500) return 3;
+  if (articlesCount > 200) return 4;
+  if (articlesCount >= 50) return 5;
+  return 6;
 };
 
 const classes = (classList: string[]) => classList.join(" ");
 
-const Shape = (options: ShapeOptions) => {
-  const { point, forcedSize } = options;
-  const { x, y } = point;
-  const config = configByThreshold.find(
-    ({ min }) => point.numRecentArticles >= min,
-  );
-  const level =
-    config?.level ?? configByThreshold[configByThreshold.length - 1].level;
-
-  const classList = forcedSize
-    ? [css.circle, css[`level-${level.toString()}`], css.searchResults]
-    : [css.circle, css[`level-${level.toString()}`]];
-
-  return <circle className={classes(classList)} cx={x} cy={y} />;
+const getPercentage = (index: number, total: number) => {
+  return Math.round(((index + 1) / total) * 100);
 };
 
-export const DataPoints = ({ points, concepts, forcedSize }: Props) => {
+export const DataPoints = ({ points, concepts, uniformStyle, mode }: Props) => {
+  const [growthRatingColors] = useStore(
+    useShallow((state) => [state.growthRatingColors]),
+  );
   const setRemoteArticleId = useArticleStore(
     ({ setRemoteArticleId }) => setRemoteArticleId,
   );
@@ -79,7 +70,7 @@ export const DataPoints = ({ points, concepts, forcedSize }: Props) => {
 
   return (
     <>
-      {points.map((point) => {
+      {points.map((point, index) => {
         const label = concepts.get(point.clusterId)?.key;
 
         return (
@@ -105,7 +96,18 @@ export const DataPoints = ({ points, concepts, forcedSize }: Props) => {
               ? getReferenceProps()
               : {})}
           >
-            <Shape point={point} forcedSize={!!forcedSize} />
+            <Shape
+              progress={getPercentage(index, points.length)}
+              level={getLevelByArticlesCount(point.numRecentArticles)}
+              point={{
+                growthRating: point.growthRating,
+                x: point.x,
+                y: point.y,
+              }}
+              uniformStyle={!!uniformStyle}
+              mode={mode}
+              growthRatingColors={growthRatingColors}
+            />
           </g>
         );
       })}

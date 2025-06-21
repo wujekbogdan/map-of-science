@@ -20,7 +20,38 @@ type Size = {
   height: number;
 };
 
+export type RGB = {
+  r: number;
+  g: number;
+  b: number;
+};
+
+type Colors = {
+  start: RGB;
+  middle: RGB;
+  end: RGB;
+};
+type MapMode = "regular" | "growth";
+
 const partialDefaults = {
+  mapMode: "regular" as MapMode,
+  growthRatingColors: {
+    start: {
+      r: 24,
+      g: 100,
+      b: 171,
+    },
+    middle: {
+      r: 255,
+      g: 255,
+      b: 255,
+    },
+    end: {
+      r: 201,
+      g: 42,
+      b: 42,
+    },
+  },
   dataPoints: new Map<number, DataPoint>(),
   concepts: new Map<number, Concept>(),
   youtubeVideos: new Map<string, YoutubeVideo[]>(),
@@ -117,6 +148,14 @@ export const useStore = create(
     },
     setPointsToHighlight: (clusterIds: number[]) => {
       set({ pointsToHighlight: clusterIds });
+    },
+    setGrowthRatingColors: (colors: Colors) => {
+      set({
+        growthRatingColors: colors,
+      });
+    },
+    setMapMode: (mode: MapMode) => {
+      set({ mapMode: mode });
     },
     temp__setSvgScaleFactor: (svgScaleFactor: number) => {
       set({ temp__svgScaleFactor: svgScaleFactor });

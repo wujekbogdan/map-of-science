@@ -2,7 +2,33 @@ import { useState } from "react";
 import styled from "styled-components";
 import { useShallow } from "zustand/react/shallow";
 import { i18n } from "../i18n.ts";
-import { useStore } from "../store.ts";
+import { useStore, RGB } from "../store.ts";
+
+const hexToRgb = (hex: string) => {
+  hex = hex
+    .replace(/^#/, "")
+    .split("")
+    .map((x) => x + x)
+    .join("");
+  const num = parseInt(hex, 16);
+  return {
+    r: (num >> 16) & 255,
+    g: (num >> 8) & 255,
+    b: num & 255,
+  };
+};
+
+const rgbToHex = (color: RGB) => {
+  const { r, g, b } = color;
+  return (
+    "#" +
+    [r, g, b]
+      .map((x) => {
+        return x.toString(16).padStart(2, "0");
+      })
+      .join("")
+  );
+};
 
 export const DevTool = () => {
   const [visibility, setVisibility] = useState<"collapsed" | "expanded">(
@@ -23,6 +49,8 @@ export const DevTool = () => {
     svgOffset,
     setSvgOffset,
     setSvgScaleFactor,
+    growthRatingColors,
+    setGrowthRatingColors,
   ] = useStore(
     useShallow((state) => [
       state.currentZoom?.scale.toFixed(2) ?? 1,
@@ -38,6 +66,8 @@ export const DevTool = () => {
       state.temp__svgOffset,
       state.temp__setSvgOffset,
       state.temp__setSvgScaleFactor,
+      state.growthRatingColors,
+      state.setGrowthRatingColors,
     ]),
   );
   const layers = ["layer1", "layer2", "layer3", "layer4"] as const;
@@ -45,6 +75,27 @@ export const DevTool = () => {
 
   const onMinimizeClick = () => {
     setVisibility(visibility === "expanded" ? "collapsed" : "expanded");
+  };
+
+  const colorInputValues = {
+    start: rgbToHex(growthRatingColors.start),
+    middle: rgbToHex(growthRatingColors.middle),
+    end: rgbToHex(growthRatingColors.end),
+  };
+
+  const setGrowthRatingColor = (
+    color: keyof typeof colorInputValues,
+    value: string,
+  ) => {
+    try {
+      const rgb = hexToRgb(value);
+      setGrowthRatingColors({
+        ...growthRatingColors,
+        [color]: rgb,
+      });
+    } catch (error) {
+      console.error("Invalid color value:", value, error);
+    }
   };
 
   return (
@@ -60,7 +111,7 @@ export const DevTool = () => {
         <Panels>
           <Panel>
             <Header>{i18n("Data")}</Header>
-            <P>
+            <Section>
               <FormControl>
                 <Label>{i18n("Visible data points limit")}</Label>
                 <Input
@@ -71,17 +122,17 @@ export const DevTool = () => {
                   }}
                 />
               </FormControl>
-            </P>
-            <P>
+            </Section>
+            <Section>
               <Label>{i18n("Current Zoom")}</Label>
               <span>{zoom}</span>
-            </P>
+            </Section>
           </Panel>
 
           <Panel>
             <Header>{i18n("Font Sizes")}</Header>
             {layers.map((layer, index) => (
-              <P key={layer}>
+              <Section key={layer}>
                 <FormControl>
                   <Label>
                     {i18n("Layer")} {index + 1}
@@ -94,14 +145,14 @@ export const DevTool = () => {
                     }}
                   />
                 </FormControl>
-              </P>
+              </Section>
             ))}
           </Panel>
 
           <Panel>
             <Header>{i18n("Scale Factor")}</Header>
             {scaleFactors.map((factor) => (
-              <P key={factor}>
+              <Section key={factor}>
                 <FormControl>
                   <Label>{factor}</Label>
                   <Input
@@ -112,13 +163,13 @@ export const DevTool = () => {
                     }}
                   />
                 </FormControl>
-              </P>
+              </Section>
             ))}
           </Panel>
 
           <Panel>
             <Header>{i18n("Zoom")}</Header>
-            <P>
+            <Section>
               <FormControl>
                 <Label>{i18n("Zoom scale factor")}</Label>
                 <Input
@@ -129,16 +180,16 @@ export const DevTool = () => {
                   }}
                 />
               </FormControl>
-            </P>
-            <P>
+            </Section>
+            <Section>
               <Label>{i18n("Current Zoom")}</Label>
               <span>{zoom}</span>
-            </P>
+            </Section>
           </Panel>
 
           <Panel>
             <Header>{i18n("SVG")}</Header>
-            <P>
+            <Section>
               <FormControl>
                 <Label>{i18n("SVG scale factor")}</Label>
                 <Input
@@ -152,8 +203,8 @@ export const DevTool = () => {
                   }}
                 />
               </FormControl>
-            </P>
-            <P>
+            </Section>
+            <Section>
               <FormControl>
                 <Label>{i18n("SVG offset X")}</Label>
                 <Input
@@ -170,8 +221,8 @@ export const DevTool = () => {
                   }}
                 />
               </FormControl>
-            </P>
-            <P>
+            </Section>
+            <Section>
               <FormControl>
                 <Label>{i18n("SVG offset Y")}</Label>
                 <Input
@@ -188,7 +239,47 @@ export const DevTool = () => {
                   }}
                 />
               </FormControl>
-            </P>
+            </Section>
+          </Panel>
+
+          <Panel>
+            <Header>{i18n("Growth mode colors")}</Header>
+            <Section>
+              <FormControl>
+                <Label>{i18n("Start")}</Label>
+                <ColorInput
+                  value={colorInputValues.start}
+                  onInput={(e) => {
+                    e.preventDefault();
+                    setGrowthRatingColor("start", e.currentTarget.value);
+                  }}
+                />
+              </FormControl>
+            </Section>
+            <Section>
+              <FormControl>
+                <Label>{i18n("Mid")}</Label>
+                <ColorInput
+                  value={colorInputValues.middle}
+                  onInput={(e) => {
+                    e.preventDefault();
+                    setGrowthRatingColor("middle", e.currentTarget.value);
+                  }}
+                />
+              </FormControl>
+            </Section>
+            <Section>
+              <FormControl>
+                <Label>{i18n("End")}</Label>
+                <ColorInput
+                  value={colorInputValues.end}
+                  onInput={(e) => {
+                    e.preventDefault();
+                    setGrowthRatingColor("end", e.currentTarget.value);
+                  }}
+                />
+              </FormControl>
+            </Section>
           </Panel>
         </Panels>
       )}
@@ -252,17 +343,22 @@ const Header = styled.h3`
 
 const Panels = styled.div`
   margin: 12px 12px 0;
-  overflow: hidden;
+  padding: 0 0 12px 0;
 `;
 
 const Panel = styled.div`
   margin: 16px 0;
+
   &:first-child {
     margin-top: 0;
   }
+
+  &:last-child {
+    margin-bottom: 0;
+  }
 `;
 
-const P = styled.p`
+const Section = styled.div`
   margin: 4px 0 8px;
 `;
 
@@ -279,4 +375,8 @@ const Input = styled.input`
   margin: 0 0 8px;
   padding: 4px;
   display: block;
+`;
+
+const ColorInput = styled.input.attrs({ type: "color" })`
+  width: 100%;
 `;
