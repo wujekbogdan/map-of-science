@@ -1,5 +1,11 @@
 # @map-of-science/typescript
 
+## 0.2.1
+
+### Patch Changes
+
+- d41e81b: Remove the `vite-plugin` path from the `tsconfig.node.json` file.
+
 ## 0.2.0
 
 ### Minor Changes
