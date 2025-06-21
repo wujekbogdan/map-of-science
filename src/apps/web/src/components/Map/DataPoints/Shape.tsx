@@ -32,6 +32,7 @@ const classes = (classList: string[]) => classList.join(" ");
 type Mode = "growth" | "regular";
 
 type ShapeOptions = {
+  progress: number;
   point: {
     growthRating: number;
     x: number;
@@ -48,7 +49,8 @@ type ShapeOptions = {
 };
 
 export const Shape = (options: ShapeOptions) => {
-  const { point, uniformStyle, mode, growthRatingColors, level } = options;
+  const { point, uniformStyle, mode, growthRatingColors, level, progress } =
+    options;
   const { x, y } = point;
   const colorClasses =
     mode === "regular" ? [css.outline, css.fill] : [css.outline];
@@ -60,8 +62,11 @@ export const Shape = (options: ShapeOptions) => {
   // TODO: It might be more efficient to simply precalculate 100 CSS classes with SCSS
   const style =
     mode === "growth"
-      ? { fill: getGradientColor(point.growthRating, growthRatingColors) }
-      : undefined;
+      ? {
+          fill: getGradientColor(point.growthRating, growthRatingColors),
+          "--progress": progress,
+        }
+      : { "--progress": progress };
 
   return (
     <>

@@ -36,6 +36,10 @@ const getLevelByArticlesCount = (articlesCount: number) => {
 
 const classes = (classList: string[]) => classList.join(" ");
 
+const getPercentage = (index: number, total: number) => {
+  return Math.round(((index + 1) / total) * 100);
+};
+
 export const DataPoints = ({ points, concepts, uniformStyle, mode }: Props) => {
   const [growthRatingColors] = useStore(
     useShallow((state) => [state.growthRatingColors]),
@@ -66,7 +70,7 @@ export const DataPoints = ({ points, concepts, uniformStyle, mode }: Props) => {
 
   return (
     <>
-      {points.map((point) => {
+      {points.map((point, index) => {
         const label = concepts.get(point.clusterId)?.key;
 
         return (
@@ -93,6 +97,7 @@ export const DataPoints = ({ points, concepts, uniformStyle, mode }: Props) => {
               : {})}
           >
             <Shape
+              progress={getPercentage(index, points.length)}
               level={getLevelByArticlesCount(point.numRecentArticles)}
               point={{
                 growthRating: point.growthRating,
