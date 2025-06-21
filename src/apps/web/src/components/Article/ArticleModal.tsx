@@ -24,7 +24,7 @@ export const ArticleModal = ({ children, onClose }: Props) => {
               onClose?.();
             }}
           >
-            {i18n("Zamknij")} ✕
+            {i18n("article.close")} ✕
           </CloseButton>
         </Header>
         <Content>{children}</Content>

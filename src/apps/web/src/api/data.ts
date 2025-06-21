@@ -5,16 +5,24 @@ import {
   AreaLabelSchema,
   YoutubeVideoSchema,
   YoutubeVideo,
+  i18nSchema,
   AreaLabelI18nSchema,
 } from "./model";
 import { loadAsArray, loadAsMap } from "./utils.ts";
 
+export type Lang = "en-US" | "pl-PL";
+
 // TODO: move this out from here. It does not belong to the API layer.
 // It's more of a service layer.
 // https://github.com/wujekbogdan/map-of-science/issues/57
-export const loadData = async () => {
-  const [concepts, dataPoints, youtube, labels, labelsI18n] = await Promise.all(
-    [
+export const loadData = async (lang: Lang) => {
+  const i18nUrl = {
+    "en-US": new URL("../../asset/ui_i18n_pl-PL.tsv", import.meta.url).href,
+    "pl-PL": new URL("../../asset/ui_i18n_pl-PL.tsv", import.meta.url).href,
+  }[lang];
+
+  const [concepts, dataPoints, youtube, labels, labelsI18n, uiI18n] =
+    await Promise.all([
       loadAsMap({
         url: new URL("../../asset/keys.tsv", import.meta.url).href,
         schema: ConceptSchema(z),
@@ -39,8 +47,11 @@ export const loadData = async () => {
         schema: AreaLabelI18nSchema(z),
         getKey: (item) => item.id,
       }),
-    ],
-  );
+      loadAsArray({
+        url: i18nUrl,
+        schema: i18nSchema(z),
+      }),
+    ]);
 
   const dataPointsOrdered = new Map(
     [...dataPoints.entries()].sort(
@@ -77,5 +88,8 @@ export const loadData = async () => {
     dataPoints: dataPointsOrdered,
     youtube: labelToVideos,
     labelsI18n,
+    uiI18n: Object.fromEntries(
+      uiI18n.map(({ id, translation }) => [id, translation]),
+    ),
   };
 };

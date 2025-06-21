@@ -33,6 +33,13 @@ export const AreaLabelI18nSchema = (z: typeof zod) =>
   });
 export type AreaLabelI18n = zod.infer<ReturnType<typeof AreaLabelI18nSchema>>;
 
+export const i18nSchema = (z: typeof zod) =>
+  z.object({
+    id: z.string(),
+    translation: z.string(),
+  });
+export type i18n = zod.infer<ReturnType<typeof i18nSchema>>;
+
 export const DataSchema = (z: typeof zod) =>
   z
     .object({

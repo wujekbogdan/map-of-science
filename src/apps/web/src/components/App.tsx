@@ -1,3 +1,4 @@
+import i18next from "i18next";
 import { useCallback } from "react";
 import styled from "styled-components";
 import useSWR from "swr";
@@ -34,13 +35,23 @@ function App() {
       s.setLabelsI18n,
     ]),
   );
-  const { data, isLoading } = useSWR("data", loadData, {
-    onSuccess: ({ dataPoints, concepts, youtube, labels, labelsI18n }) => {
+  // TODO: Move to store
+  const lang = "pl-PL";
+  const { data, isLoading } = useSWR(["data", lang], () => loadData(lang), {
+    onSuccess: ({
+      dataPoints,
+      concepts,
+      youtube,
+      labels,
+      labelsI18n,
+      uiI18n,
+    }) => {
       setDataPoints(dataPoints);
       setConcepts(concepts);
       setYoutubeVideos(youtube);
       setLabels(labels);
       setLabelsI18n(labelsI18n);
+      i18next.addResourceBundle(lang, "translation", uiI18n);
     },
   });
 
@@ -52,7 +63,6 @@ function App() {
       [setMapSize],
     ),
   );
-
   return (
     <Container>
       <Header />
