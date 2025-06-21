@@ -1,3 +1,5 @@
+@use "sass:list";
+
 $white: #fff;
 $purple: #9b5b9b;
 $stroke-color: #333;
@@ -60,9 +62,9 @@ $duration: 0.3s;
 
 $sizes: 8px, 7px, 6px, 5px, 4px, 3px;
 
-@for $i from 1 through length($sizes) {
+@for $i from 1 through list.length($sizes) {
   .level-#{$i} {
-    r: calc(nth($sizes, $i) / var(--zoom-scale));
+    r: calc(list.nth($sizes, $i) / var(--zoom-scale));
   }
 }
 
