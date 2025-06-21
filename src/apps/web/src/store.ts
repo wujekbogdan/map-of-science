@@ -75,9 +75,9 @@ const partialDefaults = {
     zoom: 0.5,
   },
   maxDataPointsInViewport: 500,
-  temp__svgScaleFactor: 0.058,
+  temp__svgScaleFactor: 0.0581,
   temp__svgOffset: {
-    x: -16.6,
+    x: -16.0,
     y: 27,
   },
 };
