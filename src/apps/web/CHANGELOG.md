@@ -1,5 +1,21 @@
 # @map-of-science/web
 
+## 1.16.0
+
+### Minor Changes
+
+- d41e81b: Introduce UUID-based IDs for all the labels. Move human-readable labels into an i18n file.
+- c4c2b43: Add ability to toggle between the regular mode and the growth rating mode. Include a toggle to switch between modes in the top bar and make it configurable via the DevTools.
+- c4c2b43: Add cluster count input to the top bar.
+- c4c2b43: Add a top bar UI component.
+- c4c2b43: Add a ripple effect to highlight search results.
+- d41e81b: Add dates to the YT videos list and make minor list styling improvements.
+- d41e81b: Remove the legacy `foreground.svg` file along with the Vite SVG parser plugin, and move all the data the plugin was extracting from the SVG file into a TSV file. Now, all the label data is rendered based on that file.
+
+### Patch Changes
+
+- d41e81b: Fix a bug that caused duplicate video items in the YT video list.
+
 ## 1.15.0
 
 ### Minor Changes

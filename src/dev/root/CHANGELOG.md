@@ -1,5 +1,11 @@
 # @map-of-science/root
 
+## 0.2.0
+
+### Minor Changes
+
+- 6e6822e: Add a GitHub Action to verify whether at least one `.changesets/*.md` file is present for an open PR.
+
 ## 0.1.0
 
 ### Minor Changes
