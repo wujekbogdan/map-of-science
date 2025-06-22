@@ -100,8 +100,8 @@ const Toggles = () => {
     setClusterInputValue(maxDataPointsInViewport.toString());
   };
 
-  const onLanguageSelect = (lang: { code: LangCode }) => {
-    i18next.changeLanguage(lang.code).catch((err) => {
+  const onLanguageSelect = (lang: LangCode) => {
+    i18next.changeLanguage(lang).catch((err) => {
       console.error("Failed to change language:", err);
     });
   };

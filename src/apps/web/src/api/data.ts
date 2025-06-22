@@ -9,10 +9,17 @@ import {
 } from "./model";
 import { loadAsArray, loadAsMap } from "./utils.ts";
 
-export type Lang = "en-US" | "pl-PL";
+export type Lang = "en" | "pl";
 export type AreaLocalized = Awaited<ReturnType<typeof loadAreas>>[number];
 
 const loadAreas = async (lang: Lang) => {
+  const langCode = (
+    {
+      en: "en-US",
+      pl: "pl-PL",
+    } as const
+  )[lang];
+
   const i18n = await loadAsMap({
     url: new URL("../../asset/areas_i18n.tsv", import.meta.url).href,
     schema: AreaI18nSchema(z),
@@ -26,7 +33,7 @@ const loadAreas = async (lang: Lang) => {
 
   return areas.map(({ ...area }) => ({
     ...area,
-    text: i18n.get(area.id)?.[lang] ?? area.id,
+    text: i18n.get(area.id)?.[langCode] ?? area.id,
   }));
 };
 

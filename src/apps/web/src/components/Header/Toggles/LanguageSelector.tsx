@@ -2,7 +2,7 @@ import { MenuButton, Menu, MenuItem, MenuItems } from "@headlessui/react";
 import { Fragment } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { LangCode, LangShort, useLanguage } from "../../../useLanguage.ts";
+import { LangCode, useLanguage } from "../../../useLanguage.ts";
 import IconEn from "./en.svg?react";
 import IconPl from "./pl.svg?react";
 
@@ -16,12 +16,12 @@ const Flag = ({ lang }: { lang: "pl" | "en" }) => {
 };
 
 type Props = {
-  onSelect?: (lang: { code: LangCode; short: LangShort }) => void;
+  onSelect?: (language: LangCode) => void;
 };
 
 export const LanguageSelector = (props: Props) => {
   const { t } = useTranslation();
-  const { short, supportedLanguages } = useLanguage();
+  const { language, supportedLanguages } = useLanguage();
 
   return (
     <Menu>
@@ -29,18 +29,18 @@ export const LanguageSelector = (props: Props) => {
         <Item>
           <Text>{t("toggles.languages.language")}</Text>
           <Icon>
-            <Flag lang={short} />
+            <Flag lang={language} />
           </Icon>
         </Item>
       </MenuButton>
       <Items anchor="bottom end">
         {supportedLanguages.map((language) => (
-          <MenuItem key={language.short} as={Fragment}>
+          <MenuItem key={language} as={Fragment}>
             {() => (
               <Item onClick={() => props.onSelect?.(language)}>
-                <Text>{t(`toggles.languages.${language.short}`)}</Text>
+                <Text>{t(`toggles.languages.${language}`)}</Text>
                 <Icon>
-                  <Flag lang={language.short} />
+                  <Flag lang={language} />
                 </Icon>
               </Item>
             )}
