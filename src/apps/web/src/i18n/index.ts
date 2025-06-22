@@ -17,6 +17,10 @@ i18next
     interpolation: {
       escapeValue: false,
     },
+    detection: {
+      caches: ["localStorage"],
+      order: ["localStorage", "navigator"],
+    },
   })
   .catch((err) => {
     console.error("Failed to initialize i18next:", err);
