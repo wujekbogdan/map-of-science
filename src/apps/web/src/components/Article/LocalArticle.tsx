@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { YoutubeVideo } from "../../api/model";
 import { config } from "../../config.ts";
-import { i18n } from "../../i18n.ts";
+import { i18n } from "../../i18n";
 
 type Props = {
   html: string | null;

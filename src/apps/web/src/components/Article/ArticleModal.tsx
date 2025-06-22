@@ -1,7 +1,7 @@
 import { ReactElement, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { useClickAway } from "react-use";
 import styled from "styled-components";
-import { i18n } from "../../i18n.ts";
 
 type Props = {
   children: ReactElement;
@@ -9,6 +9,7 @@ type Props = {
 };
 
 export const ArticleModal = ({ children, onClose }: Props) => {
+  const { t } = useTranslation();
   const ref = useRef(null);
 
   useClickAway(ref, () => {
@@ -24,7 +25,7 @@ export const ArticleModal = ({ children, onClose }: Props) => {
               onClose?.();
             }}
           >
-            {i18n("article.close")} ✕
+            {t("article.close")} ✕
           </CloseButton>
         </Header>
         <Content>{children}</Content>

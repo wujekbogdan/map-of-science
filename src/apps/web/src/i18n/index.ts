@@ -1,6 +1,7 @@
 import i18next from "i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
 import { initReactI18next } from "react-i18next";
+import { backend } from "./backend";
 
 // TODO: Remove this when the i18n is fully implemented
 export const i18n = (str: string) => str;
@@ -12,11 +13,10 @@ i18next
     }),
   )
   .use(initReactI18next)
+  .use(backend)
   .init({
-    supportedLngs: ["pl", "en", "pl-PL", "en-US"],
-    fallbackLng: "pl-PL",
+    supportedLngs: ["pl", "en"],
     load: "languageOnly",
-    resources: {},
     interpolation: {
       escapeValue: false,
     },

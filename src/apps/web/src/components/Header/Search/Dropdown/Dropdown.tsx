@@ -6,7 +6,7 @@ import {
 } from "@headlessui/react";
 import { ChangeEvent, useMemo, useState, memo, useRef } from "react";
 import styled from "styled-components";
-import { i18n } from "../../../../i18n.ts";
+import { i18n } from "../../../../i18n";
 import Label, { Token } from "./Label.tsx";
 import CloseIcon from "./close.svg";
 

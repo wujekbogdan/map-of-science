@@ -1,11 +1,10 @@
-import i18next from "i18next";
-import { useCallback } from "react";
+import { Suspense, useCallback } from "react";
 import styled from "styled-components";
 import useSWR from "swr";
 import { useShallow } from "zustand/react/shallow";
 import { loadData } from "../api/worker.ts";
 import { config } from "../config.ts";
-import { i18n } from "../i18n.ts";
+import { i18n } from "../i18n";
 import { useStore } from "../store.ts";
 import { useWindowSize } from "../useWindowSize.ts";
 import { Article } from "./Article/Article.tsx";
@@ -37,21 +36,13 @@ function App() {
   );
   // TODO: Move to store
   const lang = "pl-PL";
-  const { data, isLoading } = useSWR(["data", lang], () => loadData(lang), {
-    onSuccess: ({
-      dataPoints,
-      concepts,
-      youtube,
-      labels,
-      labelsI18n,
-      uiI18n,
-    }) => {
+  const { data, isLoading } = useSWR(["data", lang], () => loadData(), {
+    onSuccess: ({ dataPoints, concepts, youtube, labels, labelsI18n }) => {
       setDataPoints(dataPoints);
       setConcepts(concepts);
       setYoutubeVideos(youtube);
       setLabels(labels);
       setLabelsI18n(labelsI18n);
-      i18next.addResourceBundle(lang, "translation", uiI18n);
     },
   });
 
@@ -65,7 +56,9 @@ function App() {
   );
   return (
     <Container>
-      <Header />
+      <Suspense fallback={"loading header"}>
+        <Header />
+      </Suspense>
 
       {isLoading ? (
         <Loader />
