@@ -1,7 +1,7 @@
+import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { YoutubeVideo } from "../../api/model";
 import { config } from "../../config.ts";
-import { i18n } from "../../i18n.ts";
 
 type Props = {
   html: string | null;
@@ -17,6 +17,8 @@ const formatDate = (date: string) => {
 };
 
 export const LocalArticle = ({ html, videos }: Props) => {
+  const { t } = useTranslation();
+
   return (
     <>
       {
@@ -27,9 +29,7 @@ export const LocalArticle = ({ html, videos }: Props) => {
       <Videos>
         {videos.length > 0 ? (
           <>
-            <ListHeader>
-              {i18n(`Powiązane fragmenty "Czytamy Naturę" na YouTube`)}
-            </ListHeader>
+            <ListHeader>{t("article.youtubeRelated")}</ListHeader>
             <List>
               {videos.map((video) => (
                 <ListItem key={video.videoId}>
@@ -50,9 +50,7 @@ export const LocalArticle = ({ html, videos }: Props) => {
             </List>
           </>
         ) : (
-          <ListHeader>
-            {i18n(`Brak powiązanych filmów "Czytamy Naturę"`)}
-          </ListHeader>
+          <ListHeader>{t("article.youtubeNone")}</ListHeader>
         )}
       </Videos>
     </>

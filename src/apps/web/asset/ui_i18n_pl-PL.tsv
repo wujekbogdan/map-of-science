@@ -1,0 +1,41 @@
+id	translation
+article.close	Zamknij
+article.info	Więcej informacji na temat klastra <bold>#{{id}}</bold> ze strony projektu ETO Map of Science
+article.openInNewTab	Otwórz w nowej karcie
+article.youtubeRelated	Powiązane fragmenty "Czytamy Naturę" na YouTube
+article.youtubeNone	Brak powiązanych filmów "Czytamy Naturę"
+map.loading	Ładowanie mapy
+search.dropdown.youtubeCount	Filmy na YouTube
+search.dropdown.enterMin	Wpisz co najmniej 3 znaki
+search.dropdown.loading	Ładowanie
+search.dropdown.noResults	Brak wyników
+search.dropdown.placeholder	Wyszukaj na Mapie Nauki, np. {{placeholder}}
+search.dropdown.searchLabel	Szukaj
+search.dropdown.reset	Reset
+search.dropdown.placeholder.1	fizyka kwantowa
+search.dropdown.placeholder.2	genetyka
+search.dropdown.placeholder.3	chemia organiczna
+search.dropdown.placeholder.4	bioreaktory
+search.dropdown.placeholder.5	energetyka
+search.dropdown.placeholder.6	rybołówstwo
+search.dropdown.placeholder.7	prawo międzynarodowe
+search.dropdown.placeholder.8	ekonomia behawioralna
+search.dropdown.placeholder.9	cyberbezpieczeństwo
+search.dropdown.placeholder.10	logika rozmyta
+toggles.modeLabel	Tryb
+toggles.mode.regular	Standardowy
+toggles.mode.growth	Wskaźnik rozwoju
+toggles.clusterCountLabel	Liczba klastrów
+toggles.tooltip.mode.regular.title	Tryb standardowy.
+toggles.tooltip.mode.growth.title	Tryb wskaźnika rozwoju.
+toggles.tooltip.mode.regular.description	Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+toggles.tooltip.mode.growth.description	Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+toggles.tooltip.clusterCount.description.line1	Liczba klastrów wyświetlana jednocześnie na mapie.
+toggles.tooltip.clusterCount.description.line2	Obecnie maksymalna wartość to 3000. Nie zalecamy zbyt dużych wartości, ponieważ wydajność renderowania mapy wtedy znacznie spada.
+toggles.tooltip.clusterCount.description.note	Pracujemy nad znazcnym poprawieniem wydajności mapy, więc w przyszłości ta wartość będzie mogła być dużo większa.
+toggles.languages.language	Język
+toggles.languages.pl	polski
+toggles.languages.en	angielski
+map.clusterDetails.articleCount	Liczba artykułów: {{count}}
+map.clusterDetails.growthRating	Wskaźnik rozwoju: {{rating}}
+map.clusterDetails.keywordsLabel	Słowa kluczowe

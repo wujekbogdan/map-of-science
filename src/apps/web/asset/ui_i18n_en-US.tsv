@@ -1,0 +1,41 @@
+id	translation
+article.close	Close
+article.info	More information about the <bold>#{{id}}</bold> cluster from the ETO Map of Science project
+article.openInNewTab	Open in a new tab
+article.youtubeRelated	Related "Czytamy Naturę" segments on YouTube
+article.youtubeNone	No related "Czytamy Naturę" videos
+map.loading	Loading map
+search.dropdown.youtubeCount	YouTube videos
+search.dropdown.enterMin	Type at least 3 characters
+search.dropdown.loading	Loading
+search.dropdown.noResults	No results found
+search.dropdown.placeholder	Search the Map of Science, e.g. "{{placeholder}}"
+search.dropdown.searchLabel	Search
+search.dropdown.reset	Reset
+search.dropdown.placeholder.1	quantum physics
+search.dropdown.placeholder.2	genetics
+search.dropdown.placeholder.3	organic chemistry
+search.dropdown.placeholder.4	bioreactors
+search.dropdown.placeholder.5	energy systems
+search.dropdown.placeholder.6	fisheries
+search.dropdown.placeholder.7	international law
+search.dropdown.placeholder.8	behavioral economics
+search.dropdown.placeholder.9	cybersecurity
+search.dropdown.placeholder.10	fuzzy logic
+toggles.modeLabel	Mode
+toggles.mode.regular	Standard
+toggles.mode.growth	Growth rating
+toggles.clusterCountLabel	Cluster count
+toggles.tooltip.mode.regular.title	Standard mode.
+toggles.tooltip.mode.growth.title	Growth rating mode.
+toggles.tooltip.mode.regular.description	Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+toggles.tooltip.mode.growth.description	Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+toggles.tooltip.clusterCount.description.line1	Number of clusters displayed on the map at once.
+toggles.tooltip.clusterCount.description.line2	The current maximum value is 3000. We don't recommend using very high values, as map rendering performance will drop significantly.
+toggles.tooltip.clusterCount.description.note	We're working on major performance improvements, so this limit will be increased in the future.
+toggles.languages.language	Language
+toggles.languages.pl	Polish
+toggles.languages.en	English
+map.clusterDetails.articleCount	Number of articles: {{count}}
+map.clusterDetails.growthRating	Growth rating: {{rating}}
+map.clusterDetails.keywordsLabel	Keywords

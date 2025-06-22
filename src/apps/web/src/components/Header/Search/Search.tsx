@@ -18,8 +18,7 @@ export const Search = () => {
     dataPoints,
     concepts,
     youtube,
-    areaLabels,
-    labelsI18n,
+    areas,
   ] = useStore(
     useShallow((s) => [
       s.setDesiredZoom,
@@ -28,8 +27,7 @@ export const Search = () => {
       s.dataPoints,
       s.concepts,
       s.youtubeVideos,
-      s.labels,
-      s.labelsI18n,
+      s.areas,
     ]),
   );
   const [searchTerm, setSearchTerm] = useState("");
@@ -45,8 +43,7 @@ export const Search = () => {
 
       return worker.search(
         {
-          labels: areaLabels,
-          labelsI18n,
+          areas,
           dataPoints,
           concepts,
           youtube,

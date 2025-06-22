@@ -1,12 +1,6 @@
 import { normalizeSync } from "normalize-diacritics";
-import {
-  AreaLabel,
-  AreaLabelI18n,
-  Concept,
-  DataPoint,
-  YoutubeVideo,
-} from "../../../api/model";
-import { config } from "../../../config.ts";
+import { AreaLocalized } from "../../../api/data.ts";
+import { Concept, DataPoint, YoutubeVideo } from "../../../api/model";
 
 export type LabelModel = ReturnType<typeof createLabelsCollection>[number];
 
@@ -37,19 +31,15 @@ const normalize = (str: string) =>
   normalizeSync(str.replace("#", "").toLowerCase());
 
 export const createLabelsCollection = (
-  labels: Map<string, AreaLabel>,
-  labelsI18n: Map<string, AreaLabelI18n>,
+  areas: AreaLocalized[],
   youtube: Map<string, YoutubeVideo[]>,
 ) =>
-  [...labels.values()].map((label) => {
-    const name = labelsI18n.get(label.id)?.[config.LANG] ?? label.id;
-    return {
-      ...label,
-      label: name,
-      normalizedLabel: normalize(name),
-      videosCount: youtube.get(label.id)?.length ?? 0,
-    };
-  });
+  areas.map((area) => ({
+    ...area,
+    label: area.text,
+    normalizedLabel: normalize(area.text),
+    videosCount: youtube.get(area.id)?.length ?? 0,
+  }));
 
 export const createClustersByConcept = (
   dataPoints: Map<number, DataPoint>,
@@ -87,8 +77,7 @@ export const createClustersByConcept = (
 };
 
 type Options = {
-  labels: Map<string, AreaLabel>;
-  labelsI18n: Map<string, AreaLabelI18n>;
+  areas: AreaLocalized[];
   dataPoints: Map<number, DataPoint>;
   concepts: Map<number, Concept>;
   youtube: Map<string, YoutubeVideo[]>;
@@ -98,8 +87,7 @@ export const search = (options: Options, phrase: string) => {
   const labelsCollection =
     cachedLabelsCollection ??
     (cachedLabelsCollection = createLabelsCollection(
-      options.labels,
-      options.labelsI18n,
+      options.areas,
       options.youtube,
     ));
   const clustersByConcept =

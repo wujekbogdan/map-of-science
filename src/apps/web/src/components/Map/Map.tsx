@@ -3,14 +3,7 @@ import { CSSProperties, useMemo, useRef, useState } from "react";
 import styled from "styled-components";
 import useSWR from "swr";
 import { useShallow } from "zustand/react/shallow";
-import {
-  AreaLabel,
-  AreaLabelI18n,
-  Concept,
-  DataPoint as Point,
-  YoutubeVideo,
-} from "../../api/model";
-import { config } from "../../config.ts";
+import { DataPoint as Point } from "../../api/model";
 import { useArticleStore, useStore } from "../../store.ts";
 import { useD3Zoom } from "../../useD3Zoom.ts";
 import { useLayersOpacity } from "../../useLayersOpacity.ts";
@@ -66,19 +59,17 @@ type Props = {
     width: number;
     height: number;
   };
-  labels: Map<string, AreaLabel>;
-  labelsI18n: Map<string, AreaLabelI18n>;
-  dataPoints: Map<number, Point>;
-  concepts: Map<number, Concept>;
-  youtube: Map<string, YoutubeVideo[]>;
   on?: {
     labelClick?: OnLabelClick;
   };
 };
 
 export default function Map(props: Props) {
-  const { labels } = props;
   const [
+    areas,
+    dataPoints,
+    concepts,
+    youtube,
     scaleFactor,
     fontSize,
     desiredZoom,
@@ -89,6 +80,10 @@ export default function Map(props: Props) {
     mapMode,
   ] = useStore(
     useShallow((s) => [
+      s.areas,
+      s.dataPoints,
+      s.concepts,
+      s.youtubeVideos,
       s.scaleFactor,
       s.fontSize,
       s.desiredZoom,
@@ -144,7 +139,7 @@ export default function Map(props: Props) {
   };
 
   const labelsScaled = useMemo(() => {
-    return [...labels.values()].map((label) => {
+    return areas.map((label) => {
       const { fontSize, opacity: labelOpacity } = {
         1: {
           fontSize: scaledFontSize.layer1,
@@ -167,20 +162,18 @@ export default function Map(props: Props) {
       return {
         ...label,
         key: label.id,
-        text: props.labelsI18n.get(label.id)?.[config.LANG] ?? label.id,
         fontSize,
         opacity: labelOpacity,
-        videos: props.youtube.get(label.id) ?? [],
+        videos: youtube.get(label.id) ?? [],
       };
     });
   }, [
-    labels,
+    youtube,
+    areas,
     opacity.layer1,
     opacity.layer2,
     opacity.layer3,
     opacity.layer4,
-    props.labelsI18n,
-    props.youtube,
     scaledFontSize.layer1,
     scaledFontSize.layer2,
     scaledFontSize.layer3,
@@ -191,16 +184,16 @@ export default function Map(props: Props) {
     return !transform
       ? []
       : filterDataByViewport(
-          [...props.dataPoints.values()],
+          [...dataPoints.values()],
           transform,
           maxDataPointsInViewport,
           props.size,
         );
-  }, [maxDataPointsInViewport, props.dataPoints, props.size, transform]);
+  }, [maxDataPointsInViewport, dataPoints, props.size, transform]);
 
   const highlightedPoints = useMemo(() => {
     const pointsToHighlight = clustersToHighlight
-      .map((id) => props.dataPoints.get(id))
+      .map((id) => dataPoints.get(id))
       .filter((point) => point !== undefined);
 
     return !transform
@@ -211,7 +204,7 @@ export default function Map(props: Props) {
           Infinity,
           props.size,
         );
-  }, [clustersToHighlight, transform, props.size, props.dataPoints]);
+  }, [clustersToHighlight, transform, props.size, dataPoints]);
 
   const mapSvgBackgroundCss = useMemo(() => {
     if (!transform || !mapSvgUrl) {
@@ -263,13 +256,13 @@ export default function Map(props: Props) {
       <g transform={transformValue}>
         <DataPoints
           points={dataInViewport}
-          concepts={props.concepts}
+          concepts={concepts}
           mode={mapMode}
         />
         <DataPoints
           points={highlightedPoints}
           uniformStyle={true}
-          concepts={props.concepts}
+          concepts={concepts}
           mode={mapMode}
         />
         {labelsScaled.map((label) => (
