@@ -13,6 +13,7 @@ i18next
   .use(backend)
   .init({
     supportedLngs: ["pl", "en"],
+    fallbackLng: "en",
     load: "languageOnly",
     interpolation: {
       escapeValue: false,
