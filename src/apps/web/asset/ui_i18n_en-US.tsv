@@ -33,6 +33,9 @@ toggles.tooltip.mode.growth.description	Sed do eiusmod tempor incididunt ut labo
 toggles.tooltip.clusterCount.description.line1	Number of clusters displayed on the map at once.
 toggles.tooltip.clusterCount.description.line2	The current maximum value is 3000. We don't recommend using very high values, as map rendering performance will drop significantly.
 toggles.tooltip.clusterCount.description.note	We're working on major performance improvements, so this limit will be increased in the future.
+toggles.languages.language	Language
+toggles.languages.pl	Polish
+toggles.languages.en	English
 map.clusterDetails.articleCount	Number of articles: {{count}}
 map.clusterDetails.growthRating	Growth rating: {{rating}}
 map.clusterDetails.keywordsLabel	Keywords

@@ -33,6 +33,9 @@ toggles.tooltip.mode.growth.description	Sed do eiusmod tempor incididunt ut labo
 toggles.tooltip.clusterCount.description.line1	Liczba klastrów wyświetlana jednocześnie na mapie.
 toggles.tooltip.clusterCount.description.line2	Obecnie maksymalna wartość to 3000. Nie zalecamy zbyt dużych wartości, ponieważ wydajność renderowania mapy wtedy znacznie spada.
 toggles.tooltip.clusterCount.description.note	Pracujemy nad znazcnym poprawieniem wydajności mapy, więc w przyszłości ta wartość będzie mogła być dużo większa.
+toggles.languages.language	Język
+toggles.languages.pl	polski
+toggles.languages.en	angielski
 map.clusterDetails.articleCount	Liczba artykułów: {{count}}
 map.clusterDetails.growthRating	Wskaźnik rozwoju: {{rating}}
 map.clusterDetails.keywordsLabel	Słowa kluczowe

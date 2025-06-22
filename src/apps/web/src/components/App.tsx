@@ -24,7 +24,7 @@ const MapLoader = () => {
 };
 
 function App() {
-  const language = useLanguage();
+  const { code: langCode } = useLanguage();
   const [setMapSize, setDataPoints, setConcepts, setYoutubeVideos, setAreas] =
     useStore(
       useShallow((s) => [
@@ -35,7 +35,7 @@ function App() {
         s.setAreas,
       ]),
     );
-  const { isLoading } = useSWR(["data", language], () => loadData(language), {
+  const { isLoading } = useSWR(["data", langCode], () => loadData(langCode), {
     onSuccess: ({ dataPoints, concepts, youtube, areas }) => {
       setDataPoints(dataPoints);
       setConcepts(concepts);

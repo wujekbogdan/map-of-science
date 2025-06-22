@@ -7,11 +7,14 @@ import {
   useInteractions,
   useTransitionStyles,
 } from "@floating-ui/react";
+import i18next from "i18next";
 import { ChangeEvent, useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { useShallow } from "zustand/react/shallow";
 import { useStore } from "../../../store.ts";
+import { LangCode } from "../../../useLanguage.ts";
+import LanguageSelector from "./LanguageSelector.tsx";
 import helpIcon from "./help.svg";
 
 const useTooltip = () => {
@@ -97,6 +100,12 @@ const Toggles = () => {
     setClusterInputValue(maxDataPointsInViewport.toString());
   };
 
+  const onLanguageSelect = (lang: { code: LangCode }) => {
+    i18next.changeLanguage(lang.code).catch((err) => {
+      console.error("Failed to change language:", err);
+    });
+  };
+
   return (
     <Wrap>
       <TogglesList>
@@ -140,6 +149,10 @@ const Toggles = () => {
             ref={clusterCountTooltip.refs.setReference}
             {...clusterCountTooltip.getReferenceProps()}
           />
+        </TogglesListItem>
+
+        <TogglesListItem>
+          <LanguageSelector onSelect={onLanguageSelect} />
         </TogglesListItem>
       </TogglesList>
 
