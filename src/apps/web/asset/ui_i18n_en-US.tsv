@@ -12,6 +12,16 @@ search.dropdown.noResults	No results found
 search.dropdown.placeholder	Search the Map of Science, e.g. "{{placeholder}}"
 search.dropdown.searchLabel	Search
 search.dropdown.reset	Reset
+search.dropdown.placeholder.1	quantum physics
+search.dropdown.placeholder.2	genetics
+search.dropdown.placeholder.3	organic chemistry
+search.dropdown.placeholder.4	bioreactors
+search.dropdown.placeholder.5	energy systems
+search.dropdown.placeholder.6	fisheries
+search.dropdown.placeholder.7	international law
+search.dropdown.placeholder.8	behavioral economics
+search.dropdown.placeholder.9	cybersecurity
+search.dropdown.placeholder.10	fuzzy logic
 toggles.modeLabel	Mode
 toggles.mode.regular	Standard
 toggles.mode.growth	Growth rating

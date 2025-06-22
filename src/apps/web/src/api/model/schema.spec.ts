@@ -3,7 +3,7 @@ import { fileURLToPath } from "node:url";
 import { z } from "zod";
 import { ZodSchema } from "zod";
 import { describe, it, expect } from "@map-of-science/vitest";
-import { DataSchema, ConceptSchema, AreaLabelSchema } from ".";
+import { DataSchema, ConceptSchema, AreaSchema } from ".";
 import { setCollector } from "../../csv/collector.ts";
 import { parse as csvParse } from "../../csv/parse.ts";
 
@@ -64,7 +64,7 @@ describe("schema", () => {
 
   describe("area_labels.tsv", () => {
     it("should parse labels area_labels.tsv", async () => {
-      const [firstItem] = await parse("area_labels.tsv", AreaLabelSchema(z));
+      const [firstItem] = await parse("area_labels.tsv", AreaSchema(z));
       expect(firstItem).toEqual({
         id: "5ed40bc1-cf8f-5067-87df-2382b03048f4",
         x: -8.441680160507701,

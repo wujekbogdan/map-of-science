@@ -51,19 +51,6 @@ type Dropdown = {
   isLoading: boolean;
 };
 
-const placeholders = [
-  "fizyka kwantowa",
-  "genetyka",
-  "chemia organiczna",
-  "bioreaktory",
-  "energetyka",
-  "rybołówstwo",
-  "prawo międzynarodowe",
-  "ekonomia behawioralna",
-  "cyberbezpieczeństwo",
-  "logika rozmyta",
-];
-
 const tokenizeLabel = (label: string, query: string): Token[] => {
   const i = label.toLowerCase().indexOf(query.toLowerCase());
   if (i === -1) return [{ text: label, type: "regular" }];
@@ -151,6 +138,9 @@ export const Dropdown = (props: Dropdown) => {
 
     return t("search.dropdown.noResults");
   })();
+  const placeholders = Array.from({ length: 10 }, (_, i) =>
+    t(`search.dropdown.placeholder.${i + 1}`),
+  );
   const { current: randomPlaceholder } = useRef<string>(
     placeholders[Math.floor(Math.random() * placeholders.length)],
   );

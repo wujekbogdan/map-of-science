@@ -1,13 +1,8 @@
 import { create } from "zustand";
 import { combine } from "zustand/middleware";
 import { fetchArticle } from "./api";
-import {
-  AreaLabel,
-  AreaLabelI18n,
-  Concept,
-  DataPoint,
-  YoutubeVideo,
-} from "./api/model";
+import { AreaLocalized } from "./api/data.ts";
+import { Concept, DataPoint, YoutubeVideo } from "./api/model";
 
 type Zoom = { x: number; y: number; scale: number };
 type PartialDefaults = typeof partialDefaults;
@@ -55,8 +50,7 @@ const partialDefaults = {
   dataPoints: new Map<number, DataPoint>(),
   concepts: new Map<number, Concept>(),
   youtubeVideos: new Map<string, YoutubeVideo[]>(),
-  labels: new Map<string, AreaLabel>(),
-  labelsI18n: new Map<string, AreaLabelI18n>(),
+  areas: [] as AreaLocalized[],
   pointsToHighlight: [] as number[],
   zoomStepFactor: 1.6,
   mapSize: {
@@ -140,11 +134,8 @@ export const useStore = create(
     setYoutubeVideos: (youtubeVideos: Map<string, YoutubeVideo[]>) => {
       set({ youtubeVideos });
     },
-    setLabels: (labels: Map<string, AreaLabel>) => {
-      set({ labels });
-    },
-    setLabelsI18n: (labelsI18n: Map<string, AreaLabelI18n>) => {
-      set({ labelsI18n });
+    setAreas: (areas: AreaLocalized[]) => {
+      set({ areas });
     },
     setPointsToHighlight: (clusterIds: number[]) => {
       set({ pointsToHighlight: clusterIds });

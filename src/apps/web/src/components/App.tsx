@@ -6,6 +6,7 @@ import { useShallow } from "zustand/react/shallow";
 import { loadData } from "../api/worker.ts";
 import { config } from "../config.ts";
 import { useStore } from "../store.ts";
+import { useLanguage } from "../useLanguage.ts";
 import { useWindowSize } from "../useWindowSize.ts";
 import { Article } from "./Article/Article.tsx";
 import { DevTool } from "./DevTool.tsx";
@@ -23,32 +24,23 @@ const MapLoader = () => {
 };
 
 function App() {
-  const [
-    setMapSize,
-    setDataPoints,
-    setConcepts,
-    setYoutubeVideos,
-    setLabels,
-    setLabelsI18n,
-  ] = useStore(
-    useShallow((s) => [
-      s.setMapSize,
-      s.setDataPoints,
-      s.setConcepts,
-      s.setYoutubeVideos,
-      s.setLabels,
-      s.setLabelsI18n,
-    ]),
-  );
-  // TODO: Move to store
-  const lang = "pl-PL";
-  const { data, isLoading } = useSWR(["data", lang], () => loadData(), {
-    onSuccess: ({ dataPoints, concepts, youtube, labels, labelsI18n }) => {
+  const language = useLanguage();
+  const [setMapSize, setDataPoints, setConcepts, setYoutubeVideos, setAreas] =
+    useStore(
+      useShallow((s) => [
+        s.setMapSize,
+        s.setDataPoints,
+        s.setConcepts,
+        s.setYoutubeVideos,
+        s.setAreas,
+      ]),
+    );
+  const { isLoading } = useSWR(["data", language], () => loadData(language), {
+    onSuccess: ({ dataPoints, concepts, youtube, areas }) => {
       setDataPoints(dataPoints);
       setConcepts(concepts);
       setYoutubeVideos(youtube);
-      setLabels(labels);
-      setLabelsI18n(labelsI18n);
+      setAreas(areas);
     },
   });
 
@@ -64,24 +56,7 @@ function App() {
     <Container>
       <Suspense fallback={<AppLoader />}>
         <Header />
-
-        {isLoading ? (
-          <MapLoader />
-        ) : (
-          <MapComponent
-            size={size}
-            /* TODO: This condition isn't really required. values are never
-             * undefined. It's just an issue with SWR typing. SWR doesn't narrow
-             * the type of data based on the isLoading value.
-             * */
-            labels={data?.labels ?? new Map()}
-            dataPoints={data?.dataPoints ?? new Map()}
-            concepts={data?.concepts ?? new Map()}
-            youtube={data?.youtube ?? new Map()}
-            labelsI18n={data?.labelsI18n ?? new Map()}
-          />
-        )}
-
+        {isLoading ? <MapLoader /> : <MapComponent size={size} />}
         <Article />
 
         {config.devTool && (

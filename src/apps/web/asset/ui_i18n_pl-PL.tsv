@@ -12,6 +12,16 @@ search.dropdown.noResults	Brak wyników
 search.dropdown.placeholder	Wyszukaj na Mapie Nauki, np. {{placeholder}}
 search.dropdown.searchLabel	Szukaj
 search.dropdown.reset	Reset
+search.dropdown.placeholder.1	fizyka kwantowa
+search.dropdown.placeholder.2	genetyka
+search.dropdown.placeholder.3	chemia organiczna
+search.dropdown.placeholder.4	bioreaktory
+search.dropdown.placeholder.5	energetyka
+search.dropdown.placeholder.6	rybołówstwo
+search.dropdown.placeholder.7	prawo międzynarodowe
+search.dropdown.placeholder.8	ekonomia behawioralna
+search.dropdown.placeholder.9	cyberbezpieczeństwo
+search.dropdown.placeholder.10	logika rozmyta
 toggles.modeLabel	Tryb
 toggles.mode.regular	Standardowy
 toggles.mode.growth	Wskaźnik rozwoju

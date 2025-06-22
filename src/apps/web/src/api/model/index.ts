@@ -7,7 +7,7 @@ export const ConceptSchema = (z: typeof zod) =>
   });
 export type Concept = zod.infer<ReturnType<typeof ConceptSchema>>;
 
-export const AreaLabelSchema = (z: typeof zod) =>
+export const AreaSchema = (z: typeof zod) =>
   z
     .object({
       id: z.string(),
@@ -23,15 +23,15 @@ export const AreaLabelSchema = (z: typeof zod) =>
       ...rest,
       clusterId: cluster_id === "null" ? null : parseInt(cluster_id, 10),
     }));
-export type AreaLabel = zod.infer<ReturnType<typeof AreaLabelSchema>>;
+export type Area = zod.infer<ReturnType<typeof AreaSchema>>;
 
-export const AreaLabelI18nSchema = (z: typeof zod) =>
+export const AreaI18nSchema = (z: typeof zod) =>
   z.object({
     id: z.string(),
     "pl-PL": z.string(),
     "en-US": z.string(),
   });
-export type AreaLabelI18n = zod.infer<ReturnType<typeof AreaLabelI18nSchema>>;
+export type AreaLabelI18n = zod.infer<ReturnType<typeof AreaI18nSchema>>;
 
 export const i18nSchema = (z: typeof zod) =>
   z.object({
