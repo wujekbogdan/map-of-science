@@ -5,8 +5,8 @@ import {
   ComboboxOption as ComboboxOptionHeadless,
 } from "@headlessui/react";
 import { ChangeEvent, useMemo, useState, memo, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { i18n } from "../../../../i18n";
 import Label, { Token } from "./Label.tsx";
 import CloseIcon from "./close.svg";
 
@@ -80,6 +80,7 @@ const tokenizeLabel = (label: string, query: string): Token[] => {
 };
 
 type OptionRowProps = {
+  t: (text: string) => string;
   id: string;
   focus: boolean;
   selected: boolean;
@@ -94,7 +95,7 @@ const OptionRow = memo(
       props.videosCount === undefined
         ? undefined
         : {
-            text: ` [${i18n("Filmy na YouTube:")} ${props.videosCount}]`,
+            text: ` [${props.t("search.dropdown.youtubeCount")}: ${props.videosCount}]`,
             type: "regular",
           };
 
@@ -118,6 +119,7 @@ const OptionRow = memo(
 );
 
 export const Dropdown = (props: Dropdown) => {
+  const { t } = useTranslation();
   const { options: rawOptions } = props;
   const [query, setQuery] = useState("");
   const [selection, setSelection] = useState<Option | null>(null);
@@ -140,14 +142,14 @@ export const Dropdown = (props: Dropdown) => {
   const hasNoResultsText = query.length > 1 && options.length === 0;
   const noResultsText = (() => {
     if (query.length < 3) {
-      return i18n("Wpisz co najmniej 3 znaki");
+      return t("search.dropdown.enterMin");
     }
 
     if (props.isLoading) {
-      return i18n("Ładowanie...");
+      return `${t("search.dropdown.loading")}…`;
     }
 
-    return i18n("Brak wyników");
+    return t("search.dropdown.noResults");
   })();
   const { current: randomPlaceholder } = useRef<string>(
     placeholders[Math.floor(Math.random() * placeholders.length)],
@@ -189,9 +191,9 @@ export const Dropdown = (props: Dropdown) => {
             <ComboboxInput
               autoComplete="off"
               $open={open}
-              placeholder={i18n(
-                `Wyszukaj na Mapie Nauki, np. "${randomPlaceholder}"`,
-              )}
+              placeholder={t("search.dropdown.placeholder", {
+                placeholder: randomPlaceholder,
+              })}
               displayValue={(option: Option | null) => option?.keyword ?? query}
               onChange={onQueryChange}
             />
@@ -210,8 +212,8 @@ export const Dropdown = (props: Dropdown) => {
                       {({ focus, selected }) => (
                         <ComboboxOption $focus={focus} $selected={selected}>
                           <Label type="query">
-                            {i18n("Szukaj")}: <strong>{query}</strong> [
-                            {allClusters.length}]
+                            {t("search.dropdown.searchLabel")}:{" "}
+                            <strong>{query}</strong> [{allClusters.length}]
                           </Label>
                         </ComboboxOption>
                       )}
@@ -221,6 +223,7 @@ export const Dropdown = (props: Dropdown) => {
                     <ComboboxOptionHeadless key={option.id} value={option}>
                       {({ focus, selected }) => (
                         <OptionRow
+                          t={t}
                           type={option.type}
                           id={option.id}
                           focus={focus}
@@ -243,7 +246,7 @@ export const Dropdown = (props: Dropdown) => {
       </Combobox>
       {selection && (
         <ResetButton role="button" onClick={onResetClick}>
-          <SrOnly>{i18n("Reset")}</SrOnly>
+          <SrOnly>{t("search.dropdown.reset")}</SrOnly>
         </ResetButton>
       )}
     </Wrapper>

@@ -6,7 +6,7 @@ export type Lang = "en-US" | "pl-PL";
 
 export const loadI18n = async (lang: Lang) => {
   const i18nUrl = {
-    "en-US": new URL("../../asset/ui_i18n_pl-PL.tsv", import.meta.url).href,
+    "en-US": new URL("../../asset/ui_i18n_en-US.tsv", import.meta.url).href,
     "pl-PL": new URL("../../asset/ui_i18n_pl-PL.tsv", import.meta.url).href,
   }[lang];
 

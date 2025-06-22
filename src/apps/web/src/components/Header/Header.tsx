@@ -1,16 +1,13 @@
-import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { Search } from "./Search/Search.tsx";
 import Toggles from "./Toggles/Toggles.tsx";
 import { ZoomControls } from "./ZoomControls/ZoomControls.tsx";
 
 export const Header = () => {
-  const { t } = useTranslation();
-
   return (
     <>
       <TopBar>
-        <Search /> {t("article.header")}
+        <Search />
         <TogglesWrap>
           <Toggles />
         </TogglesWrap>

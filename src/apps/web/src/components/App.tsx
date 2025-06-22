@@ -1,10 +1,10 @@
 import { Suspense, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import useSWR from "swr";
 import { useShallow } from "zustand/react/shallow";
 import { loadData } from "../api/worker.ts";
 import { config } from "../config.ts";
-import { i18n } from "../i18n";
 import { useStore } from "../store.ts";
 import { useWindowSize } from "../useWindowSize.ts";
 import { Article } from "./Article/Article.tsx";
@@ -12,8 +12,14 @@ import { DevTool } from "./DevTool.tsx";
 import { Header } from "./Header/Header.tsx";
 import MapComponent from "./Map/Map.tsx";
 
-const Loader = () => {
-  return <LoadingWrapper>{i18n("Ładowanie danych...")}</LoadingWrapper>;
+const AppLoader = () => {
+  // TODO: Implement global loading state
+  return "";
+};
+
+const MapLoader = () => {
+  const { t } = useTranslation();
+  return <LoadingWrapper>{t("map.loading")}&hellip;</LoadingWrapper>;
 };
 
 function App() {
@@ -56,34 +62,34 @@ function App() {
   );
   return (
     <Container>
-      <Suspense fallback={"loading header"}>
+      <Suspense fallback={<AppLoader />}>
         <Header />
+
+        {isLoading ? (
+          <MapLoader />
+        ) : (
+          <MapComponent
+            size={size}
+            /* TODO: This condition isn't really required. values are never
+             * undefined. It's just an issue with SWR typing. SWR doesn't narrow
+             * the type of data based on the isLoading value.
+             * */
+            labels={data?.labels ?? new Map()}
+            dataPoints={data?.dataPoints ?? new Map()}
+            concepts={data?.concepts ?? new Map()}
+            youtube={data?.youtube ?? new Map()}
+            labelsI18n={data?.labelsI18n ?? new Map()}
+          />
+        )}
+
+        <Article />
+
+        {config.devTool && (
+          <DevToolsWrapper>
+            <DevTool />
+          </DevToolsWrapper>
+        )}
       </Suspense>
-
-      {isLoading ? (
-        <Loader />
-      ) : (
-        <MapComponent
-          size={size}
-          /* TODO: This condition isn't really required. values are never
-           * undefined. It's just an issue with SWR typing. SWR doesn't narrow
-           * the type of data based on the isLoading value.
-           * */
-          labels={data?.labels ?? new Map()}
-          dataPoints={data?.dataPoints ?? new Map()}
-          concepts={data?.concepts ?? new Map()}
-          youtube={data?.youtube ?? new Map()}
-          labelsI18n={data?.labelsI18n ?? new Map()}
-        />
-      )}
-
-      <Article />
-
-      {config.devTool && (
-        <DevToolsWrapper>
-          <DevTool />
-        </DevToolsWrapper>
-      )}
     </Container>
   );
 }

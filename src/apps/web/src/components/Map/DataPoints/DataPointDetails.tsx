@@ -1,13 +1,11 @@
+import { useTranslation } from "react-i18next";
 import { Concept, DataPoint } from "../../../api/model";
 
-// TODO: This is a temp solution - a direct copy of the old code.
-// Let's adjust HTML and CSS and get rid of the conceptsData dependency.
-// We should map keyConcepts in the model.
-// https://github.com/wujekbogdan/map-of-science/issues/59
 export const DataPointDetails = (props: {
   point: DataPoint;
   concepts: Map<number, Concept>;
 }) => {
+  const { t } = useTranslation();
   const { point, concepts } = props;
 
   return (
@@ -30,17 +28,21 @@ export const DataPointDetails = (props: {
               : undefined
         }
       >
-        Liczba artykułów: {point.numRecentArticles}
+        {t("map.clusterDetails.articleCount", {
+          count: point.numRecentArticles,
+        })}
       </span>
       <br />
 
       <span className={point.growthRating >= 80 ? "many-articles" : undefined}>
-        Wskaźnik rozwoju: {point.growthRating}
+        {t("map.clusterDetails.growthRating", {
+          rating: point.growthRating,
+        })}
       </span>
       <br />
-
       <br />
-      <strong>Słowa kluczowe:</strong>
+
+      <strong>{t("map.clusterDetails.keywordsLabel")}:</strong>
       <ul>
         {point.keyConcepts.map((conceptId) => {
           const concept = concepts.get(Number(conceptId));

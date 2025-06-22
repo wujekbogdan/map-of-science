@@ -1,18 +1,22 @@
+import { Trans, useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { i18n } from "../../i18n";
 
 export const IframeArticle = ({ id }: { id: number }) => {
+  const { t } = useTranslation("article");
   const url = `https://sciencemap.eto.tech/cluster/?version=2&cluster_id=${id.toString()}`;
   return (
     <Wrapper>
       <p>
-        {i18n("Więcej informacji na temat klastra ")}
-        <strong>#{id}</strong> {i18n("ze strony projektu ETO Map of Science")}:
+        <Trans
+          i18nKey="article.info"
+          values={{ id }}
+          components={{ bold: <strong /> }}
+        />
       </p>
       <Iframe src={url} />
       <p>
         <a href={url} target="_blank" rel="noopener noreferrer">
-          {i18n("Otórz w nowej karcie »")}
+          {t("article.openInNewTab")} »
         </a>
       </p>
     </Wrapper>

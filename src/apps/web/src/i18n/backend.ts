@@ -14,7 +14,7 @@ export const backend: BackendModule = {
       )[language] ?? "pl-PL";
 
     loadI18n(lang)
-      .then((i18n) => {
+      .then(({ i18n }) => {
         callback(null, i18n);
       })
       .catch((err) => {
