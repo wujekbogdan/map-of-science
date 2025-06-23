@@ -6,6 +6,7 @@ import { useShallow } from "zustand/react/shallow";
 import { Cluster } from "../../api/model";
 import { useArticleStore, useStore } from "../../store.ts";
 import { useD3Zoom } from "../../useD3Zoom.ts";
+import { useFlashState } from "../../useFlashState.ts";
 import { useLayersOpacity } from "../../useLayersOpacity.ts";
 import { Clusters, ClusterWithScaledPlace } from "./Clusters/Clusters.tsx";
 import Label, { OnLabelClick } from "./Label/Label.tsx";
@@ -199,55 +200,41 @@ export default function Map(props: Props) {
     scaledFontSize.layer4,
   ]);
 
+  const hasSearchResults = clustersToHighlight.length > 0;
   const clustersAsArray = useMemo(() => [...clusters.values()], [clusters]);
   const clustersInViewport = useMemo(() => {
-    return !transform
-      ? []
-      : processClustersForViewport({
-          clusters: clustersAsArray,
-          transform,
-          limit: maxDataPointsInViewport,
-          size: props.size,
-          places: {
-            visible: true,
-            fontSize: scaledFontSize.layer4,
-            opacity: opacity.layer4,
-          },
-        });
+    if (!transform) {
+      return [];
+    }
+
+    const allClusters = hasSearchResults
+      ? clustersToHighlight
+          .map((id) => clusters.get(id))
+          .filter((point) => point !== undefined)
+      : clustersAsArray;
+    const limit = hasSearchResults ? Infinity : maxDataPointsInViewport;
+
+    return processClustersForViewport({
+      clusters: allClusters,
+      transform,
+      limit,
+      size: props.size,
+      places: {
+        visible: true,
+        fontSize: scaledFontSize.layer4,
+        opacity: opacity.layer4,
+      },
+    });
   }, [
-    maxDataPointsInViewport,
-    clustersAsArray,
-    props.size,
+    hasSearchResults,
     transform,
-    scaledFontSize.layer4,
-    opacity,
-  ]);
-
-  const highlightedClustersInViewport = useMemo(() => {
-    const pointsToHighlight = clustersToHighlight
-      .map((id) => clusters.get(id))
-      .filter((point) => point !== undefined);
-
-    return !transform
-      ? []
-      : processClustersForViewport({
-          clusters: pointsToHighlight,
-          transform,
-          limit: Infinity,
-          size: props.size,
-          places: {
-            visible: true,
-            fontSize: scaledFontSize.layer4,
-            opacity: opacity.layer4,
-          },
-        });
-  }, [
     clustersToHighlight,
-    transform,
+    clustersAsArray,
+    maxDataPointsInViewport,
     props.size,
-    clusters,
     scaledFontSize.layer4,
-    opacity,
+    opacity.layer4,
+    clusters,
   ]);
 
   const mapSvgBackgroundCss = useMemo(() => {
@@ -288,6 +275,8 @@ export default function Map(props: Props) {
     };
   }, [transform, svgOffset, svgScaleFactor, mapSvgUrl]);
 
+  const ripple = useFlashState(hasSearchResults);
+
   return (
     <MapSvg
       ref={svgRoot}
@@ -302,12 +291,7 @@ export default function Map(props: Props) {
           clusters={clustersInViewport}
           concepts={concepts}
           mode={mapMode}
-        />
-        <Clusters
-          clusters={highlightedClustersInViewport}
-          uniformStyle={true}
-          concepts={concepts}
-          mode={mapMode}
+          ripple={ripple}
         />
         {labelsScaled.map((label) => (
           <Label

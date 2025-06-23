@@ -30,7 +30,7 @@ export type ClusterWithScaledPlace = Cluster & {
 
 type Props = {
   concepts: Map<number, Concept>;
-  uniformStyle?: boolean;
+  ripple?: boolean;
   clusters: ClusterWithScaledPlace[];
   mode: Mode;
 };
@@ -50,7 +50,7 @@ const getPercentage = (index: number, total: number) => {
   return Math.round(((index + 1) / total) * 100);
 };
 
-export const Clusters = ({ clusters, concepts, uniformStyle, mode }: Props) => {
+export const Clusters = ({ clusters, concepts, ripple, mode }: Props) => {
   const [growthRatingColors] = useStore(
     useShallow((state) => [state.growthRatingColors]),
   );
@@ -115,7 +115,7 @@ export const Clusters = ({ clusters, concepts, uniformStyle, mode }: Props) => {
                 x: cluster.x,
                 y: cluster.y,
               }}
-              uniformStyle={!!uniformStyle}
+              ripple={!!ripple}
               mode={mode}
               growthRatingColors={growthRatingColors}
             />
