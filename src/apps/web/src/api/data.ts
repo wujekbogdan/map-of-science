@@ -1,11 +1,11 @@
 import { z } from "zod";
 import {
-  DataSchema,
+  ClustersSchema,
   ConceptSchema,
   AreaSchema,
   YoutubeVideoSchema,
   YoutubeVideo,
-  AreaI18nSchema,
+  MapEntity18nSchema,
 } from "./model";
 import { loadAsArray, loadAsMap } from "./utils.ts";
 
@@ -21,8 +21,8 @@ const loadAreas = async (lang: Lang) => {
   )[lang];
 
   const i18n = await loadAsMap({
-    url: new URL("../../asset/areas_i18n.tsv", import.meta.url).href,
-    schema: AreaI18nSchema(z),
+    url: new URL("../../asset/map_entities_i18n.tsv", import.meta.url).href,
+    schema: MapEntity18nSchema(z),
     getKey: (item) => item.id,
   });
 
@@ -41,15 +41,15 @@ const loadAreas = async (lang: Lang) => {
 // It's more of a service layer.
 // https://github.com/wujekbogdan/map-of-science/issues/57
 export const loadData = async (lang: Lang) => {
-  const [concepts, dataPoints, youtube, areas] = await Promise.all([
+  const [concepts, clusters, youtube, areas] = await Promise.all([
     loadAsMap({
       url: new URL("../../asset/keys.tsv", import.meta.url).href,
       schema: ConceptSchema(z),
       getKey: (item) => item.index,
     }),
     loadAsMap({
-      url: new URL("../../asset/data.tsv", import.meta.url).href,
-      schema: DataSchema(z),
+      url: new URL("../../asset/clusters.tsv", import.meta.url).href,
+      schema: ClustersSchema(z),
       getKey: (item) => item.clusterId,
     }),
     loadAsArray({
@@ -59,8 +59,8 @@ export const loadData = async (lang: Lang) => {
     loadAreas(lang),
   ]);
 
-  const dataPointsOrdered = new Map(
-    [...dataPoints.entries()].sort(
+  const clustersOrdered = new Map(
+    [...clusters.entries()].sort(
       ([, a], [, b]) => b.numRecentArticles - a.numRecentArticles,
     ),
   );
@@ -91,7 +91,7 @@ export const loadData = async (lang: Lang) => {
   return {
     concepts,
     areas,
-    dataPoints: dataPointsOrdered,
+    clusters: clustersOrdered,
     youtube: labelToVideos,
   };
 };

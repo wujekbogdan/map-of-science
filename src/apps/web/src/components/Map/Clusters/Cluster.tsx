@@ -10,18 +10,18 @@ import {
 import { useState } from "react";
 import { createPortal } from "react-dom";
 import { useShallow } from "zustand/react/shallow";
-import { Concept, DataPoint as Point } from "../../../api/model";
+import { Concept, Cluster as Point } from "../../../api/model";
 import { useArticleStore, useStore } from "../../../store.ts";
-import { DataPointDetails } from "./DataPointDetails.tsx";
-import css from "./DataPoints.module.scss";
+import { ClusterDetails } from "./ClusterDetails.tsx";
 import Shape from "./Shape.tsx";
+import css from "./clusters.module.scss";
 
 type Mode = "growth" | "regular";
 
 type Props = {
   concepts: Map<number, Concept>;
   uniformStyle?: boolean;
-  points: Point[];
+  clusters: Point[];
   mode: Mode;
 };
 
@@ -40,14 +40,14 @@ const getPercentage = (index: number, total: number) => {
   return Math.round(((index + 1) / total) * 100);
 };
 
-export const DataPoints = ({ points, concepts, uniformStyle, mode }: Props) => {
+export const Cluster = ({ clusters, concepts, uniformStyle, mode }: Props) => {
   const [growthRatingColors] = useStore(
     useShallow((state) => [state.growthRatingColors]),
   );
   const setRemoteArticleId = useArticleStore(
     ({ setRemoteArticleId }) => setRemoteArticleId,
   );
-  const [hoveredPoint, setHoveredPoint] = useState<Point | null>(null);
+  const [hoveredPoint, setHoveredCluster] = useState<Point | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const { refs, floatingStyles, context } = useFloating({
     middleware: [offset(10), flip(), shift({ padding: 10 })],
@@ -70,39 +70,39 @@ export const DataPoints = ({ points, concepts, uniformStyle, mode }: Props) => {
 
   return (
     <>
-      {points.map((point, index) => {
-        const label = concepts.get(point.clusterId)?.key;
+      {clusters.map((cluster, index) => {
+        const label = concepts.get(cluster.clusterId)?.key;
 
         return (
           <g
             className={classes([css.group, css.fadeIn])}
-            key={point.clusterId}
+            key={cluster.clusterId}
             aria-label={label}
             ref={
-              hoveredPoint?.clusterId === point.clusterId
+              hoveredPoint?.clusterId === cluster.clusterId
                 ? refs.setReference
                 : null
             }
             onPointerEnter={() => {
-              setHoveredPoint(point);
+              setHoveredCluster(cluster);
             }}
             onPointerLeave={() => {
-              setHoveredPoint(null);
+              setHoveredCluster(null);
             }}
             onClick={() => {
-              setRemoteArticleId(point.clusterId);
+              setRemoteArticleId(cluster.clusterId);
             }}
-            {...(hoveredPoint?.clusterId === point.clusterId
+            {...(hoveredPoint?.clusterId === cluster.clusterId
               ? getReferenceProps()
               : {})}
           >
             <Shape
-              progress={getPercentage(index, points.length)}
-              level={getLevelByArticlesCount(point.numRecentArticles)}
+              progress={getPercentage(index, clusters.length)}
+              level={getLevelByArticlesCount(cluster.numRecentArticles)}
               point={{
-                growthRating: point.growthRating,
-                x: point.x,
-                y: point.y,
+                growthRating: cluster.growthRating,
+                x: cluster.x,
+                y: cluster.y,
               }}
               uniformStyle={!!uniformStyle}
               mode={mode}
@@ -120,7 +120,7 @@ export const DataPoints = ({ points, concepts, uniformStyle, mode }: Props) => {
               style={{ ...floatingStyles, ...styles }}
               {...getFloatingProps()}
             >
-              <DataPointDetails point={hoveredPoint} concepts={concepts} />
+              <ClusterDetails cluster={hoveredPoint} concepts={concepts} />
             </div>,
             document.body,
           )}

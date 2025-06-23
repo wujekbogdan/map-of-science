@@ -8,30 +8,24 @@ export const ConceptSchema = (z: typeof zod) =>
 export type Concept = zod.infer<ReturnType<typeof ConceptSchema>>;
 
 export const AreaSchema = (z: typeof zod) =>
-  z
-    .object({
-      id: z.string(),
-      x: z.coerce.number(),
-      y: z.coerce.number(),
-      level: z.preprocess(
-        (val) => Number(val),
-        z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4)]),
-      ),
-      cluster_id: z.union([z.literal("null"), z.string()]),
-    })
-    .transform(({ cluster_id, ...rest }) => ({
-      ...rest,
-      clusterId: cluster_id === "null" ? null : parseInt(cluster_id, 10),
-    }));
+  z.object({
+    id: z.string(),
+    x: z.coerce.number(),
+    y: z.coerce.number(),
+    level: z.preprocess(
+      (val) => Number(val),
+      z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4)]),
+    ),
+  });
 export type Area = zod.infer<ReturnType<typeof AreaSchema>>;
 
-export const AreaI18nSchema = (z: typeof zod) =>
+export const MapEntity18nSchema = (z: typeof zod) =>
   z.object({
     id: z.string(),
     "pl-PL": z.string(),
     "en-US": z.string(),
   });
-export type AreaLabelI18n = zod.infer<ReturnType<typeof AreaI18nSchema>>;
+export type MapEntityI18n = zod.infer<ReturnType<typeof MapEntity18nSchema>>;
 
 export const i18nSchema = (z: typeof zod) =>
   z.object({
@@ -40,7 +34,19 @@ export const i18nSchema = (z: typeof zod) =>
   });
 export type i18n = zod.infer<ReturnType<typeof i18nSchema>>;
 
-export const DataSchema = (z: typeof zod) =>
+export const PlaceSchema = (z: typeof zod) =>
+  z
+    .object({
+      id: z.string(),
+      cluster_id: z.string(),
+    })
+    .transform((place) => ({
+      id: place.id,
+      clusterId: place.cluster_id,
+    }));
+export type Place = zod.infer<ReturnType<typeof PlaceSchema>>;
+
+export const ClustersSchema = (z: typeof zod) =>
   z
     .object({
       cluster_id: z.coerce.number(),
@@ -60,7 +66,7 @@ export const DataSchema = (z: typeof zod) =>
       growthRating: data.growth_rating,
       keyConcepts: data.key_concepts.split(",").map((id) => Number(id)),
     }));
-export type DataPoint = zod.infer<ReturnType<typeof DataSchema>>;
+export type Cluster = zod.infer<ReturnType<typeof ClustersSchema>>;
 
 export const YoutubeVideoSchema = (z: typeof zod) =>
   z

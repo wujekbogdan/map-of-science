@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { combine } from "zustand/middleware";
 import { fetchArticle } from "./api";
 import { AreaLocalized } from "./api/data.ts";
-import { Concept, DataPoint, YoutubeVideo } from "./api/model";
+import { Concept, Cluster, YoutubeVideo } from "./api/model";
 
 type Zoom = { x: number; y: number; scale: number };
 type PartialDefaults = typeof partialDefaults;
@@ -47,7 +47,7 @@ const partialDefaults = {
       b: 42,
     },
   },
-  dataPoints: new Map<number, DataPoint>(),
+  clusters: new Map<number, Cluster>(),
   concepts: new Map<number, Concept>(),
   youtubeVideos: new Map<string, YoutubeVideo[]>(),
   areas: [] as AreaLocalized[],
@@ -125,8 +125,8 @@ export const useStore = create(
     setMaxDataPointsInViewport: (maxDataPointsInViewport: number) => {
       set({ maxDataPointsInViewport });
     },
-    setDataPoints: (dataPoints: Map<number, DataPoint>) => {
-      set({ dataPoints });
+    setClusters: (clusters: Map<number, Cluster>) => {
+      set({ clusters });
     },
     setConcepts: (concepts: Map<number, Concept>) => {
       set({ concepts });

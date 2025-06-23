@@ -3,11 +3,11 @@ import { CSSProperties, useMemo, useRef, useState } from "react";
 import styled from "styled-components";
 import useSWR from "swr";
 import { useShallow } from "zustand/react/shallow";
-import { DataPoint as Point } from "../../api/model";
+import { Cluster as Point } from "../../api/model";
 import { useArticleStore, useStore } from "../../store.ts";
 import { useD3Zoom } from "../../useD3Zoom.ts";
 import { useLayersOpacity } from "../../useLayersOpacity.ts";
-import { DataPoints } from "./DataPoints/DataPoints.tsx";
+import { Cluster } from "./Clusters/Cluster.tsx";
 import Label, { OnLabelClick } from "./Label.tsx";
 
 const fetchMapSvg = async () => {
@@ -24,7 +24,7 @@ const fetchMapSvg = async () => {
 };
 
 const filterDataByViewport = (
-  dataPoints: Point[],
+  clusters: Point[],
   transform: ZoomTransform,
   limit: number,
   size: {
@@ -36,7 +36,7 @@ const filterDataByViewport = (
 
   // Although .filter() would feel more natural, the regular for loop is way
   // faster since we can easily break the loop when we reach the limit.
-  for (const point of dataPoints) {
+  for (const point of clusters) {
     const screenX = transform.applyX(point.x);
     const screenY = transform.applyY(point.y);
 
@@ -67,7 +67,7 @@ type Props = {
 export default function Map(props: Props) {
   const [
     areas,
-    dataPoints,
+    clusters,
     concepts,
     youtube,
     scaleFactor,
@@ -81,7 +81,7 @@ export default function Map(props: Props) {
   ] = useStore(
     useShallow((s) => [
       s.areas,
-      s.dataPoints,
+      s.clusters,
       s.concepts,
       s.youtubeVideos,
       s.scaleFactor,
@@ -184,16 +184,16 @@ export default function Map(props: Props) {
     return !transform
       ? []
       : filterDataByViewport(
-          [...dataPoints.values()],
+          [...clusters.values()],
           transform,
           maxDataPointsInViewport,
           props.size,
         );
-  }, [maxDataPointsInViewport, dataPoints, props.size, transform]);
+  }, [maxDataPointsInViewport, clusters, props.size, transform]);
 
   const highlightedPoints = useMemo(() => {
     const pointsToHighlight = clustersToHighlight
-      .map((id) => dataPoints.get(id))
+      .map((id) => clusters.get(id))
       .filter((point) => point !== undefined);
 
     return !transform
@@ -204,7 +204,7 @@ export default function Map(props: Props) {
           Infinity,
           props.size,
         );
-  }, [clustersToHighlight, transform, props.size, dataPoints]);
+  }, [clustersToHighlight, transform, props.size, clusters]);
 
   const mapSvgBackgroundCss = useMemo(() => {
     if (!transform || !mapSvgUrl) {
@@ -254,13 +254,9 @@ export default function Map(props: Props) {
       height={props.size.height}
     >
       <g transform={transformValue}>
-        <DataPoints
-          points={dataInViewport}
-          concepts={concepts}
-          mode={mapMode}
-        />
-        <DataPoints
-          points={highlightedPoints}
+        <Cluster clusters={dataInViewport} concepts={concepts} mode={mapMode} />
+        <Cluster
+          clusters={highlightedPoints}
           uniformStyle={true}
           concepts={concepts}
           mode={mapMode}
