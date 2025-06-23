@@ -21,15 +21,15 @@ export const ClusterDetails = (props: {
 
       <span
         className={
-          cluster.numRecentArticles <= 100
+          cluster.articlesCount <= 100
             ? "few-articles"
-            : cluster.numRecentArticles >= 1000
+            : cluster.articlesCount >= 1000
               ? "many-articles"
               : undefined
         }
       >
         {t("map.clusterDetails.articleCount", {
-          count: cluster.numRecentArticles,
+          count: cluster.articlesCount,
         })}
       </span>
       <br />

@@ -1,18 +1,20 @@
 import { z } from "zod";
 import {
-  ClustersSchema,
   ConceptSchema,
   AreaSchema,
+  PlaceSchema,
   YoutubeVideoSchema,
   YoutubeVideo,
   MapEntity18nSchema,
+  MakeClustersSchema,
 } from "./model";
 import { loadAsArray, loadAsMap } from "./utils.ts";
 
 export type Lang = "en" | "pl";
-export type AreaLocalized = Awaited<ReturnType<typeof loadAreas>>[number];
+type Entities = Awaited<ReturnType<typeof loadMapEntities>>;
+export type AreaLocalized = Entities["areas"][number];
 
-const loadAreas = async (lang: Lang) => {
+const loadMapEntities = async (lang: Lang) => {
   const langCode = (
     {
       en: "en-US",
@@ -26,22 +28,38 @@ const loadAreas = async (lang: Lang) => {
     getKey: (item) => item.id,
   });
 
-  const areas = await loadAsArray({
-    url: new URL("../../asset/areas.tsv", import.meta.url).href,
-    schema: AreaSchema(z),
-  });
+  const localize = <T extends { id: string }[]>(
+    entities: T,
+  ): (T[number] & { text: string })[] =>
+    entities.map((entity) => ({
+      ...entity,
+      text: i18n.get(entity.id)?.[langCode] ?? entity.id,
+    }));
 
-  return areas.map(({ ...area }) => ({
-    ...area,
-    text: i18n.get(area.id)?.[langCode] ?? area.id,
-  }));
+  const [areas, places] = await Promise.all([
+    loadAsArray({
+      url: new URL("../../asset/areas.tsv", import.meta.url).href,
+      schema: AreaSchema(z),
+    }),
+    loadAsArray({
+      url: new URL("../../asset/places.tsv", import.meta.url).href,
+      schema: PlaceSchema(z),
+    }),
+  ]);
+
+  return {
+    areas: localize(areas),
+    places: new Map(localize(places).map((place) => [place.clusterId, place])),
+  };
 };
 
 // TODO: move this out from here. It does not belong to the API layer.
 // It's more of a service layer.
 // https://github.com/wujekbogdan/map-of-science/issues/57
 export const loadData = async (lang: Lang) => {
-  const [concepts, clusters, youtube, areas] = await Promise.all([
+  const { areas, places } = await loadMapEntities(lang);
+  const ClustersSchema = MakeClustersSchema(places);
+  const [concepts, clusters, youtube] = await Promise.all([
     loadAsMap({
       url: new URL("../../asset/keys.tsv", import.meta.url).href,
       schema: ConceptSchema(z),
@@ -56,12 +74,11 @@ export const loadData = async (lang: Lang) => {
       url: new URL("../../asset/youtube.tsv", import.meta.url).href,
       schema: YoutubeVideoSchema(z),
     }),
-    loadAreas(lang),
   ]);
 
   const clustersOrdered = new Map(
     [...clusters.entries()].sort(
-      ([, a], [, b]) => b.numRecentArticles - a.numRecentArticles,
+      ([, a], [, b]) => b.articlesCount - a.articlesCount,
     ),
   );
 

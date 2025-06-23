@@ -98,7 +98,7 @@ export const Cluster = ({ clusters, concepts, uniformStyle, mode }: Props) => {
           >
             <Shape
               progress={getPercentage(index, clusters.length)}
-              level={getLevelByArticlesCount(cluster.numRecentArticles)}
+              level={getLevelByArticlesCount(cluster.articlesCount)}
               point={{
                 growthRating: cluster.growthRating,
                 x: cluster.x,

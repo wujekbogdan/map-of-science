@@ -3,7 +3,7 @@ import { fileURLToPath } from "node:url";
 import { z } from "zod";
 import { ZodSchema } from "zod";
 import { describe, it, expect } from "@map-of-science/vitest";
-import { ClustersSchema, ConceptSchema, AreaSchema } from ".";
+import { ConceptSchema, AreaSchema, MakeClustersSchema } from ".";
 import { setCollector } from "../../csv/collector.ts";
 import { parse as csvParse } from "../../csv/parse.ts";
 
@@ -29,7 +29,7 @@ describe("schema", () => {
     it("should parse data.tsv with labels, including a null label case", async () => {
       const [withLabel, withoutLabel] = await parse(
         "data.tsv",
-        ClustersSchema(z),
+        MakeClustersSchema(new Map())(z),
       );
 
       expect([withLabel, withoutLabel]).toEqual([

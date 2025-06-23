@@ -46,27 +46,31 @@ export const PlaceSchema = (z: typeof zod) =>
     }));
 export type Place = zod.infer<ReturnType<typeof PlaceSchema>>;
 
-export const ClustersSchema = (z: typeof zod) =>
-  z
-    .object({
-      cluster_id: z.coerce.number(),
-      x: z.coerce.number(),
-      y: z.coerce.number(),
-      num_recent_articles: z.coerce.number(),
-      cluster_category: z.coerce.number(),
-      growth_rating: z.coerce.number().min(0).max(100),
-      key_concepts: z.string(),
-    })
-    .transform((data) => ({
-      clusterId: data.cluster_id,
-      x: data.x,
-      y: -data.y, // To align it with the map coordinate system
-      numRecentArticles: data.num_recent_articles,
-      clusterCategory: data.cluster_category,
-      growthRating: data.growth_rating,
-      keyConcepts: data.key_concepts.split(",").map((id) => Number(id)),
-    }));
-export type Cluster = zod.infer<ReturnType<typeof ClustersSchema>>;
+export const MakeClustersSchema =
+  (places: Map<string, Place & { text: string }>) => (z: typeof zod) =>
+    z
+      .object({
+        cluster_id: z.coerce.number(),
+        x: z.coerce.number(),
+        y: z.coerce.number(),
+        num_recent_articles: z.coerce.number(),
+        cluster_category: z.coerce.number(),
+        growth_rating: z.coerce.number().min(0).max(100),
+        key_concepts: z.string(),
+      })
+      .transform((data) => ({
+        clusterId: data.cluster_id,
+        x: data.x,
+        y: -data.y, // To align it with the map coordinate system
+        articlesCount: data.num_recent_articles,
+        clusterCategory: data.cluster_category,
+        growthRating: data.growth_rating,
+        keyConcepts: data.key_concepts.split(",").map((id) => Number(id)),
+        place: places.get(data.cluster_id.toString()) ?? null,
+      }));
+
+type ClustersSchema = ReturnType<typeof MakeClustersSchema>;
+export type Cluster = zod.infer<ReturnType<ClustersSchema>>;
 
 export const YoutubeVideoSchema = (z: typeof zod) =>
   z
