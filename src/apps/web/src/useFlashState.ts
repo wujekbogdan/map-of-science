@@ -1,23 +1,13 @@
 import { useEffect, useState } from "react";
 
-export const useFlashState = (trigger: boolean) => {
-  const [toggle, setToggle] = useState(false);
+export const useFlashState = (triggerValue: unknown) => {
+  const [state, setState] = useState(false);
 
   useEffect(() => {
-    if (!trigger) {
-      setToggle(false);
-      return;
-    }
+    setState(true);
+    const timeout = setTimeout(() => setState(false), 2000);
+    return () => clearTimeout(timeout);
+  }, [triggerValue]);
 
-    setToggle(true);
-    const timeout = setTimeout(() => {
-      setToggle(false);
-    }, 1_500);
-
-    return () => {
-      clearTimeout(timeout);
-    };
-  }, [trigger]);
-
-  return toggle;
+  return state;
 };

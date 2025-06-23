@@ -275,7 +275,7 @@ export default function Map(props: Props) {
     };
   }, [transform, svgOffset, svgScaleFactor, mapSvgUrl]);
 
-  const ripple = useFlashState(hasSearchResults);
+  const ripple = useFlashState(clustersToHighlight);
 
   return (
     <MapSvg
@@ -291,7 +291,7 @@ export default function Map(props: Props) {
           clusters={clustersInViewport}
           concepts={concepts}
           mode={mapMode}
-          ripple={ripple}
+          ripple={hasSearchResults && ripple}
         />
         {labelsScaled.map((label) => (
           <Label
