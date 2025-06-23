@@ -1,6 +1,6 @@
 import { normalizeSync } from "normalize-diacritics";
 import { AreaLocalized } from "../../../api/data.ts";
-import { Concept, DataPoint, YoutubeVideo } from "../../../api/model";
+import { Concept, Cluster, YoutubeVideo } from "../../../api/model";
 
 export type LabelModel = ReturnType<typeof createLabelsCollection>[number];
 
@@ -42,21 +42,21 @@ export const createLabelsCollection = (
   }));
 
 export const createClustersByConcept = (
-  dataPoints: Map<number, DataPoint>,
+  clusters: Map<number, Cluster>,
   concepts: Map<number, Concept>,
 ) => {
   const result = new Map<number, ConceptWithClustersModel>();
 
   // DO NOT rewrite this in an immutable way. Using reduce immutably would require constructing
   // a new object for each conceptId, which has a *massive* performance cost - orders of magnitude slower.
-  [...dataPoints.values()].forEach(
-    ({ keyConcepts, clusterId, x, y, numRecentArticles }) => {
+  [...clusters.values()].forEach(
+    ({ keyConcepts, clusterId, x, y, articlesCount }) => {
       keyConcepts.forEach((conceptId) => {
         if (!result.has(conceptId)) {
           const name = concepts.get(conceptId)?.key ?? "UNKNOWN";
           result.set(conceptId, {
             id: conceptId,
-            articlesCount: numRecentArticles,
+            articlesCount: articlesCount,
             name,
             // TODO: normalizeSync seems to be very slow. Let's use toLowerCase
             // for now, but look for a better solution later.
@@ -78,7 +78,7 @@ export const createClustersByConcept = (
 
 type Options = {
   areas: AreaLocalized[];
-  dataPoints: Map<number, DataPoint>;
+  clusters: Map<number, Cluster>;
   concepts: Map<number, Concept>;
   youtube: Map<string, YoutubeVideo[]>;
 };
@@ -93,7 +93,7 @@ export const search = (options: Options, phrase: string) => {
   const clustersByConcept =
     cachedClustersByConcept ??
     (cachedClustersByConcept = createClustersByConcept(
-      options.dataPoints,
+      options.clusters,
       options.concepts,
     ));
 

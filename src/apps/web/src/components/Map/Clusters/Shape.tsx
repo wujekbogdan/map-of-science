@@ -1,5 +1,5 @@
 import { RGB } from "../../../store.ts";
-import css from "./DataPoints.module.scss";
+import css from "./clusters.module.scss";
 
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 

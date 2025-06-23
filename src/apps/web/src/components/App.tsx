@@ -25,22 +25,25 @@ const MapLoader = () => {
 
 function App() {
   const { language } = useLanguage();
-  const [setMapSize, setDataPoints, setConcepts, setYoutubeVideos, setAreas] =
+  const [setMapSize, setClusters, setConcepts, setYoutubeVideos, setAreas] =
     useStore(
       useShallow((s) => [
         s.setMapSize,
-        s.setDataPoints,
+        s.setClusters,
         s.setConcepts,
         s.setYoutubeVideos,
         s.setAreas,
       ]),
     );
   const { isLoading } = useSWR(["data", language], () => loadData(language), {
-    onSuccess: ({ dataPoints, concepts, youtube, areas }) => {
-      setDataPoints(dataPoints);
+    onSuccess: ({ clusters, concepts, youtube, areas }) => {
+      setClusters(clusters);
       setConcepts(concepts);
       setYoutubeVideos(youtube);
       setAreas(areas);
+    },
+    onError: (err) => {
+      console.error("Error loading data:", err);
     },
   });
 

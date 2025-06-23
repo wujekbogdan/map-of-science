@@ -1,12 +1,14 @@
 import { useTranslation } from "react-i18next";
-import { Concept, DataPoint } from "../../../api/model";
+import { Concept, Cluster } from "../../../api/model";
 
-export const DataPointDetails = (props: {
-  point: DataPoint;
+export const ClusterDetails = (props: {
+  cluster: Cluster;
   concepts: Map<number, Concept>;
 }) => {
   const { t } = useTranslation();
-  const { point, concepts } = props;
+  const { cluster, concepts } = props;
+  const placeName = cluster.place?.text ?? "";
+  const id = `#${cluster.clusterId.toString()}`;
 
   return (
     <div
@@ -16,27 +18,28 @@ export const DataPointDetails = (props: {
         background: "white",
       }}
     >
-      <strong>{point.clusterId.toString()}</strong>
-      <br />
+      <p>
+        {placeName ? (
+          <>
+            <strong>{placeName}</strong> {id}
+          </>
+        ) : (
+          <strong>{id}</strong>
+        )}
+      </p>
 
-      <span
-        className={
-          point.numRecentArticles <= 100
-            ? "few-articles"
-            : point.numRecentArticles >= 1000
-              ? "many-articles"
-              : undefined
-        }
-      >
+      <span>
         {t("map.clusterDetails.articleCount", {
-          count: point.numRecentArticles,
+          count: cluster.articlesCount,
         })}
       </span>
       <br />
 
-      <span className={point.growthRating >= 80 ? "many-articles" : undefined}>
+      <span
+        className={cluster.growthRating >= 80 ? "many-articles" : undefined}
+      >
         {t("map.clusterDetails.growthRating", {
-          rating: point.growthRating,
+          rating: cluster.growthRating,
         })}
       </span>
       <br />
@@ -44,7 +47,7 @@ export const DataPointDetails = (props: {
 
       <strong>{t("map.clusterDetails.keywordsLabel")}:</strong>
       <ul>
-        {point.keyConcepts.map((conceptId) => {
+        {cluster.keyConcepts.map((conceptId) => {
           const concept = concepts.get(Number(conceptId));
           return <li key={conceptId}>{concept?.key}</li>;
         })}

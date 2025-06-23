@@ -8,30 +8,24 @@ export const ConceptSchema = (z: typeof zod) =>
 export type Concept = zod.infer<ReturnType<typeof ConceptSchema>>;
 
 export const AreaSchema = (z: typeof zod) =>
-  z
-    .object({
-      id: z.string(),
-      x: z.coerce.number(),
-      y: z.coerce.number(),
-      level: z.preprocess(
-        (val) => Number(val),
-        z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4)]),
-      ),
-      cluster_id: z.union([z.literal("null"), z.string()]),
-    })
-    .transform(({ cluster_id, ...rest }) => ({
-      ...rest,
-      clusterId: cluster_id === "null" ? null : parseInt(cluster_id, 10),
-    }));
+  z.object({
+    id: z.string(),
+    x: z.coerce.number(),
+    y: z.coerce.number(),
+    level: z.preprocess(
+      (val) => Number(val),
+      z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4)]),
+    ),
+  });
 export type Area = zod.infer<ReturnType<typeof AreaSchema>>;
 
-export const AreaI18nSchema = (z: typeof zod) =>
+export const MapEntity18nSchema = (z: typeof zod) =>
   z.object({
     id: z.string(),
     "pl-PL": z.string(),
     "en-US": z.string(),
   });
-export type AreaLabelI18n = zod.infer<ReturnType<typeof AreaI18nSchema>>;
+export type MapEntityI18n = zod.infer<ReturnType<typeof MapEntity18nSchema>>;
 
 export const i18nSchema = (z: typeof zod) =>
   z.object({
@@ -40,27 +34,43 @@ export const i18nSchema = (z: typeof zod) =>
   });
 export type i18n = zod.infer<ReturnType<typeof i18nSchema>>;
 
-export const DataSchema = (z: typeof zod) =>
+export const PlaceSchema = (z: typeof zod) =>
   z
     .object({
-      cluster_id: z.coerce.number(),
-      x: z.coerce.number(),
-      y: z.coerce.number(),
-      num_recent_articles: z.coerce.number(),
-      cluster_category: z.coerce.number(),
-      growth_rating: z.coerce.number().min(0).max(100),
-      key_concepts: z.string(),
+      id: z.string(),
+      cluster_id: z.string(),
     })
-    .transform((data) => ({
-      clusterId: data.cluster_id,
-      x: data.x,
-      y: -data.y, // To align it with the map coordinate system
-      numRecentArticles: data.num_recent_articles,
-      clusterCategory: data.cluster_category,
-      growthRating: data.growth_rating,
-      keyConcepts: data.key_concepts.split(",").map((id) => Number(id)),
+    .transform((place) => ({
+      id: place.id,
+      clusterId: place.cluster_id,
     }));
-export type DataPoint = zod.infer<ReturnType<typeof DataSchema>>;
+export type Place = zod.infer<ReturnType<typeof PlaceSchema>>;
+
+export const MakeClustersSchema =
+  (places: Map<string, Place & { text: string }>) => (z: typeof zod) =>
+    z
+      .object({
+        cluster_id: z.coerce.number(),
+        x: z.coerce.number(),
+        y: z.coerce.number(),
+        num_recent_articles: z.coerce.number(),
+        cluster_category: z.coerce.number(),
+        growth_rating: z.coerce.number().min(0).max(100),
+        key_concepts: z.string(),
+      })
+      .transform((data) => ({
+        clusterId: data.cluster_id,
+        x: data.x,
+        y: -data.y, // To align it with the map coordinate system
+        articlesCount: data.num_recent_articles,
+        clusterCategory: data.cluster_category,
+        growthRating: data.growth_rating,
+        keyConcepts: data.key_concepts.split(",").map((id) => Number(id)),
+        place: places.get(data.cluster_id.toString()) ?? null,
+      }));
+
+type ClustersSchema = ReturnType<typeof MakeClustersSchema>;
+export type Cluster = zod.infer<ReturnType<ClustersSchema>>;
 
 export const YoutubeVideoSchema = (z: typeof zod) =>
   z

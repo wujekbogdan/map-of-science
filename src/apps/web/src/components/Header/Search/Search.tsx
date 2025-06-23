@@ -15,7 +15,7 @@ export const Search = () => {
     setDesiredZoom,
     setPointsToHighlight,
     mapSize,
-    dataPoints,
+    clusters,
     concepts,
     youtube,
     areas,
@@ -24,7 +24,7 @@ export const Search = () => {
       s.setDesiredZoom,
       s.setPointsToHighlight,
       s.mapSize,
-      s.dataPoints,
+      s.clusters,
       s.concepts,
       s.youtubeVideos,
       s.areas,
@@ -44,7 +44,7 @@ export const Search = () => {
       return worker.search(
         {
           areas,
-          dataPoints,
+          clusters,
           concepts,
           youtube,
         },

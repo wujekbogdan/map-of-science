@@ -10,18 +10,28 @@ import {
 import { useState } from "react";
 import { createPortal } from "react-dom";
 import { useShallow } from "zustand/react/shallow";
-import { Concept, DataPoint as Point } from "../../../api/model";
+import { Concept, Cluster } from "../../../api/model";
 import { useArticleStore, useStore } from "../../../store.ts";
-import { DataPointDetails } from "./DataPointDetails.tsx";
-import css from "./DataPoints.module.scss";
+import LabelText from "../Label/LabelText.tsx";
+import { ClusterDetails } from "./ClusterDetails.tsx";
 import Shape from "./Shape.tsx";
+import css from "./clusters.module.scss";
 
 type Mode = "growth" | "regular";
+export type ClusterWithScaledPlace = Cluster & {
+  place:
+    | (Cluster["place"] & {
+        fontSize: number;
+        opacity: number;
+        offset: number;
+      })
+    | null;
+};
 
 type Props = {
   concepts: Map<number, Concept>;
   uniformStyle?: boolean;
-  points: Point[];
+  clusters: ClusterWithScaledPlace[];
   mode: Mode;
 };
 
@@ -40,14 +50,15 @@ const getPercentage = (index: number, total: number) => {
   return Math.round(((index + 1) / total) * 100);
 };
 
-export const DataPoints = ({ points, concepts, uniformStyle, mode }: Props) => {
+export const Clusters = ({ clusters, concepts, uniformStyle, mode }: Props) => {
   const [growthRatingColors] = useStore(
     useShallow((state) => [state.growthRatingColors]),
   );
   const setRemoteArticleId = useArticleStore(
     ({ setRemoteArticleId }) => setRemoteArticleId,
   );
-  const [hoveredPoint, setHoveredPoint] = useState<Point | null>(null);
+  const [hoveredPoint, setHoveredCluster] =
+    useState<ClusterWithScaledPlace | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const { refs, floatingStyles, context } = useFloating({
     middleware: [offset(10), flip(), shift({ padding: 10 })],
@@ -70,44 +81,56 @@ export const DataPoints = ({ points, concepts, uniformStyle, mode }: Props) => {
 
   return (
     <>
-      {points.map((point, index) => {
-        const label = concepts.get(point.clusterId)?.key;
+      {clusters.map((cluster, index) => {
+        const label = concepts.get(cluster.clusterId)?.key;
 
         return (
           <g
             className={classes([css.group, css.fadeIn])}
-            key={point.clusterId}
+            key={cluster.clusterId}
             aria-label={label}
             ref={
-              hoveredPoint?.clusterId === point.clusterId
+              hoveredPoint?.clusterId === cluster.clusterId
                 ? refs.setReference
                 : null
             }
             onPointerEnter={() => {
-              setHoveredPoint(point);
+              setHoveredCluster(cluster);
             }}
             onPointerLeave={() => {
-              setHoveredPoint(null);
+              setHoveredCluster(null);
             }}
             onClick={() => {
-              setRemoteArticleId(point.clusterId);
+              setRemoteArticleId(cluster.clusterId);
             }}
-            {...(hoveredPoint?.clusterId === point.clusterId
+            {...(hoveredPoint?.clusterId === cluster.clusterId
               ? getReferenceProps()
               : {})}
           >
             <Shape
-              progress={getPercentage(index, points.length)}
-              level={getLevelByArticlesCount(point.numRecentArticles)}
+              progress={getPercentage(index, clusters.length)}
+              level={getLevelByArticlesCount(cluster.articlesCount)}
               point={{
-                growthRating: point.growthRating,
-                x: point.x,
-                y: point.y,
+                growthRating: cluster.growthRating,
+                x: cluster.x,
+                y: cluster.y,
               }}
               uniformStyle={!!uniformStyle}
               mode={mode}
               growthRatingColors={growthRatingColors}
             />
+            {cluster.place && cluster.place.opacity > 0 && (
+              <LabelText
+                id={cluster.clusterId.toString()}
+                x={cluster.x}
+                y={cluster.y - cluster.place.offset}
+                fontSize={cluster.place.fontSize}
+                opacity={cluster.place.opacity}
+                level={4}
+              >
+                {cluster.place.text}
+              </LabelText>
+            )}
           </g>
         );
       })}
@@ -120,7 +143,7 @@ export const DataPoints = ({ points, concepts, uniformStyle, mode }: Props) => {
               style={{ ...floatingStyles, ...styles }}
               {...getFloatingProps()}
             >
-              <DataPointDetails point={hoveredPoint} concepts={concepts} />
+              <ClusterDetails cluster={hoveredPoint} concepts={concepts} />
             </div>,
             document.body,
           )}

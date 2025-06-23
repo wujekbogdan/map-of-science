@@ -3,7 +3,7 @@ import { fileURLToPath } from "node:url";
 import { z } from "zod";
 import { ZodSchema } from "zod";
 import { describe, it, expect } from "@map-of-science/vitest";
-import { DataSchema, ConceptSchema, AreaSchema } from ".";
+import { ConceptSchema, AreaSchema, MakeClustersSchema } from ".";
 import { setCollector } from "../../csv/collector.ts";
 import { parse as csvParse } from "../../csv/parse.ts";
 
@@ -27,26 +27,31 @@ const parse = async (name: string, schema: ZodSchema) => {
 describe("schema", () => {
   describe("data.tsv", () => {
     it("should parse data.tsv with labels, including a null label case", async () => {
-      const [withLabel, withoutLabel] = await parse("data.tsv", DataSchema(z));
+      const [withLabel, withoutLabel] = await parse(
+        "data.tsv",
+        MakeClustersSchema(new Map())(z),
+      );
 
       expect([withLabel, withoutLabel]).toEqual([
         {
           clusterId: 84872,
           x: -90.2114,
           y: 71.396,
-          numRecentArticles: 228,
+          articlesCount: 228,
           clusterCategory: 5,
           growthRating: 15.43,
           keyConcepts: [198432, 37537, 12177, 43800, 43431],
+          place: null,
         },
         {
           clusterId: 72062,
           x: -76.1376,
           y: 37.2588,
-          numRecentArticles: 239,
+          articlesCount: 239,
           clusterCategory: 5,
           growthRating: 3.22,
           keyConcepts: [40293, 71377, 120209, 90737, 67314],
+          place: null,
         },
       ]);
     });
@@ -70,7 +75,6 @@ describe("schema", () => {
         x: -8.441680160507701,
         y: 31.819944878207195,
         level: 1,
-        clusterId: null,
       });
     });
   });
