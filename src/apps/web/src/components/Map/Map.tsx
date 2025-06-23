@@ -3,12 +3,12 @@ import { CSSProperties, useMemo, useRef, useState } from "react";
 import styled from "styled-components";
 import useSWR from "swr";
 import { useShallow } from "zustand/react/shallow";
-import { Cluster as Point } from "../../api/model";
+import { Cluster } from "../../api/model";
 import { useArticleStore, useStore } from "../../store.ts";
 import { useD3Zoom } from "../../useD3Zoom.ts";
 import { useLayersOpacity } from "../../useLayersOpacity.ts";
-import { Cluster } from "./Clusters/Cluster.tsx";
-import Label, { OnLabelClick } from "./Label.tsx";
+import { Clusters, ClusterWithScaledPlace } from "./Clusters/Clusters.tsx";
+import Label, { OnLabelClick } from "./Label/Label.tsx";
 
 const fetchMapSvg = async () => {
   // At this point only the URL is resolved, the SVG is not yet loaded.
@@ -23,35 +23,54 @@ const fetchMapSvg = async () => {
   });
 };
 
-const filterDataByViewport = (
-  clusters: Point[],
-  transform: ZoomTransform,
-  limit: number,
+type Filter = {
+  clusters: Cluster[];
+  transform: ZoomTransform;
+  limit: number;
   size: {
     width: number;
     height: number;
-  },
-) => {
-  const dataInViewport: Point[] = [];
+  };
+  places: {
+    visible: boolean;
+    fontSize: number;
+    opacity: number;
+  };
+};
+
+const processClustersForViewport = (args: Filter) => {
+  const clustersInViewport: ClusterWithScaledPlace[] = [];
 
   // Although .filter() would feel more natural, the regular for loop is way
   // faster since we can easily break the loop when we reach the limit.
-  for (const point of clusters) {
-    const screenX = transform.applyX(point.x);
-    const screenY = transform.applyY(point.y);
+  for (const point of args.clusters) {
+    const screenX = args.transform.applyX(point.x);
+    const screenY = args.transform.applyY(point.y);
 
     if (
       screenX >= 0 &&
-      screenX <= size.width &&
+      screenX <= args.size.width &&
       screenY >= 0 &&
-      screenY <= size.height
+      screenY <= args.size.height
     ) {
-      dataInViewport.push(point);
-      if (dataInViewport.length >= limit) break;
+      const place =
+        point.place && args.places.visible
+          ? {
+              ...point.place,
+              fontSize: args.places.fontSize,
+              opacity: args.places.opacity,
+              offset: 20 / args.transform.k,
+            }
+          : null;
+      clustersInViewport.push({
+        ...point,
+        place,
+      });
+      if (clustersInViewport.length >= args.limit) break;
     }
   }
 
-  return dataInViewport;
+  return clustersInViewport;
 };
 
 type Props = {
@@ -180,31 +199,56 @@ export default function Map(props: Props) {
     scaledFontSize.layer4,
   ]);
 
-  const dataInViewport = useMemo(() => {
+  const clustersAsArray = useMemo(() => [...clusters.values()], [clusters]);
+  const clustersInViewport = useMemo(() => {
     return !transform
       ? []
-      : filterDataByViewport(
-          [...clusters.values()],
+      : processClustersForViewport({
+          clusters: clustersAsArray,
           transform,
-          maxDataPointsInViewport,
-          props.size,
-        );
-  }, [maxDataPointsInViewport, clusters, props.size, transform]);
+          limit: maxDataPointsInViewport,
+          size: props.size,
+          places: {
+            visible: true,
+            fontSize: scaledFontSize.layer4,
+            opacity: opacity.layer4,
+          },
+        });
+  }, [
+    maxDataPointsInViewport,
+    clustersAsArray,
+    props.size,
+    transform,
+    scaledFontSize.layer4,
+    opacity,
+  ]);
 
-  const highlightedPoints = useMemo(() => {
+  const highlightedClustersInViewport = useMemo(() => {
     const pointsToHighlight = clustersToHighlight
       .map((id) => clusters.get(id))
       .filter((point) => point !== undefined);
 
     return !transform
       ? []
-      : filterDataByViewport(
-          pointsToHighlight,
+      : processClustersForViewport({
+          clusters: pointsToHighlight,
           transform,
-          Infinity,
-          props.size,
-        );
-  }, [clustersToHighlight, transform, props.size, clusters]);
+          limit: Infinity,
+          size: props.size,
+          places: {
+            visible: true,
+            fontSize: scaledFontSize.layer4,
+            opacity: opacity.layer4,
+          },
+        });
+  }, [
+    clustersToHighlight,
+    transform,
+    props.size,
+    clusters,
+    scaledFontSize.layer4,
+    opacity,
+  ]);
 
   const mapSvgBackgroundCss = useMemo(() => {
     if (!transform || !mapSvgUrl) {
@@ -254,9 +298,13 @@ export default function Map(props: Props) {
       height={props.size.height}
     >
       <g transform={transformValue}>
-        <Cluster clusters={dataInViewport} concepts={concepts} mode={mapMode} />
-        <Cluster
-          clusters={highlightedPoints}
+        <Clusters
+          clusters={clustersInViewport}
+          concepts={concepts}
+          mode={mapMode}
+        />
+        <Clusters
+          clusters={highlightedClustersInViewport}
           uniformStyle={true}
           concepts={concepts}
           mode={mapMode}

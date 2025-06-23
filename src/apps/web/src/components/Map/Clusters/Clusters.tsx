@@ -10,18 +10,28 @@ import {
 import { useState } from "react";
 import { createPortal } from "react-dom";
 import { useShallow } from "zustand/react/shallow";
-import { Concept, Cluster as Point } from "../../../api/model";
+import { Concept, Cluster } from "../../../api/model";
 import { useArticleStore, useStore } from "../../../store.ts";
+import LabelText from "../Label/LabelText.tsx";
 import { ClusterDetails } from "./ClusterDetails.tsx";
 import Shape from "./Shape.tsx";
 import css from "./clusters.module.scss";
 
 type Mode = "growth" | "regular";
+export type ClusterWithScaledPlace = Cluster & {
+  place:
+    | (Cluster["place"] & {
+        fontSize: number;
+        opacity: number;
+        offset: number;
+      })
+    | null;
+};
 
 type Props = {
   concepts: Map<number, Concept>;
   uniformStyle?: boolean;
-  clusters: Point[];
+  clusters: ClusterWithScaledPlace[];
   mode: Mode;
 };
 
@@ -40,14 +50,15 @@ const getPercentage = (index: number, total: number) => {
   return Math.round(((index + 1) / total) * 100);
 };
 
-export const Cluster = ({ clusters, concepts, uniformStyle, mode }: Props) => {
+export const Clusters = ({ clusters, concepts, uniformStyle, mode }: Props) => {
   const [growthRatingColors] = useStore(
     useShallow((state) => [state.growthRatingColors]),
   );
   const setRemoteArticleId = useArticleStore(
     ({ setRemoteArticleId }) => setRemoteArticleId,
   );
-  const [hoveredPoint, setHoveredCluster] = useState<Point | null>(null);
+  const [hoveredPoint, setHoveredCluster] =
+    useState<ClusterWithScaledPlace | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const { refs, floatingStyles, context } = useFloating({
     middleware: [offset(10), flip(), shift({ padding: 10 })],
@@ -108,6 +119,18 @@ export const Cluster = ({ clusters, concepts, uniformStyle, mode }: Props) => {
               mode={mode}
               growthRatingColors={growthRatingColors}
             />
+            {cluster.place && cluster.place.opacity > 0 && (
+              <LabelText
+                id={cluster.clusterId.toString()}
+                x={cluster.x}
+                y={cluster.y - cluster.place.offset}
+                fontSize={cluster.place.fontSize}
+                opacity={cluster.place.opacity}
+                level={4}
+              >
+                {cluster.place.text}
+              </LabelText>
+            )}
           </g>
         );
       })}

@@ -1,36 +1,22 @@
 import styled from "styled-components";
-import { YoutubeVideo } from "../../api/model";
 
 type Label = {
   id: string;
   x: number;
   y: number;
-  text: string;
   fontSize: number;
   opacity: number;
   level: 1 | 2 | 3 | 4;
-  videos: YoutubeVideo[];
-  onClick?: OnLabelClick;
+  children: string;
 };
 
-export type OnLabelClick = (
-  label: Pick<Label, "text" | "x" | "y" | "videos">,
-) => void;
+type Props = Label & {
+  onClick?: (label: Label) => void;
+};
 
-const Label = (props: Label) => {
-  const onClick = props.onClick
-    ? () => {
-        props.onClick?.({
-          text: props.text,
-          x: props.x,
-          y: props.y,
-          videos: props.videos,
-        });
-      }
-    : undefined;
-
+export const LabelText = <T extends Props>(props: T) => {
   return (
-    <LabelText
+    <Text
       display={props.opacity ? "block" : "none"}
       textAnchor="middle"
       alignmentBaseline="middle"
@@ -39,14 +25,16 @@ const Label = (props: Label) => {
       $fontSize={props.fontSize}
       $opacity={props.opacity}
       $level={props.level}
-      onClick={onClick}
+      onClick={() => {
+        props.onClick?.(props);
+      }}
     >
-      {props.text}
-    </LabelText>
+      {props.children}
+    </Text>
   );
 };
 
-export default Label;
+export default LabelText;
 
 const labelFillColor = ($level: 1 | 2 | 3 | 4) => {
   switch ($level) {
@@ -61,7 +49,7 @@ const labelFillColor = ($level: 1 | 2 | 3 | 4) => {
   }
 };
 
-const LabelText = styled.text.attrs<{
+const Text = styled.text.attrs<{
   $fontSize: number;
   $opacity: number;
 }>((props) => ({

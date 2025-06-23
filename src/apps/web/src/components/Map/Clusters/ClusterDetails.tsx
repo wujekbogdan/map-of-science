@@ -7,6 +7,8 @@ export const ClusterDetails = (props: {
 }) => {
   const { t } = useTranslation();
   const { cluster, concepts } = props;
+  const placeName = cluster.place?.text ?? "";
+  const id = `#${cluster.clusterId.toString()}`;
 
   return (
     <div
@@ -16,18 +18,17 @@ export const ClusterDetails = (props: {
         background: "white",
       }}
     >
-      <strong>{cluster.clusterId.toString()}</strong>
-      <br />
+      <p>
+        {placeName ? (
+          <>
+            <strong>{placeName}</strong> {id}
+          </>
+        ) : (
+          <strong>{id}</strong>
+        )}
+      </p>
 
-      <span
-        className={
-          cluster.articlesCount <= 100
-            ? "few-articles"
-            : cluster.articlesCount >= 1000
-              ? "many-articles"
-              : undefined
-        }
-      >
+      <span>
         {t("map.clusterDetails.articleCount", {
           count: cluster.articlesCount,
         })}
