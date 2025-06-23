@@ -1,46 +1,46 @@
-import { useCallback } from "react";
+import { Suspense, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import useSWR from "swr";
 import { useShallow } from "zustand/react/shallow";
 import { loadData } from "../api/worker.ts";
 import { config } from "../config.ts";
-import { i18n } from "../i18n.ts";
 import { useStore } from "../store.ts";
+import { useLanguage } from "../useLanguage.ts";
 import { useWindowSize } from "../useWindowSize.ts";
 import { Article } from "./Article/Article.tsx";
 import { DevTool } from "./DevTool.tsx";
 import { Header } from "./Header/Header.tsx";
 import MapComponent from "./Map/Map.tsx";
 
-const Loader = () => {
-  return <LoadingWrapper>{i18n("Ładowanie danych...")}</LoadingWrapper>;
+const AppLoader = () => {
+  // TODO: Implement global loading state
+  return "";
+};
+
+const MapLoader = () => {
+  const { t } = useTranslation();
+  return <LoadingWrapper>{t("map.loading")}&hellip;</LoadingWrapper>;
 };
 
 function App() {
-  const [
-    setMapSize,
-    setDataPoints,
-    setConcepts,
-    setYoutubeVideos,
-    setLabels,
-    setLabelsI18n,
-  ] = useStore(
-    useShallow((s) => [
-      s.setMapSize,
-      s.setDataPoints,
-      s.setConcepts,
-      s.setYoutubeVideos,
-      s.setLabels,
-      s.setLabelsI18n,
-    ]),
-  );
-  const { data, isLoading } = useSWR("data", loadData, {
-    onSuccess: ({ dataPoints, concepts, youtube, labels, labelsI18n }) => {
+  const { language } = useLanguage();
+  const [setMapSize, setDataPoints, setConcepts, setYoutubeVideos, setAreas] =
+    useStore(
+      useShallow((s) => [
+        s.setMapSize,
+        s.setDataPoints,
+        s.setConcepts,
+        s.setYoutubeVideos,
+        s.setAreas,
+      ]),
+    );
+  const { isLoading } = useSWR(["data", language], () => loadData(language), {
+    onSuccess: ({ dataPoints, concepts, youtube, areas }) => {
       setDataPoints(dataPoints);
       setConcepts(concepts);
       setYoutubeVideos(youtube);
-      setLabels(labels);
-      setLabelsI18n(labelsI18n);
+      setAreas(areas);
     },
   });
 
@@ -52,35 +52,19 @@ function App() {
       [setMapSize],
     ),
   );
-
   return (
     <Container>
-      <Header />
+      <Suspense fallback={<AppLoader />}>
+        <Header />
+        {isLoading ? <MapLoader /> : <MapComponent size={size} />}
+        <Article />
 
-      {isLoading ? (
-        <Loader />
-      ) : (
-        <MapComponent
-          size={size}
-          /* TODO: This condition isn't really required. values are never
-           * undefined. It's just an issue with SWR typing. SWR doesn't narrow
-           * the type of data based on the isLoading value.
-           * */
-          labels={data?.labels ?? new Map()}
-          dataPoints={data?.dataPoints ?? new Map()}
-          concepts={data?.concepts ?? new Map()}
-          youtube={data?.youtube ?? new Map()}
-          labelsI18n={data?.labelsI18n ?? new Map()}
-        />
-      )}
-
-      <Article />
-
-      {config.devTool && (
-        <DevToolsWrapper>
-          <DevTool />
-        </DevToolsWrapper>
-      )}
+        {config.devTool && (
+          <DevToolsWrapper>
+            <DevTool />
+          </DevToolsWrapper>
+        )}
+      </Suspense>
     </Container>
   );
 }

@@ -21,6 +21,7 @@ export const parse = async <T extends CSVRecord, R>(
       delimiter: "\t",
       columns: true,
       bom: true,
+      quote: "", // turns double quotes special treatment off
     });
 
     const onReadable = () => {

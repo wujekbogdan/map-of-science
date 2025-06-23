@@ -2,45 +2,62 @@ import { z } from "zod";
 import {
   DataSchema,
   ConceptSchema,
-  AreaLabelSchema,
+  AreaSchema,
   YoutubeVideoSchema,
   YoutubeVideo,
-  AreaLabelI18nSchema,
+  AreaI18nSchema,
 } from "./model";
 import { loadAsArray, loadAsMap } from "./utils.ts";
+
+export type Lang = "en" | "pl";
+export type AreaLocalized = Awaited<ReturnType<typeof loadAreas>>[number];
+
+const loadAreas = async (lang: Lang) => {
+  const langCode = (
+    {
+      en: "en-US",
+      pl: "pl-PL",
+    } as const
+  )[lang];
+
+  const i18n = await loadAsMap({
+    url: new URL("../../asset/areas_i18n.tsv", import.meta.url).href,
+    schema: AreaI18nSchema(z),
+    getKey: (item) => item.id,
+  });
+
+  const areas = await loadAsArray({
+    url: new URL("../../asset/areas.tsv", import.meta.url).href,
+    schema: AreaSchema(z),
+  });
+
+  return areas.map(({ ...area }) => ({
+    ...area,
+    text: i18n.get(area.id)?.[langCode] ?? area.id,
+  }));
+};
 
 // TODO: move this out from here. It does not belong to the API layer.
 // It's more of a service layer.
 // https://github.com/wujekbogdan/map-of-science/issues/57
-export const loadData = async () => {
-  const [concepts, dataPoints, youtube, labels, labelsI18n] = await Promise.all(
-    [
-      loadAsMap({
-        url: new URL("../../asset/keys.tsv", import.meta.url).href,
-        schema: ConceptSchema(z),
-        getKey: (item) => item.index,
-      }),
-      loadAsMap({
-        url: new URL("../../asset/data.tsv", import.meta.url).href,
-        schema: DataSchema(z),
-        getKey: (item) => item.clusterId,
-      }),
-      loadAsArray({
-        url: new URL("../../asset/youtube.tsv", import.meta.url).href,
-        schema: YoutubeVideoSchema(z),
-      }),
-      loadAsMap({
-        url: new URL("../../asset/area_labels.tsv", import.meta.url).href,
-        schema: AreaLabelSchema(z),
-        getKey: (item) => item.id,
-      }),
-      loadAsMap({
-        url: new URL("../../asset/labels_i18n.tsv", import.meta.url).href,
-        schema: AreaLabelI18nSchema(z),
-        getKey: (item) => item.id,
-      }),
-    ],
-  );
+export const loadData = async (lang: Lang) => {
+  const [concepts, dataPoints, youtube, areas] = await Promise.all([
+    loadAsMap({
+      url: new URL("../../asset/keys.tsv", import.meta.url).href,
+      schema: ConceptSchema(z),
+      getKey: (item) => item.index,
+    }),
+    loadAsMap({
+      url: new URL("../../asset/data.tsv", import.meta.url).href,
+      schema: DataSchema(z),
+      getKey: (item) => item.clusterId,
+    }),
+    loadAsArray({
+      url: new URL("../../asset/youtube.tsv", import.meta.url).href,
+      schema: YoutubeVideoSchema(z),
+    }),
+    loadAreas(lang),
+  ]);
 
   const dataPointsOrdered = new Map(
     [...dataPoints.entries()].sort(
@@ -73,9 +90,8 @@ export const loadData = async () => {
 
   return {
     concepts,
-    labels,
+    areas,
     dataPoints: dataPointsOrdered,
     youtube: labelToVideos,
-    labelsI18n,
   };
 };

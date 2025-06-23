@@ -7,11 +7,14 @@ import {
   useInteractions,
   useTransitionStyles,
 } from "@floating-ui/react";
+import i18next from "i18next";
 import { ChangeEvent, useState } from "react";
+import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { useShallow } from "zustand/react/shallow";
-import { i18n } from "../../../i18n.ts";
 import { useStore } from "../../../store.ts";
+import { LangCode } from "../../../useLanguage.ts";
+import LanguageSelector from "./LanguageSelector.tsx";
 import helpIcon from "./help.svg";
 
 const useTooltip = () => {
@@ -39,6 +42,7 @@ const useTooltip = () => {
 };
 
 const Toggles = () => {
+  const { t } = useTranslation();
   const [
     mapMode,
     setMapMode,
@@ -73,8 +77,8 @@ const Toggles = () => {
   const clusterCountTooltip = useTooltip();
 
   const options = [
-    { value: "regular", label: i18n("Standardowy") },
-    { value: "growth", label: i18n("Wskaźnik rozwoju") },
+    { value: "regular", label: t("toggles.mode.regular") },
+    { value: "growth", label: t("toggles.mode.growth") },
   ] as const;
 
   const onClusterInputChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -96,11 +100,17 @@ const Toggles = () => {
     setClusterInputValue(maxDataPointsInViewport.toString());
   };
 
+  const onLanguageSelect = (lang: LangCode) => {
+    i18next.changeLanguage(lang).catch((err) => {
+      console.error("Failed to change language:", err);
+    });
+  };
+
   return (
     <Wrap>
       <TogglesList>
         <TogglesListItem>
-          <Label htmlFor="mode">{i18n("Tryb")}</Label>
+          <Label htmlFor="mode">{t("toggles.modeLabel")}</Label>
           <Select
             id="mode"
             value={mapMode}
@@ -121,7 +131,9 @@ const Toggles = () => {
         </TogglesListItem>
 
         <TogglesListItem>
-          <Label htmlFor="cluster-count">{i18n("Liczba klastrów")}</Label>
+          <Label htmlFor="cluster-count">
+            {t("toggles.clusterCountLabel")}
+          </Label>
           <Input
             $invalid={!isClusterCountValid}
             id="cluster-count"
@@ -138,6 +150,10 @@ const Toggles = () => {
             {...clusterCountTooltip.getReferenceProps()}
           />
         </TogglesListItem>
+
+        <TogglesListItem>
+          <LanguageSelector onSelect={onLanguageSelect} />
+        </TogglesListItem>
       </TogglesList>
 
       <Tooltip
@@ -147,12 +163,12 @@ const Toggles = () => {
       >
         <List>
           <ListItem>
-            <strong>{i18n("Tryb standardowy.")}</strong> <br /> Lorem ipsum
-            dolor sit amet, consectetur adipiscing elit.
+            <strong>{t("toggles.tooltip.mode.regular.title")}</strong> <br />
+            {t("toggles.tooltip.mode.regular.description")}
           </ListItem>
           <ListItem>
-            <strong>{i18n("Tryb wskaźnika rozwoju.")}</strong> <br /> Sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            <strong>{t("toggles.tooltip.mode.growth.title")}</strong> <br />
+            {t("toggles.tooltip.mode.growth.description")}
           </ListItem>
         </List>
       </Tooltip>
@@ -161,18 +177,10 @@ const Toggles = () => {
         style={{ ...clusterCountTooltip.styles }}
         {...clusterCountTooltip.getFloatingProps()}
       >
-        <P>{i18n("Liczba klastrów wyświetlana jednocześnie na mapie.")}</P>
+        <P>{t("toggles.tooltip.clusterCount.description.line1")}</P>
+        <P>{t("toggles.tooltip.clusterCount.description.line2")}</P>
         <P>
-          {i18n(
-            "Obecnie maksymalna wartość to 3000. Nie zalecamy zbyt dużych wartości, ponieważ wydajność renderowania mapy wtedy znacznie spada.",
-          )}
-        </P>
-        <P>
-          <Em>
-            {i18n(
-              "Pracujemy nad znazcnym poprawieniem wydajności mapy, więc w przyszłości ta wartość będzie mogła być dużo większa.",
-            )}
-          </Em>
+          <Em>{t("toggles.tooltip.clusterCount.description.note")}</Em>
         </P>
       </Tooltip>
     </Wrap>
