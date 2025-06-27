@@ -22,8 +22,7 @@ search.dropdown.placeholder.7	international law
 search.dropdown.placeholder.8	behavioral economics
 search.dropdown.placeholder.9	cybersecurity
 search.dropdown.placeholder.10	fuzzy logic
-toggles.modeLabel	Mode
-toggles.mode.regular	Standard
+toggles.mode.regular	Standard mode
 toggles.mode.growth	Growth rating
 toggles.clusterCountLabel	Cluster count
 toggles.tooltip.mode.regular.title	Standard mode.

@@ -22,8 +22,7 @@ search.dropdown.placeholder.7	prawo międzynarodowe
 search.dropdown.placeholder.8	ekonomia behawioralna
 search.dropdown.placeholder.9	cyberbezpieczeństwo
 search.dropdown.placeholder.10	logika rozmyta
-toggles.modeLabel	Tryb
-toggles.mode.regular	Standardowy
+toggles.mode.regular	Tryb standardowy
 toggles.mode.growth	Wskaźnik rozwoju
 toggles.clusterCountLabel	Liczba klastrów
 toggles.tooltip.mode.regular.title	Tryb standardowy.
