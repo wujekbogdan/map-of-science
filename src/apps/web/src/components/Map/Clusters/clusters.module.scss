@@ -88,5 +88,5 @@ $sizes: 8px, 7px, 6px, 5px, 4px, 3px;
 .ripple {
   fill: #fff;
   animation: rippleIn 1s ease-out;
-  animation-delay: calc(0.3s + (var(--progress, 0) * 0.01s));
+  animation-delay: 0.3s;
 }

@@ -38,7 +38,7 @@ type ShapeOptions = {
     x: number;
     y: number;
   };
-  uniformStyle: boolean;
+  ripple: boolean;
   mode: Mode;
   level: 1 | 2 | 3 | 4 | 5 | 6;
   growthRatingColors: {
@@ -49,15 +49,12 @@ type ShapeOptions = {
 };
 
 export const Shape = (options: ShapeOptions) => {
-  const { point, uniformStyle, mode, growthRatingColors, level, progress } =
-    options;
+  const { point, mode, growthRatingColors, ripple, level, progress } = options;
   const { x, y } = point;
   const colorClasses =
     mode === "regular" ? [css.outline, css.fill] : [css.outline];
   const sizeClass = css[`level-${level.toString()}`];
-  const classList = uniformStyle
-    ? [css.circle, ...colorClasses, sizeClass, css.searchResults]
-    : [css.circle, ...colorClasses, sizeClass];
+  const classList = [css.circle, ...colorClasses, sizeClass];
 
   // TODO: It might be more efficient to simply precalculate 100 CSS classes with SCSS
   const style =
@@ -70,9 +67,7 @@ export const Shape = (options: ShapeOptions) => {
 
   return (
     <>
-      {uniformStyle && (
-        <circle className={css.ripple} cx={x} cy={y} style={style} />
-      )}
+      {ripple && <circle className={css.ripple} cx={x} cy={y} style={style} />}
       <circle className={classes(classList)} cx={x} cy={y} style={style} />
     </>
   );
