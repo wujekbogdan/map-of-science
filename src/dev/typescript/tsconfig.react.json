@@ -18,11 +18,6 @@
     /* Linting */
     "strict": true,
     "noUncheckedSideEffectImports": true,
-
-    // TODO: Remove once the project is fully migrated to TypeScript
-    "allowJs": true,
-    "checkJs": false,
-    "allowSyntheticDefaultImports": true,
   },
   "include": ["src"]
 }
