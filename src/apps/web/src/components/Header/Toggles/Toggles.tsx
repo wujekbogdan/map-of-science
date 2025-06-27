@@ -207,11 +207,11 @@ const Input = styled.input<{ $invalid?: boolean }>`
 const Toggle = styled.button<{ $checked: boolean }>`
   --width: 60px;
   --knob-size: 16px;
-  --v-padding: 6px;
+  --padding: 6px;
   --border: 1px;
 
   box-sizing: border-box;
-  padding: 8px var(--v-padding);
+  padding: var(--padding);
   border: var(--border) solid #9b5b9b;
   appearance: none;
   cursor: pointer;
@@ -231,7 +231,7 @@ const Toggle = styled.button<{ $checked: boolean }>`
     transform: ${({ $checked }) =>
       $checked
         ? "translateX(0)"
-        : "translateX(calc(var(--width) - var(--knob-size) - var(--v-padding) * 2 - var(--border) * 2))"};
+        : "translateX(calc(var(--width) - var(--knob-size) - var(--padding) * 2 - var(--border) * 2))"};
     transition: transform 0.2s ease-in-out;
   }
 `;
