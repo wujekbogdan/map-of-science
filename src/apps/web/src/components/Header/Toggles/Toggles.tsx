@@ -116,10 +116,13 @@ const Toggles = () => {
     <Wrap>
       <TogglesList>
         <TogglesListItem>
-          <Label>{modeLabel}</Label>
-          <Switch
+          <Label
             ref={modeTooltip.refs.setReference}
             {...modeTooltip.getReferenceProps()}
+          >
+            {modeLabel}
+          </Label>
+          <Switch
             checked={mapMode === "regular"}
             onChange={onMapdModeChange}
             as={Fragment}
@@ -133,12 +136,14 @@ const Toggles = () => {
         </TogglesListItem>
 
         <TogglesListItem>
-          <Label htmlFor="cluster-count">
+          <Label
+            htmlFor="cluster-count"
+            ref={clusterCountTooltip.refs.setReference}
+            {...clusterCountTooltip.getReferenceProps()}
+          >
             {t("toggles.clusterCountLabel")}
           </Label>
           <Input
-            ref={clusterCountTooltip.refs.setReference}
-            {...clusterCountTooltip.getReferenceProps()}
             $invalid={!isClusterCountValid}
             id="cluster-count"
             value={clusterInput}
