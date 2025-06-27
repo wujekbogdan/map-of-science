@@ -7,15 +7,17 @@ import {
   useInteractions,
   useTransitionStyles,
 } from "@floating-ui/react";
+import { Switch } from "@headlessui/react";
 import i18next from "i18next";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, Fragment, useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { useShallow } from "zustand/react/shallow";
 import { useStore } from "../../../store.ts";
 import { LangCode } from "../../../useLanguage.ts";
 import LanguageSelector from "./LanguageSelector.tsx";
-import helpIcon from "./help.svg";
+
+// import helpIcon from "./help.svg";
 
 const useTooltip = () => {
   const [isVisible, setVisibility] = useState(false);
@@ -75,11 +77,10 @@ const Toggles = () => {
 
   const modeTooltip = useTooltip();
   const clusterCountTooltip = useTooltip();
-
-  const options = [
-    { value: "regular", label: t("toggles.mode.regular") },
-    { value: "growth", label: t("toggles.mode.growth") },
-  ] as const;
+  const modeLabel = {
+    regular: t("toggles.mode.regular"),
+    growth: t("toggles.mode.growth"),
+  }[mapMode];
 
   const onClusterInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
@@ -100,6 +101,11 @@ const Toggles = () => {
     setClusterInputValue(maxDataPointsInViewport.toString());
   };
 
+  const onMapdModeChange = (checked: boolean) => {
+    const mode = checked ? "regular" : "growth";
+    setMapMode(mode);
+  };
+
   const onLanguageSelect = (lang: LangCode) => {
     i18next.changeLanguage(lang).catch((err) => {
       console.error("Failed to change language:", err);
@@ -110,24 +116,20 @@ const Toggles = () => {
     <Wrap>
       <TogglesList>
         <TogglesListItem>
-          <Label htmlFor="mode">{t("toggles.modeLabel")}</Label>
-          <Select
-            id="mode"
-            value={mapMode}
-            onChange={(e) => {
-              setMapMode(e.target.value as (typeof options)[number]["value"]);
-            }}
-          >
-            {options.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </Select>
-          <Info
+          <Label>{modeLabel}</Label>
+          <Switch
             ref={modeTooltip.refs.setReference}
             {...modeTooltip.getReferenceProps()}
-          />
+            checked={mapMode === "regular"}
+            onChange={onMapdModeChange}
+            as={Fragment}
+          >
+            {({ checked }) => (
+              <Toggle $checked={checked}>
+                <SrOnly>{t(`toggles.mode.${mapMode}`)}</SrOnly>
+              </Toggle>
+            )}
+          </Switch>
         </TogglesListItem>
 
         <TogglesListItem>
@@ -135,6 +137,8 @@ const Toggles = () => {
             {t("toggles.clusterCountLabel")}
           </Label>
           <Input
+            ref={clusterCountTooltip.refs.setReference}
+            {...clusterCountTooltip.getReferenceProps()}
             $invalid={!isClusterCountValid}
             id="cluster-count"
             value={clusterInput}
@@ -144,10 +148,6 @@ const Toggles = () => {
             step={100}
             onChange={onClusterInputChange}
             onBlur={onClusterInputBlur}
-          />
-          <Info
-            ref={clusterCountTooltip.refs.setReference}
-            {...clusterCountTooltip.getReferenceProps()}
           />
         </TogglesListItem>
 
@@ -204,24 +204,49 @@ const Input = styled.input<{ $invalid?: boolean }>`
   background-color: ${({ $invalid }) => ($invalid ? "#fff6f6" : "white")};
 `;
 
-const Select = styled.select`
-  padding: 12px;
-  border: 1px solid #ededed;
+const Toggle = styled.button<{ $checked: boolean }>`
+  --width: 60px;
+  --knob-size: 16px;
+  --v-padding: 6px;
+  --border: 1px;
+
+  box-sizing: border-box;
+  padding: 8px var(--v-padding);
+  border: var(--border) solid #9b5b9b;
   appearance: none;
   cursor: pointer;
-`;
+  width: var(--width);
+  border-radius: 16px;
+  background: #fff;
 
-const Info = styled.div`
-  width: 24px;
-  height: 24px;
-  margin-left: 12px;
-  background-image: url("${helpIcon}");
-  background-size: contain;
-  cursor: help;
-  &:hover {
-    opacity: 0.8;
+  &:after {
+    box-sizing: border-box;
+
+    content: "";
+    display: block;
+    width: var(--knob-size);
+    height: var(--knob-size);
+    background: #9b5b9b;
+    border-radius: 50%;
+    transform: ${({ $checked }) =>
+      $checked
+        ? "translateX(0)"
+        : "translateX(calc(var(--width) - var(--knob-size) - var(--v-padding) * 2 - var(--border) * 2))"};
+    transition: transform 0.2s ease-in-out;
   }
 `;
+
+// const Info = styled.div`
+//   width: 24px;
+//   height: 24px;
+//   margin-left: 12px;
+//   background-image: url("${helpIcon}");
+//   background-size: contain;
+//   cursor: help;
+//   &:hover {
+//     opacity: 0.8;
+//   }
+// `;
 
 const Tooltip = styled.div`
   max-width: 300px;
@@ -281,4 +306,16 @@ const Em = styled.em`
   color: #999;
   font-style: normal;
   font-size: 12px;
+`;
+
+const SrOnly = styled.span`
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 `;
