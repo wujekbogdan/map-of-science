@@ -18,6 +18,7 @@
     /* Linting */
     "strict": true,
     "noUncheckedSideEffectImports": true,
+    "outDir": "${configDir}/dist"
   },
-  "include": ["src"]
+  "include": ["${configDir}/src"],
 }
