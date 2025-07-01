@@ -52,16 +52,15 @@ type Dropdown = {
 };
 
 const placeholders = [
-  "fizyka kwantowa",
-  "genetyka",
-  "chemia organiczna",
-  "bioreaktory",
-  "energetyka",
-  "rybołówstwo",
-  "prawo międzynarodowe",
-  "ekonomia behawioralna",
-  "cyberbezpieczeństwo",
-  "logika rozmyta",
+  "fizyka kwantowa, quantum, ...",
+  "genetyka, CRISPR, ...",
+  "chemia organiczna, catalyst, ...",
+  "energetyka, power system, ...",
+  "rybołówstwo, fisheries, ...",
+  "prawo międzynarodowe, border control, ...",
+  "giełda, stock market, ...",
+  "cyberbezpieczeństwo, authentication, ...",
+  "logika rozmyta, fuzzy, ...",
 ];
 
 const tokenizeLabel = (label: string, query: string): Token[] => {
@@ -94,7 +93,7 @@ const OptionRow = memo(
       props.videosCount === undefined
         ? undefined
         : {
-            text: ` [${i18n("Filmy na YouTube:")} ${props.videosCount}]`,
+            text: ` [${i18n("Segmenty 'Czytamy naturę':")} ${props.videosCount}]`,
             type: "regular",
           };
 
@@ -190,7 +189,7 @@ export const Dropdown = (props: Dropdown) => {
               autoComplete="off"
               $open={open}
               placeholder={i18n(
-                `Wyszukaj na Mapie Nauki, np. "${randomPlaceholder}"`,
+                `Wyszukaj, np. "${randomPlaceholder}"`,
               )}
               displayValue={(option: Option | null) => option?.keyword ?? query}
               onChange={onQueryChange}

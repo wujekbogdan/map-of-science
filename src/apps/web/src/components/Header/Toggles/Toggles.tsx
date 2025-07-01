@@ -73,8 +73,8 @@ const Toggles = () => {
   const clusterCountTooltip = useTooltip();
 
   const options = [
-    { value: "regular", label: i18n("Standardowy") },
-    { value: "growth", label: i18n("Wskaźnik rozwoju") },
+    { value: "regular", label: i18n("Widok zwykły") },
+    { value: "growth", label: i18n("Wkaźnik rozwoju") },
   ] as const;
 
   const onClusterInputChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -147,12 +147,7 @@ const Toggles = () => {
       >
         <List>
           <ListItem>
-            <strong>{i18n("Tryb standardowy.")}</strong> <br /> Lorem ipsum
-            dolor sit amet, consectetur adipiscing elit.
-          </ListItem>
-          <ListItem>
-            <strong>{i18n("Tryb wskaźnika rozwoju.")}</strong> <br /> Sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            <strong>{i18n("Wskaźnik rozwoju")}</strong> <br /> Kolor klastra reprezentuje tempo jego rozwoju, w porównaniu z innymi klastrami. Klastry oznaczone kolorem niebieskim rozwijają się najwolniej. Klastry oznaczone kolorem czerwonym rozwijają się najszybciej.<br>
           </ListItem>
         </List>
       </Tooltip>
@@ -161,16 +156,16 @@ const Toggles = () => {
         style={{ ...clusterCountTooltip.styles }}
         {...clusterCountTooltip.getFloatingProps()}
       >
-        <P>{i18n("Liczba klastrów wyświetlana jednocześnie na mapie.")}</P>
+        <P><strong>{i18n("Liczba klastrów wyświetlanych jednocześnie na mapie")}</strong></P>
         <P>
           {i18n(
-            "Obecnie maksymalna wartość to 3000. Nie zalecamy zbyt dużych wartości, ponieważ wydajność renderowania mapy wtedy znacznie spada.",
+            "Liczba wszystkich klastrów w bazie to ok. 86 tysięcy. Aplikacja wyświetla zawsze tylko ustaloną liczbę największych klastrów. Wartość domyślna to 500. Obecnie maksymalna dostępna wartość to 3000. Uwaga: mapa może działać wolniej, gdy wyświetla naraz więcej klastrów.",
           )}
         </P>
         <P>
           <Em>
             {i18n(
-              "Pracujemy nad znazcnym poprawieniem wydajności mapy, więc w przyszłości ta wartość będzie mogła być dużo większa.",
+              "Pracujemy nad znacznym poprawieniem wydajności mapy.",
             )}
           </Em>
         </P>
