@@ -1,7 +1,14 @@
+import { useTranslation } from "react-i18next";
 import { useArticleStore } from "../../store.ts";
 import { ArticleModal } from "./ArticleModal.tsx";
+import { ArticleWithVideos } from "./ArticleWithVideos.tsx";
+import HtmlArticle from "./HtmlArticle.tsx";
 import { IframeArticle } from "./IframeArticle.tsx";
-import { LocalArticle } from "./LocalArticle.tsx";
+
+const Error = () => {
+  const { t } = useTranslation();
+  return <p>{t("general.error")}</p>;
+};
 
 export const Article = () => {
   const { type, id, article, videos, reset } = useArticleStore();
@@ -10,16 +17,20 @@ export const Article = () => {
     return null;
   }
 
-  const Component =
-    type === "iframe" ? (
-      <IframeArticle id={id} />
-    ) : (
-      <LocalArticle html={article} videos={videos} />
-    );
+  const Component = () => {
+    switch (type) {
+      case "iframe":
+        return <IframeArticle id={id} />;
+      case "local-with-videos":
+        return <ArticleWithVideos html={article} videos={videos} />;
+      case "local":
+        return !article ? <Error /> : <HtmlArticle html={article} />;
+    }
+  };
 
   return (
     <ArticleModal
-      children={Component}
+      children={Component()}
       onClose={() => {
         reset();
       }}

@@ -7,6 +7,7 @@ import { Cluster } from "../../api/model";
 import { useArticleStore, useStore } from "../../store.ts";
 import { useD3Zoom } from "../../useD3Zoom.ts";
 import { useFlashState } from "../../useFlashState.ts";
+import { useLanguage } from "../../useLanguage.ts";
 import { useLayersOpacity } from "../../useLayersOpacity.ts";
 import { Clusters, ClusterWithScaledPlace } from "./Clusters/Clusters.tsx";
 import Label, { OnLabelClick } from "./Label/Label.tsx";
@@ -114,6 +115,7 @@ export default function Map(props: Props) {
       s.mapMode,
     ]),
   );
+  const { language } = useLanguage();
 
   const [fetchLocalArticle, setVideos] = useArticleStore(
     useShallow((s) => [s.fetchLocalArticle, s.setVideos]),
@@ -300,7 +302,7 @@ export default function Map(props: Props) {
             key={label.key}
             onClick={({ text, videos }) => {
               setVideos(videos);
-              void fetchLocalArticle(text);
+              void fetchLocalArticle(text, language);
             }}
           />
         ))}
