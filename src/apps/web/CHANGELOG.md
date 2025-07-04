@@ -1,5 +1,27 @@
 # @map-of-science/web
 
+## 1.17.0
+
+### Minor Changes
+
+- fc3a38e: Add missing UI translations. Rephrase some UI text.
+- 0bbf913: Add language switcher UI.
+- a646fc6: Extract named clusters from `areas.tsv` into a separate `places.tsv` file.
+- 0bbf913: Drop props from the `Map` component and pull the data from the store instead.
+- a646fc6: Make `places` act as `clusters` in terms of click and hover interactions.
+- a646fc6: Rebrand `DataPoints` to `Clusters` across the codebase.
+- bdfe4e2: Introduce new map mode toggle UI.
+- 0bc3b17: Improve the search results UX by hiding regular clusters when a search filter is applied.
+- 0bbf913: Replace the dummy `i18n` module with the `i18next` library, and add `pl-PL` and `en-US` translations for UI components.
+- a646fc6: Enrich `clusters` with `places` data during model creation.
+- 0bbf913: Localize area labels.
+
+### Patch Changes
+
+- 2f79b10: Adjusts the SVG background position and scale.
+- 0bbf913: Drop duplicate `Vegetation, forests, fires` and `Tropical diseases` area data from tsv files.
+- e284bfb: tsconfig include paths cleanup
+
 ## 1.16.0
 
 ### Minor Changes

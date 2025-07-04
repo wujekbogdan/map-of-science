@@ -1,5 +1,11 @@
 # @map-of-science/root
 
+## 0.3.0
+
+### Minor Changes
+
+- 815ac5e: Move render.com config to the `render.yaml` file.
+
 ## 0.2.0
 
 ### Minor Changes

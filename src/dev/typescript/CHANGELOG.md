@@ -1,5 +1,18 @@
 # @map-of-science/typescript
 
+## 0.3.0
+
+### Minor Changes
+
+- ea93f60: Drop the following tsconfig settings: `allowJs`, `checkJs`, `allowSyntheticDefaultImports`.
+  They're not required anymore, as the codebase is now fully TypeScript.
+- ea93f60: Drop the following tsconfig lint rules: `noUnusedLocals`, `noUnusedParameters`, `noFallthroughCasesInSwitch`.
+  They are checked by ESLint anyway.
+
+### Patch Changes
+
+- e284bfb: tsconfig include paths cleanup
+
 ## 0.2.1
 
 ### Patch Changes
