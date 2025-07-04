@@ -9,7 +9,7 @@ search.dropdown.youtubeCount	YouTube videos
 search.dropdown.enterMin	Type at least 3 characters
 search.dropdown.loading	Loading
 search.dropdown.noResults	No results found
-search.dropdown.placeholder	Search the Map of Science, e.g. "{{placeholder}}"
+search.dropdown.placeholder	Search terms, e.g. "{{placeholder}}"
 search.dropdown.searchLabel	Search
 search.dropdown.reset	Reset
 search.dropdown.placeholder.1	quantum physics
@@ -25,12 +25,12 @@ search.dropdown.placeholder.10	fuzzy logic
 toggles.mode.regular	Standard mode
 toggles.mode.growth	Growth rating
 toggles.clusterCountLabel	Cluster count
-toggles.tooltip.mode.regular.title	Standard mode.
-toggles.tooltip.mode.growth.title	Growth rating mode.
-toggles.tooltip.mode.regular.description	Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-toggles.tooltip.mode.growth.description	Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-toggles.tooltip.clusterCount.description.line1	Number of clusters displayed on the map at once.
-toggles.tooltip.clusterCount.description.line2	The current maximum value is 3000. We don't recommend using very high values, as map rendering performance will drop significantly.
+toggles.tooltip.mode.regular.title	Standard mode
+toggles.tooltip.mode.growth.title	Growth rating mode
+toggles.tooltip.mode.regular.description	A cluster is a collection of scientific articles. In standard mode, circles representing clusters differ only by size: larger circles are clusters with more articles.
+toggles.tooltip.mode.growth.description	Growth rating is a measure of how fast a given cluster grew in the past 3 years. In growth rating mode, clusters are also colored accordingly: clusters with growth rating below average are blue; cluster with growth rating above average are red. Average clusters are white.
+toggles.tooltip.clusterCount.description.line1	The total number of clusters is ca. 86 thousand. Only the largest ones are displayed at any given time.
+toggles.tooltip.clusterCount.description.line2	By default, the 500 largest clusters are displayed. The current maximum value is 3000. Higher values may cause the app to slow down.
 toggles.tooltip.clusterCount.description.note	We're working on major performance improvements, so this limit will be increased in the future.
 toggles.languages.language	Language
 toggles.languages.pl	Polish
