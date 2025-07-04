@@ -38,3 +38,5 @@ toggles.languages.en	English
 map.clusterDetails.articleCount	Number of articles: {{count}}
 map.clusterDetails.growthRating	Growth rating: {{rating}}
 map.clusterDetails.keywordsLabel	Keywords
+info.about	About the Map of Science
+general.error	An error occurred.

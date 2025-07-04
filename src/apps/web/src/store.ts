@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { combine } from "zustand/middleware";
 import { fetchArticle } from "./api";
 import { AreaLocalized } from "./api/data.ts";
+import { Lang } from "./api/i18n.ts";
 import { Concept, Cluster, YoutubeVideo } from "./api/model";
 
 type Zoom = { x: number; y: number; scale: number };
@@ -159,13 +160,20 @@ export const useStore = create(
 
 type ArticleState =
   | { id: null; type: null; article: null; videos: YoutubeVideo[] }
-  | { id: null; type: "local"; article: string | null; videos: YoutubeVideo[] }
+  | {
+      id: null;
+      type: "local-with-videos";
+      article: string | null;
+      videos: YoutubeVideo[];
+    }
+  | { id: null; type: "local"; article: string | null; videos: null }
   | { id: number; type: "iframe"; article: null; videos: YoutubeVideo[] };
 
 type ArticleActions = {
   reset: () => void;
   setRemoteArticleId: (id: number) => void;
-  fetchLocalArticle: (label: string) => Promise<void>;
+  fetchLocalArticle: (label: string, lang: Lang) => Promise<void>;
+  fetchGeneralInfo: (lang: Lang) => Promise<void>;
   setVideos: (videos: YoutubeVideo[]) => void;
 };
 
@@ -183,11 +191,15 @@ export const useArticleStore = create<ArticleState & ArticleActions>((set) => ({
   setRemoteArticleId: (id: number) => {
     set({ id, type: "iframe", article: null });
   },
-  fetchLocalArticle: async (label: string) => {
-    const articleHTML = await fetchArticle(label);
+  fetchLocalArticle: async (label: string, lang: Lang) => {
+    const articleHTML = await fetchArticle(label, lang);
+    set({ id: null, type: "local-with-videos", article: articleHTML });
+  },
+  fetchGeneralInfo: async (lang: Lang) => {
+    const articleHTML = await fetchArticle("general-info", lang);
     set({ id: null, type: "local", article: articleHTML });
   },
   setVideos: (videos: YoutubeVideo[]) => {
-    set({ videos, id: null, type: "local" });
+    set({ videos, id: null, type: "local-with-videos" });
   },
 }));

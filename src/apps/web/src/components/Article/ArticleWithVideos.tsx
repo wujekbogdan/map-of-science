@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { YoutubeVideo } from "../../api/model";
 import { config } from "../../config.ts";
+import HtmlArticle from "./HtmlArticle.tsx";
 
 type Props = {
   html: string | null;
@@ -16,16 +17,12 @@ const formatDate = (date: string) => {
   return new Intl.DateTimeFormat(config.LANG).format(new Date(date));
 };
 
-export const LocalArticle = ({ html, videos }: Props) => {
+export const ArticleWithVideos = ({ html, videos }: Props) => {
   const { t } = useTranslation();
 
   return (
     <>
-      {
-        // It says dangerouslySetInnerHTML, but it's safe because the content comes
-        // from local markdown files we control.
-      }
-      {html && <Article dangerouslySetInnerHTML={{ __html: html }} />}
+      {html && <HtmlArticle html={html} />}
       <Videos>
         {videos.length > 0 ? (
           <>
@@ -105,10 +102,4 @@ const Thumbnail = styled.img`
   display: block;
   border-radius: 3px;
   border: 1px solid #eee;
-`;
-
-// TODO: Implement proper styling for Markdown content.
-// https://github.com/wujekbogdan/map-of-science/issues/58
-const Article = styled.div`
-  line-height: 1.42;
 `;

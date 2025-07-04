@@ -11,6 +11,7 @@ import { useWindowSize } from "../useWindowSize.ts";
 import { Article } from "./Article/Article.tsx";
 import { DevTool } from "./DevTool.tsx";
 import { Header } from "./Header/Header.tsx";
+import Info from "./Info/Info.tsx";
 import MapComponent from "./Map/Map.tsx";
 
 const AppLoader = () => {
@@ -62,6 +63,10 @@ function App() {
         {isLoading ? <MapLoader /> : <MapComponent size={size} />}
         <Article />
 
+        <InfoWrapper>
+          <Info />
+        </InfoWrapper>
+
         {config.devTool && (
           <DevToolsWrapper>
             <DevTool />
@@ -81,11 +86,17 @@ const Container = styled.div`
   );
 `;
 
+const InfoWrapper = styled.div`
+  position: fixed;
+  bottom: 0;
+  right: 0;
+`;
+
 const DevToolsWrapper = styled.div`
   z-index: 20;
   position: fixed;
   bottom: 0;
-  right: 0;
+  left: 0;
   max-height: 100vh;
   overflow-y: auto;
 `;

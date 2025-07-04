@@ -37,3 +37,5 @@ toggles.languages.en	angielski
 map.clusterDetails.articleCount	Liczba artykułów: {{count}}
 map.clusterDetails.growthRating	Wskaźnik rozwoju: {{rating}}
 map.clusterDetails.keywordsLabel	Słowa kluczowe
+info.about	O Mapie Nauki
+general.error	Wystąpił błąd.

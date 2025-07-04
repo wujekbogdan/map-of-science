@@ -1,3 +1,5 @@
+import { Lang } from "./i18n.ts";
+
 const articles: Record<string, () => Promise<{ default: string }>> =
   Object.entries(import.meta.glob("../articles/*.md")).reduce(
     (acc, [path, importFn]) => {
@@ -9,13 +11,20 @@ const articles: Record<string, () => Promise<{ default: string }>> =
     {},
   );
 
-const labelTextToLabelId = (label: string) => {
-  return label.toLowerCase().replace(/[^a-z0-9]/g, "_"); // Replace non-alphanumeric characters with underscores
+const localizedLabelId = (label: string, lang: Lang) => {
+  const prefix = label.toLowerCase().replace(/[^a-z0-9]/g, "_"); // Replace non-alphanumeric characters with underscores
+  const suffix = (
+    {
+      en: "en-US",
+      pl: "pl-PL",
+    } as const
+  )[lang];
+
+  return `${prefix}-${suffix}`;
 };
 
-export const isArticleAvailable = (articleName: string) => {
-  const labelId = labelTextToLabelId(articleName);
-  return labelId in articles;
+export const isArticleAvailable = (localizedId: string) => {
+  return localizedId in articles;
 };
 
 const markdownToHtml = async (markdown: string) => {
@@ -24,22 +33,25 @@ const markdownToHtml = async (markdown: string) => {
   return marked.parse(markdown);
 };
 
-export const fetchArticle = async (label: string) => {
-  if (!isArticleAvailable(label)) {
+export const fetchArticle = async (label: string, lang: Lang) => {
+  const localizedId = localizedLabelId(label, lang);
+  console.log(localizedId);
+
+  if (!isArticleAvailable(localizedId)) {
     return null;
   }
 
-  const labelId = labelTextToLabelId(label);
-  const path = (await articles[labelId]()).default;
+  const path = (await articles[localizedId]()).default;
 
   if (!path) {
-    throw new Error(`Article not found: ${labelId}`);
+    throw new Error(`Article not found: ${localizedId}`);
   }
 
   const response = await fetch(path);
+
   if (!response.ok) {
     throw new Error(
-      `Failed to fetch article: labelId:${labelId}, response: ${response.statusText}`,
+      `Failed to fetch article: labelId:${localizedId}, response: ${response.statusText}`,
     );
   }
 
