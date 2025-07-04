@@ -24,9 +24,9 @@ search.dropdown.placeholder.9	cyberbezpieczeństwo, security, ...
 toggles.mode.regular	Tryb standardowy
 toggles.mode.growth	Wskaźnik rozwoju
 toggles.clusterCountLabel	Liczba klastrów
-toggles.tooltip.mode.regular.title	
+toggles.tooltip.mode.regular.title	Tryb standardowy
 toggles.tooltip.mode.growth.title	Wskaźnik rozwoju
-toggles.tooltip.mode.regular.description	
+toggles.tooltip.mode.regular.description	Klaster to grupa artykułów naukowych. Okręgi reprezentujące klastry różnią się wielkością: większe zawierają więcej artykułów naukowych.
 toggles.tooltip.mode.growth.description	Wskaźnik rozwoju to miara tego, jak szybko rozwijał się dany klaster w ciągu ostatnich 3 lat, w porównaniu z innymi klastrami. Kolor niebieski - klastry rozwijające się wolniej od średniej. Kolor czerwony - klastry rozwijające się szybciej od średniej.
 toggles.tooltip.clusterCount.description.line1	Łączna liczba klastrów to ok. 86 tysięcy. Na mapie wyświetlane są tylko największe z nich.
 toggles.tooltip.clusterCount.description.line2	Domyślnie wyświetlanych jest to 500 największych klastrów. Obecnie maksymalna wartość to 3000. Wybór większych wartości może spowolnić działanie mapy.
