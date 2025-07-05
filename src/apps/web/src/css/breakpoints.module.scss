@@ -1,0 +1,36 @@
+@use 'sass:map';
+
+$breakpoints: (
+  xs: 480px,
+  sm: 600px,
+  md: 900px,
+  lg: 1200px,
+);
+
+@function get-breakpoint($name) {
+  @return map.get($breakpoints, $name);
+}
+
+@mixin min-width($breakpoint-name) {
+  @media only screen and (min-width: get-breakpoint($breakpoint-name)) {
+    @content;
+  }
+}
+
+@mixin max-width($breakpoint-name) {
+  @media only screen and (max-width: get-breakpoint($breakpoint-name) - 1px) {
+    @content;
+  }
+}
+
+@mixin between($min-breakpoint, $max-breakpoint) {
+  @media only screen and (min-width: get-breakpoint($min-breakpoint)) and (max-width: get-breakpoint($max-breakpoint) - 1px) {
+    @content;
+  }
+}
+
+:export {
+  @each $name, $value in $breakpoints {
+    #{$name}: #{$value};
+  }
+}
