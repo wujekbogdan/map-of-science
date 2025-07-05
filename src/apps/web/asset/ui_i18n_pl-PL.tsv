@@ -21,21 +21,22 @@ search.dropdown.placeholder.6	rybołówstwo, fish, ...
 search.dropdown.placeholder.7	prawo międzynarodowe, border, ...
 search.dropdown.placeholder.8	ekonomia behawioralna, decision, ...
 search.dropdown.placeholder.9	cyberbezpieczeństwo, security, ...
-toggles.mode.regular	Tryb standardowy
-toggles.mode.growth	Wskaźnik rozwoju
+toggles.mode.regular	Widok standardowy
+toggles.mode.growth	Widok tempa rozwoju
 toggles.clusterCountLabel	Liczba klastrów
-toggles.tooltip.mode.regular.title	Tryb standardowy
-toggles.tooltip.mode.growth.title	Wskaźnik rozwoju
-toggles.tooltip.mode.regular.description	Klaster to grupa artykułów naukowych. Okręgi reprezentujące klastry różnią się wielkością: większe zawierają więcej artykułów naukowych.
-toggles.tooltip.mode.growth.description	Wskaźnik rozwoju to miara tego, jak szybko rozwijał się dany klaster w ciągu ostatnich 3 lat, w porównaniu z innymi klastrami. Kolor niebieski - klastry rozwijające się wolniej od średniej. Kolor czerwony - klastry rozwijające się szybciej od średniej.
+toggles.tooltip.mode.intro	Każda kropka na mapie ("klaster") to grupa artykułów naukowych na wspólny temat.
+toggles.tooltip.mode.regular.title	Widok standardowy
+toggles.tooltip.mode.growth.title	Widok tempa rozwoju
+toggles.tooltip.mode.regular.description	W widoku standardowym klastry różnią się tylko wielkością: większe zawierają więcej artykułów naukowych.
+toggles.tooltip.mode.growth.description	Tempo rozwoju to miara tego, jak szybko rozwijał się dany klaster w ciągu ostatnich 3 lat w porównaniu z innymi klastrami. Kolor niebieski - klastry rozwijające się wolniej od średniej. Kolor czerwony - klastry rozwijające się szybciej od średniej. Klastry przeciętne są białe.
 toggles.tooltip.clusterCount.description.line1	Łączna liczba klastrów to ok. 86 tysięcy. Na mapie wyświetlane są tylko największe z nich.
-toggles.tooltip.clusterCount.description.line2	Domyślnie wyświetlanych jest to 500 największych klastrów. Obecnie maksymalna wartość to 3000. Wybór większych wartości może spowolnić działanie mapy.
+toggles.tooltip.clusterCount.description.line2	Domyślnie wyświetlanych jest 500 największych klastrów. Obecnie maksymalna wartość to 3000. Wybór większych wartości może spowolnić działanie mapy.
 toggles.tooltip.clusterCount.description.note	Pracujemy nad poprawieniem wydajności mapy, aby w przyszłości możliwe było wyświetlanie większej liczby klastrów i dodatkowych parametrów.
 toggles.languages.language	Język
 toggles.languages.pl	polski
 toggles.languages.en	angielski
 map.clusterDetails.articleCount	Liczba artykułów: {{count}}
-map.clusterDetails.growthRating	Wskaźnik rozwoju: {{rating}}
+map.clusterDetails.growthRating	Tempo rozwoju: {{rating}}
 map.clusterDetails.keywordsLabel	Słowa kluczowe
 info.about	O Mapie Nauki
 general.error	Wystąpił błąd.
