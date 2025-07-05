@@ -30,7 +30,7 @@ toggles.tooltip.mode.growth.title	Widok tempa rozwoju
 toggles.tooltip.mode.regular.description	W widoku standardowym klastry różnią się tylko wielkością: większe zawierają więcej artykułów naukowych.
 toggles.tooltip.mode.growth.description	Tempo rozwoju to miara tego, jak szybko rozwijał się dany klaster w ciągu ostatnich 3 lat w porównaniu z innymi klastrami. Kolor niebieski - klastry rozwijające się wolniej od średniej. Kolor czerwony - klastry rozwijające się szybciej od średniej. Klastry przeciętne są białe.
 toggles.tooltip.clusterCount.description.line1	Łączna liczba klastrów to ok. 86 tysięcy. Na mapie wyświetlane są tylko największe z nich.
-toggles.tooltip.clusterCount.description.line2	Domyślnie wyświetlanych jest to 500 największych klastrów. Obecnie maksymalna wartość to 3000. Wybór większych wartości może spowolnić działanie mapy.
+toggles.tooltip.clusterCount.description.line2	Domyślnie wyświetlanych jest 500 największych klastrów. Obecnie maksymalna wartość to 3000. Wybór większych wartości może spowolnić działanie mapy.
 toggles.tooltip.clusterCount.description.note	Pracujemy nad poprawieniem wydajności mapy, aby w przyszłości możliwe było wyświetlanie większej liczby klastrów i dodatkowych parametrów.
 toggles.languages.language	Język
 toggles.languages.pl	polski

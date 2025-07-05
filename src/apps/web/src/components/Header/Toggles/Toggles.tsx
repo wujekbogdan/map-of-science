@@ -166,8 +166,8 @@ const Toggles = () => {
         style={{ ...modeTooltip.styles }}
         {...modeTooltip.getFloatingProps()}
       >
+        <P>{t("toggles.tooltip.mode.intro")}</P>
         <List>
-          <ListItem>{t("toggles.tooltip.mode.intro")}</ListItem>
           <ListItem>
             <strong>{t("toggles.tooltip.mode.regular.title")}</strong> <br />
             {t("toggles.tooltip.mode.regular.description")}
@@ -241,18 +241,6 @@ const Toggle = styled.button<{ $checked: boolean }>`
     transition: transform 0.2s ease-in-out;
   }
 `;
-
-// const Info = styled.div`
-//   width: 24px;
-//   height: 24px;
-//   margin-left: 12px;
-//   background-image: url("${helpIcon}");
-//   background-size: contain;
-//   cursor: help;
-//   &:hover {
-//     opacity: 0.8;
-//   }
-// `;
 
 const Tooltip = styled.div`
   max-width: 300px;
