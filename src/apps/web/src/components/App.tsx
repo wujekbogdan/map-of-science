@@ -12,6 +12,7 @@ import { Article } from "./Article/Article.tsx";
 import { DevTool } from "./DevTool.tsx";
 import { Header } from "./Header/Header.tsx";
 import Info from "./Info/Info.tsx";
+import Logo from "./Logo/Logo.tsx";
 import MapComponent from "./Map/Map.tsx";
 
 const AppLoader = () => {
@@ -67,6 +68,10 @@ function App() {
           <Info />
         </InfoWrapper>
 
+        <LogoWrapper>
+          <Logo />
+        </LogoWrapper>
+
         {config.devTool && (
           <DevToolsWrapper>
             <DevTool />
@@ -90,6 +95,12 @@ const InfoWrapper = styled.div`
   position: fixed;
   bottom: 0;
   right: 0;
+`;
+
+const LogoWrapper = styled.div`
+  position: fixed;
+  bottom: 0;
+  left: 0;
 `;
 
 const DevToolsWrapper = styled.div`
