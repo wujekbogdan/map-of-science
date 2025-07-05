@@ -167,10 +167,8 @@ const Toggles = () => {
         {...modeTooltip.getFloatingProps()}
       >
         <List>
+          <ListItem>{t("toggles.tooltip.mode.intro")}</ListItem>
           <ListItem>
-			{t("toggles.tooltip.mode.intro")}
-		  </ListItem>
-		  <ListItem>
             <strong>{t("toggles.tooltip.mode.regular.title")}</strong> <br />
             {t("toggles.tooltip.mode.regular.description")}
           </ListItem>
