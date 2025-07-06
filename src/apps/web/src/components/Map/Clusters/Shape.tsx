@@ -1,6 +1,8 @@
 import { RGB } from "../../../store.ts";
 import css from "./clusters.module.scss";
 
+console.log({ css });
+
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
 const interpolateColor = (c1: RGB, c2: RGB, t: number): RGB => ({
@@ -46,6 +48,7 @@ type ShapeOptions = {
     middle: RGB;
     end: RGB;
   };
+  forcedHover: boolean;
 };
 
 export const Shape = (options: ShapeOptions) => {
@@ -54,7 +57,22 @@ export const Shape = (options: ShapeOptions) => {
   const colorClasses =
     mode === "regular" ? [css.outline, css.fill] : [css.outline];
   const sizeClass = css[`level-${level.toString()}`];
-  const classList = [css.circle, ...colorClasses, sizeClass];
+  const hoveredClass = () => {
+    if (!options.forcedHover) {
+      return [];
+    }
+
+    if (mode === "regular") {
+      return [css["outline--hover"], css["fill--hover"]];
+    }
+
+    if (mode === "growth") {
+      return [css["outline--hover"]];
+    }
+
+    return [];
+  };
+  const classList = [css.circle, ...colorClasses, sizeClass, ...hoveredClass()];
 
   // TODO: It might be more efficient to simply precalculate 100 CSS classes with SCSS
   const style =
