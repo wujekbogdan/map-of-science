@@ -1,12 +1,13 @@
 import { useMediaQuery } from "@uidotdev/usehooks";
-import { xs, sm, md, lg } from "./css/breakpoints.module.scss";
+import { sm, md, lg, xl, xxl } from "./css/breakpoints.module.scss";
 
-const breakpoints = {
-  xs: xs,
+export const breakpoints = {
   sm: sm,
   md: md,
   lg: lg,
-};
+  xl: xl,
+  xxl: xxl,
+} as const;
 type Breakpoint = keyof typeof breakpoints;
 
 export const useBreakpointMin = (breakpoint: Breakpoint) => {

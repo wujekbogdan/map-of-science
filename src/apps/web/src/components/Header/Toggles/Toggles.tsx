@@ -14,17 +14,17 @@ import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { useShallow } from "zustand/react/shallow";
 import { useStore } from "../../../store.ts";
+import { breakpoints, useBreakpointMin } from "../../../useBreakpoint.ts";
 import { LangCode } from "../../../useLanguage.ts";
 import LanguageSelector from "./LanguageSelector.tsx";
 
-// import helpIcon from "./help.svg";
-
 const useTooltip = () => {
   const [isVisible, setVisibility] = useState(false);
+  const isAtLeastLg = useBreakpointMin("lg");
 
   const { refs, floatingStyles, context } = useFloating({
     middleware: [offset(10), flip(), shift({ padding: 10 })],
-    open: isVisible,
+    open: isVisible && isAtLeastLg,
     onOpenChange: setVisibility,
   });
   const { styles } = useTransitionStyles(context, {
@@ -201,13 +201,22 @@ const Wrap = styled.div`
 `;
 
 const Label = styled.label`
-  margin-right: 12px;
+  margin: 0 0 6px 0;
+
+  @media (min-width: ${breakpoints.lg}) {
+    margin: 0 12px 0 0;
+  }
 `;
 
 const Input = styled.input<{ $invalid?: boolean }>`
+  width: 100%;
   padding: 12px;
   border: 1px solid ${({ $invalid }) => ($invalid ? "crimson" : "#ededed")};
   background-color: ${({ $invalid }) => ($invalid ? "#fff6f6" : "white")};
+
+  @media (min-width: ${breakpoints.lg}) {
+    width: auto;
+  }
 `;
 
 const Toggle = styled.button<{ $checked: boolean }>`
@@ -271,15 +280,31 @@ const TogglesList = styled.ul`
   padding: 0;
   list-style: none;
   display: flex;
+  flex-direction: column;
+
+  @media (min-width: ${breakpoints.lg}) {
+    flex-direction: row;
+  }
 `;
 
 const TogglesListItem = styled.li`
   display: flex;
-  align-items: center;
-  margin-right: 24px;
+  margin: 0 0 12px 0;
+  flex-direction: column;
+  align-items: flex-start;
 
   &:last-child {
-    margin-right: 0;
+    margin-bottom: 0;
+  }
+
+  @media (min-width: ${breakpoints.lg}) {
+    margin: 0 24px 0 0;
+    flex-direction: row;
+    align-items: center;
+
+    &:last-child {
+      margin-right: 0;
+    }
   }
 `;
 

@@ -220,6 +220,4 @@ export const Search = () => {
   );
 };
 
-const Form = styled.form`
-  width: 450px;
-`;
+const Form = styled.form``;
