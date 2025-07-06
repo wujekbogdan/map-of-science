@@ -117,6 +117,7 @@ export const Clusters = ({ clusters, concepts, ripple, mode }: Props) => {
               }}
               ripple={!!ripple}
               mode={mode}
+              forcedHover={hoveredPoint?.clusterId === cluster.clusterId}
               growthRatingColors={growthRatingColors}
             />
             {cluster.place && cluster.place.opacity > 0 && (
@@ -126,6 +127,7 @@ export const Clusters = ({ clusters, concepts, ripple, mode }: Props) => {
                 y={cluster.y - cluster.place.offset}
                 fontSize={cluster.place.fontSize}
                 opacity={cluster.place.opacity}
+                forcedHover={hoveredPoint?.clusterId === cluster.clusterId}
                 level={4}
               >
                 {cluster.place.text}

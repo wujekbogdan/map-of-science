@@ -61,7 +61,7 @@ const processClustersForViewport = (args: Filter) => {
               ...point.place,
               fontSize: args.places.fontSize,
               opacity: args.places.opacity,
-              offset: 20 / args.transform.k,
+              offset: 15 / args.transform.k,
             }
           : null;
       clustersInViewport.push({

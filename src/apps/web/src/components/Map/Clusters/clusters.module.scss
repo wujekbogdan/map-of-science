@@ -33,6 +33,7 @@ $duration: 0.3s;
 .outline {
   stroke: $stroke-color;
 
+  &--hover,
   &:hover {
     stroke: $white;
   }
@@ -41,6 +42,7 @@ $duration: 0.3s;
 .fill {
   fill: $fill-color;
 
+  &--hover,
   &:hover {
     fill: $purple;
   }
@@ -51,6 +53,7 @@ $duration: 0.3s;
   fill: $purple;
   stroke: $white;
 
+  &--hover,
   &:hover {
     cursor: pointer;
     fill: $white;

@@ -8,6 +8,7 @@ type Label = {
   opacity: number;
   level: 1 | 2 | 3 | 4;
   children: string;
+  forcedHover?: boolean;
 };
 
 type Props = Label & {
@@ -25,6 +26,7 @@ export const LabelText = <T extends Props>(props: T) => {
       $fontSize={props.fontSize}
       $opacity={props.opacity}
       $level={props.level}
+      $forcedHover={!!props.forcedHover}
       onClick={() => {
         props.onClick?.(props);
       }}
@@ -52,6 +54,7 @@ const labelFillColor = ($level: 1 | 2 | 3 | 4) => {
 const Text = styled.text.attrs<{
   $fontSize: number;
   $opacity: number;
+  $forcedHover: boolean;
 }>((props) => ({
   style: {
     fontSize: `${props.$fontSize.toString()}px`,
@@ -74,7 +77,9 @@ const Text = styled.text.attrs<{
     0 0 5px #f2efe9,
     0 0 5px #f2efe9,
     0 0 5px #f2efe9;
-  fill: ${(props) => labelFillColor(props.$level)};
+  fill: ${(props) => {
+    return props.$forcedHover ? "#4a90e2" : labelFillColor(props.$level);
+  }};
 
   &:hover {
     fill: #4a90e2;
