@@ -80,6 +80,7 @@ const TogglesWrap = styled.div`
   background: rgba(255, 255, 255, 0.4);
 
   @media (min-width: ${breakpoints.lg}) {
+    background: none;
     padding: 0;
     position: static;
     margin-left: auto;
