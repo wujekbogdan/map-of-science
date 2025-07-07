@@ -17,7 +17,7 @@ jobs:
               - '.changeset/*.md'
 
       - name: Fail if no changeset
-        if: steps.changeset.outputs.changeset != 'true'
+        if: steps.changeset.outputs.changeset != 'true' && github.actor != 'github-actions[bot]'
         run: |
           echo "❌ No changeset found!"
           exit 1
