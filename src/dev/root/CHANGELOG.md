@@ -1,5 +1,11 @@
 # @map-of-science/root
 
+## 0.3.1
+
+### Patch Changes
+
+- c3f199c: Format `*.css` and `*.scss` files with Prettier.
+
 ## 0.3.0
 
 ### Minor Changes
