@@ -1,5 +1,16 @@
 # @map-of-science/root
 
+## 0.4.0
+
+### Minor Changes
+
+- fb6c6a8: Use `PERSONAL_ACCESS_TOKEN` instead of `GITHUB_TOKEN` in the "Release" GitHub workflow to allow the "CI" workflow to run when the "Release" PR is created.
+- fb6c6a8: Remove the "Deploy to GitHub Pages" GitHub workflow. We don't use it anymore since we moved to render.com.
+
+### Patch Changes
+
+- c3f199c: Format `*.css` and `*.scss` files with Prettier.
+
 ## 0.3.0
 
 ### Minor Changes

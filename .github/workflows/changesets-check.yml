@@ -8,6 +8,7 @@ on:
 jobs:
   check-for-changeset:
     runs-on: ubuntu-24.04
+    if: github.actor != 'github-actions[bot]'
     steps:
       - uses: dorny/paths-filter@v3
         id: changeset
@@ -17,7 +18,7 @@ jobs:
               - '.changeset/*.md'
 
       - name: Fail if no changeset
-        if: steps.changeset.outputs.changeset != 'true' && github.actor != 'github-actions[bot]'
+        if: steps.changeset.outputs.changeset != 'true'
         run: |
           echo "❌ No changeset found!"
           exit 1

@@ -1,5 +1,27 @@
 # @map-of-science/web
 
+## 1.18.0
+
+### Minor Changes
+
+- 9102bcd: Add _"About the Map of Science"_ modal, triggered by a button in the footer.
+- 539e770: Translation updates:
+
+  - Map entities: EN translations.
+  - Various UI translation improvements.
+  - General info: EN translation.
+
+- be68559: Add logo
+- c987fea: For clusters with an associated label, force label hover on cluster hover and vice versa.
+- 9bb86d0: Define placeholder SCSS breakpoints and a set of React hooks: `useBreakpointMin`, `useBreakpointMax`, and
+  `useBreakpointBetween` that utilize SCSS-exported variables.
+- 21c7cb0: Add very basic mobile CSS.
+
+### Patch Changes
+
+- c6c89ad: Remove unintended background from header toggles on desktop.
+- fb6c6a8: Prevent the "Check for Changesets" workflow from running on release PR creation.
+
 ## 1.17.0
 
 ### Minor Changes
