@@ -1,100 +1,40 @@
-import { pipeline } from "@huggingface/transformers";
-import { readFileSync } from "node:fs";
-import { z as zod } from "zod";
-import {
-  parse,
-  createProcessor,
-  arrayCollector,
-  mapCollector,
-} from "@map-of-science/csv";
+import { appendFileSync } from "node:fs";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+import { clusters, extract } from "./extractor.js";
 
-export const ConceptSchema = (z: typeof zod) =>
-  z
-    .object({
-      index: z.coerce.number(),
-      key: z.string(),
-    })
-    .transform((concept) => ({
-      id: concept.index,
-      concept: concept.key,
-    }));
-export type Concept = zod.infer<ReturnType<typeof ConceptSchema>>;
+const here = dirname(fileURLToPath(import.meta.url));
 
-export const MakeClustersSchema =
-  (concepts: Map<number, Concept>) => (z: typeof zod) =>
-    z
-      .object({
-        cluster_id: z.coerce.number(),
-        x: z.coerce.number(),
-        y: z.coerce.number(),
-        num_recent_articles: z.coerce.number(),
-        cluster_category: z.coerce.number(),
-        growth_rating: z.coerce.number().min(0).max(100),
-        key_concepts: z.string(),
-      })
-      .transform((data) => ({
-        clusterId: data.cluster_id,
-        concepts: data.key_concepts
-          .split(",")
-          .map((id) => concepts.get(Number(id)))
-          .filter((id) => id !== undefined),
-      }));
+const run = async () => {
+  const cls = await clusters({
+    clusters: resolve(here, "../assets/clusters.tsv"),
+    concepts: resolve(here, "../assets/concepts.tsv"),
+  });
+  let index = 0;
+  const outputFile = resolve(
+    here,
+    `../assets/embeddings-${new Date().getTime()}.tsv`,
+  );
+  const header = "cluster_id\tconcepts\tembeddings\n";
+  appendFileSync(outputFile, header);
 
-type ClustersSchema = ReturnType<typeof MakeClustersSchema>;
-export type Cluster = zod.infer<ReturnType<ClustersSchema>>;
-
-type Paths = {
-  clusters: string;
-  concepts: string;
+  for await (const item of extract(cls)) {
+    index++;
+    console.log(`Processing item ${index}...`);
+    const row = [
+      item.clusterId,
+      item.concepts.join(","),
+      item.embeddings.join(","),
+    ].join("\t");
+    const tsvRow = `${row}\n`;
+    appendFileSync(outputFile, tsvRow);
+  }
 };
 
-export const clusters = async (paths: Paths) => {
-  const conceptsProcessor = createProcessor(
-    ConceptSchema(zod),
-    mapCollector(({ id }) => id),
-  );
-
-  await parse(
-    () => readFileSync(paths.concepts).toString(),
-    conceptsProcessor.process,
-  );
-
-  const clustersProcessor = createProcessor(
-    MakeClustersSchema(conceptsProcessor.getResults())(zod),
-    arrayCollector(),
-  );
-
-  await parse(
-    () => readFileSync(paths.clusters).toString(),
-    clustersProcessor.process,
-  );
-
-  return clustersProcessor.getResults();
-};
-
-export const extract = async (cluster: Cluster[]) => {
-  const extractor = await pipeline(
-    "feature-extraction",
-    "Xenova/all-MiniLM-L6-v2",
-  );
-
-  return await Promise.all(
-    cluster.map(async ({ clusterId, concepts }) => {
-      const commaSeparatedConcepts = concepts
-        .map((concept) => concept.concept)
-        .join(", ");
-
-      const tensor = await extractor(commaSeparatedConcepts, {
-        pooling: "mean",
-        normalize: true,
-      });
-      const list = tensor.tolist() as number[][];
-
-      return {
-        clusterId: clusterId,
-        concepts: concepts.map(({ id }) => id),
-        embeddings: list[0],
-      };
-    }),
-  );
-};
+try {
+  await run();
+  console.log("Extraction completed.");
+} catch (error) {
+  console.error("Error during extraction:", error);
+  throw error;
+}

@@ -1,7 +1,7 @@
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, it, expect } from "vitest";
-import { clusters, extract } from "./index.js";
+import { clusters, extract } from "./extractor.js";
 
 const resolvePath = (relativePath: string) => {
   const here = dirname(fileURLToPath(import.meta.url));
@@ -38,7 +38,7 @@ describe("API", () => {
   });
 
   it("should extract embeddings", async () => {
-    const clustersWithEmbeddings = await extract([
+    const clusters = [
       {
         clusterId: 84872,
         concepts: [
@@ -50,7 +50,12 @@ describe("API", () => {
         clusterId: 72062,
         concepts: [{ concept: "five", id: 5 }],
       },
-    ]);
+    ];
+    const clustersWithEmbeddings = [];
+
+    for await (const item of extract(clusters)) {
+      clustersWithEmbeddings.push(item);
+    }
 
     expect(clustersWithEmbeddings).toMatchObject([
       {

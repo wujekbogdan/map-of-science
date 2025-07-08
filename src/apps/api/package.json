@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "dev": "tsx src/index.ts",
+    "dev": "tsx src/extractor.ts",
     "lint": "eslint .",
     "test": "vitest run"
   },
