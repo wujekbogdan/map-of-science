@@ -1,8 +1,6 @@
 import { RGB } from "../../../store.ts";
 import css from "./clusters.module.scss";
 
-console.log({ css });
-
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
 const interpolateColor = (c1: RGB, c2: RGB, t: number): RGB => ({

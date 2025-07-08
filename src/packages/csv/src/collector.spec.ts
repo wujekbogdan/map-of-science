@@ -1,5 +1,5 @@
-import { describe, it, expect } from "@map-of-science/vitest";
-import { arrayCollector, mapCollector, setCollector } from "./collector.ts";
+import { describe, it, expect } from "vitest";
+import { arrayCollector, mapCollector, setCollector } from "./collector.js";
 
 describe("collectors", () => {
   describe("arrayCollector", () => {

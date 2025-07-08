@@ -23,7 +23,7 @@ znaleźć się blisko siebie.
 ### Czym są „państwa” i ich „regiony”?
 
 Obszary na mapie zostały wydzielone ze względu na to, jak grupują się klastry. Większe, wyraźnie oddzielone grupy klastrów zostały nazwane, biorąc pod uwagę ich wspólną tematykę. Nie zawsze odpowiada to tradycyjnie używanym nazwom dyscyplin naukowych. Granice między obszarami badawczymi są też płynne;
-przykładowo, medycyna „płynnie” przechodzi w biochemię, a ta w chemię. Nazwy obszarów lepiej więc traktować z przymrużeniem oka. 
+przykładowo, medycyna „płynnie” przechodzi w biochemię, a ta w chemię. Nazwy obszarów lepiej więc traktować z przymrużeniem oka.
 
 ## Jak korzystać z mapy?
 

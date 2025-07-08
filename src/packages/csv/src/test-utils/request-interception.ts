@@ -1,6 +1,6 @@
 import { http, HttpResponse } from "msw";
 import { SetupServer, setupServer } from "msw/node";
-import { expect } from "@map-of-science/vitest";
+import { expect } from "vitest";
 
 type ServerOptions = Parameters<typeof setupServer>;
 export type HandlerArguments = {
