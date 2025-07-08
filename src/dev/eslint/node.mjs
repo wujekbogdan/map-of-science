@@ -19,7 +19,12 @@ export const defineConfig = () =>
           projectService: true,
         },
         ecmaVersion: 2020,
-        globals: globals.node,
+        globals: globals.browser,
+      },
+      settings: {
+        node: {
+          version: "22.15.0",
+        },
       },
     },
     {
