@@ -10,7 +10,6 @@
       ]
     },
     "test": {
-      "outputs": ["coverage/**"],
       "dependsOn": ["^build"]
     },
     "lint": {

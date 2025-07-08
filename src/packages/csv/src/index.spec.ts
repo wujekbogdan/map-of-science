@@ -1,4 +1,4 @@
-import { describe, it, expect } from "@map-of-science/vitest";
+import { describe, it, expect } from "vitest";
 
 describe("API Index", () => {
   it("should run the index test", () => {

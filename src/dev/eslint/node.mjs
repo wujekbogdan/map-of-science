@@ -11,7 +11,7 @@ export const defineConfig = () =>
     tsEslint.configs.stylisticTypeChecked,
     nodePlugin.configs["flat/recommended-script"],
     {
-      ignores: ["dist"],
+      ignores: ["dist", "vitest.config.ts"],
     },
     {
       languageOptions: {
