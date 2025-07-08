@@ -9,7 +9,7 @@ packages:
   # Deployable apps (e.g. Node.js, React)
   - 'src/apps/*'
   # Shared runtime code (e.g. UI components, utils)
-  # - 'src/packages/*'
+  - 'src/packages/*'
   # Development-only tooling (e.g. configs, linters, build tools)
   - 'src/dev/*'
 
