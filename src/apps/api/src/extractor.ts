@@ -80,7 +80,7 @@ export async function* extract(cluster: Cluster[]) {
 
   for (const { clusterId, concepts } of cluster) {
     const commaSeparatedConcepts = concepts
-      .map((concept) => concept.concept)
+      .map(({ concept }) => concept)
       .join(", ");
 
     const tensor = await extractor(commaSeparatedConcepts, {

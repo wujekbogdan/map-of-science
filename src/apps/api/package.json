@@ -26,6 +26,9 @@
   "dependencies": {
     "@huggingface/transformers": "^3.6.2",
     "@map-of-science/csv": "workspace:*",
+    "@qdrant/js-client-rest": "^1.14.1",
+    "csv-parse": "^5.6.0",
+    "dotenv": "^17.1.0",
     "zod": "^3.23.8"
   }
 }
