@@ -6,8 +6,6 @@
     "module": "NodeNext",
     "skipLibCheck": true,
     "isolatedModules": true,
-
-    /* Linting */
     "strict": true,
     "noUncheckedSideEffectImports": true
   }
