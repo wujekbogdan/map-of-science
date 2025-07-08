@@ -48,19 +48,20 @@ type Paths = {
   concepts: string;
 };
 
-export const clusters = async (paths: Paths) => {
+export const concepts = async (path: string) => {
   const conceptsProcessor = createProcessor(
     ConceptSchema(zod),
     mapCollector(({ id }) => id),
   );
 
-  await parse(
-    () => readFileSync(paths.concepts).toString(),
-    conceptsProcessor.process,
-  );
+  await parse(() => readFileSync(path).toString(), conceptsProcessor.process);
 
+  return conceptsProcessor.getResults();
+};
+
+export const clusters = async (paths: Paths) => {
   const clustersProcessor = createProcessor(
-    MakeClustersSchema(conceptsProcessor.getResults())(zod),
+    MakeClustersSchema(await concepts(paths.concepts))(zod),
     arrayCollector(),
   );
 
@@ -72,27 +73,37 @@ export const clusters = async (paths: Paths) => {
   return clustersProcessor.getResults();
 };
 
-export async function* extract(cluster: Cluster[]) {
+export const Extractor = async () => {
   const extractor = await pipeline(
     "feature-extraction",
     "Xenova/all-MiniLM-L6-v2",
   );
 
+  return {
+    extract: async (text: string) => {
+      const tensor = await extractor(text, {
+        pooling: "mean",
+        normalize: true,
+      });
+      const list = tensor.tolist() as number[][];
+      return list[0];
+    },
+  };
+};
+
+export async function* extract(cluster: Cluster[]) {
+  const extractor = await Extractor();
+
   for (const { clusterId, concepts } of cluster) {
     const commaSeparatedConcepts = concepts
       .map(({ concept }) => concept)
       .join(", ");
-
-    const tensor = await extractor(commaSeparatedConcepts, {
-      pooling: "mean",
-      normalize: true,
-    });
-    const list = tensor.tolist() as number[][];
+    const embeddings = await extractor.extract(commaSeparatedConcepts);
 
     yield {
       clusterId,
       concepts: concepts.map(({ id }) => id),
-      embeddings: list[0],
+      embeddings,
     };
   }
 }
