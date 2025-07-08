@@ -46,13 +46,6 @@ importers:
         version: 2.5.4
 
   src/apps/api:
-    dependencies:
-      '@map-of-science/csv':
-        specifier: workspace:*
-        version: link:../../packages/csv
-      zod:
-        specifier: ^3.23.8
-        version: 3.25.42
     devDependencies:
       '@map-of-science/eslint':
         specifier: workspace:*
