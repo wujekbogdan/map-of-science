@@ -1,4 +1,3 @@
 {
-  "extends": "@map-of-science/typescript/react",
-  "include": ["src"]
+  "extends": "@map-of-science/typescript/react"
 }

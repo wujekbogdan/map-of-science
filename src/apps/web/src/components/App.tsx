@@ -1,30 +1,51 @@
-import { useCallback } from "react";
+import { Suspense, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import useSWR from "swr";
 import { useShallow } from "zustand/react/shallow";
-import map from "../../asset/foreground.svg?parse";
 import { loadData } from "../api/worker.ts";
 import { config } from "../config.ts";
-import { i18n } from "../i18n.ts";
 import { useStore } from "../store.ts";
+import { useLanguage } from "../useLanguage.ts";
 import { useWindowSize } from "../useWindowSize.ts";
 import { Article } from "./Article/Article.tsx";
 import { DevTool } from "./DevTool.tsx";
 import { Header } from "./Header/Header.tsx";
-import MapComponent from "./Map";
+import Info from "./Info/Info.tsx";
+import Logo from "./Logo/Logo.tsx";
+import MapComponent from "./Map/Map.tsx";
 
-const Loader = () => {
-  return <LoadingWrapper>{i18n("Ładowanie danych...")}</LoadingWrapper>;
+const AppLoader = () => {
+  // TODO: Implement global loading state
+  return "";
+};
+
+const MapLoader = () => {
+  const { t } = useTranslation();
+  return <LoadingWrapper>{t("map.loading")}&hellip;</LoadingWrapper>;
 };
 
 function App() {
-  const [setMapSize, setDataPoints, setConcepts] = useStore(
-    useShallow((s) => [s.setMapSize, s.setDataPoints, s.setConcepts]),
-  );
-  const { data, isLoading } = useSWR("data", loadData, {
-    onSuccess: ({ dataPoints, concepts }) => {
-      setDataPoints(dataPoints);
+  const { language } = useLanguage();
+  const [setMapSize, setClusters, setConcepts, setYoutubeVideos, setAreas] =
+    useStore(
+      useShallow((s) => [
+        s.setMapSize,
+        s.setClusters,
+        s.setConcepts,
+        s.setYoutubeVideos,
+        s.setAreas,
+      ]),
+    );
+  const { isLoading } = useSWR(["data", language], () => loadData(language), {
+    onSuccess: ({ clusters, concepts, youtube, areas }) => {
+      setClusters(clusters);
       setConcepts(concepts);
+      setYoutubeVideos(youtube);
+      setAreas(areas);
+    },
+    onError: (err) => {
+      console.error("Error loading data:", err);
     },
   });
 
@@ -36,35 +57,27 @@ function App() {
       [setMapSize],
     ),
   );
-
   return (
     <Container>
-      <Header />
+      <Suspense fallback={<AppLoader />}>
+        <Header />
+        {isLoading ? <MapLoader /> : <MapComponent size={size} />}
+        <Article />
 
-      {isLoading ? (
-        <Loader />
-      ) : (
-        <MapComponent
-          size={size}
-          /* TODO: This condition isn't really required. values are never
-           * undefined. It's just an issue with SWR typing. SWR doesn't narrow
-           * the type of data based on the isLoading value.
-           * */
-          cityLabels={data?.cityLabels ?? []}
-          dataPoints={data?.dataPoints ?? new Map()}
-          concepts={data?.concepts ?? new Map()}
-          youtube={data?.youtube ?? new Map()}
-          map={map}
-        />
-      )}
+        <InfoWrapper>
+          <Info />
+        </InfoWrapper>
 
-      <Article />
+        <LogoWrapper>
+          <Logo />
+        </LogoWrapper>
 
-      {config.devTool && (
-        <DevToolsWrapper>
-          <DevTool />
-        </DevToolsWrapper>
-      )}
+        {config.devTool && (
+          <DevToolsWrapper>
+            <DevTool />
+          </DevToolsWrapper>
+        )}
+      </Suspense>
     </Container>
   );
 }
@@ -78,11 +91,25 @@ const Container = styled.div`
   );
 `;
 
+const InfoWrapper = styled.div`
+  position: fixed;
+  bottom: 0;
+  right: 0;
+`;
+
+const LogoWrapper = styled.div`
+  position: fixed;
+  bottom: 0;
+  left: 0;
+`;
+
 const DevToolsWrapper = styled.div`
   z-index: 20;
   position: fixed;
   bottom: 0;
-  right: 0;
+  left: 0;
+  max-height: 100vh;
+  overflow-y: auto;
 `;
 
 const LoadingWrapper = styled.div`

@@ -1,7 +1,8 @@
 import { ReactElement, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { useClickAway } from "react-use";
 import styled from "styled-components";
-import { i18n } from "../../i18n.ts";
+import { breakpoints } from "../../useBreakpoint.ts";
 
 type Props = {
   children: ReactElement;
@@ -9,6 +10,7 @@ type Props = {
 };
 
 export const ArticleModal = ({ children, onClose }: Props) => {
+  const { t } = useTranslation();
   const ref = useRef(null);
 
   useClickAway(ref, () => {
@@ -24,7 +26,7 @@ export const ArticleModal = ({ children, onClose }: Props) => {
               onClose?.();
             }}
           >
-            {i18n("Zamknij")} ✕
+            {t("article.close")} ✕
           </CloseButton>
         </Header>
         <Content>{children}</Content>
@@ -51,15 +53,25 @@ const ArticleWrapper = styled.div`
   display: flex;
   flex-direction: column;
   position: fixed;
-  top: 40px;
-  right: 40px;
-  bottom: 40px;
-  width: 40%;
+  top: 12px;
+  right: 12px;
+  bottom: 12px;
+  left: 12px;
   padding: 20px;
   background: rgba(255, 255, 255, 0.95);
   border-radius: 4px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 16px rgba(0, 0, 0, 0.2);
   overflow-y: auto;
+
+  @media (min-width: ${breakpoints.lg}) {
+    top: 36px;
+    right: auto;
+    bottom: 36px;
+    left: 50%;
+    width: 50%;
+    transform: translateX(-50%);
+    padding: 12px;
+  }
 `;
 
 const Header = styled.header`

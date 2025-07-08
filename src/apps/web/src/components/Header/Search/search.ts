@@ -1,17 +1,8 @@
 import { normalizeSync } from "normalize-diacritics";
-import { MapSvgRepresentation } from "../../../../vite-plugin/svg-map-parser.ts";
-import { Concept, DataPoint } from "../../../api/model";
+import { AreaLocalized } from "../../../api/data.ts";
+import { Concept, Cluster, YoutubeVideo } from "../../../api/model";
 
-export type LabelModel = {
-  id: string;
-  label: string;
-  normalizedLabel: string;
-  boundingBox: {
-    min: { x: number; y: number };
-    max: { x: number; y: number };
-    center: { x: number; y: number };
-  };
-};
+export type LabelModel = ReturnType<typeof createLabelsCollection>[number];
 
 type ConceptWithClustersModel = {
   id: number;
@@ -39,44 +30,33 @@ let cachedClustersByConcept: Map<ConceptId, ConceptWithClustersModel> | null =
 const normalize = (str: string) =>
   normalizeSync(str.replace("#", "").toLowerCase());
 
-const mapPath = (
-  path: MapSvgRepresentation["layer1"]["children"][number]["path"],
-) => ({
-  id: path.id,
-  label: path.label.replace("#", ""),
-  normalizedLabel: normalize(path.label),
-  boundingBox: path.boundingBox,
-});
-
-export const createLabelsCollection = (map: MapSvgRepresentation) => [
-  ...map.layer1.children.map(({ path }) => mapPath(path)),
-  ...map.layer2.children.map(({ path }) => mapPath(path)),
-  ...map.layer3.groups.flatMap((group) =>
-    group.children.map(({ rect }) => ({
-      id: rect.id,
-      label: rect.label.replace("#", ""),
-      normalizedLabel: normalize(rect.label),
-      boundingBox: rect.boundingBox,
-    })),
-  ),
-];
+export const createLabelsCollection = (
+  areas: AreaLocalized[],
+  youtube: Map<string, YoutubeVideo[]>,
+) =>
+  areas.map((area) => ({
+    ...area,
+    label: area.text,
+    normalizedLabel: normalize(area.text),
+    videosCount: youtube.get(area.id)?.length ?? 0,
+  }));
 
 export const createClustersByConcept = (
-  dataPoints: Map<number, DataPoint>,
+  clusters: Map<number, Cluster>,
   concepts: Map<number, Concept>,
 ) => {
   const result = new Map<number, ConceptWithClustersModel>();
 
   // DO NOT rewrite this in an immutable way. Using reduce immutably would require constructing
   // a new object for each conceptId, which has a *massive* performance cost - orders of magnitude slower.
-  [...dataPoints.values()].forEach(
-    ({ keyConcepts, clusterId, x, y, numRecentArticles }) => {
+  [...clusters.values()].forEach(
+    ({ keyConcepts, clusterId, x, y, articlesCount }) => {
       keyConcepts.forEach((conceptId) => {
         if (!result.has(conceptId)) {
           const name = concepts.get(conceptId)?.key ?? "UNKNOWN";
           result.set(conceptId, {
             id: conceptId,
-            articlesCount: numRecentArticles,
+            articlesCount: articlesCount,
             name,
             // TODO: normalizeSync seems to be very slow. Let's use toLowerCase
             // for now, but look for a better solution later.
@@ -97,19 +77,23 @@ export const createClustersByConcept = (
 };
 
 type Options = {
-  map: MapSvgRepresentation;
-  dataPoints: Map<number, DataPoint>;
+  areas: AreaLocalized[];
+  clusters: Map<number, Cluster>;
   concepts: Map<number, Concept>;
+  youtube: Map<string, YoutubeVideo[]>;
 };
 
 export const search = (options: Options, phrase: string) => {
   const labelsCollection =
     cachedLabelsCollection ??
-    (cachedLabelsCollection = createLabelsCollection(options.map));
+    (cachedLabelsCollection = createLabelsCollection(
+      options.areas,
+      options.youtube,
+    ));
   const clustersByConcept =
     cachedClustersByConcept ??
     (cachedClustersByConcept = createClustersByConcept(
-      options.dataPoints,
+      options.clusters,
       options.concepts,
     ));
 

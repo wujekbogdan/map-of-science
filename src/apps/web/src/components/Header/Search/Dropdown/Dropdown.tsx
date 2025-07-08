@@ -1,13 +1,14 @@
 import {
-  Combobox,
+  Combobox as ComboboxHeadless,
   ComboboxInput as ComboboxInputHeadless,
   ComboboxOptions as ComboboxOptionsHeadless,
   ComboboxOption as ComboboxOptionHeadless,
 } from "@headlessui/react";
 import { ChangeEvent, useMemo, useState, memo, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { i18n } from "../../../../i18n.ts";
 import Label, { Token } from "./Label.tsx";
+import CloseIcon from "./close.svg";
 
 export type BoundingBox = {
   min: { x: number; y: number };
@@ -28,7 +29,10 @@ type OptionBase = {
 export type Option =
   | (OptionBase & {
       type: "label";
-      boundingBox: BoundingBox;
+      level: 1 | 2 | 3 | 4;
+      x: number;
+      y: number;
+      videosCount: number;
     })
   | (OptionBase & {
       type: "point";
@@ -42,22 +46,10 @@ export type Option =
 type Dropdown = {
   options: Option[];
   onSelect: (option: Option) => void;
+  onReset: () => void;
   onInput: (query: string) => void;
   isLoading: boolean;
 };
-
-const placeholders = [
-  "fizyka kwantowa",
-  "genetyka",
-  "chemia organiczna",
-  "bioreaktory",
-  "energetyka",
-  "rybołówstwo",
-  "prawo międzynarodowe",
-  "ekonomia behawioralna",
-  "cyberbezpieczeństwo",
-  "logika rozmyta",
-];
 
 const tokenizeLabel = (label: string, query: string): Token[] => {
   const i = label.toLowerCase().indexOf(query.toLowerCase());
@@ -75,19 +67,35 @@ const tokenizeLabel = (label: string, query: string): Token[] => {
 };
 
 type OptionRowProps = {
+  t: (text: string) => string;
   id: string;
   focus: boolean;
   selected: boolean;
   tokens: Token[];
   type: "query" | "label" | "point";
+  videosCount?: number;
 };
 
 const OptionRow = memo(
-  (props: OptionRowProps) => (
-    <ComboboxOption $focus={props.focus} $selected={props.selected}>
-      <Label tokens={props.tokens} type={props.type} />
-    </ComboboxOption>
-  ),
+  (props: OptionRowProps) => {
+    const videosCountToken =
+      props.videosCount === undefined
+        ? undefined
+        : {
+            text: ` [${props.t("search.dropdown.youtubeCount")}: ${props.videosCount}]`,
+            type: "regular",
+          };
+
+    const tokens = [...props.tokens, videosCountToken].filter(
+      Boolean,
+    ) as Token[];
+
+    return (
+      <ComboboxOption $focus={props.focus} $selected={props.selected}>
+        <Label tokens={tokens} type={props.type} />
+      </ComboboxOption>
+    );
+  },
   (prev, next) => {
     return (
       prev.id === next.id &&
@@ -98,9 +106,10 @@ const OptionRow = memo(
 );
 
 export const Dropdown = (props: Dropdown) => {
+  const { t } = useTranslation();
   const { options: rawOptions } = props;
   const [query, setQuery] = useState("");
-  const [selection, setSelection] = useState<Option | undefined>(undefined);
+  const [selection, setSelection] = useState<Option | null>(null);
   const { options, allClusters } = useMemo(() => {
     const options = rawOptions.map((option) => ({
       ...option,
@@ -120,15 +129,18 @@ export const Dropdown = (props: Dropdown) => {
   const hasNoResultsText = query.length > 1 && options.length === 0;
   const noResultsText = (() => {
     if (query.length < 3) {
-      return i18n("Wpisz co najmniej 3 znaki");
+      return t("search.dropdown.enterMin");
     }
 
     if (props.isLoading) {
-      return i18n("Ładowanie...");
+      return `${t("search.dropdown.loading")}…`;
     }
 
-    return i18n("Brak wyników");
+    return t("search.dropdown.noResults");
   })();
+  const placeholders = Array.from({ length: 10 }, (_, i) =>
+    t(`search.dropdown.placeholder.${i + 1}`),
+  );
   const { current: randomPlaceholder } = useRef<string>(
     placeholders[Math.floor(Math.random() * placeholders.length)],
   );
@@ -139,10 +151,11 @@ export const Dropdown = (props: Dropdown) => {
     keyword: query,
     clusters: allClusters,
   };
+  const hasHighlightAllOption = query.length >= 3 && allClusters.length > 0;
 
   const onQueryChange = (event: ChangeEvent<HTMLInputElement>) => {
     const query = event.target.value;
-    setSelection(undefined);
+    setSelection(null);
     setQuery(query);
     props.onInput(query);
   };
@@ -154,62 +167,90 @@ export const Dropdown = (props: Dropdown) => {
     props.onSelect(selection);
   };
 
+  const onResetClick = () => {
+    setSelection(null);
+    setQuery("");
+    props.onReset();
+  };
+
   return (
-    <Combobox value={selection} immediate onChange={onSelectionChange}>
-      {({ open }) => (
-        <div>
-          <ComboboxInput
-            autoComplete="off"
-            $open={open}
-            placeholder={i18n(
-              `Wyszukaj na Mapie Nauki, np. "${randomPlaceholder}"`,
-            )}
-            displayValue={(option: Option | null) => option?.keyword ?? query}
-            onChange={onQueryChange}
-          />
-          <ComboboxOptions
-            anchor="bottom start"
-            style={{
-              width: "var(--input-width)",
-            }}
-          >
-            {hasNoResultsText ? (
-              <NoResults>{noResultsText}</NoResults>
-            ) : (
-              <>
-                {query.length >= 3 && (
-                  <ComboboxOptionHeadless value={queryOption}>
-                    {({ focus, selected }) => (
-                      <ComboboxOption $focus={focus} $selected={selected}>
-                        <Label type="query">
-                          {i18n("Szukaj")}: <strong>{query}</strong> [
-                          {allClusters.length}]
-                        </Label>
-                      </ComboboxOption>
-                    )}
-                  </ComboboxOptionHeadless>
-                )}
-                {options.map((option) => (
-                  <ComboboxOptionHeadless key={option.id} value={option}>
-                    {({ focus, selected }) => (
-                      <OptionRow
-                        type={option.type}
-                        id={option.id}
-                        focus={focus}
-                        selected={selected}
-                        tokens={option.tokens}
-                      />
-                    )}
-                  </ComboboxOptionHeadless>
-                ))}
-              </>
-            )}
-          </ComboboxOptions>
-        </div>
+    <Wrapper>
+      <Combobox value={selection} immediate onChange={onSelectionChange}>
+        {({ open }) => (
+          <div>
+            <ComboboxInput
+              autoComplete="off"
+              $open={open}
+              placeholder={t("search.dropdown.placeholder", {
+                placeholder: randomPlaceholder,
+              })}
+              displayValue={(option: Option | null) => option?.keyword ?? query}
+              onChange={onQueryChange}
+            />
+            <ComboboxOptions
+              anchor="bottom start"
+              style={{
+                width: "var(--input-width)",
+              }}
+            >
+              {hasNoResultsText ? (
+                <NoResults>{noResultsText}</NoResults>
+              ) : (
+                <>
+                  {hasHighlightAllOption && (
+                    <ComboboxOptionHeadless value={queryOption}>
+                      {({ focus, selected }) => (
+                        <ComboboxOption $focus={focus} $selected={selected}>
+                          <Label type="query">
+                            {t("search.dropdown.searchLabel")}:{" "}
+                            <strong>{query}</strong> [{allClusters.length}]
+                          </Label>
+                        </ComboboxOption>
+                      )}
+                    </ComboboxOptionHeadless>
+                  )}
+                  {options.map((option) => (
+                    <ComboboxOptionHeadless key={option.id} value={option}>
+                      {({ focus, selected }) => (
+                        <OptionRow
+                          t={t}
+                          type={option.type}
+                          id={option.id}
+                          focus={focus}
+                          selected={selected}
+                          tokens={option.tokens}
+                          videosCount={
+                            option.type === "label"
+                              ? option.videosCount
+                              : undefined
+                          }
+                        />
+                      )}
+                    </ComboboxOptionHeadless>
+                  ))}
+                </>
+              )}
+            </ComboboxOptions>
+          </div>
+        )}
+      </Combobox>
+      {selection && (
+        <ResetButton role="button" onClick={onResetClick}>
+          <SrOnly>{t("search.dropdown.reset")}</SrOnly>
+        </ResetButton>
       )}
-    </Combobox>
+    </Wrapper>
   );
 };
+
+const Wrapper = styled.div`
+  position: relative;
+  display: flex;
+`;
+
+const Combobox = styled(ComboboxHeadless)`
+  flex: 1;
+`;
 
 const ComboboxInput = styled(ComboboxInputHeadless).attrs<{
   placeholder?: string;
@@ -219,14 +260,12 @@ const ComboboxInput = styled(ComboboxInputHeadless).attrs<{
   placeholder: props.placeholder ?? "",
   autoComplete: props.autoComplete ?? "",
 }))<{ $open: boolean }>`
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-
   font-size: 16px;
   box-sizing: border-box;
   position: relative;
   width: 100%;
   padding: 12px;
-  border-width: ${({ $open }) => ($open ? "2px 2px 0 2px" : "2px")};
+  border-width: 2px;
   border-style: solid;
   border-color: ${(props) =>
     props.$open ? "#9B5B9B #9B5B9B #fff #9B5B9B" : "#9B5B9B"};
@@ -246,6 +285,7 @@ const ComboboxOptions = styled(ComboboxOptionsHeadless)`
   border-radius: 0 0 4px 4px;
   border: 2px solid #9b5b9b;
   border-top-width: 0;
+  margin-top: -2px;
 `;
 
 const NoResults = styled.div`
@@ -260,4 +300,31 @@ const ComboboxOption = styled.div<{
   color: #333;
   padding: 12px;
   background-color: ${({ $focus }) => ($focus ? "#eee" : "transparent")};
+`;
+
+const SrOnly = styled.span`
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+`;
+
+const ResetButton = styled.span`
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background-image: url("${CloseIcon}");
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.8;
+  }
 `;

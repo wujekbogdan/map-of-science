@@ -3,7 +3,6 @@ import { useState, useMemo } from "react";
 import styled from "styled-components";
 import useSWR from "swr";
 import { useShallow } from "zustand/react/shallow";
-import map from "../../../../asset/foreground.svg?parse";
 import { useStore } from "../../../store.ts";
 import { BoundingBox, Dropdown, Option } from "./Dropdown/Dropdown.tsx";
 
@@ -12,36 +11,45 @@ const worker = new ComlinkWorker<typeof import("./search.ts")>(
 );
 
 export const Search = () => {
-  const [setDesiredZoom, setPointsToHighlight, mapSize, dataPoints, concepts] =
-    useStore(
-      useShallow((s) => [
-        s.setDesiredZoom,
-        s.setPointsToHighlight,
-        s.mapSize,
-        s.dataPoints,
-        s.concepts,
-      ]),
-    );
+  const [
+    setDesiredZoom,
+    setPointsToHighlight,
+    mapSize,
+    clusters,
+    concepts,
+    youtube,
+    areas,
+  ] = useStore(
+    useShallow((s) => [
+      s.setDesiredZoom,
+      s.setPointsToHighlight,
+      s.mapSize,
+      s.clusters,
+      s.concepts,
+      s.youtubeVideos,
+      s.areas,
+    ]),
+  );
   const [searchTerm, setSearchTerm] = useState("");
 
   const { data: results, isLoading } = useSWR(
-    searchTerm ? [map, searchTerm] : null,
-    async ([map, query]) => {
+    searchTerm ? [searchTerm] : null,
+    async ([query]) => {
       if (!query)
         return {
           labels: [],
           points: [],
         };
 
-      const result = worker.search(
+      return worker.search(
         {
-          map,
-          dataPoints,
+          areas,
+          clusters,
           concepts,
+          youtube,
         },
         query,
       );
-      return result;
     },
   );
 
@@ -105,12 +113,15 @@ export const Search = () => {
   };
 
   const dropdownOptions = [
-    ...labels.map(({ id, label, boundingBox }) => ({
+    ...labels.map(({ id, label, videosCount, x, y, level }) => ({
       type: "label" as const,
       id,
       label,
       keyword: label,
-      boundingBox,
+      videosCount,
+      x,
+      y,
+      level,
     })),
     ...points.map(({ id, name, clusters }) => {
       // TODO: Consider moving cords to the model, but getting cords here is more efficient
@@ -156,10 +167,27 @@ export const Search = () => {
     });
   };
 
+  const zoomToArea = (args: { level: 1 | 2 | 3 | 4; x: number; y: number }) => {
+    const zoom = {
+      1: 4,
+      2: 15,
+      3: 40,
+      4: 50,
+    }[args.level];
+    const x = -args.x * zoom + mapSize.width / 2;
+    const y = -args.y * zoom + mapSize.height / 2;
+
+    setDesiredZoom({
+      x: x,
+      y: y,
+      scale: zoom,
+    });
+  };
+
   const onSelectionChange = (option: Option) => {
     if (option.type === "label") {
       setPointsToHighlight([]);
-      zoomToBoundingBox(option.boundingBox);
+      zoomToArea(option);
       return;
     }
 
@@ -169,6 +197,10 @@ export const Search = () => {
       setPointsToHighlight(option.clusters.map(({ clusterId }) => clusterId));
       return;
     }
+  };
+
+  const onReset = () => {
+    setPointsToHighlight([]);
   };
 
   return (
@@ -182,11 +214,10 @@ export const Search = () => {
         options={dropdownOptions}
         onInput={onInput}
         onSelect={onSelectionChange}
+        onReset={onReset}
       />
     </Form>
   );
 };
 
-const Form = styled.form`
-  width: 450px;
-`;
+const Form = styled.form``;

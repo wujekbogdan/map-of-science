@@ -1,5 +1,82 @@
 # @map-of-science/web
 
+## 1.18.0
+
+### Minor Changes
+
+- 9102bcd: Add _"About the Map of Science"_ modal, triggered by a button in the footer.
+- 539e770: Translation updates:
+
+  - Map entities: EN translations.
+  - Various UI translation improvements.
+  - General info: EN translation.
+
+- be68559: Add logo
+- c987fea: For clusters with an associated label, force label hover on cluster hover and vice versa.
+- 9bb86d0: Define placeholder SCSS breakpoints and a set of React hooks: `useBreakpointMin`, `useBreakpointMax`, and
+  `useBreakpointBetween` that utilize SCSS-exported variables.
+- 21c7cb0: Add very basic mobile CSS.
+
+### Patch Changes
+
+- c6c89ad: Remove unintended background from header toggles on desktop.
+- fb6c6a8: Prevent the "Check for Changesets" workflow from running on release PR creation.
+
+## 1.17.0
+
+### Minor Changes
+
+- fc3a38e: Add missing UI translations. Rephrase some UI text.
+- 0bbf913: Add language switcher UI.
+- a646fc6: Extract named clusters from `areas.tsv` into a separate `places.tsv` file.
+- 0bbf913: Drop props from the `Map` component and pull the data from the store instead.
+- a646fc6: Make `places` act as `clusters` in terms of click and hover interactions.
+- a646fc6: Rebrand `DataPoints` to `Clusters` across the codebase.
+- bdfe4e2: Introduce new map mode toggle UI.
+- 0bc3b17: Improve the search results UX by hiding regular clusters when a search filter is applied.
+- 0bbf913: Replace the dummy `i18n` module with the `i18next` library, and add `pl-PL` and `en-US` translations for UI components.
+- a646fc6: Enrich `clusters` with `places` data during model creation.
+- 0bbf913: Localize area labels.
+
+### Patch Changes
+
+- 2f79b10: Adjusts the SVG background position and scale.
+- 0bbf913: Drop duplicate `Vegetation, forests, fires` and `Tropical diseases` area data from tsv files.
+- e284bfb: tsconfig include paths cleanup
+
+## 1.16.0
+
+### Minor Changes
+
+- d41e81b: Introduce UUID-based IDs for all the labels. Move human-readable labels into an i18n file.
+- c4c2b43: Add ability to toggle between the regular mode and the growth rating mode. Include a toggle to switch between modes in the top bar and make it configurable via the DevTools.
+- c4c2b43: Add cluster count input to the top bar.
+- c4c2b43: Add a top bar UI component.
+- c4c2b43: Add a ripple effect to highlight search results.
+- d41e81b: Add dates to the YT videos list and make minor list styling improvements.
+- d41e81b: Remove the legacy `foreground.svg` file along with the Vite SVG parser plugin, and move all the data the plugin was extracting from the SVG file into a TSV file. Now, all the label data is rendered based on that file.
+
+### Patch Changes
+
+- d41e81b: Fix a bug that caused duplicate video items in the YT video list.
+
+## 1.15.0
+
+### Minor Changes
+
+- 9000df8: Replace the old manually edited `foreground.svg` with a new SVG generated based on cluster data produced by an experimental Canvas map renderer. See:: https://github.com/wujekbogdan/map-of-science/pull/73
+
+  The old `foreground.svg` image is still being used, but only as a source of label information.
+
+- 8a327cc: Add the ability to select all data points that match the search query.
+- d82eaab: Assign "Czytamy Naturę" YouTube videos to map labels.
+
+### Patch Changes
+
+- 96139e3: Fix a bug causing search results not to be unique.
+- 74fd765: Move `typescript-plugin-css-modules` to the root `tsconfig.json` since plugins in referenced configs are not applied.
+- 77f1557: Add `eslint` dependency explicitly due to the recently introduced `autoInstallPeers: false` setting in pnpm.
+
 ## 1.14.0
 
 ### Minor Changes

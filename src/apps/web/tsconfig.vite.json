@@ -1,4 +1,9 @@
 {
+<<<<<<< HEAD:src/apps/web/tsconfig.vite.json
   "extends": "@map-of-science/typescript/vite",
   "include": ["vite.config.ts", "vite-plugin"]
+=======
+  "extends": "@map-of-science/typescript/node",
+  "include": ["vite.config.ts"]
+>>>>>>> main:src/apps/web/tsconfig.node.json
 }

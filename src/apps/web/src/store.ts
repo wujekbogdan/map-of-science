@@ -1,7 +1,9 @@
 import { create } from "zustand";
 import { combine } from "zustand/middleware";
 import { fetchArticle } from "./api";
-import { Concept, DataPoint, YoutubeVideo } from "./api/model";
+import { AreaLocalized } from "./api/data.ts";
+import { Lang } from "./api/i18n.ts";
+import { Concept, Cluster, YoutubeVideo } from "./api/model";
 
 type Zoom = { x: number; y: number; scale: number };
 type PartialDefaults = typeof partialDefaults;
@@ -14,9 +16,42 @@ type Size = {
   height: number;
 };
 
+export type RGB = {
+  r: number;
+  g: number;
+  b: number;
+};
+
+type Colors = {
+  start: RGB;
+  middle: RGB;
+  end: RGB;
+};
+type MapMode = "regular" | "growth";
+
 const partialDefaults = {
-  dataPoints: new Map<number, DataPoint>(),
+  mapMode: "regular" as MapMode,
+  growthRatingColors: {
+    start: {
+      r: 24,
+      g: 100,
+      b: 171,
+    },
+    middle: {
+      r: 255,
+      g: 255,
+      b: 255,
+    },
+    end: {
+      r: 201,
+      g: 42,
+      b: 42,
+    },
+  },
+  clusters: new Map<number, Cluster>(),
   concepts: new Map<number, Concept>(),
+  youtubeVideos: new Map<string, YoutubeVideo[]>(),
+  areas: [] as AreaLocalized[],
   pointsToHighlight: [] as number[],
   zoomStepFactor: 1.6,
   mapSize: {
@@ -35,9 +70,9 @@ const partialDefaults = {
     zoom: 0.5,
   },
   maxDataPointsInViewport: 500,
-  temp__svgScaleFactor: 0.058,
+  temp__svgScaleFactor: 0.0581,
   temp__svgOffset: {
-    x: -16.6,
+    x: -16.0,
     y: 27,
   },
 };
@@ -91,14 +126,28 @@ export const useStore = create(
     setMaxDataPointsInViewport: (maxDataPointsInViewport: number) => {
       set({ maxDataPointsInViewport });
     },
-    setDataPoints: (dataPoints: Map<number, DataPoint>) => {
-      set({ dataPoints });
+    setClusters: (clusters: Map<number, Cluster>) => {
+      set({ clusters });
     },
     setConcepts: (concepts: Map<number, Concept>) => {
       set({ concepts });
     },
+    setYoutubeVideos: (youtubeVideos: Map<string, YoutubeVideo[]>) => {
+      set({ youtubeVideos });
+    },
+    setAreas: (areas: AreaLocalized[]) => {
+      set({ areas });
+    },
     setPointsToHighlight: (clusterIds: number[]) => {
       set({ pointsToHighlight: clusterIds });
+    },
+    setGrowthRatingColors: (colors: Colors) => {
+      set({
+        growthRatingColors: colors,
+      });
+    },
+    setMapMode: (mode: MapMode) => {
+      set({ mapMode: mode });
     },
     temp__setSvgScaleFactor: (svgScaleFactor: number) => {
       set({ temp__svgScaleFactor: svgScaleFactor });
@@ -111,13 +160,20 @@ export const useStore = create(
 
 type ArticleState =
   | { id: null; type: null; article: null; videos: YoutubeVideo[] }
-  | { id: null; type: "local"; article: string | null; videos: YoutubeVideo[] }
+  | {
+      id: null;
+      type: "local-with-videos";
+      article: string | null;
+      videos: YoutubeVideo[];
+    }
+  | { id: null; type: "local"; article: string | null; videos: null }
   | { id: number; type: "iframe"; article: null; videos: YoutubeVideo[] };
 
 type ArticleActions = {
   reset: () => void;
   setRemoteArticleId: (id: number) => void;
-  fetchLocalArticle: (label: string) => Promise<void>;
+  fetchLocalArticle: (label: string, lang: Lang) => Promise<void>;
+  fetchGeneralInfo: (lang: Lang) => Promise<void>;
   setVideos: (videos: YoutubeVideo[]) => void;
 };
 
@@ -135,11 +191,15 @@ export const useArticleStore = create<ArticleState & ArticleActions>((set) => ({
   setRemoteArticleId: (id: number) => {
     set({ id, type: "iframe", article: null });
   },
-  fetchLocalArticle: async (label: string) => {
-    const articleHTML = await fetchArticle(label);
+  fetchLocalArticle: async (label: string, lang: Lang) => {
+    const articleHTML = await fetchArticle(label, lang);
+    set({ id: null, type: "local-with-videos", article: articleHTML });
+  },
+  fetchGeneralInfo: async (lang: Lang) => {
+    const articleHTML = await fetchArticle("general-info", lang);
     set({ id: null, type: "local", article: articleHTML });
   },
   setVideos: (videos: YoutubeVideo[]) => {
-    set({ videos, id: null, type: "local" });
+    set({ videos, id: null, type: "local-with-videos" });
   },
 }));
