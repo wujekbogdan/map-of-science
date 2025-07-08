@@ -38,9 +38,8 @@ COPY --from=builder /app/node_modules ./node_modules
 #  `COPY --from=builder /app/src/apps/**/node_modules ./src/apps`
 #  `COPY --from=builder /app/src/packages/**/dist ./src/packages`
 #  `COPY --from=builder /app/src/packages/**/node_modules ./src/packages`
-# But instead, for simplicity, I copy the entire directories
+# But instead, for simplicity, I copy entire directories
 COPY --from=builder /app/src/apps ./src/apps
-COPY --from=builder /app/src/packages ./src/packages
 # TODO: The above COPY commands copied too much - not only `dist` and `node_modules`, but also the source code.
 # To fix this, I could either write a cleanup script, use selective per-package copying, or add a bundler.
 
