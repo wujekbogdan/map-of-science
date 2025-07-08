@@ -1,3 +1,4 @@
+import { pipeline } from "@huggingface/transformers";
 import { readFileSync } from "node:fs";
 import { z as zod } from "zod";
 import {
@@ -69,4 +70,31 @@ export const clusters = async (paths: Paths) => {
   );
 
   return clustersProcessor.getResults();
+};
+
+export const extract = async (cluster: Cluster[]) => {
+  const extractor = await pipeline(
+    "feature-extraction",
+    "Xenova/all-MiniLM-L6-v2",
+  );
+
+  return await Promise.all(
+    cluster.map(async ({ clusterId, concepts }) => {
+      const commaSeparatedConcepts = concepts
+        .map((concept) => concept.concept)
+        .join(", ");
+
+      const tensor = await extractor(commaSeparatedConcepts, {
+        pooling: "mean",
+        normalize: true,
+      });
+      const list = tensor.tolist() as number[][];
+
+      return {
+        clusterId: clusterId,
+        concepts: concepts.map(({ id }) => id),
+        embeddings: list[0],
+      };
+    }),
+  );
 };
