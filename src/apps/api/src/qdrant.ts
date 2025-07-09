@@ -2,9 +2,13 @@ import { QdrantClient } from "@qdrant/js-client-rest";
 import { parse as csvParse } from "csv-parse";
 import { createReadStream } from "node:fs";
 import { z } from "zod";
+import { config } from "./config.js";
 import { Extractor } from "./extractor.js";
 
-export const client = new QdrantClient({ host: "localhost", port: 6333 });
+export const client = new QdrantClient({
+  host: config.qdrant.host,
+  port: config.qdrant.port,
+});
 
 const Schema = z
   .object({

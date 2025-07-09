@@ -30,15 +30,15 @@ RUN addgroup --system --gid 1001 app
 RUN adduser --system --uid 1001 app
 USER app
 
-COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder --chown=app:app  /app/node_modules ./node_modules
 # If Docker supported wildcard COPY, I would do:
 #  `COPY --from=builder /app/src/apps/**/dist ./src/apps`
 #  `COPY --from=builder /app/src/apps/**/node_modules ./src/apps`
 #  `COPY --from=builder /app/src/packages/**/dist ./src/packages`
 #  `COPY --from=builder /app/src/packages/**/node_modules ./src/packages`
 # But instead, for simplicity, I copy entire directories
-COPY --from=builder /app/src/apps ./src/apps
-COPY --from=builder /app/src/packages ./src/packages
+COPY --from=builder --chown=app:app  /app/src/apps ./src/apps
+COPY --from=builder --chown=app:app  /app/src/packages ./src/packages
 # TODO: The above COPY commands copied too much - not only `dist` and `node_modules`, but also the source code.
 # To fix this, I could either write a cleanup script, use selective per-package copying, or add a bundler.
 

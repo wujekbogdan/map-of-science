@@ -3,17 +3,13 @@ import { fileURLToPath } from "node:url";
 import { describe, it, expect } from "vitest";
 import { clusters, extract } from "./extractor.js";
 
-const resolvePath = (relativePath: string) => {
-  const here = dirname(fileURLToPath(import.meta.url));
-  return resolve(here, relativePath);
-};
-
-describe("API", () => {
+describe("extractor", () => {
   it("should prepare the data", async () => {
+    const here = dirname(fileURLToPath(import.meta.url));
     expect(
       await clusters({
-        clusters: resolvePath("./__fixtures__/clusters.tsv"),
-        concepts: resolvePath("./__fixtures__/concepts.tsv"),
+        clusters: resolve(here, "./__fixtures__/clusters.tsv"),
+        concepts: resolve(here, "./__fixtures__/concepts.tsv"),
       }),
     ).toEqual([
       {

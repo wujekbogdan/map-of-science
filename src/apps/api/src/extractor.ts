@@ -77,6 +77,10 @@ export const Extractor = async () => {
   const extractor = await pipeline(
     "feature-extraction",
     "Xenova/all-MiniLM-L6-v2",
+    {
+      dtype: "fp32",
+      cache_dir: `${import.meta.dirname}/../.cache`,
+    },
   );
 
   return {

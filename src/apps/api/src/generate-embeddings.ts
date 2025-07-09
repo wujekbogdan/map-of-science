@@ -1,9 +1,8 @@
 import { appendFileSync } from "node:fs";
-import { dirname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { resolve } from "node:path";
 import { clusters, extract } from "./extractor.js";
 
-const here = dirname(fileURLToPath(import.meta.url));
+const here = import.meta.dirname;
 
 export const generateEmbeddings = async () => {
   const cls = await clusters({
