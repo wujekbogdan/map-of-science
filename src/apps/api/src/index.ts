@@ -17,9 +17,10 @@ import { search } from "./qdrant.js";
 // }
 
 try {
-  const result = await search("photonics", 5);
+  const result = await search("'Photonixx Integrted Cicuits", 5);
   const response = result.map((item) => ({
     clusterId: item.id,
+    score: item.score,
     concepts: item.concepts.map(({ concept }) => concept).join(", "),
   }));
   console.log(response);
