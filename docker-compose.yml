@@ -1,5 +1,7 @@
 services:
   web:
+    depends_on:
+      - api
     container_name: web
     build:
       context: .
@@ -7,20 +9,28 @@ services:
     restart: always
     ports:
       - "8080:80"
+    environment:
+      VITE_API_URL: api
   api:
     container_name: api
+    depends_on:
+      - qdrant
     build:
       context: .
       dockerfile: ./src/apps/api/Dockerfile
     restart: always
     ports:
       - "3001:3001"
+    environment:
+      SERVER_PORT: 3001
+      SERVER_HOST: 0.0.0.0
+      QDRANT_HOST: qdrant
+      QDRANT_PORT: 6333
   qdrant:
     container_name: qdrant
     image: qdrant/qdrant:v1.14.1
     ports:
       - "6333:6333"
-      - "6334:6334"
     volumes:
       - qdrant_data:/qdrant/storage
 volumes:

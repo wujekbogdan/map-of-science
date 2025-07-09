@@ -1,8 +1,6 @@
-FROM node:22.15.0-alpine3.20 AS base
+FROM node:22.15.0-slim AS base
 
 FROM base AS pnpm
-RUN apk update
-RUN apk add --no-cache libc6-compat
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
@@ -23,7 +21,7 @@ RUN pnpm turbo build
 # node_modules directories and re-run `pnpm install`, but now with the `--prod` flag. This replicates the behavior of
 # `pnpm prune --prod`
 RUN npx --yes rimraf --glob "**/node_modules"
-RUN pnpm install  --prod
+RUN pnpm install --prod
 # If I had a bundler. I would do it differently - I would change the WORKDIR and prune just the `@my-namespace/my-app`
 
 FROM base AS runner
@@ -40,6 +38,7 @@ COPY --from=builder /app/node_modules ./node_modules
 #  `COPY --from=builder /app/src/packages/**/node_modules ./src/packages`
 # But instead, for simplicity, I copy entire directories
 COPY --from=builder /app/src/apps ./src/apps
+COPY --from=builder /app/src/packages ./src/packages
 # TODO: The above COPY commands copied too much - not only `dist` and `node_modules`, but also the source code.
 # To fix this, I could either write a cleanup script, use selective per-package copying, or add a bundler.
 

@@ -34,7 +34,7 @@ export const Server = async ({ port, host }: Config) => {
   });
 
   await server.listen({ port, host });
-  console.info("Server started on port", port);
+  console.info(`Server listening on ${host}:${port}`);
 
   return {
     stop: () => server.close(),
