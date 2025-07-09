@@ -80,12 +80,20 @@ const ResultSchema = z.object({
   score: z.number(),
 });
 
-export const search = async (query: string, limit: number) => {
+type SearchOptions = {
+  query: string;
+  limit?: number;
+  scoreThreshold?: number;
+};
+
+export const search = async (options: SearchOptions) => {
+  const { query, limit = 1000, scoreThreshold = 0.5 } = options;
   const { extract } = await Extractor();
   const queryVector = await extract(query);
   const response = await client.search("clusters", {
     vector: queryVector,
     limit,
+    score_threshold: scoreThreshold,
   });
   return response.map((item) => ResultSchema.parse(item));
 };

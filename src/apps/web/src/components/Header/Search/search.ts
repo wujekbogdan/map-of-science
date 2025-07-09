@@ -1,4 +1,5 @@
 import { normalizeSync } from "normalize-diacritics";
+import { clustersSearch } from "../../../api/clusters-search.ts";
 import { AreaLocalized } from "../../../api/data.ts";
 import { Concept, Cluster, YoutubeVideo } from "../../../api/model";
 
@@ -7,7 +8,6 @@ export type LabelModel = ReturnType<typeof createLabelsCollection>[number];
 type ConceptWithClustersModel = {
   id: number;
   name: string;
-  nameNormalized: string;
   clusters: {
     clusterId: number;
     x: number;
@@ -15,14 +15,11 @@ type ConceptWithClustersModel = {
   }[];
   articlesCount: number;
 };
-type ConceptId = number;
 
 // FIXME: This isn't exactly right. The code assumes that the model never changes.
 // It's true in practice, but in theory one could call the search function with
 // a different map parameter each time.
 let cachedLabelsCollection: LabelModel[] | null = null;
-let cachedClustersByConcept: Map<ConceptId, ConceptWithClustersModel> | null =
-  null;
 
 /**
  * Normalize a string by removing diacritics and converting to lowercase.
@@ -42,38 +39,35 @@ export const createLabelsCollection = (
   }));
 
 export const createClustersByConcept = (
-  clusters: Map<number, Cluster>,
+  clusters: Cluster[],
   concepts: Map<number, Concept>,
 ) => {
-  const result = new Map<number, ConceptWithClustersModel>();
+  const clustersByConcept = new Map<number, ConceptWithClustersModel>();
 
+  console.time("createClustersByConcept");
   // DO NOT rewrite this in an immutable way. Using reduce immutably would require constructing
   // a new object for each conceptId, which has a *massive* performance cost - orders of magnitude slower.
-  [...clusters.values()].forEach(
-    ({ keyConcepts, clusterId, x, y, articlesCount }) => {
-      keyConcepts.forEach((conceptId) => {
-        if (!result.has(conceptId)) {
-          const name = concepts.get(conceptId)?.key ?? "UNKNOWN";
-          result.set(conceptId, {
-            id: conceptId,
-            articlesCount: articlesCount,
-            name,
-            // TODO: normalizeSync seems to be very slow. Let's use toLowerCase
-            // for now, but look for a better solution later.
-            nameNormalized: name.toLowerCase(),
-            clusters: [],
-          });
-        }
-        result.get(conceptId)?.clusters.push({
-          clusterId,
-          x,
-          y,
+  clusters.forEach(({ keyConcepts, clusterId, x, y, articlesCount }) => {
+    keyConcepts.forEach((conceptId) => {
+      if (!clustersByConcept.has(conceptId)) {
+        const name = concepts.get(conceptId)?.key ?? "UNKNOWN";
+        clustersByConcept.set(conceptId, {
+          id: conceptId,
+          articlesCount: articlesCount,
+          name,
+          clusters: [],
         });
+      }
+      clustersByConcept.get(conceptId)?.clusters.push({
+        clusterId,
+        x,
+        y,
       });
-    },
-  );
+    });
+  });
+  console.timeEnd("createClustersByConcept");
 
-  return result;
+  return [...clustersByConcept.values()];
 };
 
 type Options = {
@@ -83,18 +77,17 @@ type Options = {
   youtube: Map<string, YoutubeVideo[]>;
 };
 
-export const search = (options: Options, phrase: string) => {
+export const search = async (options: Options, phrase: string) => {
+  const results = await clustersSearch(phrase);
+  const clusters = results
+    .map(({ id }) => options.clusters.get(id))
+    .filter((cluster) => cluster !== undefined);
+
   const labelsCollection =
     cachedLabelsCollection ??
     (cachedLabelsCollection = createLabelsCollection(
       options.areas,
       options.youtube,
-    ));
-  const clustersByConcept =
-    cachedClustersByConcept ??
-    (cachedClustersByConcept = createClustersByConcept(
-      options.clusters,
-      options.concepts,
     ));
 
   if (!phrase)
@@ -103,20 +96,14 @@ export const search = (options: Options, phrase: string) => {
       points: [],
     };
 
+  const clustersByConcept = createClustersByConcept(clusters, options.concepts);
   const normalizedPhrase = normalize(phrase).toLowerCase();
 
   const points = () => {
-    const results = [...clustersByConcept.values()].filter(
-      ({ nameNormalized }) => {
-        return nameNormalized.includes(normalizedPhrase);
-      },
-    );
-
     const LIMIT = 300;
     // TODO: Implement a better/more efficient way to filter and sort the
-    // results. Fuse.js maybe?
-    // https://github.com/users/wujekbogdan/projects/1/views/1?pane=issue&itemId=110658002
-    return results
+    // results.
+    return clustersByConcept
       .sort((a, b) => b.clusters.length - a.clusters.length)
       .slice(0, LIMIT);
   };

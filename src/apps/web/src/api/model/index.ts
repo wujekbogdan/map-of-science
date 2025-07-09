@@ -91,3 +91,11 @@ export const YoutubeVideoSchema = (z: typeof zod) =>
       labelIds: data.classification.split("|"),
     }));
 export type YoutubeVideo = zod.infer<ReturnType<typeof YoutubeVideoSchema>>;
+
+export const ClusterSearchResultSchema = () =>
+  zod.array(
+    zod.object({
+      id: zod.number(),
+      score: zod.number(),
+    }),
+  );

@@ -34,7 +34,7 @@ export const Search = () => {
 
   const { data: results, isLoading } = useSWR(
     searchTerm ? [searchTerm] : null,
-    async ([query]) => {
+    ([query]) => {
       if (!query)
         return {
           labels: [],
@@ -50,6 +50,11 @@ export const Search = () => {
         },
         query,
       );
+    },
+    {
+      onError: (err) => {
+        console.error("Error fetching search results:", err);
+      },
     },
   );
 
