@@ -1,29 +1,15 @@
-// import { dirname, resolve } from "node:path";
-// import { fileURLToPath } from "node:url";
-import { search } from "./qdrant.js";
+import "dotenv/config";
+import { Server } from "./Server.js";
+import { config } from "./config.js";
 
-// import { search, upsert } from "./qdrant.js";
+const { stop } = await Server({
+  port: config.server.port,
+  host: config.server.host,
+});
 
-// const resolvePath = (relativePath: string) => {
-//   const here = dirname(fileURLToPath(import.meta.url));
-//   return resolve(here, relativePath);
-// };
-
-// try {
-//   const file = resolvePath("../assets/embeddings-1752005501427.tsv");
-//   await upsert(file);
-// } catch (error) {
-//   console.error("Error during upsert:", error);
-// }
-
-try {
-  const result = await search("'Photonixx Integrted Cicuits", 5);
-  const response = result.map((item) => ({
-    clusterId: item.id,
-    score: item.score,
-    concepts: item.concepts.map(({ concept }) => concept).join(", "),
-  }));
-  console.log(response);
-} catch (error) {
-  console.error("Error during search:", error);
-}
+process.on("SIGINT", () => {
+  console.info("Stopping");
+  stop()
+    .then(() => console.info("Game server stopped"))
+    .catch((err) => console.error("Error stopping game server:", err));
+});

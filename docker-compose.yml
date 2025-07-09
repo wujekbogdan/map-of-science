@@ -15,3 +15,13 @@ services:
     restart: always
     ports:
       - "3001:3001"
+  qdrant:
+    container_name: qdrant
+    image: qdrant/qdrant:v1.14.1
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant_data:/qdrant/storage
+volumes:
+  qdrant_data:

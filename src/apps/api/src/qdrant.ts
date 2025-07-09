@@ -1,18 +1,10 @@
 import { QdrantClient } from "@qdrant/js-client-rest";
 import { parse as csvParse } from "csv-parse";
-import "dotenv/config";
 import { createReadStream } from "node:fs";
-import { dirname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
 import { z } from "zod";
-import { concepts, Extractor } from "./extractor.js";
+import { Extractor } from "./extractor.js";
 
-const here = dirname(fileURLToPath(import.meta.url));
-
-export const client = new QdrantClient({
-  url: process.env.QDRANT_API_URL,
-  apiKey: process.env.QDRANT_API_KEY,
-});
+export const client = new QdrantClient({ host: "localhost", port: 6333 });
 
 const Schema = z
   .object({
@@ -58,7 +50,8 @@ export async function* parse(file: string, batchSize = 100) {
 
 export const upsert = async (file: string) => {
   const collectionName = "clusters";
-  const hasCollection = await client.collectionExists(collectionName);
+  const { exists: hasCollection } =
+    await client.collectionExists(collectionName);
   if (!hasCollection) {
     await client.createCollection(collectionName, {
       vectors: { size: 384, distance: "Cosine" },
@@ -66,13 +59,10 @@ export const upsert = async (file: string) => {
   }
 
   for await (const clusters of parse(file)) {
+    console.log(`Upserting ${clusters.length} clusters`);
     const points = clusters.map((cluster) => ({
       id: cluster.clusterId,
       vector: cluster.embeddings,
-      payload: {
-        clusterId: cluster.clusterId,
-        concepts: cluster.concepts,
-      },
     }));
 
     await client.upsert(collectionName, {
@@ -84,27 +74,14 @@ export const upsert = async (file: string) => {
 const ResultSchema = z.object({
   id: z.number(),
   score: z.number(),
-  payload: z.object({
-    clusterId: z.number(),
-    concepts: z.array(z.number()),
-  }),
 });
 
-export const search = async (query: string, limit = 10) => {
+export const search = async (query: string, limit: number) => {
   const { extract } = await Extractor();
   const queryVector = await extract(query);
   const response = await client.search("clusters", {
     vector: queryVector,
     limit,
   });
-  const conceptsMap = await concepts(resolve(here, "../assets/concepts.tsv"));
-  return response.map((item) => {
-    const parsed = ResultSchema.parse(item);
-    return {
-      ...parsed,
-      concepts: parsed.payload.concepts
-        .map((id) => conceptsMap.get(id))
-        .filter((concept) => concept !== undefined),
-    };
-  });
+  return response.map((item) => ResultSchema.parse(item));
 };
