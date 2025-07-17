@@ -9,6 +9,10 @@ export const ConfigSchema = z.object({
     host: z.string().default("localhost"),
     port: z.coerce.number().default(6333),
   }),
+  embeddings: z.object({
+    host: z.string().default("localhost"),
+    port: z.coerce.number().default(8081),
+  }),
 });
 
 export const config = ConfigSchema.parse({
@@ -19,5 +23,9 @@ export const config = ConfigSchema.parse({
   qdrant: {
     host: process.env.QDRANT_HOST,
     port: process.env.QDRANT_PORT,
+  },
+  embeddings: {
+    host: process.env.EMBEDDINGS_HOST,
+    port: process.env.EMBEDDINGS_PORT,
   },
 });

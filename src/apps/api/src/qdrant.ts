@@ -88,10 +88,16 @@ type SearchOptions = {
 
 export const search = async (options: SearchOptions) => {
   const { query, limit = 1000, scoreThreshold = 0.5 } = options;
-  const { extract } = await Extractor();
-  const queryVector = await extract(query);
+  const { extract } = Extractor();
+  const { data } = await extract(query);
+
+  if (!data.length) {
+    return [];
+  }
+
+  const result = data[0];
   const response = await client.search("clusters", {
-    vector: queryVector,
+    vector: result.embedding,
     limit,
     score_threshold: scoreThreshold,
   });

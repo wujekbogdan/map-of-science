@@ -1,4 +1,3 @@
-import { pipeline } from "@huggingface/transformers";
 import { readFileSync } from "node:fs";
 import { z as zod } from "zod";
 import {
@@ -7,6 +6,18 @@ import {
   arrayCollector,
   mapCollector,
 } from "@map-of-science/csv";
+import { config } from "./config.js";
+
+const EmbeddingResponseSchema = zod.object({
+  data: zod.array(
+    zod.object({
+      object: zod.literal("embedding"),
+      embedding: zod.array(zod.number()),
+      index: zod.number(),
+    }),
+  ),
+  id: zod.string(),
+});
 
 export const ConceptSchema = (z: typeof zod) =>
   z
@@ -73,41 +84,40 @@ export const clusters = async (paths: Paths) => {
   return clustersProcessor.getResults();
 };
 
-export const Extractor = async () => {
-  const extractor = await pipeline(
-    "feature-extraction",
-    "Xenova/all-MiniLM-L6-v2",
-    {
-      dtype: "fp32",
-      cache_dir: `${import.meta.dirname}/../.cache`,
-    },
-  );
+export const Extractor = () => {
+  const baseUrl = `http://${config.embeddings.host}:${config.embeddings.port}`;
 
   return {
-    extract: async (text: string) => {
-      const tensor = await extractor(text, {
-        pooling: "mean",
-        normalize: true,
+    extract: async (text: string[] | string) => {
+      const input = Array.isArray(text) ? text : [text];
+      const response = await fetch(`${baseUrl}/embeddings`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ input }),
       });
-      const list = tensor.tolist() as number[][];
-      return list[0];
+
+      if (!response.ok) {
+        throw new Error(`Embedding service error: ${response.status}`);
+      }
+
+      const json = await response.json();
+      return EmbeddingResponseSchema.parse(json);
     },
   };
 };
 
-export async function* extract(cluster: Cluster[]) {
-  const extractor = await Extractor();
+export async function extract(cluster: Cluster[]) {
+  const extractor = Extractor();
 
-  for (const { clusterId, concepts } of cluster) {
-    const commaSeparatedConcepts = concepts
-      .map(({ concept }) => concept)
-      .join(", ");
-    const embeddings = await extractor.extract(commaSeparatedConcepts);
+  const { data } = await extractor.extract(
+    cluster.map(({ concepts }) =>
+      concepts.map(({ concept }) => concept).join(", "),
+    ),
+  );
 
-    yield {
-      clusterId,
-      concepts: concepts.map(({ id }) => id),
-      embeddings,
-    };
-  }
+  return cluster.map(({ clusterId, concepts }, index) => ({
+    clusterId,
+    concepts: concepts.map(({ id }) => id),
+    embeddings: data[index].embedding,
+  }));
 }
