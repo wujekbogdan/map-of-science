@@ -1,5 +1,13 @@
 # @map-of-science/eslint
 
+## 0.3.0
+
+### Minor Changes
+
+- c7524b9: Introduce a new ESLint config for Node.js apps. It's based on the existing ESLint but stripped of React-specific rules, with `eslint-plugin-n` rules added.
+- 8ae6d4d: Add the `vitest.config.ts` file to ignore list.
+- c7524b9: Add config for Node.js
+
 ## 0.2.0
 
 ### Minor Changes
