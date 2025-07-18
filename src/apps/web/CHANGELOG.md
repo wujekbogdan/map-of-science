@@ -1,5 +1,16 @@
 # @map-of-science/web
 
+## 1.18.1
+
+### Patch Changes
+
+- 8ae6d4d: Install `vitest` directly instead of relying on the binary exposed by the `@map-of-science/vites` package.
+- c7524b9: Update `Dockerfile` to work with the new monorepo structure and the global `docker-compose.yml` configuration.
+- 9d8e6ba: Extract the CSV parser and related utilities into a separate `@map-of-science/csv` package.
+- Updated dependencies [8ae6d4d]
+- Updated dependencies [9d8e6ba]
+  - @map-of-science/csv@0.1.0
+
 ## 1.18.0
 
 ### Minor Changes

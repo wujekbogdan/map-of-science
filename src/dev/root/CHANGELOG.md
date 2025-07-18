@@ -1,5 +1,18 @@
 # @map-of-science/root
 
+## 0.5.0
+
+### Minor Changes
+
+- 9d8e6ba: Add a new `packages` pnpm workspace.
+- 8ae6d4d: Removed the `"outputs"` entry from the `test` task - it was never meant to be there.
+- c7524b9: Build Docker images via GitHub Actions on push.
+- c7524b9: Add `docker-compose.yml` that supports the `@map-of-science/web` and `@map-of-science/api` apps.
+
+### Patch Changes
+
+- 7e844b2: Trigger the "CI" workflow on changesets-created PRs.
+
 ## 0.4.0
 
 ### Minor Changes
