@@ -446,6 +446,31 @@ importers:
         specifier: ^4.0.15
         version: 4.0.16(@types/node@22.15.18)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.8.6(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
 
+  src/packages/rate-limiter:
+    dependencies:
+      p-queue:
+        specifier: ^9.0.1
+        version: 9.0.1
+    devDependencies:
+      '@map-of-science/eslint':
+        specifier: workspace:*
+        version: link:../../dev/eslint
+      '@map-of-science/typescript':
+        specifier: workspace:*
+        version: link:../../dev/typescript
+      '@map-of-science/vitest':
+        specifier: workspace:*
+        version: link:../../dev/vitest
+      '@types/node':
+        specifier: ^22.15.18
+        version: 22.15.18
+      typescript:
+        specifier: ~5.6.2
+        version: 5.6.3
+      vitest:
+        specifier: ^4.0.15
+        version: 4.0.16(@types/node@22.15.18)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.8.6(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
+
 packages:
 
   '@adobe/css-tools@4.3.3':
@@ -3730,6 +3755,14 @@ packages:
   p-map@2.1.0:
     resolution: {integrity: sha512-y3b8Kpd8OAN444hxfBbFfj1FY/RjtTd8tzYwhUqNYXx0fXx2iX4maP4Qr6qhIKbQXI02wTLAda4fYUbDagTUFw==}
     engines: {node: '>=6'}
+
+  p-queue@9.0.1:
+    resolution: {integrity: sha512-RhBdVhSwJb7Ocn3e8ULk4NMwBEuOxe+1zcgphUy9c2e5aR/xbEsdVXxHJ3lynw6Qiqu7OINEyHlZkiblEpaq7w==}
+    engines: {node: '>=20'}
+
+  p-timeout@7.0.1:
+    resolution: {integrity: sha512-AxTM2wDGORHGEkPCt8yqxOTMgpfbEHqF51f/5fJCmwFC3C/zNcGT63SymH2ttOAaiIws2zVg4+izQCjrakcwHg==}
+    engines: {node: '>=20'}
 
   p-try@2.2.0:
     resolution: {integrity: sha512-R4nPAVTAU0B9D35/Gk3uJf/7XYbQcyohSKdvAxIRSNghFl4e71hVoGnBNQz9cWaXxO2I10KTC+3jMdvvoKw6dQ==}
@@ -8553,6 +8586,13 @@ snapshots:
       p-limit: 4.0.0
 
   p-map@2.1.0: {}
+
+  p-queue@9.0.1:
+    dependencies:
+      eventemitter3: 5.0.1
+      p-timeout: 7.0.1
+
+  p-timeout@7.0.1: {}
 
   p-try@2.2.0: {}
 
