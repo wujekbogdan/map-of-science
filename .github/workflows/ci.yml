@@ -33,7 +33,7 @@ jobs:
           node-version-file: .nvmrc
           cache: 'pnpm'
       - run: pnpm i
-      - run: pnpm turbo test
+      - run: pnpm turbo test:unit test:integration
 
   build:
     runs-on: ubuntu-24.04
