@@ -1,3 +1,4 @@
 {
-  "extends": "@map-of-science/typescript/node"
+  "extends": "@map-of-science/typescript/node",
+  "include": ["*.config.ts"]
 }
