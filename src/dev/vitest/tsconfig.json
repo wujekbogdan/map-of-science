@@ -1,3 +1,7 @@
 {
-  "extends": "@map-of-science/typescript/node"
+  "extends": "@map-of-science/typescript/node",
+  "compilerOptions": {
+    "noEmit": false,
+    "outDir": "./dist"
+  }
 }

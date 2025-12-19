@@ -6,9 +6,11 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "main": "./src/index.ts",
+  "main": "./dist/index.js",
+  "types": "./src/index.ts",
   "scripts": {
-    "typecheck": "tsc",
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
     "eslint": "eslint"
   },
   "peerDependencies": {
