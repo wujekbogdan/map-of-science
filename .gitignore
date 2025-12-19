@@ -136,3 +136,6 @@ out
 
 # turbo
 .turbo
+
+# AI
+.claude

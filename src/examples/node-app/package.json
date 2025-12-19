@@ -1,26 +1,27 @@
 {
-  "name": "@map-of-science/api",
-  "version": "0.1.0",
-  "private": true,
+  "name": "@map-of-science/node-app",
+  "version": "0.0.0",
+  "description": "TODO: set description",
   "type": "module",
+  "private": true,
   "scripts": {
     "build": "tsdown",
     "lint": "eslint",
-    "typecheck": "tsc -b",
-    "dev": "tsx watch src/index.ts",
+    "typecheck": "tsc",
+    "dev": "tsx src/index.ts",
     "start": "node dist/index.mjs",
     "test:unit": "vitest --project=unit",
     "test:integration": "vitest --project=integration"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "dependencies": {
+    "@map-of-science/package": "workspace:*",
+    "dotenv": "^17.2.3"
+  },
   "devDependencies": {
     "@map-of-science/eslint": "workspace:*",
     "@map-of-science/tsdown": "workspace:*",
     "@map-of-science/typescript": "workspace:*",
     "@map-of-science/vitest": "workspace:*",
-    "@types/lodash": "^4.17.17",
     "@types/node": "^22.15.18",
     "eslint": "^9.13.0",
     "tsdown": "^0.16.8",

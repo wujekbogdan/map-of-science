@@ -6,21 +6,18 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./src/index.ts",
   "scripts": {
-    "build": "tsc",
+    "typecheck": "tsc",
     "eslint": "eslint"
   },
-  "dependencies": {
-    "vitest": "^3.2.4"
-  },
   "peerDependencies": {
-    "vitest": "^3.2.4"
+    "vitest": "^4.0.15"
   },
   "devDependencies": {
-    "typescript": "~5.6.2",
     "@map-of-science/eslint": "workspace:*",
-    "@map-of-science/typescript": "workspace:*"
+    "@map-of-science/typescript": "workspace:*",
+    "typescript": "~5.6.2",
+    "vitest": "^4.0.15"
   }
 }
