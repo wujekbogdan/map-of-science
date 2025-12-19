@@ -30,10 +30,11 @@ export const Article = () => {
 
   return (
     <ArticleModal
-      children={Component()}
       onClose={() => {
         reset();
       }}
-    />
+    >
+      {Component()}
+    </ArticleModal>
   );
 };

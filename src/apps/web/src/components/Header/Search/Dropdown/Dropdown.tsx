@@ -77,7 +77,7 @@ type OptionRowProps = {
 };
 
 const OptionRow = memo(
-  (props: OptionRowProps) => {
+  function OptionRow(props: OptionRowProps) {
     const videosCountToken =
       props.videosCount === undefined
         ? undefined
