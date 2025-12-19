@@ -4,22 +4,23 @@ import nodePlugin from "eslint-plugin-n";
 import globals from "globals";
 import tsEslint from "typescript-eslint";
 
-export const defineConfig = () =>
+export const defineConfig = (...configs) =>
   tsEslint.config(
     jsEslint.configs.recommended,
     tsEslint.configs.recommendedTypeChecked,
     tsEslint.configs.stylisticTypeChecked,
     nodePlugin.configs["flat/recommended-script"],
     {
-      ignores: ["dist", "vitest.config.ts"],
+      ignores: ["dist", ".eslint.config.mjs"],
     },
     {
       languageOptions: {
         parserOptions: {
+          tsconfigRootDir: import.meta.dirname,
           projectService: true,
         },
         ecmaVersion: 2020,
-        globals: globals.browser,
+        globals: globals.node,
       },
       settings: {
         node: {
@@ -36,5 +37,6 @@ export const defineConfig = () =>
       files: ["**/*.js", "**/*.mjs"],
       extends: [tsEslint.configs.disableTypeChecked],
     },
+    ...configs,
     eslintConfigPrettier,
   );

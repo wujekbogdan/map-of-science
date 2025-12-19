@@ -1,16 +1,8 @@
 {
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
     "target": "ES2022",
-    "lib": ["ES2023"],
-    "module": "NodeNext",
-    "skipLibCheck": true,
-    "isolatedModules": true,
-    "strict": true,
-    "noUncheckedSideEffectImports": true,
-    "declaration": true,
-    "declarationMap": true,
-    "outDir": "${configDir}/dist"
+    "lib": ["ES2023"]
   },
-  "include": ["${configDir}/src"]
+  "include": ["${configDir}/**/*.ts"]
 }
