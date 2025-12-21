@@ -13,7 +13,8 @@
       "dependsOn": ["^build"]
     },
     "test:integration": {
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build"],
+      "passThroughEnv": ["DOCKER_HOST", "TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE"]
     },
     "lint": {
       "dependsOn": ["^build", "^lint"]
