@@ -1,4 +1,4 @@
-# @map-of-science/csv
+# @map-of-science/parsers
 
 ## 0.1.0
 
