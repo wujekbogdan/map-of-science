@@ -3,6 +3,8 @@ import { describe, it, expect } from "vitest";
 import { createQdrantStore } from "./qdrant.js";
 import { withQdrantContainer } from "./test-utils/useQdrantContainer.js";
 
+const VECTOR_NAME = "embedding";
+
 describe("Qdrant integration", () => {
   it(
     "should upsert and search vectors",
@@ -10,23 +12,23 @@ describe("Qdrant integration", () => {
       const store = createQdrantStore({
         url: qdrant.url,
         collectionName: "test-integration",
-        vectorSize: 3,
+        vectors: { [VECTOR_NAME]: { size: 3 } },
       });
 
       await store.upsert({
         id: "550e8400-e29b-41d4-a716-446655440001",
-        vector: [1, 0, 0],
+        vectors: { [VECTOR_NAME]: [1, 0, 0] },
         metadata: { label: "first" },
       });
 
       await store.upsert({
         id: "550e8400-e29b-41d4-a716-446655440002",
-        vector: [0, 1, 0],
+        vectors: { [VECTOR_NAME]: [0, 1, 0] },
         metadata: { label: "second" },
       });
 
-      // Vector search
       const results = await store.search({
+        using: VECTOR_NAME,
         vector: [0.9, 0.1, 0],
         limit: 10,
         scoreThreshold: 0.5,
@@ -35,8 +37,8 @@ describe("Qdrant integration", () => {
       expect(results.items[0].id).toBe("550e8400-e29b-41d4-a716-446655440001");
       expect(results.items[0].score).toBeGreaterThan(0.5);
 
-      // Vector + filter combined
       const filtered = await store.search({
+        using: VECTOR_NAME,
         vector: [0.1, 0.9, 0],
         filter: [{ key: "label", match: "second" }],
         limit: 10,
@@ -45,7 +47,6 @@ describe("Qdrant integration", () => {
       expect(filtered.items).toHaveLength(1);
       expect(filtered.items[0].id).toBe("550e8400-e29b-41d4-a716-446655440002");
 
-      // Filter only (no vector) - uses scroll API
       const byFilter = await store.search({
         filter: [{ key: "label", match: "first" }],
       });
@@ -62,13 +63,13 @@ describe("Qdrant integration", () => {
       const store = createQdrantStore({
         url: qdrant.url,
         collectionName: "test-get",
-        vectorSize: 3,
+        vectors: { [VECTOR_NAME]: { size: 3 } },
       });
 
       const id = "550e8400-e29b-41d4-a716-446655440006";
       await store.upsert({
         id,
-        vector: [1, 0, 0],
+        vectors: { [VECTOR_NAME]: [1, 0, 0] },
         metadata: { label: "test" },
       });
 
@@ -76,7 +77,7 @@ describe("Qdrant integration", () => {
 
       expect(result).not.toBeNull();
       expect(result?.id).toBe(id);
-      expect(result?.vector).toEqual([1, 0, 0]);
+      expect(result?.vectors[VECTOR_NAME]).toEqual([1, 0, 0]);
       expect(result?.metadata).toEqual({ label: "test" });
     }),
   );
@@ -87,12 +88,12 @@ describe("Qdrant integration", () => {
       const store = createQdrantStore({
         url: qdrant.url,
         collectionName: "test-get-null",
-        vectorSize: 3,
+        vectors: { [VECTOR_NAME]: { size: 3 } },
       });
 
       await store.upsert({
         id: "550e8400-e29b-41d4-a716-446655440007",
-        vector: [1, 0, 0],
+        vectors: { [VECTOR_NAME]: [1, 0, 0] },
       });
 
       const result = await store.get("550e8400-e29b-41d4-a716-446655440099");
@@ -107,13 +108,13 @@ describe("Qdrant integration", () => {
       const store = createQdrantStore({
         url: qdrant.url,
         collectionName: "test-delete",
-        vectorSize: 3,
+        vectors: { [VECTOR_NAME]: { size: 3 } },
       });
 
       const id = "550e8400-e29b-41d4-a716-446655440008";
       await store.upsert({
         id,
-        vector: [1, 0, 0],
+        vectors: { [VECTOR_NAME]: [1, 0, 0] },
         metadata: { label: "to-delete" },
       });
 
@@ -131,13 +132,13 @@ describe("Qdrant integration", () => {
       const store = createQdrantStore({
         url: qdrant.url,
         collectionName: "test-update-metadata",
-        vectorSize: 3,
+        vectors: { [VECTOR_NAME]: { size: 3 } },
       });
 
       const id = "550e8400-e29b-41d4-a716-446655440009";
       await store.upsert({
         id,
-        vector: [1, 0, 0],
+        vectors: { [VECTOR_NAME]: [1, 0, 0] },
         metadata: { status: "draft", title: "Original" },
       });
 
@@ -145,7 +146,7 @@ describe("Qdrant integration", () => {
 
       const result = await store.get(id);
 
-      expect(result?.vector).toEqual([1, 0, 0]);
+      expect(result?.vectors[VECTOR_NAME]).toEqual([1, 0, 0]);
       expect(result?.metadata).toEqual({
         status: "approved",
         title: "Updated",
@@ -161,21 +162,19 @@ describe("Qdrant integration", () => {
       const store = createQdrantStore({
         url: qdrant.url,
         collectionName,
-        vectorSize: 3,
+        vectors: { [VECTOR_NAME]: { size: 3 } },
         payloadIndexes: [
           { field: "category", type: "keyword" },
           { field: "priority", type: "integer" },
         ],
       });
 
-      // Trigger collection creation
       await store.upsert({
         id: "550e8400-e29b-41d4-a716-446655440010",
-        vector: [1, 0, 0],
+        vectors: { [VECTOR_NAME]: [1, 0, 0] },
         metadata: { category: "test", priority: 1 },
       });
 
-      // Verify indexes were created
       const client = new QdrantClient({ url: qdrant.url });
       const collection = await client.getCollection(collectionName);
 
@@ -192,25 +191,26 @@ describe("Qdrant integration", () => {
       const store = createQdrantStore({
         url: qdrant.url,
         collectionName: "test-pagination-vector",
-        vectorSize: 3,
+        vectors: { [VECTOR_NAME]: { size: 3 } },
       });
 
       await Promise.all([
         store.upsert({
           id: "550e8400-e29b-41d4-a716-446655440051",
-          vector: [1, 0, 0],
+          vectors: { [VECTOR_NAME]: [1, 0, 0] },
         }),
         store.upsert({
           id: "550e8400-e29b-41d4-a716-446655440052",
-          vector: [0.9, 0.1, 0],
+          vectors: { [VECTOR_NAME]: [0.9, 0.1, 0] },
         }),
         store.upsert({
           id: "550e8400-e29b-41d4-a716-446655440053",
-          vector: [0.8, 0.2, 0],
+          vectors: { [VECTOR_NAME]: [0.8, 0.2, 0] },
         }),
       ]);
 
       const page1 = await store.search({
+        using: VECTOR_NAME,
         vector: [1, 0, 0],
         limit: 2,
         scoreThreshold: 0.5,
@@ -219,6 +219,7 @@ describe("Qdrant integration", () => {
       expect(page1.nextOffset).toBe(2);
 
       const page2 = await store.search({
+        using: VECTOR_NAME,
         vector: [1, 0, 0],
         limit: 2,
         offset: page1.nextOffset as number,
@@ -236,23 +237,23 @@ describe("Qdrant integration", () => {
       const store = createQdrantStore({
         url: qdrant.url,
         collectionName: `test-pagination-filter-${Date.now()}`,
-        vectorSize: 3,
+        vectors: { [VECTOR_NAME]: { size: 3 } },
       });
 
       await Promise.all([
         store.upsert({
           id: "550e8400-e29b-41d4-a716-446655440021",
-          vector: [1, 0, 0],
+          vectors: { [VECTOR_NAME]: [1, 0, 0] },
           metadata: { type: "a" },
         }),
         store.upsert({
           id: "550e8400-e29b-41d4-a716-446655440022",
-          vector: [0, 1, 0],
+          vectors: { [VECTOR_NAME]: [0, 1, 0] },
           metadata: { type: "a" },
         }),
         store.upsert({
           id: "550e8400-e29b-41d4-a716-446655440023",
-          vector: [0, 0, 1],
+          vectors: { [VECTOR_NAME]: [0, 0, 1] },
           metadata: { type: "a" },
         }),
       ]);
@@ -262,7 +263,6 @@ describe("Qdrant integration", () => {
         limit: 2,
       });
       expect(page1.items).toHaveLength(2);
-      // nextOffset should be a PointId (string), not a numeric offset
       expect(typeof page1.nextOffset).toBe("string");
 
       const page2 = await store.search({
@@ -272,7 +272,6 @@ describe("Qdrant integration", () => {
       });
       expect(page2.items).toHaveLength(1);
       expect(page2.nextOffset).toBeNull();
-      // Page 2 should have different items than page 1
       expect(page2.items[0].id).not.toBe(page1.items[0].id);
       expect(page2.items[0].id).not.toBe(page1.items[1].id);
     }),
@@ -285,28 +284,26 @@ describe("Qdrant integration", () => {
       const store = createQdrantStore({
         url: qdrant.url,
         collectionName: `test-order-by-${Date.now()}`,
-        vectorSize: 3,
+        vectors: { [VECTOR_NAME]: { size: 3 } },
         payloadIndexes: [{ field: "createdAt", type: "integer" }],
       });
 
-      // Insert in random order
       await store.upsert({
         id: "550e8400-e29b-41d4-a716-446655440031",
-        vector: [1, 0, 0],
+        vectors: { [VECTOR_NAME]: [1, 0, 0] },
         metadata: { createdAt: 200 },
       });
       await store.upsert({
         id: "550e8400-e29b-41d4-a716-446655440032",
-        vector: [0, 1, 0],
+        vectors: { [VECTOR_NAME]: [0, 1, 0] },
         metadata: { createdAt: 100 },
       });
       await store.upsert({
         id: "550e8400-e29b-41d4-a716-446655440033",
-        vector: [0, 0, 1],
+        vectors: { [VECTOR_NAME]: [0, 0, 1] },
         metadata: { createdAt: 300 },
       });
 
-      // Ascending order
       const ascResults = await store.search({
         filter: [],
         orderBy: { key: "createdAt", direction: "asc" },
@@ -315,7 +312,6 @@ describe("Qdrant integration", () => {
         100, 200, 300,
       ]);
 
-      // Descending order
       const descResults = await store.search({
         filter: [],
         orderBy: { key: "createdAt", direction: "desc" },
@@ -337,23 +333,23 @@ describe("Qdrant integration", () => {
         const store = createQdrantStore({
           url: qdrant.url,
           collectionName: `test-orderby-pagination-${direction}-${Date.now()}`,
-          vectorSize: 3,
+          vectors: { [VECTOR_NAME]: { size: 3 } },
           payloadIndexes: [{ field: "createdAt", type: "integer" }],
         });
 
         await store.upsert({
           id: "550e8400-e29b-41d4-a716-446655440041",
-          vector: [1, 0, 0],
+          vectors: { [VECTOR_NAME]: [1, 0, 0] },
           metadata: { createdAt: 300 },
         });
         await store.upsert({
           id: "550e8400-e29b-41d4-a716-446655440042",
-          vector: [0, 1, 0],
+          vectors: { [VECTOR_NAME]: [0, 1, 0] },
           metadata: { createdAt: 200 },
         });
         await store.upsert({
           id: "550e8400-e29b-41d4-a716-446655440043",
-          vector: [0, 0, 1],
+          vectors: { [VECTOR_NAME]: [0, 0, 1] },
           metadata: { createdAt: 100 },
         });
 

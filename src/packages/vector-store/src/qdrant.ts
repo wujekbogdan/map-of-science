@@ -5,7 +5,7 @@ import { buildFilter } from "./buildFilter.js";
 
 type UpsertParams = {
   id?: string;
-  vector: number[];
+  vectors: Record<string, number[]>;
   metadata?: Record<string, unknown>;
 };
 
@@ -15,7 +15,7 @@ type UpsertResult = {
 
 const upsertParamsSchema = z.object({
   id: z.string().optional(),
-  vector: z.array(z.number()),
+  vectors: z.record(z.string(), z.array(z.number())),
   metadata: z.record(z.string(), z.unknown()).optional(),
 });
 
@@ -25,6 +25,7 @@ export type MatchFilter = {
 };
 
 type VectorSearchParams = {
+  using: string;
   vector: number[];
   filter?: MatchFilter[];
   limit?: number;
@@ -57,7 +58,7 @@ const searchResultSchema = z.object({
 
 const pointSchema = z.object({
   id: z.union([z.string(), z.number()]).transform(String),
-  vector: z.array(z.number()),
+  vector: z.record(z.string(), z.array(z.number())),
   payload: metadataSchema,
 });
 
@@ -74,7 +75,7 @@ type PaginatedSearchResult = {
 
 type GetResult = {
   id: string;
-  vector: number[];
+  vectors: Record<string, number[]>;
   metadata?: Record<string, unknown>;
 };
 
@@ -86,19 +87,15 @@ export interface VectorStore {
   updateMetadata(id: string, metadata: Record<string, unknown>): Promise<void>;
 }
 
-type PayloadIndexType = "keyword" | "integer" | "float" | "bool" | "text";
-
-type PayloadIndex = {
-  field: string;
-  type: PayloadIndexType;
-};
-
 type Params = {
   url: string;
   apiKey?: string;
   collectionName: string;
-  vectorSize: number;
-  payloadIndexes?: PayloadIndex[];
+  vectors: Record<string, { size: number }>;
+  payloadIndexes?: {
+    field: string;
+    type: "keyword" | "integer" | "float" | "bool" | "text";
+  }[];
 };
 
 export const createQdrantStore = (params: Params) => {
@@ -115,8 +112,14 @@ export const createQdrantStore = (params: Params) => {
     ensureCollectionPromise = (async () => {
       const { exists } = await client.collectionExists(params.collectionName);
       if (!exists) {
+        const vectorsConfig = Object.fromEntries(
+          Object.entries(params.vectors).map(([name, { size }]) => [
+            name,
+            { size, distance: "Cosine" as const },
+          ]),
+        );
         await client.createCollection(params.collectionName, {
-          vectors: { size: params.vectorSize, distance: "Cosine" },
+          vectors: vectorsConfig,
         });
 
         if (params.payloadIndexes?.length) {
@@ -197,11 +200,11 @@ export const createQdrantStore = (params: Params) => {
     qdrantFilter: ReturnType<typeof buildFilter> | undefined,
     limit: number,
   ): Promise<PaginatedSearchResult> => {
-    const { vector, offset = 0, scoreThreshold = 0.5 } = searchParams;
+    const { using, vector, offset = 0, scoreThreshold = 0.5 } = searchParams;
     const fetchLimit = limit + 1;
 
     const response = await client.search(params.collectionName, {
-      vector,
+      vector: { name: using, vector },
       filter: qdrantFilter,
       limit: fetchLimit,
       offset,
@@ -225,13 +228,13 @@ export const createQdrantStore = (params: Params) => {
     async upsert(upsertParams: UpsertParams) {
       const {
         id: providedId,
-        vector,
+        vectors,
         metadata,
       } = upsertParamsSchema.parse(upsertParams);
       const id = providedId ?? randomUUID();
       await ensureCollection();
       await client.upsert(params.collectionName, {
-        points: [{ id, vector, payload: metadata }],
+        points: [{ id, vector: vectors, payload: metadata }],
       });
       return { id };
     },
@@ -257,7 +260,7 @@ export const createQdrantStore = (params: Params) => {
       const parsed = pointSchema.parse(response[0]);
       return {
         id: parsed.id,
-        vector: parsed.vector,
+        vectors: parsed.vector,
         metadata: parsed.payload,
       };
     },
