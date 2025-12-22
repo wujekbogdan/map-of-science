@@ -1,9 +1,11 @@
 import { http, HttpResponse } from "msw";
-import { SetupServer, setupServer } from "msw/node";
+import { setupServer } from "msw/node";
+import type { SetupServer } from "msw/node";
 import { expect } from "vitest";
 
 type ServerOptions = Parameters<typeof setupServer>;
-export type HandlerArguments = {
+
+type HandlerArguments = {
   http: typeof http;
   HttpResponse: typeof HttpResponse;
 };

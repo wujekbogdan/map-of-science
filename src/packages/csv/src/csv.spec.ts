@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
+import { withRequestInterception } from "@map-of-science/test-utils";
 import { parse, withHttpProvider } from "./parse.js";
-import { withRequestInterception } from "./test-utils/request-interception.js";
 
 const CSV = "name\tage\nAlice\t30\nBob\t40";
 

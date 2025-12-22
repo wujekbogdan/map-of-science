@@ -82,7 +82,7 @@ importers:
         version: 5.6.3
       vitest:
         specifier: ^4.0.15
-        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.8.6(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
+        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
 
   src/apps/web:
     dependencies:
@@ -145,7 +145,7 @@ importers:
         version: 0.6.2
       zod:
         specifier: ^3.23.8
-        version: 3.25.42
+        version: 3.25.76
       zustand:
         specifier: ^5.0.1
         version: 5.0.5(@types/react@19.2.7)(react@19.2.3)(use-sync-external-store@1.5.0(react@19.2.3))
@@ -209,7 +209,7 @@ importers:
         version: 4.3.0(rollup@4.53.5)(typescript@5.6.3)(vite@7.3.0(@types/node@22.15.18)(jiti@2.4.2)(less@4.3.0)(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1))
       vitest:
         specifier: ^4.0.15
-        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.8.6(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
+        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
 
   src/dev/eslint:
     dependencies:
@@ -282,7 +282,7 @@ importers:
         version: 5.6.3
       vitest:
         specifier: ^4.0.15
-        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.8.6(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
+        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
 
   src/examples/node-app:
     dependencies:
@@ -322,7 +322,7 @@ importers:
         version: 5.6.3
       vitest:
         specifier: ^4.0.15
-        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.8.6(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
+        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
 
   src/examples/package:
     devDependencies:
@@ -343,7 +343,7 @@ importers:
         version: 5.6.3
       vitest:
         specifier: ^4.0.15
-        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.8.6(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
+        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
 
   src/examples/react-app:
     dependencies:
@@ -386,7 +386,7 @@ importers:
         version: 7.3.0(@types/node@22.15.18)(jiti@2.4.2)(less@4.3.0)(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
       vitest:
         specifier: ^4.0.15
-        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.8.6(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
+        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
 
   src/packages/csv:
     dependencies:
@@ -395,11 +395,14 @@ importers:
         version: 5.6.0
       zod:
         specifier: ^3.23.8
-        version: 3.25.42
+        version: 3.25.76
     devDependencies:
       '@map-of-science/eslint':
         specifier: workspace:*
         version: link:../../dev/eslint
+      '@map-of-science/test-utils':
+        specifier: workspace:*
+        version: link:../test-utils
       '@map-of-science/typescript':
         specifier: workspace:*
         version: link:../../dev/typescript
@@ -412,9 +415,6 @@ importers:
       eslint:
         specifier: ^9.13.0
         version: 9.39.2(jiti@2.4.2)
-      msw:
-        specifier: ^2.6.8
-        version: 2.8.6(@types/node@22.15.18)(typescript@5.6.3)
       tsx:
         specifier: ^4.20.3
         version: 4.21.0
@@ -423,7 +423,7 @@ importers:
         version: 5.6.3
       vitest:
         specifier: ^4.0.15
-        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.8.6(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
+        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
 
   src/packages/embeddings:
     dependencies:
@@ -454,7 +454,7 @@ importers:
         version: 5.6.3
       vitest:
         specifier: ^4.0.15
-        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.8.6(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
+        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
 
   src/packages/logger:
     dependencies:
@@ -479,7 +479,41 @@ importers:
         version: 5.6.3
       vitest:
         specifier: ^4.0.15
-        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.8.6(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
+        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
+
+  src/packages/openalex:
+    dependencies:
+      es-toolkit:
+        specifier: ^1.43.0
+        version: 1.43.0
+      zod:
+        specifier: ^3.25.76
+        version: 3.25.76
+    devDependencies:
+      '@map-of-science/eslint':
+        specifier: workspace:*
+        version: link:../../dev/eslint
+      '@map-of-science/test-utils':
+        specifier: workspace:*
+        version: link:../test-utils
+      '@map-of-science/typescript':
+        specifier: workspace:*
+        version: link:../../dev/typescript
+      '@map-of-science/vitest':
+        specifier: workspace:*
+        version: link:../../dev/vitest
+      '@types/node':
+        specifier: ^22.15.18
+        version: 22.15.18
+      msw:
+        specifier: ^2.8.6
+        version: 2.12.4(@types/node@22.15.18)(typescript@5.6.3)
+      typescript:
+        specifier: ~5.6.2
+        version: 5.6.3
+      vitest:
+        specifier: ^4.0.15
+        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
 
   src/packages/rate-limiter:
     dependencies:
@@ -504,7 +538,32 @@ importers:
         version: 5.6.3
       vitest:
         specifier: ^4.0.15
-        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.8.6(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
+        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
+
+  src/packages/test-utils:
+    dependencies:
+      msw:
+        specifier: ^2.12.4
+        version: 2.12.4(@types/node@22.15.18)(typescript@5.6.3)
+    devDependencies:
+      '@map-of-science/eslint':
+        specifier: workspace:*
+        version: link:../../dev/eslint
+      '@map-of-science/typescript':
+        specifier: workspace:*
+        version: link:../../dev/typescript
+      '@map-of-science/vitest':
+        specifier: workspace:*
+        version: link:../../dev/vitest
+      '@types/node':
+        specifier: ^22.15.18
+        version: 22.15.18
+      typescript:
+        specifier: ~5.6.2
+        version: 5.6.3
+      vitest:
+        specifier: ^4.0.16
+        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
 
   src/packages/vector-store:
     dependencies:
@@ -516,7 +575,7 @@ importers:
         version: 1.43.0
       zod:
         specifier: ^3.23.8
-        version: 3.25.42
+        version: 3.25.76
     devDependencies:
       '@map-of-science/eslint':
         specifier: workspace:*
@@ -538,7 +597,7 @@ importers:
         version: 5.6.3
       vitest:
         specifier: ^4.0.15
-        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.8.6(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
+        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
 
 packages:
 
@@ -681,15 +740,6 @@ packages:
 
   '@bufbuild/protobuf@2.5.1':
     resolution: {integrity: sha512-lut4UTvKL8tqtend0UDu7R79/n9jA7Jtxf77RNPbxtmWqfWI4qQ9bTjf7KCS4vfqLmpQbuHr1ciqJumAgJODdw==}
-
-  '@bundled-es-modules/cookie@2.0.1':
-    resolution: {integrity: sha512-8o+5fRPLNbjbdGRRmJj3h6Hh1AQJf2dk3qQ/5ZFb+PXkRNiSoMGGUKlsgLfrxneb72axVJyIYji64E2+nNfYyw==}
-
-  '@bundled-es-modules/statuses@1.0.1':
-    resolution: {integrity: sha512-yn7BklA5acgcBr+7w064fGV+SGIFySjCKpqjcWgBAIfrAkY+4GQTJJHQMeT3V/sgz23VTEVV8TtOmkvJAhFVfg==}
-
-  '@bundled-es-modules/tough-cookie@0.1.6':
-    resolution: {integrity: sha512-dvMHbL464C0zI+Yqxbz6kZ5TOEp7GLW+pry/RWndAR8MJQAXZ2rPmIs8tziTZjeIyhSNZgZbCePtfSbdWqStJw==}
 
   '@changesets/apply-release-plan@7.0.12':
     resolution: {integrity: sha512-EaET7As5CeuhTzvXTQCRZeBUcisoYPDDcXvgTE/2jmmypKp0RC7LxKj/yzqeh/1qFTZI7oDGFcL1PHRuQuketQ==}
@@ -1189,8 +1239,8 @@ packages:
     resolution: {integrity: sha512-0FOIepYR4ugPYaHwK7hDeHDkfPOBVvayt9QpvRbi2LT/h2b0GaE/gM9Gag7fsnyYyNaTZ2IGyOuVg07IYepvYQ==}
     engines: {node: '>=20.0.0'}
 
-  '@mswjs/interceptors@0.38.7':
-    resolution: {integrity: sha512-Jkb27iSn7JPdkqlTqKfhncFfnEZsIJVYxsFbUSWEkxdIPdsyngrhoDBk0/BGD2FQcRH99vlRrkHpNTyKqI+0/w==}
+  '@mswjs/interceptors@0.40.0':
+    resolution: {integrity: sha512-EFd6cVbHsgLa6wa4RljGj6Wk75qoHxUSyc5asLyyPSyuhIcdS2Q3Phw6ImS1q+CkALthJRShiYfKANcQMuMqsQ==}
     engines: {node: '>=18'}
 
   '@napi-rs/wasm-runtime@1.1.0':
@@ -1879,9 +1929,6 @@ packages:
   '@types/conventional-commits-parser@5.0.1':
     resolution: {integrity: sha512-7uz5EHdzz2TqoMfV7ee61Egf5y6NkcO4FB/1iCCQnbeiI1F3xzv3vK5dBCXUCLQgGYS+mUeigK1iKQzvED+QnQ==}
 
-  '@types/cookie@0.6.0':
-    resolution: {integrity: sha512-4Kh9a6B2bQciAhf7FSuMRRkUWecJgJu9nPnx3yzpsfXX/c50REIqpHY4C82bXP90qrLtXtkDxTZosYO3UpOwlA==}
-
   '@types/d3-array@3.2.1':
     resolution: {integrity: sha512-Y2Jn2idRrLzUfAKV2LyRImR+y4oa2AntrgID95SHJxuMUrkNXmanDSed71sRNZysveJVt1hLLemQZIady0FpEg==}
 
@@ -2037,14 +2084,11 @@ packages:
   '@types/ssh2@1.15.5':
     resolution: {integrity: sha512-N1ASjp/nXH3ovBHddRJpli4ozpk6UdDYIX4RJWFa9L1YKnzdhTlVmiGHm4DZnj/jLbqZpes4aeR30EFGQtvhQQ==}
 
-  '@types/statuses@2.0.5':
-    resolution: {integrity: sha512-jmIUGWrAiwu3dZpxntxieC+1n/5c3mjrImkmOSQ2NC5uP6cYO4aAZDdSmRcI5C1oiTmqlZGHC+/NmJrKogbP5A==}
+  '@types/statuses@2.0.6':
+    resolution: {integrity: sha512-xMAgYwceFhRA2zY+XbEA7mxYbA093wdiW8Vu6gZPGWy9cmOyU9XesH1tNcEWsKFd5Vzrqx5T3D38PWx1FIIXkA==}
 
   '@types/stylis@4.2.5':
     resolution: {integrity: sha512-1Xve+NMN7FWjY14vLoY5tL3BVEQ/n42YLwaqJIPYhotZ9uBHt87VceMwWQpzmdEt2TNXIorIFG+YeCUUW7RInw==}
-
-  '@types/tough-cookie@4.0.5':
-    resolution: {integrity: sha512-/Ad8+nIOV7Rl++6f1BdKxFSMgmoqEoYbHRpPcx3JEfv8VRsQe9Z4mCXeJBzxs7mbHY/XOZZuXlRNfhpVPbs6ZA==}
 
   '@types/whatwg-mimetype@3.0.2':
     resolution: {integrity: sha512-c2AKvDT8ToxLIOUlN51gTiHXflsfIFisS4pO7pDPoKouJCESkhZnEy623gwP9laCy5lnLDAw1vAzu2vM2YLOrA==}
@@ -2573,9 +2617,9 @@ packages:
   convert-source-map@2.0.0:
     resolution: {integrity: sha512-Kvp459HrV2FEJ1CAsi1Ku+MY3kasH19TFykTz2xWmMeq6bk2NU3XXvfJ+Q61m0xktWwt+1HSYf3JZsTms3aRJg==}
 
-  cookie@0.7.2:
-    resolution: {integrity: sha512-yki5XnKuf750l50uGTllt6kKILY4nQ1eNIQatoXEByZ5dWgnKqbnqmTrBE5B4N7lrMJKQ2ytWMiTO2o0v6Ew/w==}
-    engines: {node: '>= 0.6'}
+  cookie@1.1.1:
+    resolution: {integrity: sha512-ei8Aos7ja0weRpFzJnEA9UHJ/7XQmqglbRwnf2ATjcB9Wq874VKH9kfjjirM6UhU2/E5fFYadylyhFldcqSidQ==}
+    engines: {node: '>=18'}
 
   copy-anything@2.0.6:
     resolution: {integrity: sha512-1j20GZTsvKNkc4BY3NpMOM8tt///wY3FpIzozTOFO2ffuZcV61nojHXVKIy3WM+7ADCy5FVhdZYHYDdgTU0yJw==}
@@ -3400,8 +3444,8 @@ packages:
   graphemer@1.4.0:
     resolution: {integrity: sha512-EtKwoO6kxCL9WO5xipiHTZlSzBm7WLT627TqC/uVRd0HKmq8NXyebnNYxDoBi7wt8eTWrUrKXCOVaFq9x1kgag==}
 
-  graphql@16.11.0:
-    resolution: {integrity: sha512-mS1lbMsxgQj6hge1XZ6p7GPhbrtFwUFYi3wRzXAC/FmYnyXMTvvI3td3rjmQ2u8ewXueaSvRPWaEcgVVOT9Jnw==}
+  graphql@16.12.0:
+    resolution: {integrity: sha512-DKKrynuQRne0PNpEbzuEdHlYOMksHSUI8Zc9Unei5gTsMNA2/vMpoMz/yKba50pejK56qj98qM0SjYxAKi13gQ==}
     engines: {node: ^12.22.0 || ^14.16.0 || ^16.0.0 || >=17.0.0}
 
   happy-dom@20.0.11:
@@ -3996,8 +4040,8 @@ packages:
   ms@2.1.3:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}
 
-  msw@2.8.6:
-    resolution: {integrity: sha512-fpwS5PnENnf7q7VF2ev00yfzmNXW78McKNgyaHaXQgz7p9pV8b2qQx1FoI0QA4BOxaVGBB6zBQUV4QWaK3G40g==}
+  msw@2.12.4:
+    resolution: {integrity: sha512-rHNiVfTyKhzc0EjoXUBVGteNKBevdjOlVC6GlIRXpy+/3LHEIGRovnB5WPjcvmNODVQ1TNFnoa7wsGbd0V3epg==}
     engines: {node: '>=18'}
     hasBin: true
     peerDependencies:
@@ -4382,9 +4426,6 @@ packages:
   prr@1.0.1:
     resolution: {integrity: sha512-yPw4Sng1gWghHQWj0B3ZggWUm4qVbPwPFcRG8KyxiU7J2OHFSoEHKS+EZ3fv5l1t9CyCiop6l/ZYeWbrgoQejw==}
 
-  psl@1.15.0:
-    resolution: {integrity: sha512-JZd3gMVBAVQkSs6HdNZo9Sdo0LNcQeMNP3CozBJb3JYC/QUYZTnKxP+f8oWRX4rHP5EurWxqAHTSwUCjlNKa1w==}
-
   pump@3.0.3:
     resolution: {integrity: sha512-todwxLMY7/heScKmntwQG8CXVkWUOdYxIvY2s0VWAAMh/nd8SoYiRaKjlr7+iCs984f2P8zvrfWcDDYVb73NfA==}
 
@@ -4397,9 +4438,6 @@ packages:
 
   quansync@1.0.0:
     resolution: {integrity: sha512-5xZacEEufv3HSTPQuchrvV6soaiACMFnq1H8wkVioctoH3TRha9Sz66lOxRwPK/qZj7HPiSveih9yAyh98gvqA==}
-
-  querystringify@2.2.0:
-    resolution: {integrity: sha512-FIqgj2EUvTa7R50u0rGsyTftzjYmv/a3hO345bZNrqabNqjtgiDMgmo4mkUjd+nzU5oF3dClKqFIPUKybUyqoQ==}
 
   queue-microtask@1.2.3:
     resolution: {integrity: sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==}
@@ -4505,9 +4543,6 @@ packages:
     resolution: {integrity: sha512-Xf0nWe6RseziFMu+Ap9biiUbmplq6S9/p+7w7YXP/JBHhrUDDUhwa+vANyubuqfZWTveU//DYVGsDG7RKL/vEw==}
     engines: {node: '>=0.10.0'}
 
-  requires-port@1.0.0:
-    resolution: {integrity: sha512-KigOCHcocU3XODJxsu8i/j8T9tzT4adHiecwORRQ0ZZFcp7ahwXuRU1m+yuO90C5ZUyGeGfocHDI14M3L3yDAQ==}
-
   reserved-words@0.1.2:
     resolution: {integrity: sha512-0S5SrIUJ9LfpbVl4Yzij6VipUdafHrOTzvmfazSw/jeZrZtQK303OPZW+obtkaw7jQlTQppy0UvZWm9872PbRw==}
 
@@ -4544,6 +4579,9 @@ packages:
   retry@0.12.0:
     resolution: {integrity: sha512-9LkiTwjUh6rT555DtE9rTX+BKByPfrMzEAtnlEtdEwr3Nkffwiihqe2bWADg+OQRjt9gl6ICdmB/ZFDCGAtSow==}
     engines: {node: '>= 4'}
+
+  rettime@0.7.0:
+    resolution: {integrity: sha512-LPRKoHnLKd/r3dVxcwO7vhCW+orkOGj9ViueosEBK6ie89CijnfRlhaDhHq/3Hxu4CkWQtxwlBG0mzTQY6uQjw==}
 
   reusify@1.1.0:
     resolution: {integrity: sha512-g6QUff04oZpHs0eG5p83rFLhHeV00ug/Yf9nZM6fLeUrPguBTkTQOdpAWWspMh55TZfVQDPaN3NQJfbVRAxdIw==}
@@ -4916,8 +4954,8 @@ packages:
   stacktrace-js@2.0.2:
     resolution: {integrity: sha512-Je5vBeY4S1r/RnLydLl0TBTi3F2qdfWmYsGvtfZgEI+SCprPppaIhQf5nGcal4gI4cGpCV/duLcAzT1np6sQqg==}
 
-  statuses@2.0.1:
-    resolution: {integrity: sha512-RwNA9Z/7PrK06rYLIzFMlaF+l73iwpzsqRIFgbMLbTcLD6cOao82TaWefPXQvB2fOC4AjuYSEndS7N/mTCbkdQ==}
+  statuses@2.0.2:
+    resolution: {integrity: sha512-DvEy55V3DB7uknRo+4iOGT5fP1slR8wQohVdknigZPMpMstaKJQWhwiYBACJE3Ul2pTnATihhBYnRhZQHGBiRw==}
     engines: {node: '>= 0.8'}
 
   std-env@3.10.0:
@@ -5054,6 +5092,10 @@ packages:
   tabbable@6.2.0:
     resolution: {integrity: sha512-Cat63mxsVJlzYvN51JmVXIgNoUokrIaT2zLclCXjRd8boZ0004U4KCs/sToJ75C6sdlByWxpYnb5Boif1VSFew==}
 
+  tagged-tag@1.0.0:
+    resolution: {integrity: sha512-yEFYrVhod+hdNyx7g5Bnkkb0G6si8HJurOoOEgC8B/O0uXLHlaey/65KRv6cuWBNhBgHKAROVpc7QyYqE5gFng==}
+    engines: {node: '>=20'}
+
   tapable@2.2.2:
     resolution: {integrity: sha512-Re10+NauLTMCudc7T5WLFLAwDhQ0JWdrMK+9B2M8zR5hRExKmsRDCBA7/aV/pNJFltmBFO5BAMlQFi/vq3nKOg==}
     engines: {node: '>=6'}
@@ -5120,6 +5162,13 @@ packages:
     resolution: {integrity: sha512-PSkbLUoxOFRzJYjjxHJt9xro7D+iilgMX/C9lawzVuYiIdcihh9DXmVibBe8lmcFrRi/VzlPjBxbN7rH24q8/Q==}
     engines: {node: '>=14.0.0'}
 
+  tldts-core@7.0.19:
+    resolution: {integrity: sha512-lJX2dEWx0SGH4O6p+7FPwYmJ/bu1JbcGJ8RLaG9b7liIgZ85itUVEPbMtWRVrde/0fnDPEPHW10ZsKW3kVsE9A==}
+
+  tldts@7.0.19:
+    resolution: {integrity: sha512-8PWx8tvC4jDB39BQw1m4x8y5MH1BcQ5xHeL2n7UVFulMPH/3Q0uiamahFJ3lXA0zO2SUyRXuVVbWSDmstlt9YA==}
+    hasBin: true
+
   tmp@0.0.33:
     resolution: {integrity: sha512-jRCJlojKnZ3addtTOjdIqoRuPEKBvNXcGYqzO6zWZX8KfKEpnGY5jfggJQ3EjKuu8D4bJRr0y+cYJFmYbImXGw==}
     engines: {node: '>=0.6.0'}
@@ -5135,9 +5184,9 @@ packages:
   toggle-selection@1.0.6:
     resolution: {integrity: sha512-BiZS+C1OS8g/q2RRbJmy59xpyghNBqrr6k5L/uKBGRsTfxmu3ffiRnd8mlGPUVayg8pvfi5urfnu8TU7DVOkLQ==}
 
-  tough-cookie@4.1.4:
-    resolution: {integrity: sha512-Loo5UUvLD9ScZ6jh8beX1T6sO1w2/MpCRpEP7V280GKMVUQ0Jzar2U3UJPsrdbziLEMMhu3Ujnq//rhiFuIeag==}
-    engines: {node: '>=6'}
+  tough-cookie@6.0.0:
+    resolution: {integrity: sha512-kXuRi1mtaKMrsLUxz3sQYvVl37B0Ns6MzfrtV5DvJceE9bPyspOqk9xxv7XbZWcfLWbFmm997vl83qUWVJA64w==}
+    engines: {node: '>=16'}
 
   tree-kill@1.2.2:
     resolution: {integrity: sha512-L0Orpi8qGpRG//Nd+H90vFB+3iHnue1zSSGmNOOCh1GLJ7rUKVwV2HvijphGQS2UmhUZewS9VgvxYIdgr+fG1A==}
@@ -5242,9 +5291,9 @@ packages:
     resolution: {integrity: sha512-t0rzBq87m3fVcduHDUFhKmyyX+9eo6WQjZvf51Ea/M0Q7+T374Jp1aUiyUl0GKxp8M/OETVHSDvmkyPgvX+X2w==}
     engines: {node: '>=10'}
 
-  type-fest@4.41.0:
-    resolution: {integrity: sha512-TeTSQ6H5YHvpqVwBRcnLDCBnDOHWYu7IvGbHT6N8AOymcr9PJGjc1GTtiWZTYg0NCgYwvnYWEkVChQAr9bjfwA==}
-    engines: {node: '>=16'}
+  type-fest@5.3.1:
+    resolution: {integrity: sha512-VCn+LMHbd4t6sF3wfU/+HKT63C9OoyrSIf4b+vtWHpt2U7/4InZG467YDNMFMR70DdHjAdpPWmw2lzRdg0Xqqg==}
+    engines: {node: '>=20'}
 
   typed-array-buffer@1.0.3:
     resolution: {integrity: sha512-nAYYwfY3qnzX30IkA6AQZjVbtK6duGontcQm1WSG1MD94YLqK0515GNApXkoxKOWMusVssAHWLh9SeaoefYFGw==}
@@ -5312,10 +5361,6 @@ packages:
     resolution: {integrity: sha512-rBJeI5CXAlmy1pV+617WB9J63U6XcazHHF2f2dbJix4XzpUF0RS3Zbj0FGIOCAva5P/d/GBOYaACQ1w+0azUkg==}
     engines: {node: '>= 4.0.0'}
 
-  universalify@0.2.0:
-    resolution: {integrity: sha512-CJ1QgKmNg3CwvAv/kOFmtnEN05f0D/cn9QntgNOQlQF9dgvVTHj3t+8JPdjqawCHk7V/KA+fbUqzZ9XWhcqPUg==}
-    engines: {node: '>= 4.0.0'}
-
   universalify@2.0.1:
     resolution: {integrity: sha512-gptHNQghINnc/vTGIk0SOFGFNXw7JVrlRUtConJRlvaw6DuX0wO5Jeko9sWrMBhh+PsYAZ7oXAiOnf/UKogyiw==}
     engines: {node: '>= 10.0.0'}
@@ -5330,6 +5375,9 @@ packages:
       synckit:
         optional: true
 
+  until-async@3.0.2:
+    resolution: {integrity: sha512-IiSk4HlzAMqTUseHHe3VhIGyuFmN90zMTpD3Z3y8jeQbzLIq500MVM7Jq2vUAnTKAFPJrqwkzr6PoTcPhGcOiw==}
+
   update-browserslist-db@1.1.3:
     resolution: {integrity: sha512-UxhIZQ+QInVdunkDAaiazvvT/+fXL5Osr0JZlJulepYu6Jd7qJtDZjlur0emRlT71EN3ScPoE7gvsuIKKNavKw==}
     hasBin: true
@@ -5338,9 +5386,6 @@ packages:
 
   uri-js@4.4.1:
     resolution: {integrity: sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==}
-
-  url-parse@1.5.10:
-    resolution: {integrity: sha512-WypcfiRhfeUP9vvF0j6rw0J3hrWrw6iZv3+22h6iRMJ/8z1Tj6XfLP4DsUix5MhMPnXpiHDoKyoZ/bdCkwBCiQ==}
 
   use-sync-external-store@1.5.0:
     resolution: {integrity: sha512-Rb46I4cGGVBmjamjphe8L/UnvJD+uPPtTkNvX5mZgqdbavhI4EbgIWJiIHXJ8bc/i9EQGPRh4DwEURJ552Do0A==}
@@ -5595,9 +5640,6 @@ packages:
     resolution: {integrity: sha512-zK7YHHz4ZXpW89AHXUPbQVGKI7uvkd3hzusTdotCg1UxyaVtg0zFJSTfW/Dq5f7OBBVnq6cZIaC8Ti4hb6dtCA==}
     engines: {node: '>= 14'}
 
-  zod@3.25.42:
-    resolution: {integrity: sha512-PcALTLskaucbeHc41tU/xfjfhcz8z0GdhhDcSgrCTmSazUuqnYqiXO63M0QUBVwpBlsLsNVn5qHSC5Dw3KZvaQ==}
-
   zod@3.25.76:
     resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
 
@@ -5805,19 +5847,6 @@ snapshots:
   '@balena/dockerignore@1.0.2': {}
 
   '@bufbuild/protobuf@2.5.1': {}
-
-  '@bundled-es-modules/cookie@2.0.1':
-    dependencies:
-      cookie: 0.7.2
-
-  '@bundled-es-modules/statuses@1.0.1':
-    dependencies:
-      statuses: 2.0.1
-
-  '@bundled-es-modules/tough-cookie@0.1.6':
-    dependencies:
-      '@types/tough-cookie': 4.0.5
-      tough-cookie: 4.1.4
 
   '@changesets/apply-release-plan@7.0.12':
     dependencies:
@@ -6410,7 +6439,7 @@ snapshots:
       js-yaml: 4.1.0
       tinyglobby: 0.2.15
 
-  '@mswjs/interceptors@0.38.7':
+  '@mswjs/interceptors@0.40.0':
     dependencies:
       '@open-draft/deferred-promise': 2.2.0
       '@open-draft/logger': 0.3.0
@@ -6942,8 +6971,6 @@ snapshots:
     dependencies:
       '@types/node': 22.15.18
 
-  '@types/cookie@0.6.0': {}
-
   '@types/d3-array@3.2.1': {}
 
   '@types/d3-axis@3.0.6':
@@ -7129,11 +7156,9 @@ snapshots:
     dependencies:
       '@types/node': 18.19.130
 
-  '@types/statuses@2.0.5': {}
+  '@types/statuses@2.0.6': {}
 
   '@types/stylis@4.2.5': {}
-
-  '@types/tough-cookie@4.0.5': {}
 
   '@types/whatwg-mimetype@3.0.2': {}
 
@@ -7257,13 +7282,13 @@ snapshots:
       chai: 6.2.1
       tinyrainbow: 3.0.3
 
-  '@vitest/mocker@4.0.16(msw@2.8.6(@types/node@22.15.18)(typescript@5.6.3))(vite@7.3.0(@types/node@22.15.18)(jiti@2.4.2)(less@4.3.0)(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1))':
+  '@vitest/mocker@4.0.16(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(vite@7.3.0(@types/node@22.15.18)(jiti@2.4.2)(less@4.3.0)(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1))':
     dependencies:
       '@vitest/spy': 4.0.16
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
-      msw: 2.8.6(@types/node@22.15.18)(typescript@5.6.3)
+      msw: 2.12.4(@types/node@22.15.18)(typescript@5.6.3)
       vite: 7.3.0(@types/node@22.15.18)(jiti@2.4.2)(less@4.3.0)(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
 
   '@vitest/pretty-format@4.0.16':
@@ -7732,7 +7757,7 @@ snapshots:
 
   convert-source-map@2.0.0: {}
 
-  cookie@0.7.2: {}
+  cookie@1.1.1: {}
 
   copy-anything@2.0.6:
     dependencies:
@@ -8728,7 +8753,7 @@ snapshots:
 
   graphemer@1.4.0: {}
 
-  graphql@16.11.0: {}
+  graphql@16.12.0: {}
 
   happy-dom@20.0.11:
     dependencies:
@@ -9274,25 +9299,25 @@ snapshots:
 
   ms@2.1.3: {}
 
-  msw@2.8.6(@types/node@22.15.18)(typescript@5.6.3):
+  msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3):
     dependencies:
-      '@bundled-es-modules/cookie': 2.0.1
-      '@bundled-es-modules/statuses': 1.0.1
-      '@bundled-es-modules/tough-cookie': 0.1.6
       '@inquirer/confirm': 5.1.12(@types/node@22.15.18)
-      '@mswjs/interceptors': 0.38.7
+      '@mswjs/interceptors': 0.40.0
       '@open-draft/deferred-promise': 2.2.0
-      '@open-draft/until': 2.1.0
-      '@types/cookie': 0.6.0
-      '@types/statuses': 2.0.5
-      graphql: 16.11.0
+      '@types/statuses': 2.0.6
+      cookie: 1.1.1
+      graphql: 16.12.0
       headers-polyfill: 4.0.3
       is-node-process: 1.2.0
       outvariant: 1.4.3
       path-to-regexp: 6.3.0
       picocolors: 1.1.1
+      rettime: 0.7.0
+      statuses: 2.0.2
       strict-event-emitter: 0.5.1
-      type-fest: 4.41.0
+      tough-cookie: 6.0.0
+      type-fest: 5.3.1
+      until-async: 3.0.2
       yargs: 17.7.2
     optionalDependencies:
       typescript: 5.6.3
@@ -9671,10 +9696,6 @@ snapshots:
   prr@1.0.1:
     optional: true
 
-  psl@1.15.0:
-    dependencies:
-      punycode: 2.3.1
-
   pump@3.0.3:
     dependencies:
       end-of-stream: 1.4.5
@@ -9685,8 +9706,6 @@ snapshots:
   quansync@0.2.10: {}
 
   quansync@1.0.0: {}
-
-  querystringify@2.2.0: {}
 
   queue-microtask@1.2.3: {}
 
@@ -9815,8 +9834,6 @@ snapshots:
 
   require-from-string@2.0.2: {}
 
-  requires-port@1.0.0: {}
-
   reserved-words@0.1.2: {}
 
   resize-observer-polyfill@1.5.1: {}
@@ -9849,6 +9866,8 @@ snapshots:
       signal-exit: 4.1.0
 
   retry@0.12.0: {}
+
+  rettime@0.7.0: {}
 
   reusify@1.1.0: {}
 
@@ -10242,7 +10261,7 @@ snapshots:
       stack-generator: 2.0.10
       stacktrace-gps: 3.1.2
 
-  statuses@2.0.1: {}
+  statuses@2.0.2: {}
 
   std-env@3.10.0: {}
 
@@ -10410,6 +10429,8 @@ snapshots:
 
   tabbable@6.2.0: {}
 
+  tagged-tag@1.0.0: {}
+
   tapable@2.2.2: {}
 
   tar-fs@2.1.4:
@@ -10509,6 +10530,12 @@ snapshots:
 
   tinyrainbow@3.0.3: {}
 
+  tldts-core@7.0.19: {}
+
+  tldts@7.0.19:
+    dependencies:
+      tldts-core: 7.0.19
+
   tmp@0.0.33:
     dependencies:
       os-tmpdir: 1.0.2
@@ -10521,12 +10548,9 @@ snapshots:
 
   toggle-selection@1.0.6: {}
 
-  tough-cookie@4.1.4:
+  tough-cookie@6.0.0:
     dependencies:
-      psl: 1.15.0
-      punycode: 2.3.1
-      universalify: 0.2.0
-      url-parse: 1.5.10
+      tldts: 7.0.19
 
   tree-kill@1.2.2: {}
 
@@ -10619,7 +10643,9 @@ snapshots:
 
   type-fest@0.21.3: {}
 
-  type-fest@4.41.0: {}
+  type-fest@5.3.1:
+    dependencies:
+      tagged-tag: 1.0.0
 
   typed-array-buffer@1.0.3:
     dependencies:
@@ -10715,13 +10741,13 @@ snapshots:
 
   universalify@0.1.2: {}
 
-  universalify@0.2.0: {}
-
   universalify@2.0.1: {}
 
   unrun@0.2.20:
     dependencies:
       rolldown: 1.0.0-beta.55
+
+  until-async@3.0.2: {}
 
   update-browserslist-db@1.1.3(browserslist@4.25.0):
     dependencies:
@@ -10732,11 +10758,6 @@ snapshots:
   uri-js@4.4.1:
     dependencies:
       punycode: 2.3.1
-
-  url-parse@1.5.10:
-    dependencies:
-      querystringify: 2.2.0
-      requires-port: 1.0.0
 
   use-sync-external-store@1.5.0(react@19.2.3):
     dependencies:
@@ -10805,10 +10826,10 @@ snapshots:
       tsx: 4.21.0
       yaml: 2.7.1
 
-  vitest@4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.8.6(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1):
+  vitest@4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1):
     dependencies:
       '@vitest/expect': 4.0.16
-      '@vitest/mocker': 4.0.16(msw@2.8.6(@types/node@22.15.18)(typescript@5.6.3))(vite@7.3.0(@types/node@22.15.18)(jiti@2.4.2)(less@4.3.0)(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1))
+      '@vitest/mocker': 4.0.16(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(vite@7.3.0(@types/node@22.15.18)(jiti@2.4.2)(less@4.3.0)(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1))
       '@vitest/pretty-format': 4.0.16
       '@vitest/runner': 4.0.16
       '@vitest/snapshot': 4.0.16
@@ -10974,8 +10995,6 @@ snapshots:
       archiver-utils: 5.0.2
       compress-commons: 6.0.2
       readable-stream: 4.7.0
-
-  zod@3.25.42: {}
 
   zod@3.25.76: {}
 
