@@ -4,8 +4,7 @@ import { fileURLToPath } from "node:url";
 import { describe, it, expect } from "vitest";
 import { z } from "zod";
 import { ZodSchema } from "zod";
-import { setCollector } from "@map-of-science/parsers";
-import { parse as csvParse } from "@map-of-science/parsers";
+import { setCollector, parseCsv } from "@map-of-science/parsers";
 import { ConceptSchema, AreaSchema, MakeClustersSchema } from ".";
 
 const parse = async (name: string, schema: ZodSchema) => {
@@ -15,7 +14,7 @@ const parse = async (name: string, schema: ZodSchema) => {
   const file = await readFile(filePath, "utf-8");
   const collector = setCollector();
 
-  await csvParse(
+  await parseCsv(
     () => file, // Correctly pass provider function
     (row) => {
       collector.add(schema.parse(row));

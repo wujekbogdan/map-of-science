@@ -86,9 +86,30 @@ importers:
 
   src/apps/embedder-cli:
     dependencies:
+      '@map-of-science/cluster-embedder':
+        specifier: workspace:*
+        version: link:../../packages/cluster-embedder
+      '@map-of-science/embeddings':
+        specifier: workspace:*
+        version: link:../../packages/embeddings
+      '@map-of-science/openalex':
+        specifier: workspace:*
+        version: link:../../packages/openalex
       '@map-of-science/package':
         specifier: workspace:*
         version: link:../../examples/package
+      '@map-of-science/parsers':
+        specifier: workspace:*
+        version: link:../../packages/parsers
+      '@map-of-science/rate-limiter':
+        specifier: workspace:*
+        version: link:../../packages/rate-limiter
+      '@map-of-science/vector-store':
+        specifier: workspace:*
+        version: link:../../packages/vector-store
+      commander:
+        specifier: ^14.0.2
+        version: 14.0.2
       dotenv:
         specifier: ^17.2.3
         version: 17.2.3
@@ -544,6 +565,9 @@ importers:
       csv-parse:
         specifier: ^5.6.0
         version: 5.6.0
+      stream-json:
+        specifier: ^1.9.1
+        version: 1.9.1
       zod:
         specifier: ^3.23.8
         version: 3.25.76
@@ -563,6 +587,9 @@ importers:
       '@types/node':
         specifier: ^22.15.18
         version: 22.15.18
+      '@types/stream-json':
+        specifier: ^1.7.8
+        version: 1.7.8
       eslint:
         specifier: ^9.13.0
         version: 9.39.2(jiti@2.4.2)
@@ -2148,6 +2175,12 @@ packages:
   '@types/statuses@2.0.6':
     resolution: {integrity: sha512-xMAgYwceFhRA2zY+XbEA7mxYbA093wdiW8Vu6gZPGWy9cmOyU9XesH1tNcEWsKFd5Vzrqx5T3D38PWx1FIIXkA==}
 
+  '@types/stream-chain@2.1.0':
+    resolution: {integrity: sha512-guDyAl6s/CAzXUOWpGK2bHvdiopLIwpGu8v10+lb9hnQOyo4oj/ZUQFOvqFjKGsE3wJP1fpIesCcMvbXuWsqOg==}
+
+  '@types/stream-json@1.7.8':
+    resolution: {integrity: sha512-MU1OB1eFLcYWd1LjwKXrxdoPtXSRzRmAnnxs4Js/ayB5O/NvHraWwuOaqMWIebpYwM6khFlsJOHEhI9xK/ab4Q==}
+
   '@types/stylis@4.2.5':
     resolution: {integrity: sha512-1Xve+NMN7FWjY14vLoY5tL3BVEQ/n42YLwaqJIPYhotZ9uBHt87VceMwWQpzmdEt2TNXIorIFG+YeCUUW7RInw==}
 
@@ -2636,6 +2669,10 @@ packages:
   commander@13.1.0:
     resolution: {integrity: sha512-/rFeCpNJQbhSZjGVwO9RFV3xPqbnERS8MmIQzCtD/zl6gpJuV/bMLuN92oG3F7d8oDEHHRrujSXNUr8fpjntKw==}
     engines: {node: '>=18'}
+
+  commander@14.0.2:
+    resolution: {integrity: sha512-TywoWNNRbhoD0BXs1P3ZEScW8W5iKrnbithIl0YH+uCmBd0QpPOA8yc82DS3BIE5Ma6FnBVUsJ7wVUDz4dvOWQ==}
+    engines: {node: '>=20'}
 
   commander@7.2.0:
     resolution: {integrity: sha512-QrWXB+ZQSVPmIWIhtEO9H+gwHaMGYiF5ChvoJ+K9ZGHG/sVsa6yiesAD1GC/x46sET00Xlwo1u49RVVVzvcSkw==}
@@ -5026,6 +5063,12 @@ packages:
     resolution: {integrity: sha512-eLoXW/DHyl62zxY4SCaIgnRhuMr6ri4juEYARS8E6sCEqzKpOiE521Ucofdx+KnDZl5xmvGYaaKCk5FEOxJCoQ==}
     engines: {node: '>= 0.4'}
 
+  stream-chain@2.2.5:
+    resolution: {integrity: sha512-1TJmBx6aSWqZ4tx7aTpBDXK0/e2hhcNSTV8+CbFJtDjbb+I1mZ8lHit0Grw9GRT+6JbIrrDd8esncgBi8aBXGA==}
+
+  stream-json@1.9.1:
+    resolution: {integrity: sha512-uWkjJ+2Nt/LO9Z/JyKZbMusL8Dkh97uUBTv3AJQ74y07lVahLY4eEFsPsE97pxYBwr8nnjMAIch5eqI0gPShyw==}
+
   streamx@2.23.0:
     resolution: {integrity: sha512-kn+e44esVfn2Fa/O0CPFcex27fjIL6MkVae0Mm6q+E6f0hWv578YCERbv+4m02cjxvDsPKLnmxral/rR6lBMAg==}
 
@@ -7219,6 +7262,15 @@ snapshots:
 
   '@types/statuses@2.0.6': {}
 
+  '@types/stream-chain@2.1.0':
+    dependencies:
+      '@types/node': 22.15.18
+
+  '@types/stream-json@1.7.8':
+    dependencies:
+      '@types/node': 22.15.18
+      '@types/stream-chain': 2.1.0
+
   '@types/stylis@4.2.5': {}
 
   '@types/whatwg-mimetype@3.0.2': {}
@@ -7756,6 +7808,8 @@ snapshots:
   comlink@4.4.2: {}
 
   commander@13.1.0: {}
+
+  commander@14.0.2: {}
 
   commander@7.2.0: {}
 
@@ -10330,6 +10384,12 @@ snapshots:
     dependencies:
       es-errors: 1.3.0
       internal-slot: 1.1.0
+
+  stream-chain@2.2.5: {}
+
+  stream-json@1.9.1:
+    dependencies:
+      stream-chain: 2.2.5
 
   streamx@2.23.0:
     dependencies:

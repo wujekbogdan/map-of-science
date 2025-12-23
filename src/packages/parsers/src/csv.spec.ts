@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { withRequestInterception } from "@map-of-science/test-utils";
-import { parse, withHttpProvider } from "./parse.js";
+import { parseCsv, withHttpProvider } from "./csv.js";
 
 const CSV = "name\tage\nAlice\t30\nBob\t40";
 
@@ -10,7 +10,7 @@ describe("csv", () => {
       const provider = vi.fn(() => CSV);
       const onItem = vi.fn();
 
-      await parse(provider, onItem);
+      await parseCsv(provider, onItem);
 
       expect(onItem).toHaveBeenCalledTimes(2);
       expect(onItem).toHaveBeenNthCalledWith(1, { name: "Alice", age: "30" });
@@ -21,7 +21,7 @@ describe("csv", () => {
       const provider = vi.fn(() => Promise.resolve(CSV));
       const onItem = vi.fn();
 
-      await parse(provider, onItem);
+      await parseCsv(provider, onItem);
 
       expect(onItem).toHaveBeenCalledTimes(2);
       expect(onItem).toHaveBeenNthCalledWith(1, { name: "Alice", age: "30" });
@@ -34,7 +34,9 @@ describe("csv", () => {
         throw new Error("onItem failed");
       };
 
-      return expect(parse(provider, onItem)).rejects.toThrow("onItem failed");
+      return expect(parseCsv(provider, onItem)).rejects.toThrow(
+        "onItem failed",
+      );
     });
   });
 

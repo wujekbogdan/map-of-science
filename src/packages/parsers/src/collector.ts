@@ -1,4 +1,4 @@
-import { Collector } from "./parse.js";
+import { Collector } from "./utils.js";
 
 export const arrayCollector = <T>(): Collector<T, T[]> => {
   const collection: T[] = [];
