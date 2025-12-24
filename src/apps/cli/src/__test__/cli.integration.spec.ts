@@ -5,18 +5,13 @@ import {
   withQdrantContainer,
   type Qdrant,
 } from "@map-of-science/vector-store/test";
-import { embed } from "./embed.js";
+import { embed } from "../commands/embed/embed.js";
+import { search } from "../commands/search/search.js";
 
-const FIXTURE_PATH = path.join(
-  import.meta.dirname,
-  "..",
-  "..",
-  "__test__",
-  "clusters.json",
-);
+const FIXTURE_PATH = path.join(import.meta.dirname, "clusters.json");
 const EMBEDDING_DIM = 768;
 
-describe("embed command E2E", () => {
+describe("CLI E2E", () => {
   const required = [
     "OPENALEX_API_KEY",
     "OPENALEX_EMAIL",
@@ -31,7 +26,7 @@ describe("embed command E2E", () => {
   });
 
   it(
-    "should process clusters",
+    "should embed clusters and search them",
     withQdrantContainer(async (qdrant: Qdrant) => {
       for (const key of required) {
         vi.stubEnv(key, process.env[key]);
@@ -66,6 +61,15 @@ describe("embed command E2E", () => {
 
       const point5 = await store.get("5");
       expect(point5).toBeNull();
+
+      // Search embedded clusters
+      const searchResult = await search("perovskite solar cells", {
+        vector: "articles",
+        limit: "5",
+      });
+
+      expect(searchResult.results.length).toBeGreaterThan(0);
+      expect(searchResult.results[0].score).toBeGreaterThan(0);
     }),
     180_000,
   );
