@@ -9,6 +9,7 @@
   },
   "scripts": {
     "build": "tsdown",
+    "build:exe": "pkg --config pkg.json dist/mos-cli.cjs",
     "lint": "eslint",
     "typecheck": "tsc",
     "dev": "tsx src/index.ts",
@@ -35,6 +36,7 @@
     "@map-of-science/typescript": "workspace:*",
     "@map-of-science/vitest": "workspace:*",
     "@types/node": "^22.15.18",
+    "@yao-pkg/pkg": "^6.11.0",
     "eslint": "^9.13.0",
     "testcontainers": "^11.10.0",
     "tsdown": "^0.16.8",
