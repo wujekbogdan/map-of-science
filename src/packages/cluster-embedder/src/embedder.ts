@@ -1,6 +1,6 @@
 type Article = {
-  DOI: string;
-  Title: string;
+  doi: string;
+  title: string;
 };
 
 type ClusterInput = {
@@ -49,7 +49,7 @@ const buildArticlesText = (works: Work[]) =>
 
 const extractDois = (articles: Article[]) =>
   articles
-    .map((article) => article.DOI)
+    .map((article) => article.doi)
     .filter((doi) => doi.startsWith("https://doi.org/"));
 
 const deduplicateDois = (dois: string[]) => [...new Set(dois)];

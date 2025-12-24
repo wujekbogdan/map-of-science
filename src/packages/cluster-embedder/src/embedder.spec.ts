@@ -26,10 +26,10 @@ const createMockCluster = () => ({
   articleAge: 5,
   growthRating: 80,
   articles: [
-    { DOI: "https://doi.org/10.1234/a", Title: "Title A" },
-    { DOI: "https://doi.org/10.1234/b", Title: "Title B" },
-    { DOI: "https://doi.org/10.1234/a", Title: "Title A Duplicate" },
-    { DOI: "invalid-doi", Title: "Invalid" },
+    { doi: "https://doi.org/10.1234/a", title: "Title A" },
+    { doi: "https://doi.org/10.1234/b", title: "Title B" },
+    { doi: "https://doi.org/10.1234/a", title: "Title A Duplicate" },
+    { doi: "invalid-doi", title: "Invalid" },
   ],
 });
 

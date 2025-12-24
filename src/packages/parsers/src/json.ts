@@ -1,30 +1,18 @@
-import { createReadStream, type ReadStream } from "node:fs";
+import { createReadStream } from "node:fs";
 import StreamObject from "stream-json/streamers/StreamObject";
 
-type StreamProvider = () => ReadStream;
-type OnItem<Key, Value, Result> = (key: Key, value: Value) => Result;
+export async function* streamJson<Key extends string, Value>(
+  stream: NodeJS.ReadableStream,
+): AsyncGenerator<{ key: Key; value: Value }> {
+  const pipeline = stream.pipe(StreamObject.withParser());
 
-export const parseJson = <Key extends string, Value, Result>(
-  provider: StreamProvider,
-  onItem: OnItem<Key, Value, Result>,
-): Promise<void> =>
-  new Promise((resolve, reject) => {
-    const pipeline = provider().pipe(StreamObject.withParser());
+  for await (const item of pipeline) {
+    yield item;
+  }
+}
 
-    pipeline.on("data", ({ key, value }: { key: Key; value: Value }) => {
-      try {
-        onItem(key, value);
-      } catch (error) {
-        pipeline.destroy();
-        reject(error instanceof Error ? error : new Error(String(error)));
-      }
-    });
-
-    pipeline.on("error", reject);
-    pipeline.on("end", resolve);
-  });
-
-export const withFileStreamProvider = <Key extends string, Value, Result>(
+export function streamJsonFile<Key extends string, Value>(
   filePath: string,
-  onItem: OnItem<Key, Value, Result>,
-) => parseJson<Key, Value, Result>(() => createReadStream(filePath), onItem);
+): AsyncGenerator<{ key: Key; value: Value }> {
+  return streamJson<Key, Value>(createReadStream(filePath));
+}

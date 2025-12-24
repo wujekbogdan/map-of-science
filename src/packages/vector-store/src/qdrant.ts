@@ -1,7 +1,12 @@
 import { QdrantClient } from "@qdrant/js-client-rest";
 import { randomUUID } from "node:crypto";
+import { v5 as uuidv5 } from "uuid";
 import { z } from "zod";
 import { buildFilter } from "./buildFilter.js";
+
+const NAMESPACE = "6ba7b810-9dad-11d1-80b4-00c04fd430c8";
+
+const toPointId = (id: string) => uuidv5(id, NAMESPACE);
 
 type UpsertParams = {
   id?: string;
@@ -232,9 +237,10 @@ export const createQdrantStore = (params: Params) => {
         metadata,
       } = upsertParamsSchema.parse(upsertParams);
       const id = providedId ?? randomUUID();
+      const pointId = providedId ? toPointId(providedId) : id;
       await ensureCollection();
       await client.upsert(params.collectionName, {
-        points: [{ id, vector: vectors, payload: metadata }],
+        points: [{ id: pointId, vector: vectors, payload: metadata }],
       });
       return { id };
     },
@@ -251,29 +257,32 @@ export const createQdrantStore = (params: Params) => {
     },
 
     async get(id: string) {
+      const pointId = toPointId(id);
       const response = await client.retrieve(params.collectionName, {
-        ids: [id],
+        ids: [pointId],
         with_payload: true,
         with_vector: true,
       });
       if (response.length === 0) return null;
       const parsed = pointSchema.parse(response[0]);
       return {
-        id: parsed.id,
+        id,
         vectors: parsed.vector,
         metadata: parsed.payload,
       };
     },
 
     async delete(id: string) {
+      const pointId = toPointId(id);
       await client.delete(params.collectionName, {
-        points: [id],
+        points: [pointId],
       });
     },
 
     async updateMetadata(id: string, metadata: Record<string, unknown>) {
+      const pointId = toPointId(id);
       await client.overwritePayload(params.collectionName, {
-        points: [id],
+        points: [pointId],
         payload: metadata,
       });
     },

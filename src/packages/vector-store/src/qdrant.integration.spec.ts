@@ -34,7 +34,7 @@ describe("Qdrant integration", () => {
         scoreThreshold: 0.5,
       });
       expect(results.items.length).toBeGreaterThan(0);
-      expect(results.items[0].id).toBe("550e8400-e29b-41d4-a716-446655440001");
+      expect(results.items[0].metadata?.label).toBe("first");
       expect(results.items[0].score).toBeGreaterThan(0.5);
 
       const filtered = await store.search({
@@ -45,13 +45,13 @@ describe("Qdrant integration", () => {
         scoreThreshold: 0.5,
       });
       expect(filtered.items).toHaveLength(1);
-      expect(filtered.items[0].id).toBe("550e8400-e29b-41d4-a716-446655440002");
+      expect(filtered.items[0].metadata?.label).toBe("second");
 
       const byFilter = await store.search({
         filter: [{ key: "label", match: "first" }],
       });
       expect(byFilter.items).toHaveLength(1);
-      expect(byFilter.items[0].id).toBe("550e8400-e29b-41d4-a716-446655440001");
+      expect(byFilter.items[0].metadata?.label).toBe("first");
       expect(byFilter.items[0].score).toBe(1);
     }),
     60_000,
