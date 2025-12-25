@@ -73,8 +73,11 @@ export const search = async (query: string, options: SearchOptions) => {
 
   const searchStart = performance.now();
   const response = await store.search({
-    using: config.vector,
-    vector: embedding,
+    query: {
+      type: "single",
+      using: config.vector,
+      vector: embedding,
+    },
     limit: config.limit,
   });
   const searchMs = performance.now() - searchStart;
