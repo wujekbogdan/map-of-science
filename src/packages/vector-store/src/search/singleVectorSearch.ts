@@ -1,19 +1,11 @@
-import type { QdrantClient } from "@qdrant/js-client-rest";
-import { z } from "zod";
 import { buildFilter } from "../buildFilter.js";
-import type {
+import { paginate } from "./paginate.js";
+import { parseSearchResult } from "./parseSearchResult.js";
+import {
   MatchFilter,
-  PaginatedSearchResult,
-  SingleVectorQuery,
+  PaginatedSearchResult, SearchDependencies,
+  SingleVectorQuery
 } from "./types.js";
-
-const metadataSchema = z.record(z.string(), z.unknown()).optional();
-
-const searchResultSchema = z.object({
-  id: z.union([z.string(), z.number()]).transform(String),
-  score: z.number(),
-  payload: metadataSchema,
-});
 
 type Params = {
   query: SingleVectorQuery;
@@ -22,14 +14,10 @@ type Params = {
   offset: number;
 };
 
-type Dependencies = {
-  client: QdrantClient;
-  collectionName: string;
-};
 
 export const singleVectorSearch = async (
   { query, filter, limit, offset }: Params,
-  { client, collectionName }: Dependencies,
+  { client, collectionName }: SearchDependencies,
 ): Promise<PaginatedSearchResult> => {
   const { using, vector, scoreThreshold = 0.5 } = query;
   const fetchLimit = limit + 1;
@@ -44,14 +32,6 @@ export const singleVectorSearch = async (
     with_payload: true,
   });
 
-  const items = response.map((item) => {
-    const parsed = searchResultSchema.parse(item);
-    return { id: parsed.id, score: parsed.score, metadata: parsed.payload };
-  });
-
-  const hasMore = items.length > limit;
-  return {
-    items: hasMore ? items.slice(0, limit) : items,
-    nextOffset: hasMore ? offset + limit : null,
-  };
+  const items = response.map(parseSearchResult);
+  return paginate({ items, limit, offset });
 };

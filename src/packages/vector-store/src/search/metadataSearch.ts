@@ -1,6 +1,6 @@
-import type { QdrantClient } from "@qdrant/js-client-rest";
 import { buildFilter } from "../buildFilter.js";
-import type { MatchFilter, PaginatedSearchResult } from "./types.js";
+import { parseScrollResult } from "./parseScrollResult.js";
+import { MatchFilter, PaginatedSearchResult, SearchDependencies } from "./types.js";
 
 type OrderBy = {
   key: string;
@@ -14,11 +14,6 @@ type Params = {
   orderBy?: OrderBy;
 };
 
-type Dependencies = {
-  client: QdrantClient;
-  collectionName: string;
-};
-
 const getStartFrom = (
   orderBy: OrderBy | undefined,
   offset: string | undefined,
@@ -30,7 +25,7 @@ const getStartFrom = (
 
 export const metadataSearch = async (
   { filter, limit, offset, orderBy }: Params,
-  { client, collectionName }: Dependencies,
+  { client, collectionName }: SearchDependencies,
 ): Promise<PaginatedSearchResult> => {
   const qdrantFilter = filter.length ? buildFilter(filter) : undefined;
   const fetchLimit = limit + 1;
@@ -51,11 +46,7 @@ export const metadataSearch = async (
       : undefined,
   });
 
-  const allItems = response.points.map((point) => ({
-    id: String(point.id),
-    score: 1,
-    metadata: point.payload as Record<string, unknown> | undefined,
-  }));
+  const allItems = response.points.map(parseScrollResult);
 
   if (orderBy) {
     const hasMore = allItems.length > limit;

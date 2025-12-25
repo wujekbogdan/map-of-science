@@ -7,11 +7,11 @@ const VECTOR_NAME = "embedding";
 
 describe("Qdrant integration", () => {
   it(
-    "should upsert and search vectors",
+    "should upsert vectors",
     withQdrantContainer(async (qdrant) => {
       const store = createQdrantStore({
         url: qdrant.url,
-        collectionName: "test-integration",
+        collectionName: "test-upsert",
         vectors: { [VECTOR_NAME]: { size: 3 } },
       });
 
@@ -21,44 +21,8 @@ describe("Qdrant integration", () => {
         metadata: { label: "first" },
       });
 
-      await store.upsert({
-        id: "550e8400-e29b-41d4-a716-446655440002",
-        vectors: { [VECTOR_NAME]: [0, 1, 0] },
-        metadata: { label: "second" },
-      });
-
-      const results = await store.search({
-        query: {
-          type: "single",
-          using: VECTOR_NAME,
-          vector: [0.9, 0.1, 0],
-          scoreThreshold: 0.5,
-        },
-        limit: 10,
-      });
-      expect(results.items.length).toBeGreaterThan(0);
-      expect(results.items[0].metadata?.label).toBe("first");
-      expect(results.items[0].score).toBeGreaterThan(0.5);
-
-      const filtered = await store.search({
-        query: {
-          type: "single",
-          using: VECTOR_NAME,
-          vector: [0.1, 0.9, 0],
-          scoreThreshold: 0.5,
-        },
-        filter: [{ key: "label", match: "second" }],
-        limit: 10,
-      });
-      expect(filtered.items).toHaveLength(1);
-      expect(filtered.items[0].metadata?.label).toBe("second");
-
-      const byFilter = await store.search({
-        filter: [{ key: "label", match: "first" }],
-      });
-      expect(byFilter.items).toHaveLength(1);
-      expect(byFilter.items[0].metadata?.label).toBe("first");
-      expect(byFilter.items[0].score).toBe(1);
+      const result = await store.get("550e8400-e29b-41d4-a716-446655440001");
+      expect(result?.metadata?.label).toBe("first");
     }),
     60_000,
   );
@@ -191,434 +155,544 @@ describe("Qdrant integration", () => {
     }),
   );
 
-  it(
-    "should paginate vector search results",
-    withQdrantContainer(async (qdrant) => {
-      const store = createQdrantStore({
-        url: qdrant.url,
-        collectionName: "test-pagination-vector",
-        vectors: { [VECTOR_NAME]: { size: 3 } },
-      });
+  describe("search", () => {
+    describe("single vector", () => {
+      it(
+        "finds similar vectors with filter",
+        withQdrantContainer(async (qdrant) => {
+          const store = createQdrantStore({
+            url: qdrant.url,
+            collectionName: "test-single-vector",
+            vectors: { [VECTOR_NAME]: { size: 3 } },
+          });
 
-      await Promise.all([
-        store.upsert({
-          id: "550e8400-e29b-41d4-a716-446655440051",
-          vectors: { [VECTOR_NAME]: [1, 0, 0] },
+          await store.upsert({
+            id: "point-1",
+            vectors: { [VECTOR_NAME]: [1, 0, 0] },
+            metadata: { label: "first" },
+          });
+          await store.upsert({
+            id: "point-2",
+            vectors: { [VECTOR_NAME]: [0.9, 0.1, 0] },
+            metadata: { label: "second" },
+          });
+
+          const results = await store.search({
+            query: {
+              type: "single",
+              using: VECTOR_NAME,
+              vector: [1, 0, 0],
+              scoreThreshold: 0.5,
+            },
+            limit: 10,
+          });
+          expect(results.items[0].metadata?.label).toBe("first");
+          expect(results.items[0].score).toBeGreaterThan(0.5);
+
+          const filtered = await store.search({
+            query: {
+              type: "single",
+              using: VECTOR_NAME,
+              vector: [1, 0, 0],
+              scoreThreshold: 0.5,
+            },
+            filter: [{ key: "label", match: "second" }],
+            limit: 10,
+          });
+          expect(filtered.items).toHaveLength(1);
+          expect(filtered.items[0].metadata?.label).toBe("second");
         }),
-        store.upsert({
-          id: "550e8400-e29b-41d4-a716-446655440052",
-          vectors: { [VECTOR_NAME]: [0.9, 0.1, 0] },
+        60_000,
+      );
+
+      it(
+        "paginates results",
+        withQdrantContainer(async (qdrant) => {
+          const store = createQdrantStore({
+            url: qdrant.url,
+            collectionName: "test-single-pagination",
+            vectors: { [VECTOR_NAME]: { size: 3 } },
+          });
+
+          await Promise.all([
+            store.upsert({
+              id: "point-1",
+              vectors: { [VECTOR_NAME]: [1, 0, 0] },
+            }),
+            store.upsert({
+              id: "point-2",
+              vectors: { [VECTOR_NAME]: [0.9, 0.1, 0] },
+            }),
+            store.upsert({
+              id: "point-3",
+              vectors: { [VECTOR_NAME]: [0.8, 0.2, 0] },
+            }),
+          ]);
+
+          const page1 = await store.search({
+            query: {
+              type: "single",
+              using: VECTOR_NAME,
+              vector: [1, 0, 0],
+              scoreThreshold: 0.5,
+            },
+            limit: 2,
+          });
+          expect(page1.items).toHaveLength(2);
+          expect(page1.nextOffset).toBe(2);
+
+          const page2 = await store.search({
+            query: {
+              type: "single",
+              using: VECTOR_NAME,
+              vector: [1, 0, 0],
+              scoreThreshold: 0.5,
+            },
+            limit: 2,
+            offset: page1.nextOffset as number,
+          });
+          expect(page2.items).toHaveLength(1);
+          expect(page2.nextOffset).toBeNull();
         }),
-        store.upsert({
-          id: "550e8400-e29b-41d4-a716-446655440053",
-          vectors: { [VECTOR_NAME]: [0.8, 0.2, 0] },
-        }),
-      ]);
+        60_000,
+      );
+    });
 
-      const page1 = await store.search({
-        query: {
-          type: "single",
-          using: VECTOR_NAME,
-          vector: [1, 0, 0],
-          scoreThreshold: 0.5,
-        },
-        limit: 2,
-      });
-      expect(page1.items).toHaveLength(2);
-      expect(page1.nextOffset).toBe(2);
+    describe("multi vector", () => {
+      it(
+        "rrf boosts items appearing in both result lists",
+        withQdrantContainer(async (qdrant) => {
+          const store = createQdrantStore({
+            url: qdrant.url,
+            collectionName: "test-rrf",
+            vectors: { primary: { size: 3 }, secondary: { size: 3 } },
+          });
 
-      const page2 = await store.search({
-        query: {
-          type: "single",
-          using: VECTOR_NAME,
-          vector: [1, 0, 0],
-          scoreThreshold: 0.5,
-        },
-        limit: 2,
-        offset: page1.nextOffset as number,
-      });
-      expect(page2.items).toHaveLength(1);
-      expect(page2.nextOffset).toBeNull();
-    }),
-    60_000,
-  );
+          // Point A: high primary score, low secondary score
+          await store.upsert({
+            id: "point-a",
+            vectors: { primary: [1, 0, 0], secondary: [0, 0, 1] },
+            metadata: { label: "A" },
+          });
 
-  it(
-    "should paginate filter-only search results using PointId offset",
-    withQdrantContainer(async (qdrant) => {
-      const store = createQdrantStore({
-        url: qdrant.url,
-        collectionName: `test-pagination-filter-${Date.now()}`,
-        vectors: { [VECTOR_NAME]: { size: 3 } },
-      });
+          // Point B: low primary score, high secondary score
+          await store.upsert({
+            id: "point-b",
+            vectors: { primary: [0, 0, 1], secondary: [1, 0, 0] },
+            metadata: { label: "B" },
+          });
 
-      await Promise.all([
-        store.upsert({
-          id: "550e8400-e29b-41d4-a716-446655440021",
-          vectors: { [VECTOR_NAME]: [1, 0, 0] },
-          metadata: { type: "a" },
-        }),
-        store.upsert({
-          id: "550e8400-e29b-41d4-a716-446655440022",
-          vectors: { [VECTOR_NAME]: [0, 1, 0] },
-          metadata: { type: "a" },
-        }),
-        store.upsert({
-          id: "550e8400-e29b-41d4-a716-446655440023",
-          vectors: { [VECTOR_NAME]: [0, 0, 1] },
-          metadata: { type: "a" },
-        }),
-      ]);
+          // Point C: medium scores on both
+          await store.upsert({
+            id: "point-c",
+            vectors: { primary: [0.7, 0.3, 0], secondary: [0.7, 0.3, 0] },
+            metadata: { label: "C" },
+          });
 
-      const page1 = await store.search({
-        filter: [{ key: "type", match: "a" }],
-        limit: 2,
-      });
-      expect(page1.items).toHaveLength(2);
-      expect(typeof page1.nextOffset).toBe("string");
-
-      const page2 = await store.search({
-        filter: [{ key: "type", match: "a" }],
-        limit: 2,
-        offset: page1.nextOffset as string,
-      });
-      expect(page2.items).toHaveLength(1);
-      expect(page2.nextOffset).toBeNull();
-      expect(page2.items[0].id).not.toBe(page1.items[0].id);
-      expect(page2.items[0].id).not.toBe(page1.items[1].id);
-    }),
-    60_000,
-  );
-
-  it(
-    "should order filter-only search results by payload field",
-    withQdrantContainer(async (qdrant) => {
-      const store = createQdrantStore({
-        url: qdrant.url,
-        collectionName: `test-order-by-${Date.now()}`,
-        vectors: { [VECTOR_NAME]: { size: 3 } },
-        payloadIndexes: [{ field: "createdAt", type: "integer" }],
-      });
-
-      await store.upsert({
-        id: "550e8400-e29b-41d4-a716-446655440031",
-        vectors: { [VECTOR_NAME]: [1, 0, 0] },
-        metadata: { createdAt: 200 },
-      });
-      await store.upsert({
-        id: "550e8400-e29b-41d4-a716-446655440032",
-        vectors: { [VECTOR_NAME]: [0, 1, 0] },
-        metadata: { createdAt: 100 },
-      });
-      await store.upsert({
-        id: "550e8400-e29b-41d4-a716-446655440033",
-        vectors: { [VECTOR_NAME]: [0, 0, 1] },
-        metadata: { createdAt: 300 },
-      });
-
-      const ascResults = await store.search({
-        filter: [],
-        orderBy: { key: "createdAt", direction: "asc" },
-      });
-      expect(ascResults.items.map((i) => i.metadata?.createdAt)).toEqual([
-        100, 200, 300,
-      ]);
-
-      const descResults = await store.search({
-        filter: [],
-        orderBy: { key: "createdAt", direction: "desc" },
-      });
-      expect(descResults.items.map((i) => i.metadata?.createdAt)).toEqual([
-        300, 200, 100,
-      ]);
-    }),
-    60_000,
-  );
-
-  it.each([
-    { direction: "desc" as const, firstPage: [300, 200], lastItem: 100 },
-    { direction: "asc" as const, firstPage: [100, 200], lastItem: 300 },
-  ])(
-    "should paginate filter-only search with orderBy $direction",
-    async ({ direction, firstPage, lastItem }) => {
-      await withQdrantContainer(async (qdrant) => {
-        const store = createQdrantStore({
-          url: qdrant.url,
-          collectionName: `test-orderby-pagination-${direction}-${Date.now()}`,
-          vectors: { [VECTOR_NAME]: { size: 3 } },
-          payloadIndexes: [{ field: "createdAt", type: "integer" }],
-        });
-
-        await store.upsert({
-          id: "550e8400-e29b-41d4-a716-446655440041",
-          vectors: { [VECTOR_NAME]: [1, 0, 0] },
-          metadata: { createdAt: 300 },
-        });
-        await store.upsert({
-          id: "550e8400-e29b-41d4-a716-446655440042",
-          vectors: { [VECTOR_NAME]: [0, 1, 0] },
-          metadata: { createdAt: 200 },
-        });
-        await store.upsert({
-          id: "550e8400-e29b-41d4-a716-446655440043",
-          vectors: { [VECTOR_NAME]: [0, 0, 1] },
-          metadata: { createdAt: 100 },
-        });
-
-        const page1 = await store.search({
-          filter: [],
-          limit: 2,
-          orderBy: { key: "createdAt", direction },
-        });
-        expect(page1.items).toHaveLength(2);
-        expect(page1.items.map((i) => i.metadata?.createdAt)).toEqual(
-          firstPage,
-        );
-        expect(page1.nextOffset).not.toBeNull();
-
-        const page2 = await store.search({
-          filter: [],
-          limit: 2,
-          offset: page1.nextOffset as string,
-          orderBy: { key: "createdAt", direction },
-        });
-        expect(page2.items).toHaveLength(1);
-        expect(page2.items[0].metadata?.createdAt).toBe(lastItem);
-        expect(page2.nextOffset).toBeNull();
-      })();
-    },
-    60_000,
-  );
-
-  describe("multiVectorSearch", () => {
-    it(
-      "should combine results from multiple vectors using RRF fusion",
-      withQdrantContainer(async (qdrant) => {
-        const store = createQdrantStore({
-          url: qdrant.url,
-          collectionName: "test-hybrid-rrf",
-          vectors: {
-            primary: { size: 3 },
-            secondary: { size: 3 },
-          },
-        });
-
-        // Point A: high primary score, low secondary score
-        await store.upsert({
-          id: "point-a",
-          vectors: {
-            primary: [1, 0, 0],
-            secondary: [0, 0, 1],
-          },
-          metadata: { label: "A" },
-        });
-
-        // Point B: low primary score, high secondary score
-        await store.upsert({
-          id: "point-b",
-          vectors: {
-            primary: [0, 0, 1],
-            secondary: [1, 0, 0],
-          },
-          metadata: { label: "B" },
-        });
-
-        // Point C: medium scores on both
-        await store.upsert({
-          id: "point-c",
-          vectors: {
-            primary: [0.7, 0.3, 0],
-            secondary: [0.7, 0.3, 0],
-          },
-          metadata: { label: "C" },
-        });
-
-        const queryVector = [1, 0, 0];
-
-        const results = await store.search({
-          query: {
-            type: "multi",
-            prefetch: [
-              { vector: queryVector, using: "primary", limit: 10 },
-              { vector: queryVector, using: "secondary", limit: 10 },
-            ],
-            fusion: { type: "rrf" },
-          },
-          limit: 3,
-        });
-
-        expect(results.items).toHaveLength(3);
-        // With RRF, items appearing high in both lists get boosted
-        // Point C should rank well as it scores decently on both vectors
-        expect(results.items.map((r) => r.metadata?.label)).toContain("C");
-      }),
-      60_000,
-    );
-
-    it(
-      "should apply weighted sum fusion with custom weights",
-      withQdrantContainer(async (qdrant) => {
-        const store = createQdrantStore({
-          url: qdrant.url,
-          collectionName: "test-hybrid-weighted",
-          vectors: {
-            primary: { size: 3 },
-            secondary: { size: 3 },
-          },
-        });
-
-        await store.upsert({
-          id: "point-a",
-          vectors: {
-            primary: [1, 0, 0],
-            secondary: [0, 1, 0],
-          },
-          metadata: { label: "A" },
-        });
-
-        await store.upsert({
-          id: "point-b",
-          vectors: {
-            primary: [0, 1, 0],
-            secondary: [1, 0, 0],
-          },
-          metadata: { label: "B" },
-        });
-
-        const queryVector = [1, 0, 0];
-
-        // Heavy weight on primary (0.9) should favor point A
-        const primaryWeighted = await store.search({
-          query: {
-            type: "multi",
-            prefetch: [
-              { vector: queryVector, using: "primary", limit: 10 },
-              { vector: queryVector, using: "secondary", limit: 10 },
-            ],
-            fusion: { type: "weightedSum", weights: [0.9, 0.1] },
-          },
-          limit: 2,
-        });
-
-        expect(primaryWeighted.items[0].metadata?.label).toBe("A");
-
-        // Heavy weight on secondary (0.9) should favor point B
-        const secondaryWeighted = await store.search({
-          query: {
-            type: "multi",
-            prefetch: [
-              { vector: queryVector, using: "primary", limit: 10 },
-              { vector: queryVector, using: "secondary", limit: 10 },
-            ],
-            fusion: { type: "weightedSum", weights: [0.1, 0.9] },
-          },
-          limit: 2,
-        });
-
-        expect(secondaryWeighted.items[0].metadata?.label).toBe("B");
-      }),
-      60_000,
-    );
-
-    it(
-      "should throw when prefetch limit is less than limit + offset",
-      withQdrantContainer(async (qdrant) => {
-        const store = createQdrantStore({
-          url: qdrant.url,
-          collectionName: "test-hybrid-limit-validation",
-          vectors: { primary: { size: 3 }, secondary: { size: 3 } },
-        });
-
-        await expect(
-          store.search({
+          const results = await store.search({
             query: {
               type: "multi",
               prefetch: [
-                { vector: [1, 0, 0], using: "primary", limit: 5 },
-                { vector: [1, 0, 0], using: "secondary", limit: 8 },
+                { vector: [1, 0, 0], using: "primary", limit: 10 },
+                { vector: [1, 0, 0], using: "secondary", limit: 10 },
               ],
               fusion: { type: "rrf" },
             },
-            limit: 10,
-          }),
-        ).rejects.toThrow(
-          'Prefetch limits "primary" (5), "secondary" (8) must be >= limit + offset (10)',
-        );
-      }),
-      60_000,
-    );
+            limit: 3,
+          });
 
-    it(
-      "should paginate multi-vector search results",
-      withQdrantContainer(async (qdrant) => {
-        const store = createQdrantStore({
-          url: qdrant.url,
-          collectionName: "test-hybrid-pagination",
-          vectors: {
-            primary: { size: 3 },
-            secondary: { size: 3 },
-          },
-        });
+          expect(results.items).toHaveLength(3);
+          // With RRF, items appearing high in both lists get boosted
+          // Point C should rank well as it scores decently on both vectors
+          expect(results.items.map((r) => r.metadata?.label)).toContain("C");
+        }),
+        60_000,
+      );
 
-        await Promise.all([
-          store.upsert({
-            id: "point-1",
+      it(
+        "dbsf combines normalized scores",
+        withQdrantContainer(async (qdrant) => {
+          const store = createQdrantStore({
+            url: qdrant.url,
+            collectionName: "test-dbsf",
+            vectors: { primary: { size: 3 }, secondary: { size: 3 } },
+          });
+
+          await store.upsert({
+            id: "point-a",
+            vectors: { primary: [1, 0, 0], secondary: [0.5, 0.5, 0] },
+            metadata: { label: "A" },
+          });
+          await store.upsert({
+            id: "point-b",
+            vectors: { primary: [0.5, 0.5, 0], secondary: [1, 0, 0] },
+            metadata: { label: "B" },
+          });
+
+          const results = await store.search({
+            query: {
+              type: "multi",
+              prefetch: [
+                { vector: [1, 0, 0], using: "primary", limit: 10 },
+                { vector: [1, 0, 0], using: "secondary", limit: 10 },
+              ],
+              fusion: { type: "dbsf" },
+            },
+            limit: 2,
+          });
+
+          expect(results.items).toHaveLength(2);
+        }),
+        60_000,
+      );
+
+      it(
+        "weightedSum favors vector with higher weight",
+        withQdrantContainer(async (qdrant) => {
+          const store = createQdrantStore({
+            url: qdrant.url,
+            collectionName: "test-weighted-sum",
+            vectors: { primary: { size: 3 }, secondary: { size: 3 } },
+          });
+
+          await store.upsert({
+            id: "point-a",
+            vectors: { primary: [1, 0, 0], secondary: [0, 1, 0] },
+            metadata: { label: "A" },
+          });
+          await store.upsert({
+            id: "point-b",
+            vectors: { primary: [0, 1, 0], secondary: [1, 0, 0] },
+            metadata: { label: "B" },
+          });
+
+          const queryVector = [1, 0, 0];
+
+          const primaryWeighted = await store.search({
+            query: {
+              type: "multi",
+              prefetch: [
+                { vector: queryVector, using: "primary", limit: 10 },
+                { vector: queryVector, using: "secondary", limit: 10 },
+              ],
+              fusion: { type: "weightedSum", weights: [0.9, 0.1] },
+            },
+            limit: 2,
+          });
+          expect(primaryWeighted.items[0].metadata?.label).toBe("A");
+
+          const secondaryWeighted = await store.search({
+            query: {
+              type: "multi",
+              prefetch: [
+                { vector: queryVector, using: "primary", limit: 10 },
+                { vector: queryVector, using: "secondary", limit: 10 },
+              ],
+              fusion: { type: "weightedSum", weights: [0.1, 0.9] },
+            },
+            limit: 2,
+          });
+          expect(secondaryWeighted.items[0].metadata?.label).toBe("B");
+        }),
+        60_000,
+      );
+
+      it(
+        "applies filter",
+        withQdrantContainer(async (qdrant) => {
+          const store = createQdrantStore({
+            url: qdrant.url,
+            collectionName: "test-multi-filter",
+            vectors: { primary: { size: 3 }, secondary: { size: 3 } },
+          });
+
+          await store.upsert({
+            id: "point-a",
             vectors: { primary: [1, 0, 0], secondary: [1, 0, 0] },
-            metadata: { order: 1 },
-          }),
-          store.upsert({
-            id: "point-2",
+            metadata: { category: "x" },
+          });
+          await store.upsert({
+            id: "point-b",
             vectors: { primary: [0.9, 0.1, 0], secondary: [0.9, 0.1, 0] },
-            metadata: { order: 2 },
-          }),
-          store.upsert({
-            id: "point-3",
-            vectors: { primary: [0.8, 0.2, 0], secondary: [0.8, 0.2, 0] },
-            metadata: { order: 3 },
-          }),
-        ]);
+            metadata: { category: "y" },
+          });
 
-        const queryVector = [1, 0, 0];
+          const results = await store.search({
+            query: {
+              type: "multi",
+              prefetch: [
+                { vector: [1, 0, 0], using: "primary", limit: 10 },
+                { vector: [1, 0, 0], using: "secondary", limit: 10 },
+              ],
+              fusion: { type: "rrf" },
+            },
+            filter: [{ key: "category", match: "y" }],
+            limit: 10,
+          });
 
-        const page1 = await store.search({
-          query: {
-            type: "multi",
-            prefetch: [
-              { vector: queryVector, using: "primary", limit: 10 },
-              { vector: queryVector, using: "secondary", limit: 10 },
-            ],
-            fusion: { type: "rrf" },
-          },
-          limit: 2,
-        });
+          expect(results.items).toHaveLength(1);
+          expect(results.items[0].metadata?.category).toBe("y");
+        }),
+        60_000,
+      );
 
-        expect(page1.items).toHaveLength(2);
-        expect(page1.nextOffset).toBe(2);
+      it(
+        "throws when prefetch limit < limit + offset",
+        withQdrantContainer(async (qdrant) => {
+          const store = createQdrantStore({
+            url: qdrant.url,
+            collectionName: "test-limit-validation",
+            vectors: { primary: { size: 3 }, secondary: { size: 3 } },
+          });
 
-        const page2 = await store.search({
-          query: {
-            type: "multi",
-            prefetch: [
-              { vector: queryVector, using: "primary", limit: 10 },
-              { vector: queryVector, using: "secondary", limit: 10 },
-            ],
-            fusion: { type: "rrf" },
-          },
-          limit: 2,
-          offset: page1.nextOffset as number,
-        });
+          await expect(
+            store.search({
+              query: {
+                type: "multi",
+                prefetch: [
+                  { vector: [1, 0, 0], using: "primary", limit: 5 },
+                  { vector: [1, 0, 0], using: "secondary", limit: 8 },
+                ],
+                fusion: { type: "rrf" },
+              },
+              limit: 10,
+            }),
+          ).rejects.toThrow(/Prefetch limits .* must be >= limit \+ offset/);
+        }),
+        60_000,
+      );
 
-        expect(page2.items).toHaveLength(1);
-        expect(page2.nextOffset).toBeNull();
+      it(
+        "paginates results",
+        withQdrantContainer(async (qdrant) => {
+          const store = createQdrantStore({
+            url: qdrant.url,
+            collectionName: "test-multi-pagination",
+            vectors: { primary: { size: 3 }, secondary: { size: 3 } },
+          });
 
-        // Ensure no duplicate items between pages
-        const page1Ids = page1.items.map((i: { id: string }) => i.id);
-        const page2Ids = page2.items.map((i: { id: string }) => i.id);
-        expect(page1Ids.some((id: string) => page2Ids.includes(id))).toBe(
-          false,
-        );
-      }),
-      60_000,
-    );
+          await Promise.all([
+            store.upsert({
+              id: "point-1",
+              vectors: { primary: [1, 0, 0], secondary: [1, 0, 0] },
+            }),
+            store.upsert({
+              id: "point-2",
+              vectors: { primary: [0.9, 0.1, 0], secondary: [0.9, 0.1, 0] },
+            }),
+            store.upsert({
+              id: "point-3",
+              vectors: { primary: [0.8, 0.2, 0], secondary: [0.8, 0.2, 0] },
+            }),
+          ]);
+
+          const page1 = await store.search({
+            query: {
+              type: "multi",
+              prefetch: [
+                { vector: [1, 0, 0], using: "primary", limit: 10 },
+                { vector: [1, 0, 0], using: "secondary", limit: 10 },
+              ],
+              fusion: { type: "rrf" },
+            },
+            limit: 2,
+          });
+          expect(page1.items).toHaveLength(2);
+          expect(page1.nextOffset).toBe(2);
+
+          const page2 = await store.search({
+            query: {
+              type: "multi",
+              prefetch: [
+                { vector: [1, 0, 0], using: "primary", limit: 10 },
+                { vector: [1, 0, 0], using: "secondary", limit: 10 },
+              ],
+              fusion: { type: "rrf" },
+            },
+            limit: 2,
+            offset: page1.nextOffset as number,
+          });
+          expect(page2.items).toHaveLength(1);
+          expect(page2.nextOffset).toBeNull();
+
+          const allIds = [...page1.items, ...page2.items].map((i) => i.id);
+          expect(new Set(allIds).size).toBe(3);
+        }),
+        60_000,
+      );
+    });
+
+    describe("metadata", () => {
+      it(
+        "finds by filter",
+        withQdrantContainer(async (qdrant) => {
+          const store = createQdrantStore({
+            url: qdrant.url,
+            collectionName: "test-metadata-filter",
+            vectors: { [VECTOR_NAME]: { size: 3 } },
+          });
+
+          await store.upsert({
+            id: "point-1",
+            vectors: { [VECTOR_NAME]: [1, 0, 0] },
+            metadata: { label: "first" },
+          });
+
+          const results = await store.search({
+            filter: [{ key: "label", match: "first" }],
+          });
+
+          expect(results.items).toHaveLength(1);
+          expect(results.items[0].metadata?.label).toBe("first");
+          expect(results.items[0].score).toBe(1);
+        }),
+        60_000,
+      );
+
+      it(
+        "paginates using PointId offset",
+        withQdrantContainer(async (qdrant) => {
+          const store = createQdrantStore({
+            url: qdrant.url,
+            collectionName: "test-metadata-pagination",
+            vectors: { [VECTOR_NAME]: { size: 3 } },
+          });
+
+          await Promise.all([
+            store.upsert({
+              id: "550e8400-e29b-41d4-a716-446655440021",
+              vectors: { [VECTOR_NAME]: [1, 0, 0] },
+              metadata: { type: "a" },
+            }),
+            store.upsert({
+              id: "550e8400-e29b-41d4-a716-446655440022",
+              vectors: { [VECTOR_NAME]: [0, 1, 0] },
+              metadata: { type: "a" },
+            }),
+            store.upsert({
+              id: "550e8400-e29b-41d4-a716-446655440023",
+              vectors: { [VECTOR_NAME]: [0, 0, 1] },
+              metadata: { type: "a" },
+            }),
+          ]);
+
+          const page1 = await store.search({
+            filter: [{ key: "type", match: "a" }],
+            limit: 2,
+          });
+          expect(page1.items).toHaveLength(2);
+          expect(typeof page1.nextOffset).toBe("string");
+
+          const page2 = await store.search({
+            filter: [{ key: "type", match: "a" }],
+            limit: 2,
+            offset: page1.nextOffset as string,
+          });
+          expect(page2.items).toHaveLength(1);
+          expect(page2.nextOffset).toBeNull();
+
+          const allIds = [...page1.items, ...page2.items].map((i) => i.id);
+          expect(new Set(allIds).size).toBe(3);
+        }),
+        60_000,
+      );
+
+      it.each([
+        { direction: "asc" as const, expected: [100, 200, 300] },
+        { direction: "desc" as const, expected: [300, 200, 100] },
+      ])(
+        "orders by payload field $direction",
+        async ({ direction, expected }) => {
+          await withQdrantContainer(async (qdrant) => {
+            const store = createQdrantStore({
+              url: qdrant.url,
+              collectionName: `test-orderby-${direction}`,
+              vectors: { [VECTOR_NAME]: { size: 3 } },
+              payloadIndexes: [{ field: "createdAt", type: "integer" }],
+            });
+
+            await store.upsert({
+              id: "point-1",
+              vectors: { [VECTOR_NAME]: [1, 0, 0] },
+              metadata: { createdAt: 200 },
+            });
+            await store.upsert({
+              id: "point-2",
+              vectors: { [VECTOR_NAME]: [0, 1, 0] },
+              metadata: { createdAt: 100 },
+            });
+            await store.upsert({
+              id: "point-3",
+              vectors: { [VECTOR_NAME]: [0, 0, 1] },
+              metadata: { createdAt: 300 },
+            });
+
+            const results = await store.search({
+              filter: [],
+              orderBy: { key: "createdAt", direction },
+            });
+
+            expect(results.items.map((i) => i.metadata?.createdAt)).toEqual(
+              expected,
+            );
+          })();
+        },
+        60_000,
+      );
+
+      it.each([
+        { direction: "desc" as const, firstPage: [300, 200], lastItem: 100 },
+        { direction: "asc" as const, firstPage: [100, 200], lastItem: 300 },
+      ])(
+        "paginates with orderBy $direction",
+        async ({ direction, firstPage, lastItem }) => {
+          await withQdrantContainer(async (qdrant) => {
+            const store = createQdrantStore({
+              url: qdrant.url,
+              collectionName: `test-orderby-pagination-${direction}`,
+              vectors: { [VECTOR_NAME]: { size: 3 } },
+              payloadIndexes: [{ field: "createdAt", type: "integer" }],
+            });
+
+            await store.upsert({
+              id: "point-1",
+              vectors: { [VECTOR_NAME]: [1, 0, 0] },
+              metadata: { createdAt: 300 },
+            });
+            await store.upsert({
+              id: "point-2",
+              vectors: { [VECTOR_NAME]: [0, 1, 0] },
+              metadata: { createdAt: 200 },
+            });
+            await store.upsert({
+              id: "point-3",
+              vectors: { [VECTOR_NAME]: [0, 0, 1] },
+              metadata: { createdAt: 100 },
+            });
+
+            const page1 = await store.search({
+              filter: [],
+              limit: 2,
+              orderBy: { key: "createdAt", direction },
+            });
+            expect(page1.items.map((i) => i.metadata?.createdAt)).toEqual(
+              firstPage,
+            );
+            expect(page1.nextOffset).not.toBeNull();
+
+            const page2 = await store.search({
+              filter: [],
+              limit: 2,
+              offset: page1.nextOffset as string,
+              orderBy: { key: "createdAt", direction },
+            });
+            expect(page2.items).toHaveLength(1);
+            expect(page2.items[0].metadata?.createdAt).toBe(lastItem);
+            expect(page2.nextOffset).toBeNull();
+          })();
+        },
+        60_000,
+      );
+    });
   });
 });

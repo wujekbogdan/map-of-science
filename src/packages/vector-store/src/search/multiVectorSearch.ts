@@ -1,30 +1,17 @@
-import type { QdrantClient } from "@qdrant/js-client-rest";
-import { z } from "zod";
 import { buildFilter } from "../buildFilter.js";
-import type {
+import { paginate } from "./paginate.js";
+import { parseSearchResult } from "./parseSearchResult.js";
+import {
   MatchFilter,
   MultiVectorQuery,
-  PaginatedSearchResult,
+  PaginatedSearchResult, SearchDependencies
 } from "./types.js";
-
-const metadataSchema = z.record(z.string(), z.unknown()).optional();
-
-const searchResultSchema = z.object({
-  id: z.union([z.string(), z.number()]).transform(String),
-  score: z.number(),
-  payload: metadataSchema,
-});
 
 type Params = {
   query: MultiVectorQuery;
   filter?: MatchFilter[];
   limit: number;
   offset: number;
-};
-
-type Dependencies = {
-  client: QdrantClient;
-  collectionName: string;
 };
 
 const validatePrefetchLimits = (
@@ -60,7 +47,7 @@ const buildFusionQuery = (fusion: MultiVectorQuery["fusion"]) => {
 
 export const multiVectorSearch = async (
   { query, filter, limit, offset }: Params,
-  { client, collectionName }: Dependencies,
+  { client, collectionName }: SearchDependencies,
 ): Promise<PaginatedSearchResult> => {
   const { prefetch, fusion, scoreThreshold } = query;
 
@@ -86,14 +73,6 @@ export const multiVectorSearch = async (
     with_payload: true,
   });
 
-  const items = response.points.map((item) => {
-    const parsed = searchResultSchema.parse(item);
-    return { id: parsed.id, score: parsed.score, metadata: parsed.payload };
-  });
-
-  const hasMore = items.length > limit;
-  return {
-    items: hasMore ? items.slice(0, limit) : items,
-    nextOffset: hasMore ? offset + limit : null,
-  };
+  const items = response.points.map(parseSearchResult);
+  return paginate({ items, limit, offset });
 };

@@ -1,3 +1,6 @@
+import { z } from "zod";
+import type { QdrantClient } from "@qdrant/js-client-rest";
+
 export type MatchFilter = {
   key: string;
   match: string | number | boolean;
@@ -90,3 +93,19 @@ type MetadataSearchParams = {
 };
 
 export type SearchParams = VectorSearchParams | MetadataSearchParams;
+
+export type SearchDependencies = {
+  client: QdrantClient;
+  collectionName: string;
+};
+
+export const metadataSchema = z.record(z.string(), z.unknown()).optional();
+
+export const pointSchema = z.object({
+  id: z.union([z.string(), z.number()]).transform(String),
+  payload: metadataSchema,
+});
+
+export const searchResultSchema = pointSchema.extend({
+  score: z.number(),
+});
