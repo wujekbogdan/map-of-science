@@ -1,5 +1,5 @@
 import { groupBy } from "es-toolkit";
-import type { MatchFilter } from "./qdrant.js";
+import type { MatchFilter } from "./search/types.js";
 
 const toCondition = ({ key, match }: MatchFilter) => ({
   key,

@@ -28,21 +28,27 @@ describe("Qdrant integration", () => {
       });
 
       const results = await store.search({
-        using: VECTOR_NAME,
-        vector: [0.9, 0.1, 0],
+        query: {
+          type: "single",
+          using: VECTOR_NAME,
+          vector: [0.9, 0.1, 0],
+          scoreThreshold: 0.5,
+        },
         limit: 10,
-        scoreThreshold: 0.5,
       });
       expect(results.items.length).toBeGreaterThan(0);
       expect(results.items[0].metadata?.label).toBe("first");
       expect(results.items[0].score).toBeGreaterThan(0.5);
 
       const filtered = await store.search({
-        using: VECTOR_NAME,
-        vector: [0.1, 0.9, 0],
+        query: {
+          type: "single",
+          using: VECTOR_NAME,
+          vector: [0.1, 0.9, 0],
+          scoreThreshold: 0.5,
+        },
         filter: [{ key: "label", match: "second" }],
         limit: 10,
-        scoreThreshold: 0.5,
       });
       expect(filtered.items).toHaveLength(1);
       expect(filtered.items[0].metadata?.label).toBe("second");
@@ -210,20 +216,26 @@ describe("Qdrant integration", () => {
       ]);
 
       const page1 = await store.search({
-        using: VECTOR_NAME,
-        vector: [1, 0, 0],
+        query: {
+          type: "single",
+          using: VECTOR_NAME,
+          vector: [1, 0, 0],
+          scoreThreshold: 0.5,
+        },
         limit: 2,
-        scoreThreshold: 0.5,
       });
       expect(page1.items).toHaveLength(2);
       expect(page1.nextOffset).toBe(2);
 
       const page2 = await store.search({
-        using: VECTOR_NAME,
-        vector: [1, 0, 0],
+        query: {
+          type: "single",
+          using: VECTOR_NAME,
+          vector: [1, 0, 0],
+          scoreThreshold: 0.5,
+        },
         limit: 2,
         offset: page1.nextOffset as number,
-        scoreThreshold: 0.5,
       });
       expect(page2.items).toHaveLength(1);
       expect(page2.nextOffset).toBeNull();
@@ -378,7 +390,7 @@ describe("Qdrant integration", () => {
     60_000,
   );
 
-  describe("hybridSearch", () => {
+  describe("multiVectorSearch", () => {
     it(
       "should combine results from multiple vectors using RRF fusion",
       withQdrantContainer(async (qdrant) => {
@@ -423,12 +435,15 @@ describe("Qdrant integration", () => {
 
         const queryVector = [1, 0, 0];
 
-        const results = await store.hybridSearch({
-          prefetch: [
-            { vector: queryVector, using: "primary", limit: 10 },
-            { vector: queryVector, using: "secondary", limit: 10 },
-          ],
-          fusion: { type: "rrf" },
+        const results = await store.search({
+          query: {
+            type: "multi",
+            prefetch: [
+              { vector: queryVector, using: "primary", limit: 10 },
+              { vector: queryVector, using: "secondary", limit: 10 },
+            ],
+            fusion: { type: "rrf" },
+          },
           limit: 3,
         });
 
@@ -473,24 +488,30 @@ describe("Qdrant integration", () => {
         const queryVector = [1, 0, 0];
 
         // Heavy weight on primary (0.9) should favor point A
-        const primaryWeighted = await store.hybridSearch({
-          prefetch: [
-            { vector: queryVector, using: "primary", limit: 10 },
-            { vector: queryVector, using: "secondary", limit: 10 },
-          ],
-          fusion: { type: "weightedSum", weights: [0.9, 0.1] },
+        const primaryWeighted = await store.search({
+          query: {
+            type: "multi",
+            prefetch: [
+              { vector: queryVector, using: "primary", limit: 10 },
+              { vector: queryVector, using: "secondary", limit: 10 },
+            ],
+            fusion: { type: "weightedSum", weights: [0.9, 0.1] },
+          },
           limit: 2,
         });
 
         expect(primaryWeighted.items[0].metadata?.label).toBe("A");
 
         // Heavy weight on secondary (0.9) should favor point B
-        const secondaryWeighted = await store.hybridSearch({
-          prefetch: [
-            { vector: queryVector, using: "primary", limit: 10 },
-            { vector: queryVector, using: "secondary", limit: 10 },
-          ],
-          fusion: { type: "weightedSum", weights: [0.1, 0.9] },
+        const secondaryWeighted = await store.search({
+          query: {
+            type: "multi",
+            prefetch: [
+              { vector: queryVector, using: "primary", limit: 10 },
+              { vector: queryVector, using: "secondary", limit: 10 },
+            ],
+            fusion: { type: "weightedSum", weights: [0.1, 0.9] },
+          },
           limit: 2,
         });
 
@@ -509,12 +530,15 @@ describe("Qdrant integration", () => {
         });
 
         await expect(
-          store.hybridSearch({
-            prefetch: [
-              { vector: [1, 0, 0], using: "primary", limit: 5 },
-              { vector: [1, 0, 0], using: "secondary", limit: 8 },
-            ],
-            fusion: { type: "rrf" },
+          store.search({
+            query: {
+              type: "multi",
+              prefetch: [
+                { vector: [1, 0, 0], using: "primary", limit: 5 },
+                { vector: [1, 0, 0], using: "secondary", limit: 8 },
+              ],
+              fusion: { type: "rrf" },
+            },
             limit: 10,
           }),
         ).rejects.toThrow(
@@ -525,7 +549,7 @@ describe("Qdrant integration", () => {
     );
 
     it(
-      "should paginate hybrid search results",
+      "should paginate multi-vector search results",
       withQdrantContainer(async (qdrant) => {
         const store = createQdrantStore({
           url: qdrant.url,
@@ -556,24 +580,30 @@ describe("Qdrant integration", () => {
 
         const queryVector = [1, 0, 0];
 
-        const page1 = await store.hybridSearch({
-          prefetch: [
-            { vector: queryVector, using: "primary", limit: 10 },
-            { vector: queryVector, using: "secondary", limit: 10 },
-          ],
-          fusion: { type: "rrf" },
+        const page1 = await store.search({
+          query: {
+            type: "multi",
+            prefetch: [
+              { vector: queryVector, using: "primary", limit: 10 },
+              { vector: queryVector, using: "secondary", limit: 10 },
+            ],
+            fusion: { type: "rrf" },
+          },
           limit: 2,
         });
 
         expect(page1.items).toHaveLength(2);
         expect(page1.nextOffset).toBe(2);
 
-        const page2 = await store.hybridSearch({
-          prefetch: [
-            { vector: queryVector, using: "primary", limit: 10 },
-            { vector: queryVector, using: "secondary", limit: 10 },
-          ],
-          fusion: { type: "rrf" },
+        const page2 = await store.search({
+          query: {
+            type: "multi",
+            prefetch: [
+              { vector: queryVector, using: "primary", limit: 10 },
+              { vector: queryVector, using: "secondary", limit: 10 },
+            ],
+            fusion: { type: "rrf" },
+          },
           limit: 2,
           offset: page1.nextOffset as number,
         });
@@ -582,9 +612,11 @@ describe("Qdrant integration", () => {
         expect(page2.nextOffset).toBeNull();
 
         // Ensure no duplicate items between pages
-        const page1Ids = page1.items.map((i) => i.id);
-        const page2Ids = page2.items.map((i) => i.id);
-        expect(page1Ids.some((id) => page2Ids.includes(id))).toBe(false);
+        const page1Ids = page1.items.map((i: { id: string }) => i.id);
+        const page2Ids = page2.items.map((i: { id: string }) => i.id);
+        expect(page1Ids.some((id: string) => page2Ids.includes(id))).toBe(
+          false,
+        );
       }),
       60_000,
     );

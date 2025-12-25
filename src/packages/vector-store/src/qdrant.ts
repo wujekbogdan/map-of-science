@@ -2,7 +2,8 @@ import { QdrantClient } from "@qdrant/js-client-rest";
 import { randomUUID } from "node:crypto";
 import { v5 as uuidv5 } from "uuid";
 import { z } from "zod";
-import { buildFilter } from "./buildFilter.js";
+import { createSearch } from "./search/createSearch.js";
+import type { PaginatedSearchResult, SearchParams } from "./search/types.js";
 
 const NAMESPACE = "6ba7b810-9dad-11d1-80b4-00c04fd430c8";
 
@@ -24,104 +25,13 @@ const upsertParamsSchema = z.object({
   metadata: z.record(z.string(), z.unknown()).optional(),
 });
 
-export type MatchFilter = {
-  key: string;
-  match: string | number | boolean;
-};
-
-type VectorSearchParams = {
-  using: string;
-  vector: number[];
-  filter?: MatchFilter[];
-  limit?: number;
-  offset?: number;
-  scoreThreshold?: number;
-};
-
-type OrderBy = {
-  key: string;
-  direction: "asc" | "desc";
-};
-
-type FilterOnlySearchParams = {
-  vector?: never;
-  filter: MatchFilter[];
-  limit?: number;
-  offset?: string;
-  orderBy?: OrderBy;
-};
-
-type SearchParams = VectorSearchParams | FilterOnlySearchParams;
-
 const metadataSchema = z.record(z.string(), z.unknown()).optional();
-
-const searchResultSchema = z.object({
-  id: z.union([z.string(), z.number()]).transform(String),
-  score: z.number(),
-  payload: metadataSchema,
-});
 
 const pointSchema = z.object({
   id: z.union([z.string(), z.number()]).transform(String),
   vector: z.record(z.string(), z.array(z.number())),
   payload: metadataSchema,
 });
-
-type SearchResult = {
-  id: string;
-  score: number;
-  metadata?: Record<string, unknown>;
-};
-
-/**
- * Fusion strategy for combining results from multiple vector searches.
- *
- * - `rrf`: Reciprocal Rank Fusion - combines results based on their position/rank,
- *   ignoring actual similarity scores. Results appearing in multiple lists get boosted.
- *   The `k` parameter controls how much weight is given to position (higher k = positions matter less).
- *
- * - `dbsf`: Distribution-Based Score Fusion - normalizes similarity scores from each
- *   vector search and then sums them. Good when scores are meaningful and comparable.
- *
- * - `weightedSum`: Calculates final score as: weight[0] * score[0] + weight[1] * score[1].
- *   Use when you know the relative importance of each vector.
- */
-export type FusionStrategy =
-  | { type: "rrf"; k?: number }
-  | { type: "dbsf" }
-  | { type: "weightedSum"; weights: [number, number] };
-
-/**
- * A prefetch query runs a vector search and collects candidates for fusion.
- * The limit should be larger than the final query limit (e.g., 10x-100x) to ensure
- * enough candidates are available for accurate fusion.
- */
-export type PrefetchQuery = {
-  vector: number[];
-  using: string;
-  limit: number;
-  scoreThreshold?: number;
-};
-
-/**
- * Parameters for hybrid search that combines results from multiple vector searches.
- *
- * **Pagination constraint**: Each prefetch `limit` must be >= main query's `limit + offset`
- * to ensure enough candidates are available for accurate fusion at any page.
- */
-export type HybridSearchParams = {
-  prefetch: [PrefetchQuery, PrefetchQuery];
-  fusion: FusionStrategy;
-  filter?: MatchFilter[];
-  limit?: number;
-  offset?: number;
-  scoreThreshold?: number;
-};
-
-type PaginatedSearchResult = {
-  items: SearchResult[];
-  nextOffset: number | string | null;
-};
 
 type GetResult = {
   id: string;
@@ -188,92 +98,6 @@ export const createQdrantStore = (params: Params) => {
     return ensureCollectionPromise;
   };
 
-  const scrollSearch = async (
-    searchParams: FilterOnlySearchParams,
-    qdrantFilter: ReturnType<typeof buildFilter> | undefined,
-    limit: number,
-  ): Promise<PaginatedSearchResult> => {
-    const { orderBy } = searchParams;
-    const fetchLimit = limit + 1;
-    const scrollLimit = orderBy ? fetchLimit : limit;
-
-    const getStartFrom = () => {
-      if (!orderBy || !searchParams.offset) return undefined;
-      const value = Number(searchParams.offset);
-      return orderBy.direction === "desc" ? value - 1 : value + 1;
-    };
-
-    const response = await client.scroll(params.collectionName, {
-      filter: qdrantFilter,
-      limit: scrollLimit,
-      offset: orderBy ? undefined : searchParams.offset,
-      with_payload: true,
-      with_vector: false,
-      order_by: orderBy
-        ? {
-            key: orderBy.key,
-            direction: orderBy.direction,
-            start_from: getStartFrom(),
-          }
-        : undefined,
-    });
-
-    const allItems = response.points.map((point) => ({
-      id: String(point.id),
-      score: 1,
-      metadata: point.payload as Record<string, unknown> | undefined,
-    }));
-
-    if (orderBy) {
-      const hasMore = allItems.length > limit;
-      const items = hasMore ? allItems.slice(0, limit) : allItems;
-      const lastItem = items[items.length - 1];
-      return {
-        items,
-        nextOffset:
-          hasMore && lastItem ? String(lastItem.metadata?.[orderBy.key]) : null,
-      };
-    }
-
-    const nextPageOffset = response.next_page_offset;
-    return {
-      items: allItems,
-      nextOffset:
-        typeof nextPageOffset === "string" || typeof nextPageOffset === "number"
-          ? String(nextPageOffset)
-          : null,
-    };
-  };
-
-  const vectorSearch = async (
-    searchParams: VectorSearchParams,
-    qdrantFilter: ReturnType<typeof buildFilter> | undefined,
-    limit: number,
-  ): Promise<PaginatedSearchResult> => {
-    const { using, vector, offset = 0, scoreThreshold = 0.5 } = searchParams;
-    const fetchLimit = limit + 1;
-
-    const response = await client.search(params.collectionName, {
-      vector: { name: using, vector },
-      filter: qdrantFilter,
-      limit: fetchLimit,
-      offset,
-      score_threshold: scoreThreshold,
-      with_payload: true,
-    });
-
-    const items = response.map((item) => {
-      const parsed = searchResultSchema.parse(item);
-      return { id: parsed.id, score: parsed.score, metadata: parsed.payload };
-    });
-
-    const hasMore = items.length > limit;
-    return {
-      items: hasMore ? items.slice(0, limit) : items,
-      nextOffset: hasMore ? offset + limit : null,
-    };
-  };
-
   return {
     async upsert(upsertParams: UpsertParams) {
       const {
@@ -292,16 +116,11 @@ export const createQdrantStore = (params: Params) => {
 
     async search(searchParams: SearchParams): Promise<PaginatedSearchResult> {
       await ensureCollection();
-      const { filter, limit = 100 } = searchParams;
-      const qdrantFilter = filter?.length ? buildFilter(filter) : undefined;
-
-      // TODO: make sure to use composition pattern when adding features to the
-      // search function or even compose search of multiple search strategy
-      // implementations
-      if (searchParams.vector) {
-        return vectorSearch(searchParams, qdrantFilter, limit);
-      }
-      return scrollSearch(searchParams, qdrantFilter, limit);
+      const search = createSearch({
+        client,
+        collectionName: params.collectionName,
+      });
+      return search(searchParams);
     },
 
     async get(id: string) {
@@ -333,83 +152,6 @@ export const createQdrantStore = (params: Params) => {
         points: [pointId],
         payload: metadata,
       });
-    },
-
-    async hybridSearch(
-      searchParams: HybridSearchParams,
-    ): Promise<PaginatedSearchResult> {
-      await ensureCollection();
-
-      const {
-        prefetch,
-        fusion,
-        filter,
-        limit = 10,
-        offset = 0,
-        scoreThreshold,
-      } = searchParams;
-
-      const minPrefetchLimit = limit + offset;
-      const invalidPrefetches = prefetch.filter(
-        (p) => p.limit < minPrefetchLimit,
-      );
-      if (invalidPrefetches.length > 0) {
-        const details = invalidPrefetches
-          .map((p) => `"${p.using}" (${p.limit})`)
-          .join(", ");
-        throw new Error(
-          `Prefetch limits ${details} must be >= limit + offset (${minPrefetchLimit})`,
-        );
-      }
-
-      const qdrantFilter = filter?.length ? buildFilter(filter) : undefined;
-      const fetchLimit = limit + 1;
-
-      const prefetchRequests = prefetch.map((p) => ({
-        query: p.vector,
-        using: p.using,
-        limit: p.limit,
-        score_threshold: p.scoreThreshold,
-      }));
-
-      const buildFusionQuery = () => {
-        switch (fusion.type) {
-          case "rrf":
-            return { fusion: "rrf" as const };
-          case "dbsf":
-            return { fusion: "dbsf" as const };
-          case "weightedSum":
-            return {
-              formula: {
-                sum: [
-                  { mult: [fusion.weights[0], "$score[0]"] },
-                  { mult: [fusion.weights[1], "$score[1]"] },
-                ],
-              },
-            };
-        }
-      };
-
-      const response = await client.query(params.collectionName, {
-        prefetch: prefetchRequests,
-        query: buildFusionQuery(),
-        limit: fetchLimit,
-        offset,
-        score_threshold: scoreThreshold,
-        filter: qdrantFilter,
-        with_payload: true,
-      });
-
-      const items = response.points.map((item) => {
-        const parsed = searchResultSchema.parse(item);
-        return { id: parsed.id, score: parsed.score, metadata: parsed.payload };
-      });
-
-      const hasMore = items.length > limit;
-      return {
-        items: hasMore ? items.slice(0, limit) : items,
-        nextOffset: hasMore ? offset + limit : null,
-      };
     },
   };
 };
