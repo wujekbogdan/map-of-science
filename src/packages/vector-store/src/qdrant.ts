@@ -105,12 +105,16 @@ export type PrefetchQuery = {
 
 /**
  * Parameters for hybrid search that combines results from multiple vector searches.
+ *
+ * **Pagination constraint**: Each prefetch `limit` must be >= main query's `limit + offset`
+ * to ensure enough candidates are available for accurate fusion at any page.
  */
 export type HybridSearchParams = {
   prefetch: [PrefetchQuery, PrefetchQuery];
   fusion: FusionStrategy;
   filter?: MatchFilter[];
   limit?: number;
+  offset?: number;
   scoreThreshold?: number;
 };
 
@@ -333,7 +337,7 @@ export const createQdrantStore = (params: Params) => {
 
     async hybridSearch(
       searchParams: HybridSearchParams,
-    ): Promise<SearchResult[]> {
+    ): Promise<PaginatedSearchResult> {
       await ensureCollection();
 
       const {
@@ -341,9 +345,25 @@ export const createQdrantStore = (params: Params) => {
         fusion,
         filter,
         limit = 10,
+        offset = 0,
         scoreThreshold,
       } = searchParams;
+
+      const minPrefetchLimit = limit + offset;
+      const invalidPrefetches = prefetch.filter(
+        (p) => p.limit < minPrefetchLimit,
+      );
+      if (invalidPrefetches.length > 0) {
+        const details = invalidPrefetches
+          .map((p) => `"${p.using}" (${p.limit})`)
+          .join(", ");
+        throw new Error(
+          `Prefetch limits ${details} must be >= limit + offset (${minPrefetchLimit})`,
+        );
+      }
+
       const qdrantFilter = filter?.length ? buildFilter(filter) : undefined;
+      const fetchLimit = limit + 1;
 
       const prefetchRequests = prefetch.map((p) => ({
         query: p.vector,
@@ -373,16 +393,23 @@ export const createQdrantStore = (params: Params) => {
       const response = await client.query(params.collectionName, {
         prefetch: prefetchRequests,
         query: buildFusionQuery(),
-        limit,
+        limit: fetchLimit,
+        offset,
         score_threshold: scoreThreshold,
         filter: qdrantFilter,
         with_payload: true,
       });
 
-      return response.points.map((item) => {
+      const items = response.points.map((item) => {
         const parsed = searchResultSchema.parse(item);
         return { id: parsed.id, score: parsed.score, metadata: parsed.payload };
       });
+
+      const hasMore = items.length > limit;
+      return {
+        items: hasMore ? items.slice(0, limit) : items,
+        nextOffset: hasMore ? offset + limit : null,
+      };
     },
   };
 };

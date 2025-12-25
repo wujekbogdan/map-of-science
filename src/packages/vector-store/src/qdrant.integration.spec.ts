@@ -432,10 +432,10 @@ describe("Qdrant integration", () => {
           limit: 3,
         });
 
-        expect(results).toHaveLength(3);
+        expect(results.items).toHaveLength(3);
         // With RRF, items appearing high in both lists get boosted
         // Point C should rank well as it scores decently on both vectors
-        expect(results.map((r) => r.metadata?.label)).toContain("C");
+        expect(results.items.map((r) => r.metadata?.label)).toContain("C");
       }),
       60_000,
     );
@@ -482,7 +482,7 @@ describe("Qdrant integration", () => {
           limit: 2,
         });
 
-        expect(primaryWeighted[0].metadata?.label).toBe("A");
+        expect(primaryWeighted.items[0].metadata?.label).toBe("A");
 
         // Heavy weight on secondary (0.9) should favor point B
         const secondaryWeighted = await store.hybridSearch({
@@ -494,7 +494,97 @@ describe("Qdrant integration", () => {
           limit: 2,
         });
 
-        expect(secondaryWeighted[0].metadata?.label).toBe("B");
+        expect(secondaryWeighted.items[0].metadata?.label).toBe("B");
+      }),
+      60_000,
+    );
+
+    it(
+      "should throw when prefetch limit is less than limit + offset",
+      withQdrantContainer(async (qdrant) => {
+        const store = createQdrantStore({
+          url: qdrant.url,
+          collectionName: "test-hybrid-limit-validation",
+          vectors: { primary: { size: 3 }, secondary: { size: 3 } },
+        });
+
+        await expect(
+          store.hybridSearch({
+            prefetch: [
+              { vector: [1, 0, 0], using: "primary", limit: 5 },
+              { vector: [1, 0, 0], using: "secondary", limit: 8 },
+            ],
+            fusion: { type: "rrf" },
+            limit: 10,
+          }),
+        ).rejects.toThrow(
+          'Prefetch limits "primary" (5), "secondary" (8) must be >= limit + offset (10)',
+        );
+      }),
+      60_000,
+    );
+
+    it(
+      "should paginate hybrid search results",
+      withQdrantContainer(async (qdrant) => {
+        const store = createQdrantStore({
+          url: qdrant.url,
+          collectionName: "test-hybrid-pagination",
+          vectors: {
+            primary: { size: 3 },
+            secondary: { size: 3 },
+          },
+        });
+
+        await Promise.all([
+          store.upsert({
+            id: "point-1",
+            vectors: { primary: [1, 0, 0], secondary: [1, 0, 0] },
+            metadata: { order: 1 },
+          }),
+          store.upsert({
+            id: "point-2",
+            vectors: { primary: [0.9, 0.1, 0], secondary: [0.9, 0.1, 0] },
+            metadata: { order: 2 },
+          }),
+          store.upsert({
+            id: "point-3",
+            vectors: { primary: [0.8, 0.2, 0], secondary: [0.8, 0.2, 0] },
+            metadata: { order: 3 },
+          }),
+        ]);
+
+        const queryVector = [1, 0, 0];
+
+        const page1 = await store.hybridSearch({
+          prefetch: [
+            { vector: queryVector, using: "primary", limit: 10 },
+            { vector: queryVector, using: "secondary", limit: 10 },
+          ],
+          fusion: { type: "rrf" },
+          limit: 2,
+        });
+
+        expect(page1.items).toHaveLength(2);
+        expect(page1.nextOffset).toBe(2);
+
+        const page2 = await store.hybridSearch({
+          prefetch: [
+            { vector: queryVector, using: "primary", limit: 10 },
+            { vector: queryVector, using: "secondary", limit: 10 },
+          ],
+          fusion: { type: "rrf" },
+          limit: 2,
+          offset: page1.nextOffset as number,
+        });
+
+        expect(page2.items).toHaveLength(1);
+        expect(page2.nextOffset).toBeNull();
+
+        // Ensure no duplicate items between pages
+        const page1Ids = page1.items.map((i) => i.id);
+        const page2Ids = page2.items.map((i) => i.id);
+        expect(page1Ids.some((id) => page2Ids.includes(id))).toBe(false);
       }),
       60_000,
     );
