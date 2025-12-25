@@ -2,7 +2,9 @@
 
 CLI for map-of-science operations.
 
-## Environment Variables
+## Configuration
+
+The CLI supports both environment variables and `.env` file placed in the directory from which the binary is executed.
 
 | Variable            | Required | Description                           |
 | ------------------- | -------- | ------------------------------------- |

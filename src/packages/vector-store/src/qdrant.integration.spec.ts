@@ -377,4 +377,126 @@ describe("Qdrant integration", () => {
     },
     60_000,
   );
+
+  describe("hybridSearch", () => {
+    it(
+      "should combine results from multiple vectors using RRF fusion",
+      withQdrantContainer(async (qdrant) => {
+        const store = createQdrantStore({
+          url: qdrant.url,
+          collectionName: "test-hybrid-rrf",
+          vectors: {
+            primary: { size: 3 },
+            secondary: { size: 3 },
+          },
+        });
+
+        // Point A: high primary score, low secondary score
+        await store.upsert({
+          id: "point-a",
+          vectors: {
+            primary: [1, 0, 0],
+            secondary: [0, 0, 1],
+          },
+          metadata: { label: "A" },
+        });
+
+        // Point B: low primary score, high secondary score
+        await store.upsert({
+          id: "point-b",
+          vectors: {
+            primary: [0, 0, 1],
+            secondary: [1, 0, 0],
+          },
+          metadata: { label: "B" },
+        });
+
+        // Point C: medium scores on both
+        await store.upsert({
+          id: "point-c",
+          vectors: {
+            primary: [0.7, 0.3, 0],
+            secondary: [0.7, 0.3, 0],
+          },
+          metadata: { label: "C" },
+        });
+
+        const queryVector = [1, 0, 0];
+
+        const results = await store.hybridSearch({
+          prefetch: [
+            { vector: queryVector, using: "primary", limit: 10 },
+            { vector: queryVector, using: "secondary", limit: 10 },
+          ],
+          fusion: { type: "rrf" },
+          limit: 3,
+        });
+
+        expect(results).toHaveLength(3);
+        // With RRF, items appearing high in both lists get boosted
+        // Point C should rank well as it scores decently on both vectors
+        expect(results.map((r) => r.metadata?.label)).toContain("C");
+      }),
+      60_000,
+    );
+
+    it(
+      "should apply weighted sum fusion with custom weights",
+      withQdrantContainer(async (qdrant) => {
+        const store = createQdrantStore({
+          url: qdrant.url,
+          collectionName: "test-hybrid-weighted",
+          vectors: {
+            primary: { size: 3 },
+            secondary: { size: 3 },
+          },
+        });
+
+        await store.upsert({
+          id: "point-a",
+          vectors: {
+            primary: [1, 0, 0],
+            secondary: [0, 1, 0],
+          },
+          metadata: { label: "A" },
+        });
+
+        await store.upsert({
+          id: "point-b",
+          vectors: {
+            primary: [0, 1, 0],
+            secondary: [1, 0, 0],
+          },
+          metadata: { label: "B" },
+        });
+
+        const queryVector = [1, 0, 0];
+
+        // Heavy weight on primary (0.9) should favor point A
+        const primaryWeighted = await store.hybridSearch({
+          prefetch: [
+            { vector: queryVector, using: "primary", limit: 10 },
+            { vector: queryVector, using: "secondary", limit: 10 },
+          ],
+          fusion: { type: "weightedSum", weights: [0.9, 0.1] },
+          limit: 2,
+        });
+
+        expect(primaryWeighted[0].metadata?.label).toBe("A");
+
+        // Heavy weight on secondary (0.9) should favor point B
+        const secondaryWeighted = await store.hybridSearch({
+          prefetch: [
+            { vector: queryVector, using: "primary", limit: 10 },
+            { vector: queryVector, using: "secondary", limit: 10 },
+          ],
+          fusion: { type: "weightedSum", weights: [0.1, 0.9] },
+          limit: 2,
+        });
+
+        expect(secondaryWeighted[0].metadata?.label).toBe("B");
+      }),
+      60_000,
+    );
+  });
 });

@@ -73,6 +73,47 @@ type SearchResult = {
   metadata?: Record<string, unknown>;
 };
 
+/**
+ * Fusion strategy for combining results from multiple vector searches.
+ *
+ * - `rrf`: Reciprocal Rank Fusion - combines results based on their position/rank,
+ *   ignoring actual similarity scores. Results appearing in multiple lists get boosted.
+ *   The `k` parameter controls how much weight is given to position (higher k = positions matter less).
+ *
+ * - `dbsf`: Distribution-Based Score Fusion - normalizes similarity scores from each
+ *   vector search and then sums them. Good when scores are meaningful and comparable.
+ *
+ * - `weightedSum`: Calculates final score as: weight[0] * score[0] + weight[1] * score[1].
+ *   Use when you know the relative importance of each vector.
+ */
+export type FusionStrategy =
+  | { type: "rrf"; k?: number }
+  | { type: "dbsf" }
+  | { type: "weightedSum"; weights: [number, number] };
+
+/**
+ * A prefetch query runs a vector search and collects candidates for fusion.
+ * The limit should be larger than the final query limit (e.g., 10x-100x) to ensure
+ * enough candidates are available for accurate fusion.
+ */
+export type PrefetchQuery = {
+  vector: number[];
+  using: string;
+  limit: number;
+  scoreThreshold?: number;
+};
+
+/**
+ * Parameters for hybrid search that combines results from multiple vector searches.
+ */
+export type HybridSearchParams = {
+  prefetch: [PrefetchQuery, PrefetchQuery];
+  fusion: FusionStrategy;
+  filter?: MatchFilter[];
+  limit?: number;
+  scoreThreshold?: number;
+};
+
 type PaginatedSearchResult = {
   items: SearchResult[];
   nextOffset: number | string | null;
@@ -250,6 +291,9 @@ export const createQdrantStore = (params: Params) => {
       const { filter, limit = 100 } = searchParams;
       const qdrantFilter = filter?.length ? buildFilter(filter) : undefined;
 
+      // TODO: make sure to use composition pattern when adding features to the
+      // search function or even compose search of multiple search strategy
+      // implementations
       if (searchParams.vector) {
         return vectorSearch(searchParams, qdrantFilter, limit);
       }
@@ -284,6 +328,60 @@ export const createQdrantStore = (params: Params) => {
       await client.overwritePayload(params.collectionName, {
         points: [pointId],
         payload: metadata,
+      });
+    },
+
+    async hybridSearch(
+      searchParams: HybridSearchParams,
+    ): Promise<SearchResult[]> {
+      await ensureCollection();
+
+      const {
+        prefetch,
+        fusion,
+        filter,
+        limit = 10,
+        scoreThreshold,
+      } = searchParams;
+      const qdrantFilter = filter?.length ? buildFilter(filter) : undefined;
+
+      const prefetchRequests = prefetch.map((p) => ({
+        query: p.vector,
+        using: p.using,
+        limit: p.limit,
+        score_threshold: p.scoreThreshold,
+      }));
+
+      const buildFusionQuery = () => {
+        switch (fusion.type) {
+          case "rrf":
+            return { fusion: "rrf" as const };
+          case "dbsf":
+            return { fusion: "dbsf" as const };
+          case "weightedSum":
+            return {
+              formula: {
+                sum: [
+                  { mult: [fusion.weights[0], "$score[0]"] },
+                  { mult: [fusion.weights[1], "$score[1]"] },
+                ],
+              },
+            };
+        }
+      };
+
+      const response = await client.query(params.collectionName, {
+        prefetch: prefetchRequests,
+        query: buildFusionQuery(),
+        limit,
+        score_threshold: scoreThreshold,
+        filter: qdrantFilter,
+        with_payload: true,
+      });
+
+      return response.points.map((item) => {
+        const parsed = searchResultSchema.parse(item);
+        return { id: parsed.id, score: parsed.score, metadata: parsed.payload };
       });
     },
   };
