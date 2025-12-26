@@ -1,15 +1,18 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeAll } from "vitest";
 import { createGeminiEmbedder } from "./gemini.js";
 
-const apiKey = process.env.GOOGLE_API_KEY;
-if (!apiKey) {
-  throw new Error("GOOGLE_API_KEY not set. Create .env.test in repo root.");
-}
-
 describe("createGeminiEmbedder", () => {
+  const apiKey = process.env.GOOGLE_API_KEY;
+
+  beforeAll(() => {
+    if (!apiKey) {
+      throw new Error("GOOGLE_API_KEY required");
+    }
+  });
+
   it("should call real Gemini API and return embedding", async () => {
     const embedder = createGeminiEmbedder(
-      { apiKey, dimension: 768 },
+      { apiKey: apiKey!, dimension: 768 },
       "document",
     );
     const text = "Lorem ipsum dolor";
