@@ -11,6 +11,36 @@ import { search } from "../commands/search/search.js";
 const FIXTURE_PATH = path.join(import.meta.dirname, "clusters.json");
 const EMBEDDING_DIM = 768;
 
+describe("search validation", () => {
+  it("requires --fusion when multiple vectors", async () => {
+    await expect(
+      search("query", { vector: "articles,concepts" }),
+    ).rejects.toThrow("Multiple vectors requires --fusion");
+  });
+
+  it("requires multiple vectors when --fusion provided", async () => {
+    await expect(
+      search("query", { vector: "articles", fusion: "rrf" }),
+    ).rejects.toThrow("--fusion requires multiple vectors");
+  });
+
+  it("requires --fusion weighted when --weights provided", async () => {
+    await expect(
+      search("query", {
+        vector: "articles,concepts",
+        fusion: "rrf",
+        weights: "3:1",
+      }),
+    ).rejects.toThrow("--weights requires --fusion weighted");
+  });
+
+  it("requires --weights when --fusion weighted", async () => {
+    await expect(
+      search("query", { vector: "articles,concepts", fusion: "weighted" }),
+    ).rejects.toThrow("--fusion weighted requires --weights");
+  });
+});
+
 describe("CLI E2E", () => {
   const required = [
     "OPENALEX_API_KEY",

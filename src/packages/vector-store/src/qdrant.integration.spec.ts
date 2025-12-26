@@ -375,7 +375,7 @@ describe("Qdrant integration", () => {
                 { vector: queryVector, using: "primary", limit: 10 },
                 { vector: queryVector, using: "secondary", limit: 10 },
               ],
-              fusion: { type: "weightedSum", weights: [0.9, 0.1] },
+              fusion: { type: "weightedSum", weights: [9, 1] },
             },
             limit: 2,
           });
@@ -388,7 +388,7 @@ describe("Qdrant integration", () => {
                 { vector: queryVector, using: "primary", limit: 10 },
                 { vector: queryVector, using: "secondary", limit: 10 },
               ],
-              fusion: { type: "weightedSum", weights: [0.1, 0.9] },
+              fusion: { type: "weightedSum", weights: [1, 9] },
             },
             limit: 2,
           });

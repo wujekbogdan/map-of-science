@@ -4,7 +4,8 @@ import { parseSearchResult } from "./parseSearchResult.js";
 import {
   MatchFilter,
   MultiVectorQuery,
-  PaginatedSearchResult, SearchDependencies
+  PaginatedSearchResult,
+  SearchDependencies,
 } from "./types.js";
 
 type Params = {
@@ -27,21 +28,30 @@ const validatePrefetchLimits = (
   }
 };
 
+export const normalizeWeights = (
+  weights: [number, number],
+): [number, number] => {
+  const sum = weights[0] + weights[1];
+  if (sum === 0) {
+    throw new Error("Weights cannot both be zero");
+  }
+  return [weights[0] / sum, weights[1] / sum];
+};
+
 const buildFusionQuery = (fusion: MultiVectorQuery["fusion"]) => {
   switch (fusion.type) {
     case "rrf":
       return { fusion: "rrf" as const };
     case "dbsf":
       return { fusion: "dbsf" as const };
-    case "weightedSum":
+    case "weightedSum": {
+      const [w0, w1] = normalizeWeights(fusion.weights);
       return {
         formula: {
-          sum: [
-            { mult: [fusion.weights[0], "$score[0]"] },
-            { mult: [fusion.weights[1], "$score[1]"] },
-          ],
+          sum: [{ mult: [w0, "$score[0]"] }, { mult: [w1, "$score[1]"] }],
         },
       };
+    }
   }
 };
 

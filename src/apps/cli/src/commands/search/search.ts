@@ -2,6 +2,10 @@ import { Command, Option } from "commander";
 import { z } from "zod";
 import { createEmbedder } from "@map-of-science/embeddings";
 import { createQdrantStore } from "@map-of-science/vector-store";
+import type {
+  FusionStrategy,
+  PrefetchQuery,
+} from "@map-of-science/vector-store";
 
 const envSchema = z.object({
   gemini: z.object({
@@ -14,11 +18,55 @@ const envSchema = z.object({
   }),
 });
 
-const cliSchema = z.object({
-  query: z.string(),
-  vector: z.enum(["articles", "concepts"]).default("articles"),
-  limit: z.coerce.number().default(10),
-});
+const vectorsSchema = z.preprocess(
+  (val) =>
+    typeof val === "string" ? val.split(",").map((v) => v.trim()) : val,
+  z
+    .array(z.enum(["articles", "concepts"]))
+    .min(1)
+    .max(2),
+);
+
+const fusionAliases = {
+  rrf: "rrf",
+  "rank-fusion": "rrf",
+  dbsf: "dbsf",
+  "score-fusion": "dbsf",
+  weighted: "weighted",
+} as const;
+
+const fusionSchema = z
+  .enum(["rrf", "rank-fusion", "dbsf", "score-fusion", "weighted"])
+  .transform((val) => fusionAliases[val]);
+
+const weightsSchema = z.preprocess(
+  (val) =>
+    typeof val === "string" ? val.split(":").map((v) => v.trim()) : val,
+  z.tuple([z.coerce.number(), z.coerce.number()]),
+);
+
+const cliSchema = z
+  .object({
+    query: z.string(),
+    vector: vectorsSchema.default(["articles"]),
+    fusion: fusionSchema.optional(),
+    weights: weightsSchema.optional(),
+    limit: z.coerce.number().default(10),
+  })
+  .refine((data) => !(data.vector.length > 1 && !data.fusion), {
+    message:
+      "Multiple vectors requires --fusion (rrf, score-fusion, or weighted)",
+  })
+  .refine((data) => !(data.fusion && data.vector.length < 2), {
+    message:
+      "--fusion requires multiple vectors (e.g., --vector articles,concepts)",
+  })
+  .refine((data) => !(data.weights && data.fusion !== "weighted"), {
+    message: "--weights requires --fusion weighted",
+  })
+  .refine((data) => !(data.fusion === "weighted" && !data.weights), {
+    message: "--fusion weighted requires --weights (e.g., --weights 3:1)",
+  });
 
 const parseEnv = () =>
   envSchema.parse({
@@ -32,11 +80,14 @@ const parseEnv = () =>
     },
   });
 
-const createSearchConfig = (cliArgs: Record<string, unknown>) => ({
-  ...parseEnv(),
-  ...cliSchema.parse(cliArgs),
-  embeddingDimension: 768 as const,
-});
+const createSearchConfig = (cliArgs: Record<string, unknown>) => {
+  const cli = cliSchema.parse(cliArgs);
+  return {
+    ...parseEnv(),
+    ...cli,
+    embeddingDimension: 768 as const,
+  };
+};
 
 type SearchConfig = ReturnType<typeof createSearchConfig>;
 
@@ -60,31 +111,80 @@ const compose = (config: SearchConfig) => {
 
 type SearchOptions = {
   vector?: string;
+  fusion?: string;
+  weights?: string;
   limit?: string;
 };
 
+const PREFETCH_MULTIPLIER = 10;
+
+const buildSearchQuery = (config: SearchConfig, embedding: number[]) => {
+  const { vector, fusion, weights, limit } = config;
+
+  if (vector.length === 1) {
+    return {
+      type: "single" as const,
+      using: vector[0],
+      vector: embedding,
+    };
+  }
+
+  const prefetchLimit = limit * PREFETCH_MULTIPLIER;
+  const prefetch: [PrefetchQuery, PrefetchQuery] = [
+    { vector: embedding, using: vector[0], limit: prefetchLimit },
+    { vector: embedding, using: vector[1], limit: prefetchLimit },
+  ];
+
+  const fusionStrategy: FusionStrategy =
+    fusion === "weighted"
+      ? { type: "weightedSum", weights: weights! }
+      : fusion === "dbsf"
+        ? { type: "dbsf" }
+        : { type: "rrf" };
+
+  return {
+    type: "multi" as const,
+    prefetch,
+    fusion: fusionStrategy,
+  };
+};
+
+const formatValidationError = (error: z.ZodError): string =>
+  error.issues.map((e) => e.message).join("\n");
+
+const parseConfig = (query: string, options: SearchOptions) => {
+  try {
+    return createSearchConfig({ query, ...options });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      throw new Error(formatValidationError(error));
+    }
+    throw error;
+  }
+};
+
 export const search = async (query: string, options: SearchOptions) => {
-  const config = createSearchConfig({ query, ...options });
+  const config = parseConfig(query, options);
   const { embedder, store } = compose(config);
 
   const embedStart = performance.now();
   const { embedding } = await embedder.embed(config.query);
   const embedMs = performance.now() - embedStart;
 
+  const searchQuery = buildSearchQuery(config, embedding);
+
   const searchStart = performance.now();
   const response = await store.search({
-    query: {
-      type: "single",
-      using: config.vector,
-      vector: embedding,
-    },
+    query: searchQuery,
     limit: config.limit,
   });
   const searchMs = performance.now() - searchStart;
 
   const output = {
     query: config.query,
-    vector: config.vector,
+    mode: config.vector.length === 1 ? "single" : "hybrid",
+    vectors: config.vector,
+    ...(config.fusion && { fusion: config.fusion }),
     results: response.items,
     timing: {
       embedMs: Math.round(embedMs),
@@ -104,9 +204,22 @@ export const createSearchCommand = () => {
     .description("Search clusters using vector similarity")
     .argument("<query>", "Search query text")
     .addOption(
-      new Option("-v, --vector <name>", "Vector to search")
-        .choices(["articles", "concepts"])
-        .default("articles"),
+      new Option(
+        "-v, --vector <names>",
+        "Vector(s) to search (combine with comma: articles,concepts)",
+      ).default("articles"),
+    )
+    .addOption(
+      new Option(
+        "-f, --fusion <strategy>",
+        "Strategy for combining multiple vectors",
+      ).choices(["rrf", "rank-fusion", "dbsf", "score-fusion", "weighted"]),
+    )
+    .addOption(
+      new Option(
+        "-w, --weights <ratio>",
+        "Importance ratio for weighted fusion (e.g., 3:1)",
+      ),
     )
     .option("-l, --limit <n>", "Result limit", "10")
     .action(async (query: string, options: SearchOptions) => {
