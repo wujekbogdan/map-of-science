@@ -3,6 +3,7 @@ import { createSearch } from "./createSearch.js";
 import { metadataSearch } from "./metadataSearch.js";
 import { multiVectorSearch } from "./multiVectorSearch.js";
 import { singleVectorSearch } from "./singleVectorSearch.js";
+import type { MultiVectorQuery } from "./types.js";
 
 vi.mock("./singleVectorSearch.js", () => ({
   singleVectorSearch: vi.fn(),
@@ -60,7 +61,9 @@ describe("createSearch", () => {
     expect(multiVectorSearch).toHaveBeenCalledTimes(1);
     expect(multiVectorSearch).toHaveBeenCalledWith(
       expect.objectContaining({
-        query: expect.objectContaining({ type: "multi" }),
+        query: expect.objectContaining({
+          type: "multi",
+        }) as unknown as MultiVectorQuery,
         limit: 10,
         offset: 0,
       }),

@@ -3,7 +3,7 @@ import { createClusterEmbedder } from "@map-of-science/cluster-embedder";
 import { createEmbedder } from "@map-of-science/embeddings";
 import { createLogger } from "@map-of-science/logger";
 import { createOpenAlexClient } from "@map-of-science/openalex";
-import { streamJsonFile } from "@map-of-science/parsers";
+import { streamJsonFile } from "@map-of-science/parsers/node";
 import { createRateLimitedFunction } from "@map-of-science/rate-limiter";
 import { createQdrantStore } from "@map-of-science/vector-store";
 import { createConfig, type Config } from "../../config.js";

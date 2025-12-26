@@ -30,9 +30,8 @@ export const useQdrantContainer = async ({
   };
 };
 
-export type Qdrant = Awaited<ReturnType<typeof useQdrantContainer>>;
-export type Test = (qdrant: Qdrant) => Promise<void>;
-export type Params = Parameters<typeof useQdrantContainer>[0];
+type Test = (qdrant: Qdrant) => Promise<void>;
+type Params = Parameters<typeof useQdrantContainer>[0];
 
 export const withQdrantContainer =
   (test: Test, params?: Params) => async () => {
@@ -44,3 +43,5 @@ export const withQdrantContainer =
       await qdrant.stop();
     }
   };
+
+export type Qdrant = Awaited<ReturnType<typeof useQdrantContainer>>;

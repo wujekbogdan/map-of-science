@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import { describe, it, expect } from "vitest";
 import { z } from "zod";
 import { ZodSchema } from "zod";
-import { setCollector, parseCsv } from "@map-of-science/parsers";
+import { setCollector, parseCsv } from "@map-of-science/parsers/browser";
 import { ConceptSchema, AreaSchema, MakeClustersSchema } from ".";
 
 const parse = async (name: string, schema: ZodSchema) => {

@@ -1,5 +1,5 @@
-import { z } from "zod";
 import type { QdrantClient } from "@qdrant/js-client-rest";
+import { z } from "zod";
 
 export type MatchFilter = {
   key: string;
@@ -17,7 +17,7 @@ export type PaginatedSearchResult = {
   nextOffset: number | string | null;
 };
 
-export type OrderBy = {
+type OrderBy = {
   key: string;
   direction: "asc" | "desc";
 };
