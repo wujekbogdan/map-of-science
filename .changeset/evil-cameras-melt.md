@@ -2,4 +2,4 @@
 "@map-of-science/rate-limiter": minor
 ---
 
-Add rate-limiter package
+Add p-queue based rate limiting wrapper for async functions.

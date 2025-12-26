@@ -2,4 +2,4 @@
 "@map-of-science/embeddings": minor
 ---
 
-Add embeddings package with Gemini provider support
+Add task-aware (document vs query optimization) embeddings package with Gemini provider support.
