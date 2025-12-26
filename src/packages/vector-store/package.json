@@ -1,7 +1,7 @@
 {
   "name": "@map-of-science/vector-store",
   "version": "0.0.0",
-  "description": "TODO: set description",
+  "description": "Vector database SDK with Qdrant backend",
   "type": "module",
   "private": true,
   "main": "./src/index.ts",

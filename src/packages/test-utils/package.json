@@ -1,7 +1,7 @@
 {
   "name": "@map-of-science/test-utils",
   "version": "0.0.0",
-  "description": "TODO: set description",
+  "description": "Shared testing utilities",
   "type": "module",
   "private": true,
   "main": "./src/index.ts",

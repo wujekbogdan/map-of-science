@@ -1,7 +1,7 @@
 {
   "name": "@map-of-science/rate-limiter",
   "version": "0.0.0",
-  "description": "TODO: set description",
+  "description": "Rate limiting wrapper for async functions",
   "type": "module",
   "private": true,
   "main": "./src/index.ts",

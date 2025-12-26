@@ -1,7 +1,7 @@
 {
   "name": "@map-of-science/logger",
   "version": "0.0.0",
-  "description": "TODO: set description",
+  "description": "Structured logging utility using Pino",
   "type": "module",
   "private": true,
   "main": "./src/index.ts",
