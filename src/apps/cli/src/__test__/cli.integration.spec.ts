@@ -67,7 +67,7 @@ describe("CLI E2E", () => {
       const result = await embed({
         input: FIXTURE_PATH,
         limit: "5",
-        maxArticles: "3",
+        maxArticles: "20",
       });
 
       expect(result.processed).toBe(5);

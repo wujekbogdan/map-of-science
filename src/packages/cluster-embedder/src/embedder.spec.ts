@@ -87,6 +87,10 @@ describe("createClusterEmbedder", () => {
         keyConcepts: "quantum computing, qubits",
         articleCount: 100,
         growthRating: 80,
+        embedding: {
+          articleCount: 2,
+          abstractCount: 1,
+        },
       },
     });
     expect(deps.upsert).toHaveBeenCalledTimes(1);

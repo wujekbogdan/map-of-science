@@ -78,6 +78,10 @@ export const createClusterEmbedder =
         keyConcepts: cluster.keyConcepts,
         articleCount: cluster.articleCount,
         growthRating: cluster.growthRating,
+        embedding: {
+          articleCount: works.length,
+          abstractCount: works.filter((work) => work.abstract !== null).length,
+        },
       },
     });
 
