@@ -20,6 +20,6 @@
     "vitest": "^4.0.15"
   },
   "dependencies": {
-    "p-queue": "^9.0.1"
+    "bottleneck": "^2.19.5"
   }
 }
