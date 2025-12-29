@@ -1,7 +1,6 @@
 import { Command } from "commander";
 import { createClusterEmbedder } from "@map-of-science/cluster-embedder";
 import { createEmbedder } from "@map-of-science/embeddings";
-import { createLogger } from "@map-of-science/logger";
 import { createOpenAlexClient } from "@map-of-science/openalex";
 import { streamJsonFile } from "@map-of-science/parsers/node";
 import { createRateLimitedFunction } from "@map-of-science/rate-limiter";
@@ -9,8 +8,6 @@ import { createQdrantStore } from "@map-of-science/vector-store";
 import { createConfig, type Config } from "../../config.js";
 import { clusterDataSchema } from "./schema.js";
 import { forEachEntry } from "./stream.js";
-
-const logger = createLogger();
 
 const compose = (config: Config) => {
   const openAlex = createOpenAlexClient(config.openAlex);
@@ -58,10 +55,8 @@ export const embed = async (options: EmbedOptions) => {
     { start: config.start, limit: config.limit },
     async (key, value) => {
       const cluster = clusterDataSchema.parse(value);
-      logger.info(
-        { clusterId: key, progress: `${key}/${config.limit}` },
-        "Processing cluster",
-      );
+
+      console.log(`Processing cluster ${key}/${config.limit}`);
       await embedCluster(
         { id: key, ...cluster },
         { maxArticles: config.maxArticles },
@@ -69,7 +64,7 @@ export const embed = async (options: EmbedOptions) => {
     },
   );
 
-  logger.info({ processed }, "Done");
+  console.log(`Done. Processed ${processed} clusters.`);
 
   return { processed };
 };
