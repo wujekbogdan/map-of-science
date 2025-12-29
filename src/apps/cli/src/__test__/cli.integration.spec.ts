@@ -8,7 +8,11 @@ import {
 import { embed } from "../commands/embed/embed.js";
 import { search } from "../commands/search/search.js";
 
-const FIXTURE_PATH = path.join(import.meta.dirname, "clusters.json");
+const CLUSTERS_FIXTURE_PATH = path.join(import.meta.dirname, "clusters.json");
+const CLUSTERS_WITH_INVALID_FIXTURE_PATH = path.join(
+  import.meta.dirname,
+  "clusters-with-invalid.json",
+);
 const EMBEDDING_DIM = 768;
 
 describe("search validation", () => {
@@ -65,7 +69,7 @@ describe("CLI E2E", () => {
       vi.stubEnv("QDRANT_COLLECTION", "test-embed-e2e");
 
       const result = await embed({
-        input: FIXTURE_PATH,
+        input: CLUSTERS_FIXTURE_PATH,
         limit: "5",
         maxArticles: "20",
       });
@@ -100,6 +104,43 @@ describe("CLI E2E", () => {
 
       expect(searchResult.results.length).toBeGreaterThan(0);
       expect(searchResult.results[0].score).toBeGreaterThan(0);
+    }),
+    180_000,
+  );
+
+  it(
+    "should skip invalid clusters",
+    withQdrantContainer(async (qdrant: Qdrant) => {
+      for (const key of required) {
+        vi.stubEnv(key, process.env[key]);
+      }
+      vi.stubEnv("QDRANT_URL", qdrant.url);
+      vi.stubEnv("QDRANT_COLLECTION", "test-skip-invalid");
+
+      const result = await embed({
+        input: CLUSTERS_WITH_INVALID_FIXTURE_PATH,
+        maxArticles: "5",
+      });
+
+      expect(result.processed).toBe(3);
+
+      const store = createQdrantStore({
+        url: qdrant.url,
+        collectionName: "test-skip-invalid",
+        vectors: {
+          concepts: { size: EMBEDDING_DIM },
+          articles: { size: EMBEDDING_DIM },
+        },
+      });
+
+      const point0 = await store.get("0");
+      expect(point0).not.toBeNull();
+
+      const point1 = await store.get("1");
+      expect(point1).toBeNull();
+
+      const point2 = await store.get("2");
+      expect(point2).not.toBeNull();
     }),
     180_000,
   );

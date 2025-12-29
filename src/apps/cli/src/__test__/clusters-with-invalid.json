@@ -1,0 +1,34 @@
+{
+  "0": {
+    "Research fields": "Materials science",
+    "Research subfields": "Chemical engineering",
+    "Key concepts": "solar cells",
+    "Number of articles": 100,
+    "Article age": 5.0,
+    "Growth rating": 60.0,
+    "Articles": [
+      {
+        "DOI": "https://doi.org/10.1038/test",
+        "Title": "Test article"
+      }
+    ]
+  },
+  "1": {
+    "Articles": [],
+    "Top citing clusters": []
+  },
+  "2": {
+    "Research fields": "Physics",
+    "Research subfields": "Quantum physics",
+    "Key concepts": "quantum computing",
+    "Number of articles": 50,
+    "Article age": 3.0,
+    "Growth rating": 80.0,
+    "Articles": [
+      {
+        "DOI": "https://doi.org/10.1038/test2",
+        "Title": "Test article 2"
+      }
+    ]
+  }
+}

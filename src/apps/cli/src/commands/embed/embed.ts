@@ -54,11 +54,16 @@ export const embed = async (options: EmbedOptions) => {
     generator,
     { start: config.start, limit: config.limit },
     async (key, value) => {
-      const cluster = clusterDataSchema.parse(value);
+      const result = clusterDataSchema.safeParse(value);
+
+      if (!result.success) {
+        console.warn(`Skipping invalid cluster ${key}`);
+        return;
+      }
 
       console.log(`Processing cluster ${key}/${config.limit}`);
       await embedCluster(
-        { id: key, ...cluster },
+        { id: key, ...result.data },
         { maxArticles: config.maxArticles },
       );
     },
