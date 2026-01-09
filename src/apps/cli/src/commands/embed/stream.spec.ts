@@ -27,8 +27,8 @@ describe("forEachEntry", () => {
 
     expect(processed).toBe(2);
     expect(onEntry).toHaveBeenCalledTimes(2);
-    expect(onEntry).toHaveBeenNthCalledWith(1, "1", "a");
-    expect(onEntry).toHaveBeenNthCalledWith(2, "2", "b");
+    expect(onEntry).toHaveBeenNthCalledWith(1, "1", "a", 1);
+    expect(onEntry).toHaveBeenNthCalledWith(2, "2", "b", 2);
   });
 
   it("should respect limit option", async () => {
@@ -67,8 +67,8 @@ describe("forEachEntry", () => {
 
     expect(processed).toBe(2);
     expect(onEntry).toHaveBeenCalledTimes(2);
-    expect(onEntry).toHaveBeenNthCalledWith(1, "2", "b");
-    expect(onEntry).toHaveBeenNthCalledWith(2, "3", "c");
+    expect(onEntry).toHaveBeenNthCalledWith(1, "2", "b", 2);
+    expect(onEntry).toHaveBeenNthCalledWith(2, "3", "c", 3);
   });
 
   it("should handle empty generator", async () => {
@@ -105,7 +105,7 @@ describe("forEachEntry", () => {
 
     expect(processed).toBe(2);
     expect(onEntry).toHaveBeenCalledTimes(2);
-    expect(onEntry).toHaveBeenNthCalledWith(1, "3", "c");
-    expect(onEntry).toHaveBeenNthCalledWith(2, "4", "d");
+    expect(onEntry).toHaveBeenNthCalledWith(1, "3", "c", 3);
+    expect(onEntry).toHaveBeenNthCalledWith(2, "4", "d", 4);
   });
 });

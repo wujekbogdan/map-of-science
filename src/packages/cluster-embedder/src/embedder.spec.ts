@@ -13,7 +13,8 @@ const createMockDeps = () => ({
   embed: vi
     .fn()
     .mockResolvedValueOnce({ embedding: [0.1, 0.2] })
-    .mockResolvedValueOnce({ embedding: [0.3, 0.4] }),
+    .mockResolvedValueOnce({ embedding: [0.3, 0.4] })
+    .mockResolvedValueOnce({ embedding: [0.5, 0.6] }),
   upsert: vi.fn().mockResolvedValueOnce({ id: "cluster-1" }),
 });
 
@@ -57,7 +58,7 @@ describe("createClusterEmbedder", () => {
     expect(deps.fetchWorks).toHaveBeenCalledTimes(1);
   });
 
-  it("should embed concepts and articles text", async () => {
+  it("should embed concepts, articles, and titles text", async () => {
     const deps = createMockDeps();
     const embedCluster = createClusterEmbedder(deps);
 
@@ -68,7 +69,8 @@ describe("createClusterEmbedder", () => {
       2,
       "Title A\n\nAbstract A\n\n\nTitle B",
     );
-    expect(deps.embed).toHaveBeenCalledTimes(2);
+    expect(deps.embed).toHaveBeenNthCalledWith(3, "Title A\n\nTitle B");
+    expect(deps.embed).toHaveBeenCalledTimes(3);
   });
 
   it("should upsert with vectors and metadata", async () => {
@@ -82,6 +84,7 @@ describe("createClusterEmbedder", () => {
       vectors: {
         concepts: [0.1, 0.2],
         articles: [0.3, 0.4],
+        titles: [0.5, 0.6],
       },
       metadata: {
         keyConcepts: "quantum computing, qubits",

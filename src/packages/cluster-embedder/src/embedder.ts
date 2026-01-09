@@ -47,6 +47,9 @@ const buildArticlesText = (works: Work[]) =>
     )
     .join("\n\n\n");
 
+const buildTitlesText = (works: Work[]) =>
+  works.map((work) => work.title).join("\n\n");
+
 const extractDois = (articles: Article[]) =>
   articles
     .map((article) => article.doi)
@@ -63,16 +66,20 @@ export const createClusterEmbedder =
     const works = await deps.fetchWorks(dois);
     const conceptsText = cluster.keyConcepts;
     const articlesText = buildArticlesText(works);
-    const [conceptsEmbedding, articlesEmbedding] = await Promise.all([
-      deps.embed(conceptsText),
-      deps.embed(articlesText),
-    ]);
+    const titlesText = buildTitlesText(works);
+    const [conceptsEmbedding, articlesEmbedding, titlesEmbedding] =
+      await Promise.all([
+        deps.embed(conceptsText),
+        deps.embed(articlesText),
+        deps.embed(titlesText),
+      ]);
 
     const result = await deps.upsert({
       id: cluster.id,
       vectors: {
         concepts: conceptsEmbedding.embedding,
         articles: articlesEmbedding.embedding,
+        titles: titlesEmbedding.embedding,
       },
       metadata: {
         keyConcepts: cluster.keyConcepts,

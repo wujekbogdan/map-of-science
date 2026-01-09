@@ -22,6 +22,7 @@ const compose = (config: Config) => {
     vectors: {
       concepts: { size: config.embeddingDimension },
       articles: { size: config.embeddingDimension },
+      titles: { size: config.embeddingDimension },
     },
   });
 
@@ -53,7 +54,7 @@ export const embed = async (options: EmbedOptions) => {
   const processed = await forEachEntry(
     generator,
     { start: config.start, limit: config.limit },
-    async (key, value) => {
+    async (key, value, position) => {
       const result = clusterDataSchema.safeParse(value);
 
       if (!result.success) {
@@ -61,7 +62,9 @@ export const embed = async (options: EmbedOptions) => {
         return;
       }
 
-      console.log(`Processing cluster ${key}/${config.limit}`);
+      console.log(
+        `Processing cluster ${position}/${config.limit} (id: ${key})`,
+      );
       await embedCluster(
         { id: key, ...result.data },
         { maxArticles: config.maxArticles },
