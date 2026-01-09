@@ -22,9 +22,9 @@ const vectorsSchema = z.preprocess(
   (val) =>
     typeof val === "string" ? val.split(",").map((v) => v.trim()) : val,
   z
-    .array(z.enum(["articles", "concepts"]))
+    .array(z.enum(["articles", "concepts", "titles"]))
     .min(1)
-    .max(2),
+    .max(3),
 );
 
 const fusionAliases = {
@@ -42,7 +42,7 @@ const fusionSchema = z
 const weightsSchema = z.preprocess(
   (val) =>
     typeof val === "string" ? val.split(":").map((v) => v.trim()) : val,
-  z.tuple([z.coerce.number(), z.coerce.number()]),
+  z.array(z.coerce.number()).min(2).max(3),
 );
 
 const cliSchema = z
@@ -66,7 +66,14 @@ const cliSchema = z
   })
   .refine((data) => !(data.fusion === "weighted" && !data.weights), {
     message: "--fusion weighted requires --weights (e.g., --weights 3:1)",
-  });
+  })
+  .refine(
+    (data) => !data.weights || data.weights.length === data.vector.length,
+    {
+      message:
+        "--weights count must match --vector count (e.g., --vector articles,concepts,titles --weights 3:2:1)",
+    },
+  );
 
 const parseEnv = () =>
   envSchema.parse({
@@ -103,6 +110,7 @@ const compose = (config: SearchConfig) => {
     vectors: {
       concepts: { size: config.embeddingDimension },
       articles: { size: config.embeddingDimension },
+      titles: { size: config.embeddingDimension },
     },
   });
 
@@ -118,6 +126,30 @@ type SearchOptions = {
 
 const PREFETCH_MULTIPLIER = 10;
 
+type Weights = [number, number] | [number, number, number];
+
+const toWeights = (weights: number[]): Weights => {
+  if (weights.length === 2) return [weights[0], weights[1]];
+  if (weights.length === 3) return [weights[0], weights[1], weights[2]];
+  throw new Error(`Invalid weights count: ${weights.length}`);
+};
+
+type Prefetch =
+  | [PrefetchQuery, PrefetchQuery]
+  | [PrefetchQuery, PrefetchQuery, PrefetchQuery];
+
+const buildPrefetch = (
+  vector: string[],
+  embedding: number[],
+  limit: number,
+): Prefetch => {
+  const build = (using: string) => ({ vector: embedding, using, limit });
+  if (vector.length === 2) return [build(vector[0]), build(vector[1])];
+  if (vector.length === 3)
+    return [build(vector[0]), build(vector[1]), build(vector[2])];
+  throw new Error(`Invalid vector count: ${vector.length}`);
+};
+
 const buildSearchQuery = (config: SearchConfig, embedding: number[]) => {
   const { vector, fusion, weights, limit } = config;
 
@@ -130,14 +162,11 @@ const buildSearchQuery = (config: SearchConfig, embedding: number[]) => {
   }
 
   const prefetchLimit = limit * PREFETCH_MULTIPLIER;
-  const prefetch: [PrefetchQuery, PrefetchQuery] = [
-    { vector: embedding, using: vector[0], limit: prefetchLimit },
-    { vector: embedding, using: vector[1], limit: prefetchLimit },
-  ];
+  const prefetch = buildPrefetch(vector, embedding, prefetchLimit);
 
   const fusionStrategy: FusionStrategy =
     fusion === "weighted"
-      ? { type: "weightedSum", weights: weights! }
+      ? { type: "weightedSum", weights: toWeights(weights!) }
       : fusion === "dbsf"
         ? { type: "dbsf" }
         : { type: "rrf" };

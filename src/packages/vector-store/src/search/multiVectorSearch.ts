@@ -28,14 +28,16 @@ const validatePrefetchLimits = (
   }
 };
 
-export const normalizeWeights = (
-  weights: [number, number],
-): [number, number] => {
-  const sum = weights[0] + weights[1];
+type Weights = [number, number] | [number, number, number];
+
+export const normalizeWeights = (weights: Weights): Weights => {
+  const sum = weights.reduce((acc, w) => acc + w, 0);
   if (sum === 0) {
-    throw new Error("Weights cannot both be zero");
+    throw new Error("Weights cannot all be zero");
   }
-  return [weights[0] / sum, weights[1] / sum];
+  return weights.length === 2
+    ? [weights[0] / sum, weights[1] / sum]
+    : [weights[0] / sum, weights[1] / sum, weights[2] / sum];
 };
 
 const buildFusionQuery = (fusion: MultiVectorQuery["fusion"]) => {
@@ -45,12 +47,9 @@ const buildFusionQuery = (fusion: MultiVectorQuery["fusion"]) => {
     case "dbsf":
       return { fusion: "dbsf" as const };
     case "weightedSum": {
-      const [w0, w1] = normalizeWeights(fusion.weights);
-      return {
-        formula: {
-          sum: [{ mult: [w0, "$score[0]"] }, { mult: [w1, "$score[1]"] }],
-        },
-      };
+      const normalized = normalizeWeights(fusion.weights);
+      const terms = normalized.map((w, i) => ({ mult: [w, `$score[${i}]`] }));
+      return { formula: { sum: terms } };
     }
   }
 };

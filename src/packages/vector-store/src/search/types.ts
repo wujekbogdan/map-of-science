@@ -32,13 +32,16 @@ type OrderBy = {
  * - `dbsf`: Distribution-Based Score Fusion - normalizes similarity scores from each
  *   vector search and then sums them. Good when scores are meaningful and comparable.
  *
- * - `weightedSum`: Calculates final score as: weight[0] * score[0] + weight[1] * score[1].
- *   Use when you know the relative importance of each vector.
+ * - `weightedSum`: Calculates final score as weighted sum of individual scores.
+ *   Supports 2-3 vectors. Use when you know the relative importance of each vector.
  */
 export type FusionStrategy =
   | { type: "rrf"; k?: number }
   | { type: "dbsf" }
-  | { type: "weightedSum"; weights: [number, number] };
+  | {
+      type: "weightedSum";
+      weights: [number, number] | [number, number, number];
+    };
 
 /**
  * A prefetch query runs a vector search and collects candidates for fusion.
@@ -70,7 +73,9 @@ export type SingleVectorQuery = {
  */
 export type MultiVectorQuery = {
   type: "multi";
-  prefetch: [PrefetchQuery, PrefetchQuery];
+  prefetch:
+    | [PrefetchQuery, PrefetchQuery]
+    | [PrefetchQuery, PrefetchQuery, PrefetchQuery];
   fusion: FusionStrategy;
   scoreThreshold?: number;
 };

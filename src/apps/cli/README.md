@@ -50,12 +50,13 @@ Options:
 
 #### Generated Vectors
 
-Each cluster produces two vectors:
+Each cluster produces three vectors:
 
-- **articles** - Embedding of concatenated article titles and abstracts. Rich representation capturing specific terminology.
-- **concepts** - Embedding of key concept tags. Lightweight representation of broad categories.
+- **articles** - Embedding of concatenated article titles and abstracts.
+- **titles** - Embedding of article titles only (no abstracts).
+- **concepts** - Embedding of key concept tags.
 
-Both vectors are stored with names `articles` and `concepts`, which are used by the `search` command.
+All vectors are used by the `search` command.
 
 ### search
 
@@ -75,30 +76,25 @@ Options:
   -h, --help               display help for command
 ```
 
-#### Vectors
-
-Each cluster has two vectors representing different aspects:
-
-- **articles** - Rich embedding from article content. Captures specific terminology and detailed concepts.
-- **concepts** - Lightweight embedding from high-level tags (key concepts). Captures broad categories.
-
 #### Single Vector Search
 
 Search using one vector (default behavior):
 
 ```bash
 cli search "quantum computing" --vector articles
+cli search "quantum computing" --vector titles
 cli search "quantum computing" --vector concepts
 ```
 
 #### Multi-Vector Search
 
-Combine both vectors for potentially better results. Requires `--fusion` to specify how results are merged:
+Combine 2-3 vectors. Requires `--fusion` to specify how results are merged:
 
 ```bash
 cli search "quantum computing" --vector articles,concepts --fusion rrf
 cli search "quantum computing" --vector articles,concepts --fusion score-fusion
 cli search "quantum computing" --vector articles,concepts --fusion weighted --weights 3:1
+cli search "quantum computing" --vector articles,titles,concepts --fusion weighted --weights 3:2:1
 ```
 
 #### Fusion Strategies
@@ -111,4 +107,4 @@ When searching multiple vectors, each returns a ranked list of results. Fusion c
 | `dbsf`     | `score-fusion` | Combines normalized similarity scores. Use when scores are meaningful. |
 | `weighted` | N/A            | Custom weight per vector. Requires `--weights`.                        |
 
-**Weights** are specified as a ratio (e.g., `3:1` means 75% articles, 25% concepts).
+**Weights** are specified as a ratio matching vector count (e.g., `3:1` for 2 vectors, `3:2:1` for 3 vectors).

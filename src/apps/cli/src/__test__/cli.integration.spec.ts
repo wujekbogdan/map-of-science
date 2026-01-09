@@ -16,9 +16,15 @@ const CLUSTERS_WITH_INVALID_FIXTURE_PATH = path.join(
 const EMBEDDING_DIM = 768;
 
 describe("search validation", () => {
-  it("requires --fusion when multiple vectors", async () => {
+  it("requires --fusion when 2 vectors", async () => {
     await expect(
       search("query", { vector: "articles,concepts" }),
+    ).rejects.toThrow("Multiple vectors requires --fusion");
+  });
+
+  it("requires --fusion when 3 vectors", async () => {
+    await expect(
+      search("query", { vector: "articles,concepts,titles" }),
     ).rejects.toThrow("Multiple vectors requires --fusion");
   });
 
@@ -42,6 +48,26 @@ describe("search validation", () => {
     await expect(
       search("query", { vector: "articles,concepts", fusion: "weighted" }),
     ).rejects.toThrow("--fusion weighted requires --weights");
+  });
+
+  it("requires --weights count to match --vector count (2 vectors, 3 weights)", async () => {
+    await expect(
+      search("query", {
+        vector: "articles,concepts",
+        fusion: "weighted",
+        weights: "3:2:1",
+      }),
+    ).rejects.toThrow("--weights count must match --vector count");
+  });
+
+  it("requires --weights count to match --vector count (3 vectors, 2 weights)", async () => {
+    await expect(
+      search("query", {
+        vector: "articles,concepts,titles",
+        fusion: "weighted",
+        weights: "3:1",
+      }),
+    ).rejects.toThrow("--weights count must match --vector count");
   });
 });
 
@@ -82,6 +108,7 @@ describe("CLI E2E", () => {
         vectors: {
           concepts: { size: EMBEDDING_DIM },
           articles: { size: EMBEDDING_DIM },
+          titles: { size: EMBEDDING_DIM },
         },
       });
 
@@ -89,6 +116,7 @@ describe("CLI E2E", () => {
       expect(point0).not.toBeNull();
       expect(point0?.vectors.concepts).toHaveLength(EMBEDDING_DIM);
       expect(point0?.vectors.articles).toHaveLength(EMBEDDING_DIM);
+      expect(point0?.vectors.titles).toHaveLength(EMBEDDING_DIM);
 
       const point4 = await store.get("4");
       expect(point4).not.toBeNull();
@@ -130,6 +158,7 @@ describe("CLI E2E", () => {
         vectors: {
           concepts: { size: EMBEDDING_DIM },
           articles: { size: EMBEDDING_DIM },
+          titles: { size: EMBEDDING_DIM },
         },
       });
 
