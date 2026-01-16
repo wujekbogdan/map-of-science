@@ -6,6 +6,7 @@ import {
   YoutubeVideoSchema,
   YoutubeVideo,
   MapEntity18nSchema,
+  ClusterNameI18nSchema,
   MakeClustersSchema,
 } from "./model";
 import { loadAsArray, loadAsMap } from "./utils.ts";
@@ -36,7 +37,7 @@ const loadMapEntities = async (lang: Lang) => {
       text: i18n.get(entity.id)?.[langCode] ?? entity.id,
     }));
 
-  const [areas, places] = await Promise.all([
+  const [areas, places, clusterNamesI18n] = await Promise.all([
     loadAsArray({
       url: new URL("../../asset/areas.tsv", import.meta.url).href,
       schema: AreaSchema(z),
@@ -45,11 +46,21 @@ const loadMapEntities = async (lang: Lang) => {
       url: new URL("../../asset/places.tsv", import.meta.url).href,
       schema: PlaceSchema(z),
     }),
+    loadAsMap({
+      url: new URL("../../asset/cluster_names_i18n.tsv", import.meta.url).href,
+      schema: ClusterNameI18nSchema(z),
+      getKey: (item) => item.cluster_id,
+    }),
   ]);
+
+  const clusterNames = new Map(
+    [...clusterNamesI18n.entries()].map(([id, entry]) => [id, entry[langCode]]),
+  );
 
   return {
     areas: localize(areas),
     places: new Map(localize(places).map((place) => [place.clusterId, place])),
+    clusterNames,
   };
 };
 
@@ -57,8 +68,8 @@ const loadMapEntities = async (lang: Lang) => {
 // It's more of a service layer.
 // https://github.com/wujekbogdan/map-of-science/issues/57
 export const loadData = async (lang: Lang) => {
-  const { areas, places } = await loadMapEntities(lang);
-  const ClustersSchema = MakeClustersSchema(places);
+  const { areas, places, clusterNames } = await loadMapEntities(lang);
+  const ClustersSchema = MakeClustersSchema(places, clusterNames);
   const [concepts, clusters, youtube] = await Promise.all([
     loadAsMap({
       url: new URL("../../asset/keys.tsv", import.meta.url).href,

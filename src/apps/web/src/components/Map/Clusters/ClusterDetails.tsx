@@ -7,7 +7,7 @@ export const ClusterDetails = (props: {
 }) => {
   const { t } = useTranslation();
   const { cluster, concepts } = props;
-  const placeName = cluster.place?.text ?? "";
+  const name = cluster.name ?? "";
   const id = `#${cluster.clusterId.toString()}`;
 
   return (
@@ -19,9 +19,9 @@ export const ClusterDetails = (props: {
       }}
     >
       <p>
-        {placeName ? (
+        {name ? (
           <>
-            <strong>{placeName}</strong> {id}
+            <strong>{name}</strong> {id}
           </>
         ) : (
           <strong>{id}</strong>
