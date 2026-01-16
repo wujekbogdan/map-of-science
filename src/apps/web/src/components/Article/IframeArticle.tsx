@@ -5,7 +5,9 @@ import { useStore } from "../../store.ts";
 export const IframeArticle = ({ id }: { id: number }) => {
   const { t } = useTranslation("article");
   const clusters = useStore((state) => state.clusters);
-  const clusterName = clusters.get(id)?.name;
+  const cluster = clusters.get(id);
+  // Prefer curated place name, fall back to LLM-generated name
+  const clusterName = cluster?.place?.text ?? cluster?.name;
   const url = `https://sciencemap.eto.tech/cluster/?version=2&cluster_id=${id.toString()}`;
   return (
     <Wrapper>
