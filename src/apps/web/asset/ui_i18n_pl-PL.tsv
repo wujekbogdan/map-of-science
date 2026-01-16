@@ -1,6 +1,6 @@
 id	translation
 article.close	Zamknij
-article.info	Więcej informacji na temat klastra <bold>#{{id}}</bold> ze strony ETO Map of Science
+article.info	Więcej informacji na temat klastra <bold>{{name}}</bold> (<bold>#{{id}}</bold>) ze strony ETO Map of Science
 article.openInNewTab	Otwórz w nowej karcie
 article.youtubeRelated	Powiązane segmenty "Czytamy Naturę"
 article.youtubeNone	Brak powiązanych segmentów "Czytamy Naturę"

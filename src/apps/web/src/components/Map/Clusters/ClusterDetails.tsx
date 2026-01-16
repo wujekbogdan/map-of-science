@@ -7,7 +7,8 @@ export const ClusterDetails = (props: {
 }) => {
   const { t } = useTranslation();
   const { cluster, concepts } = props;
-  const placeName = cluster.place?.text ?? "";
+  // Prefer curated place name, fall back to LLM-generated name
+  const name = cluster.place?.text ?? cluster.name ?? "";
   const id = `#${cluster.clusterId.toString()}`;
 
   return (
@@ -19,9 +20,9 @@ export const ClusterDetails = (props: {
       }}
     >
       <p>
-        {placeName ? (
+        {name ? (
           <>
-            <strong>{placeName}</strong> {id}
+            <strong>{name}</strong> {id}
           </>
         ) : (
           <strong>{id}</strong>
