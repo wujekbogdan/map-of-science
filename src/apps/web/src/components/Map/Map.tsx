@@ -56,9 +56,11 @@ const processClustersForViewport = (args: Filter) => {
       screenY <= args.size.height
     ) {
       const place =
-        point.place && args.places.visible
+        point.name && args.places.visible
           ? {
-              ...point.place,
+              id: point.clusterId.toString(),
+              clusterId: point.clusterId.toString(),
+              text: point.name,
               fontSize: args.places.fontSize,
               opacity: args.places.opacity,
               offset: 15 / args.transform.k,
