@@ -3,16 +3,15 @@ import { generateObject } from "ai";
 import type { z } from "zod";
 import { calculatePrice } from "@map-of-science/llm-price";
 
-export const createGeminiGenerator = (params: {
+export const createGeminiGenerator = (config: {
   apiKey: string;
-  model?: string;
+  model: string;
 }) => {
   const google = createGoogleGenerativeAI({
-    apiKey: params.apiKey,
+    apiKey: config.apiKey,
   });
 
-  const modelName = params.model ?? "gemini-2.0-flash";
-  const model = google(modelName);
+  const model = google(config.model);
 
   return {
     generate: async <TSchema extends z.ZodType>(params: {
@@ -28,14 +27,14 @@ export const createGeminiGenerator = (params: {
       });
 
       const price = calculatePrice({
-        model: modelName,
+        model: config.model,
         inputTokens: usage.inputTokens,
         outputTokens: usage.outputTokens,
       });
 
       return {
         object,
-        price: price.formatted,
+        price,
       };
     },
   };

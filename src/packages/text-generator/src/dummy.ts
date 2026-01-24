@@ -5,8 +5,12 @@ export const createDummyGenerator = (params: { response: unknown }) => ({
     prompt: string;
     schema: TSchema;
     temperature?: number;
-  }) => ({
-    object: generateParams.schema.parse(params.response),
-    price: "$0.00",
-  }),
+  }): Promise<{
+    object: z.infer<TSchema>;
+    price: { raw: number; formatted: string };
+  }> =>
+    Promise.resolve().then(() => ({
+      object: generateParams.schema.parse(params.response),
+      price: { raw: 0, formatted: "$0.00" },
+    })),
 });
