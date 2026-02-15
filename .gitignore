@@ -140,3 +140,4 @@ out
 
 # AI
 .claude
+.env
