@@ -14,7 +14,7 @@
     },
     "test:integration": {
       "dependsOn": ["^build"],
-      "passThroughEnv": ["DOCKER_HOST", "TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE"]
+      "passThroughEnv": ["DOCKER_HOST", "TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE", "GOOGLE_API_KEY", "OPENALEX_API_KEY", "OPENALEX_EMAIL"]
     },
     "lint": {
       "dependsOn": ["^build", "^lint"]
