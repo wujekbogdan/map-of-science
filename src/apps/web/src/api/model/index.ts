@@ -27,6 +27,16 @@ export const MapEntity18nSchema = (z: typeof zod) =>
   });
 export type MapEntityI18n = zod.infer<ReturnType<typeof MapEntity18nSchema>>;
 
+export const ClusterNameI18nSchema = (z: typeof zod) =>
+  z.object({
+    cluster_id: z.coerce.number(),
+    "pl-PL": z.string(),
+    "en-US": z.string(),
+  });
+export type ClusterNameI18n = zod.infer<
+  ReturnType<typeof ClusterNameI18nSchema>
+>;
+
 export const i18nSchema = (z: typeof zod) =>
   z.object({
     id: z.string(),
@@ -47,7 +57,11 @@ export const PlaceSchema = (z: typeof zod) =>
 export type Place = zod.infer<ReturnType<typeof PlaceSchema>>;
 
 export const MakeClustersSchema =
-  (places: Map<string, Place & { text: string }>) => (z: typeof zod) =>
+  (
+    places: Map<string, Place & { text: string }>,
+    clusterNames: Map<number, string>,
+  ) =>
+  (z: typeof zod) =>
     z
       .object({
         cluster_id: z.coerce.number(),
@@ -66,7 +80,10 @@ export const MakeClustersSchema =
         clusterCategory: data.cluster_category,
         growthRating: data.growth_rating,
         keyConcepts: data.key_concepts.split(",").map((id) => Number(id)),
+        // human-curated labels
         place: places.get(data.cluster_id.toString()) ?? null,
+        // LLM-generated names
+        name: clusterNames.get(data.cluster_id) ?? null,
       }));
 
 type ClustersSchema = ReturnType<typeof MakeClustersSchema>;

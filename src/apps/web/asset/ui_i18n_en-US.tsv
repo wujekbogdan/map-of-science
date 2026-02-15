@@ -1,6 +1,6 @@
 id	translation
 article.close	Close
-article.info	More information about the <bold>#{{id}}</bold> cluster from the ETO Map of Science project
+article.info	More information about the <bold>{{name}}</bold> (<bold>#{{id}}</bold>) cluster from the ETO Map of Science project
 article.openInNewTab	Open in a new tab
 article.youtubeRelated	Related "Czytamy Naturę" segments on YouTube
 article.youtubeNone	No related "Czytamy Naturę" videos

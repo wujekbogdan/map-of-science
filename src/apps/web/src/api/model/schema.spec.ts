@@ -29,7 +29,7 @@ describe("schema", () => {
     it("should parse data.tsv with labels, including a null label case", async () => {
       const [withLabel, withoutLabel] = await parse(
         "data.tsv",
-        MakeClustersSchema(new Map())(z),
+        MakeClustersSchema(new Map(), new Map())(z),
       );
 
       expect([withLabel, withoutLabel]).toEqual([
@@ -42,6 +42,7 @@ describe("schema", () => {
           growthRating: 15.43,
           keyConcepts: [198432, 37537, 12177, 43800, 43431],
           place: null,
+          name: null,
         },
         {
           clusterId: 72062,
@@ -52,6 +53,7 @@ describe("schema", () => {
           growthRating: 3.22,
           keyConcepts: [40293, 71377, 120209, 90737, 67314],
           place: null,
+          name: null,
         },
       ]);
     });
