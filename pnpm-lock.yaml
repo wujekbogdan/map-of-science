@@ -95,6 +95,9 @@ importers:
       '@map-of-science/embeddings':
         specifier: workspace:*
         version: link:../../packages/embeddings
+      '@map-of-science/eto-pdf-parser':
+        specifier: workspace:*
+        version: link:../../packages/eto-pdf-parser
       '@map-of-science/logger':
         specifier: workspace:*
         version: link:../../packages/logger
@@ -150,6 +153,9 @@ importers:
       testcontainers:
         specifier: ^11.10.0
         version: 11.10.0
+      tmp-promise:
+        specifier: ^3.0.3
+        version: 3.0.3
       tsdown:
         specifier: ^0.16.8
         version: 0.16.8(typescript@5.6.3)
@@ -527,6 +533,31 @@ importers:
       zod:
         specifier: ^3.23.8
         version: 3.25.76
+    devDependencies:
+      '@map-of-science/eslint':
+        specifier: workspace:*
+        version: link:../../dev/eslint
+      '@map-of-science/typescript':
+        specifier: workspace:*
+        version: link:../../dev/typescript
+      '@map-of-science/vitest':
+        specifier: workspace:*
+        version: link:../../dev/vitest
+      '@types/node':
+        specifier: ^22.15.18
+        version: 22.15.18
+      typescript:
+        specifier: ~5.6.2
+        version: 5.6.3
+      vitest:
+        specifier: ^4.0.15
+        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
+
+  src/packages/eto-pdf-parser:
+    dependencies:
+      unpdf:
+        specifier: 1.4.0
+        version: 1.4.0
     devDependencies:
       '@map-of-science/eslint':
         specifier: workspace:*
@@ -5509,6 +5540,9 @@ packages:
     resolution: {integrity: sha512-8PWx8tvC4jDB39BQw1m4x8y5MH1BcQ5xHeL2n7UVFulMPH/3Q0uiamahFJ3lXA0zO2SUyRXuVVbWSDmstlt9YA==}
     hasBin: true
 
+  tmp-promise@3.0.3:
+    resolution: {integrity: sha512-RwM7MoPojPxsOBYnyd2hy0bxtIlVrihNs9pj5SUvY8Zz1sQcQG2tG1hSr8PDxfgEB8RNKDhqbIlroIarSNDNsQ==}
+
   tmp@0.0.33:
     resolution: {integrity: sha512-jRCJlojKnZ3addtTOjdIqoRuPEKBvNXcGYqzO6zWZX8KfKEpnGY5jfggJQ3EjKuu8D4bJRr0y+cYJFmYbImXGw==}
     engines: {node: '>=0.6.0'}
@@ -5710,6 +5744,14 @@ packages:
   universalify@2.0.1:
     resolution: {integrity: sha512-gptHNQghINnc/vTGIk0SOFGFNXw7JVrlRUtConJRlvaw6DuX0wO5Jeko9sWrMBhh+PsYAZ7oXAiOnf/UKogyiw==}
     engines: {node: '>= 10.0.0'}
+
+  unpdf@1.4.0:
+    resolution: {integrity: sha512-TahIk0xdH/4jh/MxfclzU79g40OyxtP00VnEUZdEkJoYtXAHWLiir6t3FC6z3vDqQTzc2ZHcla6uEiVTNjejuA==}
+    peerDependencies:
+      '@napi-rs/canvas': ^0.1.69
+    peerDependenciesMeta:
+      '@napi-rs/canvas':
+        optional: true
 
   unrun@0.2.20:
     resolution: {integrity: sha512-YhobStTk93HYRN/4iBs3q3/sd7knvju1XrzwwrVVfRujyTG1K88hGONIxCoJN0PWBuO+BX7fFiHH0sVDfE3MWw==}
@@ -11123,6 +11165,10 @@ snapshots:
     dependencies:
       tldts-core: 7.0.19
 
+  tmp-promise@3.0.3:
+    dependencies:
+      tmp: 0.2.5
+
   tmp@0.0.33:
     dependencies:
       os-tmpdir: 1.0.2
@@ -11335,6 +11381,8 @@ snapshots:
   universalify@0.1.2: {}
 
   universalify@2.0.1: {}
+
+  unpdf@1.4.0: {}
 
   unrun@0.2.20:
     dependencies:
