@@ -5,5 +5,5 @@ Domain logic for embedding research clusters. Domain layer.
 ## Responsibilities
 
 - Orchestrate cluster embedding workflow
-- Generate multi-vector embeddings (concepts + articles)
-- Coordinate OpenAlex fetch, embedding, and storage
+- Generate title embeddings from cluster article titles
+- Coordinate embedding generation and vector storage
