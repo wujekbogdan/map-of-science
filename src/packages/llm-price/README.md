@@ -1,4 +1,4 @@
-# @monorepo/llm-price
+# @map-of-science/llm-price
 
 LLM API cost calculation and currency formatting. Infrastructure layer.
 
