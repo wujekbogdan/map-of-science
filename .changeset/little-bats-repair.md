@@ -2,15 +2,17 @@
 "@map-of-science/cli": minor
 ---
 
-Add CLI for cluster embedding and similarity search.
+Add CLI for cluster embedding, search, naming, and ETO PDF scraping.
 
 Commands:
 
-- `embed` - Batch process clusters from JSON into vector store
-- `search` - Query clusters using single or multi-vector similarity
+- `embed` - Embed cluster titles from NDJSON into Qdrant vector store
+- `search` - Query clusters using single or multi-vector similarity with fusion
+- `name` - Generate cluster names via LLM
+- `scrape-eto` - Extract article titles from ETO cluster PDFs to NDJSON
 
 Features:
 
 - Environment-based configuration with .env support
-- Rate-limited API calls (OpenAlex, Gemini)
-- Multi-vector search with fusion strategies (RRF, DBSF, weighted)
+- Rate-limited Gemini API calls
+- NDJSON streaming input/output
