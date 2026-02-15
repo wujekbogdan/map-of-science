@@ -2,8 +2,18 @@ import { z } from "zod";
 
 export const clusterSchema = z
   .object({
-    Articles: z.array(z.object({ Title: z.string() })),
+    id: z.number(),
+    articles: z.object({
+      core: z.array(z.string()),
+      review: z.array(z.string()),
+      highlyCited: z.array(z.string()),
+    }),
   })
   .transform((data) => ({
-    titles: data.Articles.map((article) => article.Title),
+    id: data.id,
+    titles: [
+      ...data.articles.core,
+      ...data.articles.review,
+      ...data.articles.highlyCited,
+    ],
   }));

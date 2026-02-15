@@ -2,75 +2,51 @@ import { describe, it, expect, vi } from "vitest";
 import { createClusterEmbedder } from "./embedder.js";
 
 const createMockDeps = () => ({
-  fetchWorks: vi.fn().mockResolvedValueOnce([
-    {
-      doi: "https://doi.org/10.1234/a",
-      title: "Title A",
-      abstract: "Abstract A",
-    },
-    { doi: "https://doi.org/10.1234/b", title: "Title B", abstract: null },
-  ]),
-  embed: vi
-    .fn()
-    .mockResolvedValueOnce({ embedding: [0.1, 0.2] })
-    .mockResolvedValueOnce({ embedding: [0.3, 0.4] })
-    .mockResolvedValueOnce({ embedding: [0.5, 0.6] }),
-  upsert: vi.fn().mockResolvedValueOnce({ id: "cluster-1" }),
+  embed: vi.fn().mockResolvedValueOnce({ embedding: [0.1, 0.2, 0.3] }),
+  upsert: vi.fn().mockResolvedValueOnce({ id: "42" }),
 });
 
 const createMockCluster = () => ({
-  id: "cluster-1",
-  researchFields: "Physics",
-  researchSubfields: "Quantum",
-  keyConcepts: "quantum computing, qubits",
-  articleCount: 100,
-  articleAge: 5,
-  growthRating: 80,
-  articles: [
-    { doi: "https://doi.org/10.1234/a", title: "Title A" },
-    { doi: "https://doi.org/10.1234/b", title: "Title B" },
-    { doi: "https://doi.org/10.1234/a", title: "Title A Duplicate" },
-    { doi: "invalid-doi", title: "Invalid" },
-  ],
+  id: "42",
+  totalArticles: 100,
+  titles: ["Title A", "Title B", "Title C"],
 });
 
 describe("createClusterEmbedder", () => {
-  it("should fetch works with deduplicated valid DOIs", async () => {
+  it("should embed titles text joined by double newlines", async () => {
     const deps = createMockDeps();
     const embedCluster = createClusterEmbedder(deps);
 
     await embedCluster(createMockCluster());
 
-    expect(deps.fetchWorks).toHaveBeenCalledWith([
-      "https://doi.org/10.1234/a",
-      "https://doi.org/10.1234/b",
-    ]);
-    expect(deps.fetchWorks).toHaveBeenCalledTimes(1);
+    expect(deps.embed).toHaveBeenCalledWith("Title A\n\nTitle B\n\nTitle C");
+    expect(deps.embed).toHaveBeenCalledTimes(1);
   });
 
-  it("should limit DOIs to maxArticles option", async () => {
+  it("should limit titles to maxTitles option", async () => {
     const deps = createMockDeps();
     const embedCluster = createClusterEmbedder(deps);
 
-    await embedCluster(createMockCluster(), { maxArticles: 1 });
+    await embedCluster(createMockCluster(), { maxTitles: 2 });
 
-    expect(deps.fetchWorks).toHaveBeenCalledWith(["https://doi.org/10.1234/a"]);
-    expect(deps.fetchWorks).toHaveBeenCalledTimes(1);
+    expect(deps.embed).toHaveBeenCalledWith("Title A\n\nTitle B");
+    expect(deps.embed).toHaveBeenCalledTimes(1);
   });
 
-  it("should embed concepts, articles, and titles text", async () => {
+  it("should use all titles when maxTitles is not provided", async () => {
     const deps = createMockDeps();
     const embedCluster = createClusterEmbedder(deps);
+    const cluster = {
+      id: "1",
+      totalArticles: 50,
+      titles: Array.from({ length: 20 }, (_, i) => `Title ${i + 1}`),
+    };
 
-    await embedCluster(createMockCluster());
+    await embedCluster(cluster);
 
-    expect(deps.embed).toHaveBeenNthCalledWith(1, "quantum computing, qubits");
-    expect(deps.embed).toHaveBeenNthCalledWith(
-      2,
-      "Title A\n\nAbstract A\n\n\nTitle B",
-    );
-    expect(deps.embed).toHaveBeenNthCalledWith(3, "Title A\n\nTitle B");
-    expect(deps.embed).toHaveBeenCalledTimes(3);
+    const expectedText = cluster.titles.join("\n\n");
+    expect(deps.embed).toHaveBeenCalledWith(expectedText);
+    expect(deps.embed).toHaveBeenCalledTimes(1);
   });
 
   it("should upsert with vectors and metadata", async () => {
@@ -80,22 +56,27 @@ describe("createClusterEmbedder", () => {
     await embedCluster(createMockCluster());
 
     expect(deps.upsert).toHaveBeenCalledWith({
-      id: "cluster-1",
+      id: "42",
       vectors: {
-        concepts: [0.1, 0.2],
-        articles: [0.3, 0.4],
-        titles: [0.5, 0.6],
+        titles: [0.1, 0.2, 0.3],
       },
       metadata: {
-        keyConcepts: "quantum computing, qubits",
-        articleCount: 100,
-        growthRating: 80,
+        clusterId: "42",
+        totalArticles: 100,
         embedding: {
-          articleCount: 2,
-          abstractCount: 1,
+          titlesCount: 3,
         },
       },
     });
     expect(deps.upsert).toHaveBeenCalledTimes(1);
+  });
+
+  it("should return id from upsert result", async () => {
+    const deps = createMockDeps();
+    const embedCluster = createClusterEmbedder(deps);
+
+    const result = await embedCluster(createMockCluster());
+
+    expect(result).toEqual({ id: "42" });
   });
 });

@@ -2,10 +2,6 @@ import "dotenv/config";
 import { z } from "zod";
 
 const envSchema = z.object({
-  openAlex: z.object({
-    apiKey: z.string(),
-    email: z.string(),
-  }),
   gemini: z.object({
     apiKey: z.string(),
   }),
@@ -15,7 +11,6 @@ const envSchema = z.object({
     collectionName: z.string().default("clusters"),
   }),
   rateLimits: z.object({
-    openAlex: z.coerce.number().default(10),
     gemini: z.coerce.number().default(10),
   }),
 });
@@ -24,15 +19,11 @@ const cliSchema = z.object({
   input: z.string(),
   start: z.coerce.number().default(0),
   limit: z.coerce.number().default(Infinity),
-  maxArticles: z.coerce.number().default(10),
+  maxTitles: z.coerce.number().optional(),
 });
 
 const parseEnv = () =>
   envSchema.parse({
-    openAlex: {
-      apiKey: process.env.OPENALEX_API_KEY,
-      email: process.env.OPENALEX_EMAIL,
-    },
     gemini: {
       apiKey: process.env.GOOGLE_API_KEY,
     },
@@ -42,7 +33,6 @@ const parseEnv = () =>
       collectionName: process.env.QDRANT_COLLECTION,
     },
     rateLimits: {
-      openAlex: process.env.OPENALEX_RPM,
       gemini: process.env.GEMINI_RPM,
     },
   });

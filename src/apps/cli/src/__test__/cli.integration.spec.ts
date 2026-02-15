@@ -8,36 +8,36 @@ import {
 import { embed } from "../commands/embed/embed.js";
 import { search } from "../commands/search/search.js";
 
-const CLUSTERS_FIXTURE_PATH = path.join(import.meta.dirname, "clusters.json");
+const CLUSTERS_FIXTURE_PATH = path.join(import.meta.dirname, "clusters.ndjson");
 const CLUSTERS_WITH_INVALID_FIXTURE_PATH = path.join(
   import.meta.dirname,
-  "clusters-with-invalid.json",
+  "clusters-with-invalid.ndjson",
 );
 const EMBEDDING_DIM = 768;
 
 describe("search validation", () => {
   it("requires --fusion when 2 vectors", async () => {
-    await expect(
-      search("query", { vector: "articles,concepts" }),
-    ).rejects.toThrow("Multiple vectors requires --fusion");
+    await expect(search("query", { vector: "foo,bar" })).rejects.toThrow(
+      "Multiple vectors requires --fusion",
+    );
   });
 
   it("requires --fusion when 3 vectors", async () => {
-    await expect(
-      search("query", { vector: "articles,concepts,titles" }),
-    ).rejects.toThrow("Multiple vectors requires --fusion");
+    await expect(search("query", { vector: "foo,bar,baz" })).rejects.toThrow(
+      "Multiple vectors requires --fusion",
+    );
   });
 
   it("requires multiple vectors when --fusion provided", async () => {
     await expect(
-      search("query", { vector: "articles", fusion: "rrf" }),
+      search("query", { vector: "titles", fusion: "rrf" }),
     ).rejects.toThrow("--fusion requires multiple vectors");
   });
 
   it("requires --fusion weighted when --weights provided", async () => {
     await expect(
       search("query", {
-        vector: "articles,concepts",
+        vector: "foo,bar",
         fusion: "rrf",
         weights: "3:1",
       }),
@@ -46,14 +46,14 @@ describe("search validation", () => {
 
   it("requires --weights when --fusion weighted", async () => {
     await expect(
-      search("query", { vector: "articles,concepts", fusion: "weighted" }),
+      search("query", { vector: "foo,bar", fusion: "weighted" }),
     ).rejects.toThrow("--fusion weighted requires --weights");
   });
 
   it("requires --weights count to match --vector count (2 vectors, 3 weights)", async () => {
     await expect(
       search("query", {
-        vector: "articles,concepts",
+        vector: "foo,bar",
         fusion: "weighted",
         weights: "3:2:1",
       }),
@@ -63,7 +63,7 @@ describe("search validation", () => {
   it("requires --weights count to match --vector count (3 vectors, 2 weights)", async () => {
     await expect(
       search("query", {
-        vector: "articles,concepts,titles",
+        vector: "foo,bar,baz",
         fusion: "weighted",
         weights: "3:1",
       }),
@@ -72,11 +72,7 @@ describe("search validation", () => {
 });
 
 describe("CLI E2E", () => {
-  const required = [
-    "OPENALEX_API_KEY",
-    "OPENALEX_EMAIL",
-    "GOOGLE_API_KEY",
-  ] as const;
+  const required = ["GOOGLE_API_KEY"] as const;
 
   beforeAll(() => {
     const missing = required.filter((key) => !process.env[key]);
@@ -97,7 +93,6 @@ describe("CLI E2E", () => {
       const result = await embed({
         input: CLUSTERS_FIXTURE_PATH,
         limit: "5",
-        maxArticles: "20",
       });
 
       expect(result.processed).toBe(5);
@@ -106,16 +101,12 @@ describe("CLI E2E", () => {
         url: qdrant.url,
         collectionName: "test-embed-e2e",
         vectors: {
-          concepts: { size: EMBEDDING_DIM },
-          articles: { size: EMBEDDING_DIM },
           titles: { size: EMBEDDING_DIM },
         },
       });
 
       const point0 = await store.get("0");
       expect(point0).not.toBeNull();
-      expect(point0?.vectors.concepts).toHaveLength(EMBEDDING_DIM);
-      expect(point0?.vectors.articles).toHaveLength(EMBEDDING_DIM);
       expect(point0?.vectors.titles).toHaveLength(EMBEDDING_DIM);
 
       const point4 = await store.get("4");
@@ -126,7 +117,7 @@ describe("CLI E2E", () => {
 
       // Search embedded clusters
       const searchResult = await search("perovskite solar cells", {
-        vector: "articles",
+        vector: "titles",
         limit: "5",
       });
 
@@ -147,7 +138,6 @@ describe("CLI E2E", () => {
 
       const result = await embed({
         input: CLUSTERS_WITH_INVALID_FIXTURE_PATH,
-        maxArticles: "5",
       });
 
       expect(result.processed).toBe(3);
@@ -156,8 +146,6 @@ describe("CLI E2E", () => {
         url: qdrant.url,
         collectionName: "test-skip-invalid",
         vectors: {
-          concepts: { size: EMBEDDING_DIM },
-          articles: { size: EMBEDDING_DIM },
           titles: { size: EMBEDDING_DIM },
         },
       });
@@ -166,7 +154,7 @@ describe("CLI E2E", () => {
       expect(point0).not.toBeNull();
 
       const point1 = await store.get("1");
-      expect(point1).toBeNull();
+      expect(point1).not.toBeNull();
 
       const point2 = await store.get("2");
       expect(point2).not.toBeNull();

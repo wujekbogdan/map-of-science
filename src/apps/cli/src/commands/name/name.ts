@@ -1,8 +1,8 @@
 import { Command } from "commander";
 import { createClusterNamer } from "@map-of-science/cluster-namer";
-import { streamJsonFile } from "@map-of-science/parsers/node";
+import { streamNdjsonFile } from "@map-of-science/parsers/node";
 import { createGenerator } from "@map-of-science/text-generator";
-import { forEachEntry } from "../embed/stream.js";
+import { forEachEntry } from "../../utils/stream.js";
 import { createNameConfig } from "./config.js";
 import { formatTsvHeader, formatTsvRow } from "./output.js";
 import { clusterSchema } from "./schema.js";
@@ -34,7 +34,7 @@ export const name = async (options: NameOptions) => {
   const config = createNameConfig(options);
   const { nameCluster } = compose(config);
 
-  const generator = streamJsonFile<string, unknown>(config.input);
+  const generator = streamNdjsonFile(config.input);
 
   console.log(formatTsvHeader());
 
@@ -43,16 +43,16 @@ export const name = async (options: NameOptions) => {
   await forEachEntry(
     generator,
     { start: config.start, limit: config.limit },
-    async (key, value, position) => {
-      const result = clusterSchema.safeParse(value);
+    async (entry, position) => {
+      const result = clusterSchema.safeParse(entry);
 
       if (!result.success) {
-        console.error(`Skipping invalid cluster ${key}`);
+        console.error(`Skipping invalid cluster`);
         return;
       }
 
       const { data, price } = await nameCluster(
-        { id: key, titles: result.data.titles },
+        { id: String(result.data.id), titles: result.data.titles },
         { maxTitles: config.maxTitles },
       );
 
@@ -60,7 +60,7 @@ export const name = async (options: NameOptions) => {
 
       console.log(formatTsvRow(data.id, data.label));
       console.error(
-        `[${position}/${config.limit}] ${key}: ${data.label} (${price.formatted})`,
+        `[${position}/${config.limit}] ${result.data.id}: ${data.label} (${price.formatted})`,
       );
     },
   );
@@ -74,7 +74,7 @@ export const createNameCommand = () => {
 
   command
     .description("Generate names for clusters using LLM")
-    .requiredOption("-i, --input <path>", "Path to clusters JSON file")
+    .requiredOption("-i, --input <path>", "Path to clusters NDJSON file")
     .option("-s, --start <number>", "Start index (0-based)")
     .option("-l, --limit <number>", "Number of clusters to process")
     .option("-m, --max-titles <number>", "Max titles per cluster")

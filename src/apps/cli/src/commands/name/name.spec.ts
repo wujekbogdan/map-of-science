@@ -4,7 +4,7 @@ import { name } from "./name.js";
 
 const CLUSTERS_FIXTURE_PATH = path.join(
   import.meta.dirname,
-  "../../__test__/clusters.json",
+  "../../__test__/clusters.ndjson",
 );
 
 vi.mock("@map-of-science/text-generator", () => ({

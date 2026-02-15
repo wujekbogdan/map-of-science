@@ -1,23 +1,7 @@
-type Article = {
-  doi: string;
-  title: string;
-};
-
 type ClusterInput = {
   id: string;
-  researchFields: string;
-  researchSubfields: string;
-  keyConcepts: string;
-  articleCount: number;
-  articleAge: number;
-  growthRating: number;
-  articles: Article[];
-};
-
-type Work = {
-  doi: string;
-  title: string;
-  abstract: string | null;
+  titles: string[];
+  totalArticles: number;
 };
 
 type EmbeddingResult = {
@@ -25,7 +9,6 @@ type EmbeddingResult = {
 };
 
 type Dependencies = {
-  fetchWorks: (dois: string[]) => Promise<Work[]>;
   embed: (text: string) => Promise<EmbeddingResult>;
   upsert: (params: {
     id: string;
@@ -35,59 +18,30 @@ type Dependencies = {
 };
 
 type Options = {
-  maxArticles?: number;
+  maxTitles?: number;
 };
 
-const DEFAULT_MAX_ARTICLES = 10;
-
-const buildArticlesText = (works: Work[]) =>
-  works
-    .map((work) =>
-      work.abstract ? `${work.title}\n\n${work.abstract}` : work.title,
-    )
-    .join("\n\n\n");
-
-const buildTitlesText = (works: Work[]) =>
-  works.map((work) => work.title).join("\n\n");
-
-const extractDois = (articles: Article[]) =>
-  articles
-    .map((article) => article.doi)
-    .filter((doi) => doi.startsWith("https://doi.org/"));
-
-const deduplicateDois = (dois: string[]) => [...new Set(dois)];
+const buildTitlesText = (titles: string[]) => titles.join("\n\n");
 
 export const createClusterEmbedder =
   (deps: Dependencies) =>
   async (cluster: ClusterInput, options: Options = {}) => {
-    const maxArticles = options.maxArticles ?? DEFAULT_MAX_ARTICLES;
-    const allDois = deduplicateDois(extractDois(cluster.articles));
-    const dois = allDois.slice(0, maxArticles);
-    const works = await deps.fetchWorks(dois);
-    const conceptsText = cluster.keyConcepts;
-    const articlesText = buildArticlesText(works);
-    const titlesText = buildTitlesText(works);
-    const [conceptsEmbedding, articlesEmbedding, titlesEmbedding] =
-      await Promise.all([
-        deps.embed(conceptsText),
-        deps.embed(articlesText),
-        deps.embed(titlesText),
-      ]);
+    const titles = options.maxTitles
+      ? cluster.titles.slice(0, options.maxTitles)
+      : cluster.titles;
+    const titlesText = buildTitlesText(titles);
+    const titlesEmbedding = await deps.embed(titlesText);
 
     const result = await deps.upsert({
       id: cluster.id,
       vectors: {
-        concepts: conceptsEmbedding.embedding,
-        articles: articlesEmbedding.embedding,
         titles: titlesEmbedding.embedding,
       },
       metadata: {
-        keyConcepts: cluster.keyConcepts,
-        articleCount: cluster.articleCount,
-        growthRating: cluster.growthRating,
+        clusterId: cluster.id,
+        totalArticles: cluster.totalArticles,
         embedding: {
-          articleCount: works.length,
-          abstractCount: works.filter((work) => work.abstract !== null).length,
+          titlesCount: titles.length,
         },
       },
     });

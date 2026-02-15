@@ -1,29 +1,26 @@
 import { z } from "zod";
 
-const articleSchema = z.object({
-  DOI: z.string(),
-  Title: z.string(),
-});
-
 export const clusterDataSchema = z
   .object({
-    "Research fields": z.string(),
-    "Research subfields": z.string(),
-    "Key concepts": z.string(),
-    "Number of articles": z.number(),
-    "Article age": z.number(),
-    "Growth rating": z.number(),
-    Articles: z.array(articleSchema),
+    id: z.number(),
+    totalArticles: z.number(),
+    articles: z.object({
+      core: z.array(z.string()),
+      review: z.array(z.string()),
+      highlyCited: z.array(z.string()),
+    }),
   })
   .transform((data) => ({
-    researchFields: data["Research fields"],
-    researchSubfields: data["Research subfields"],
-    keyConcepts: data["Key concepts"],
-    articleCount: data["Number of articles"],
-    articleAge: data["Article age"],
-    growthRating: data["Growth rating"],
-    articles: data.Articles.map((article) => ({
-      doi: article.DOI,
-      title: article.Title,
-    })),
-  }));
+    id: String(data.id),
+    totalArticles: data.totalArticles,
+    titles: [
+      ...new Set([
+        ...data.articles.core,
+        ...data.articles.review,
+        ...data.articles.highlyCited,
+      ]),
+    ],
+  }))
+  .refine((data) => data.titles.length > 0, {
+    message: "Cluster has no titles",
+  });
