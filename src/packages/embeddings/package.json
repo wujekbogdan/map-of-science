@@ -1,7 +1,7 @@
 {
   "name": "@map-of-science/embeddings",
   "version": "0.0.0",
-  "description": "Text embedding SDK with provider abstraction",
+  "description": "Text embedding generation with provider abstraction",
   "type": "module",
   "private": true,
   "main": "./src/index.ts",
