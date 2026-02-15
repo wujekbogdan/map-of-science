@@ -28,16 +28,12 @@ const validatePrefetchLimits = (
   }
 };
 
-type Weights = [number, number] | [number, number, number];
-
-export const normalizeWeights = (weights: Weights): Weights => {
+export const normalizeWeights = (weights: number[]): number[] => {
   const sum = weights.reduce((acc, w) => acc + w, 0);
   if (sum === 0) {
     throw new Error("Weights cannot all be zero");
   }
-  return weights.length === 2
-    ? [weights[0] / sum, weights[1] / sum]
-    : [weights[0] / sum, weights[1] / sum, weights[2] / sum];
+  return weights.map((w) => w / sum);
 };
 
 const buildFusionQuery = (fusion: MultiVectorQuery["fusion"]) => {

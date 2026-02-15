@@ -21,10 +21,7 @@ const envSchema = z.object({
 const vectorsSchema = z.preprocess(
   (val) =>
     typeof val === "string" ? val.split(",").map((v) => v.trim()) : val,
-  z
-    .array(z.enum(["articles", "concepts", "titles"]))
-    .min(1)
-    .max(3),
+  z.array(z.string().min(1)).min(1),
 );
 
 const fusionAliases = {
@@ -42,13 +39,13 @@ const fusionSchema = z
 const weightsSchema = z.preprocess(
   (val) =>
     typeof val === "string" ? val.split(":").map((v) => v.trim()) : val,
-  z.array(z.coerce.number()).min(2).max(3),
+  z.array(z.coerce.number()).min(2),
 );
 
 const cliSchema = z
   .object({
     query: z.string(),
-    vector: vectorsSchema.default(["articles"]),
+    vector: vectorsSchema.default(["titles"]),
     fusion: fusionSchema.optional(),
     weights: weightsSchema.optional(),
     limit: z.coerce.number().default(10),
@@ -59,7 +56,7 @@ const cliSchema = z
   })
   .refine((data) => !(data.fusion && data.vector.length < 2), {
     message:
-      "--fusion requires multiple vectors (e.g., --vector articles,concepts)",
+      "--fusion requires multiple vectors (e.g., --vector titles,concepts)",
   })
   .refine((data) => !(data.weights && data.fusion !== "weighted"), {
     message: "--weights requires --fusion weighted",
@@ -71,7 +68,7 @@ const cliSchema = z
     (data) => !data.weights || data.weights.length === data.vector.length,
     {
       message:
-        "--weights count must match --vector count (e.g., --vector articles,concepts,titles --weights 3:2:1)",
+        "--weights count must match --vector count (e.g., --vector titles,concepts --weights 3:1)",
     },
   );
 
@@ -103,15 +100,14 @@ const compose = (config: SearchConfig) => {
     { provider: "gemini", apiKey: config.gemini.apiKey },
     "query",
   );
+  const vectors = Object.fromEntries(
+    config.vector.map((name) => [name, { size: config.embeddingDimension }]),
+  );
   const store = createQdrantStore({
     url: config.qdrant.url,
     apiKey: config.qdrant.apiKey,
     collectionName: config.qdrant.collectionName,
-    vectors: {
-      concepts: { size: config.embeddingDimension },
-      articles: { size: config.embeddingDimension },
-      titles: { size: config.embeddingDimension },
-    },
+    vectors,
   });
 
   return { embedder, store };
@@ -126,29 +122,12 @@ type SearchOptions = {
 
 const PREFETCH_MULTIPLIER = 10;
 
-type Weights = [number, number] | [number, number, number];
-
-const toWeights = (weights: number[]): Weights => {
-  if (weights.length === 2) return [weights[0], weights[1]];
-  if (weights.length === 3) return [weights[0], weights[1], weights[2]];
-  throw new Error(`Invalid weights count: ${weights.length}`);
-};
-
-type Prefetch =
-  | [PrefetchQuery, PrefetchQuery]
-  | [PrefetchQuery, PrefetchQuery, PrefetchQuery];
-
 const buildPrefetch = (
   vector: string[],
   embedding: number[],
   limit: number,
-): Prefetch => {
-  const build = (using: string) => ({ vector: embedding, using, limit });
-  if (vector.length === 2) return [build(vector[0]), build(vector[1])];
-  if (vector.length === 3)
-    return [build(vector[0]), build(vector[1]), build(vector[2])];
-  throw new Error(`Invalid vector count: ${vector.length}`);
-};
+): PrefetchQuery[] =>
+  vector.map((using) => ({ vector: embedding, using, limit }));
 
 const buildSearchQuery = (config: SearchConfig, embedding: number[]) => {
   const { vector, fusion, weights, limit } = config;
@@ -166,7 +145,7 @@ const buildSearchQuery = (config: SearchConfig, embedding: number[]) => {
 
   const fusionStrategy: FusionStrategy =
     fusion === "weighted"
-      ? { type: "weightedSum", weights: toWeights(weights!) }
+      ? { type: "weightedSum", weights: weights! }
       : fusion === "dbsf"
         ? { type: "dbsf" }
         : { type: "rrf" };
@@ -233,10 +212,9 @@ export const createSearchCommand = () => {
     .description("Search clusters using vector similarity")
     .argument("<query>", "Search query text")
     .addOption(
-      new Option(
-        "-v, --vector <names>",
-        "Vector(s) to search (combine with comma: articles,concepts)",
-      ).default("articles"),
+      new Option("-v, --vector <names>", "Vector(s) to search").default(
+        "titles",
+      ),
     )
     .addOption(
       new Option(

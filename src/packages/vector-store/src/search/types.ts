@@ -33,14 +33,14 @@ type OrderBy = {
  *   vector search and then sums them. Good when scores are meaningful and comparable.
  *
  * - `weightedSum`: Calculates final score as weighted sum of individual scores.
- *   Supports 2-3 vectors. Use when you know the relative importance of each vector.
+ *   Use when you know the relative importance of each vector.
  */
 export type FusionStrategy =
   | { type: "rrf"; k?: number }
   | { type: "dbsf" }
   | {
       type: "weightedSum";
-      weights: [number, number] | [number, number, number];
+      weights: number[];
     };
 
 /**
@@ -73,9 +73,7 @@ export type SingleVectorQuery = {
  */
 export type MultiVectorQuery = {
   type: "multi";
-  prefetch:
-    | [PrefetchQuery, PrefetchQuery]
-    | [PrefetchQuery, PrefetchQuery, PrefetchQuery];
+  prefetch: PrefetchQuery[];
   fusion: FusionStrategy;
   scoreThreshold?: number;
 };
