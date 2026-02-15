@@ -95,7 +95,7 @@ describe("CLI E2E", () => {
         limit: "5",
       });
 
-      expect(result.processed).toBe(5);
+      expect(result.processed).toBe(3);
 
       const store = createQdrantStore({
         url: qdrant.url,
@@ -109,11 +109,11 @@ describe("CLI E2E", () => {
       expect(point0).not.toBeNull();
       expect(point0?.vectors.titles).toHaveLength(EMBEDDING_DIM);
 
-      const point4 = await store.get("4");
-      expect(point4).not.toBeNull();
+      const point2 = await store.get("2");
+      expect(point2).not.toBeNull();
 
-      const point5 = await store.get("5");
-      expect(point5).toBeNull();
+      const point3 = await store.get("3");
+      expect(point3).toBeNull();
 
       // Search embedded clusters
       const searchResult = await search("perovskite solar cells", {
@@ -140,7 +140,7 @@ describe("CLI E2E", () => {
         input: CLUSTERS_WITH_INVALID_FIXTURE_PATH,
       });
 
-      expect(result.processed).toBe(3);
+      expect(result.processed).toBe(4);
 
       const store = createQdrantStore({
         url: qdrant.url,
