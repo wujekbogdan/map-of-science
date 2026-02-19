@@ -1,6 +1,10 @@
 import { ZodSchema, ZodTypeDef } from "zod";
-import { arrayCollector, mapCollector } from "@map-of-science/csv";
-import { createProcessor, withHttpProvider } from "@map-of-science/csv";
+import {
+  arrayCollector,
+  mapCollector,
+  createProcessor,
+  withHttpProvider,
+} from "@map-of-science/parsers/browser";
 
 type Options<T> = {
   url: string;

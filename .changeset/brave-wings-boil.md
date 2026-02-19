@@ -1,5 +1,5 @@
 ---
-"@map-of-science/csv": patch
+"@map-of-science/parsers": patch
 ---
 
 - Export TS source directly (remove build step).

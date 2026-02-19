@@ -1,0 +1,22 @@
+{
+  "name": "@map-of-science/cluster-embedder",
+  "version": "0.0.0",
+  "description": "Domain logic for embedding research clusters",
+  "type": "module",
+  "private": true,
+  "main": "./src/index.ts",
+  "scripts": {
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "test:unit": "vitest --project=unit",
+    "test:integration": "vitest --project=integration"
+  },
+  "devDependencies": {
+    "@map-of-science/eslint": "workspace:*",
+    "@map-of-science/typescript": "workspace:*",
+    "@map-of-science/vitest": "workspace:*",
+    "@types/node": "^22.15.18",
+    "typescript": "~5.6.2",
+    "vitest": "^4.0.15"
+  }
+}

@@ -7,6 +7,7 @@
     "dev": "turbo dev",
     "build": "turbo build",
     "lint": "turbo lint",
+    "typecheck": "turbo typecheck",
     "test:unit": "turbo test:unit",
     "test:integration": "turbo test:integration",
     "create:package": "yes | turbo gen workspace --copy @map-of-science/package --type package --name @map-of-science/${name} --destination src/packages/${name}",

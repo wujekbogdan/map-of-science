@@ -1,0 +1,1194 @@
+{
+  "0": {
+    "Research fields": "Materials science, Engineering, Chemistry",
+    "Research subfields": "Chemical engineering, Optoelectronics, Analytical chemistry",
+    "Key concepts": "Perovskite solar cells, solar cells, inverted perovskite solar, power conversion efficiency, efficient inverted perovskite",
+    "Number of articles": 9751,
+    "Article age": 5.39,
+    "Growth rating": 62.16,
+    "Articles": [
+      {
+        "DOI": "https://doi.org/10.1038/s41560-019-0538-4",
+        "Title": "Managing grains and interfaces via ligand anchoring enables 22.3%-efficiency inverted perovskite solar cells"
+      },
+      {
+        "DOI": "https://doi.org/10.1038/s41586-021-03964-8",
+        "Title": "Perovskite solar cells with atomically coherent interlayers on SnO2 electrodes"
+      },
+      {
+        "DOI": "https://doi.org/10.1126/science.abh1885",
+        "Title": "Conformal quantum dot\u2013SnO2 layers as electron transporters for efficient perovskite solar cells, 2022"
+      },
+      {
+        "DOI": "https://doi.org/10.1038/s41586-021-03285-w",
+        "Title": "Efficient perovskite solar cells via improved carrier management"
+      },
+      {
+        "DOI": "https://doi.org/10.1038/s41586-023-05825-y",
+        "Title": "Controlled growth of perovskite layers with volatile alkylammonium chlorides"
+      },
+      {
+        "DOI": "https://doi.org/10.1038/s41586-021-03406-5",
+        "Title": "Pseudo-halide anion engineering for \u03b1-FAPbI3 perovskite solar cells"
+      },
+      {
+        "DOI": "https://doi.org/10.1126/science.abp8873",
+        "Title": "Inactive (PbI2)2RbCl stabilizes perovskite films for efficient solar cells, 2022"
+      },
+      {
+        "DOI": "https://doi.org/10.3390/cryst11070814",
+        "Title": "The Progress of Additive Engineering for CH3NH3PbI3 Photo-Active Layer in the Context of Perovskite Solar Cells"
+      },
+      {
+        "DOI": "https://doi.org/10.1002/solr.202300860",
+        "Title": "Recent Progress in Coating Methods for Large\u2010Area Perovskite Solar Module Fabrication"
+      },
+      {
+        "DOI": "https://doi.org/10.1007/s11664-020-08264-x",
+        "Title": "Advancement in Inorganic Hole Transport Materials for Inverted Perovskite Solar Cells"
+      },
+      {
+        "DOI": "https://doi.org/10.1007/s12274-022-4322-6",
+        "Title": "Progress toward understanding the fullerene-related chemical interactions in perovskite solar cells"
+      },
+      {
+        "DOI": "https://doi.org/10.1007/s10008-021-05064-z",
+        "Title": "Recent progress in electron transport bilayer for efficient and low-cost perovskite solar cells: a review"
+      },
+      {
+        "DOI": "https://doi.org/10.1038/s41560-019-0538-4",
+        "Title": "Managing grains and interfaces via ligand anchoring enables 22.3%-efficiency inverted perovskite solar cells"
+      },
+      {
+        "DOI": "https://doi.org/10.1038/s41586-021-03964-8",
+        "Title": "Perovskite solar cells with atomically coherent interlayers on SnO2 electrodes"
+      },
+      {
+        "DOI": "https://doi.org/10.1126/science.abc4417",
+        "Title": "Impact of strain relaxation on performance of alpha-formamidinium lead iodide perovskite solar cells, 2020"
+      },
+      {
+        "DOI": "https://doi.org/10.1126/science.abh1885",
+        "Title": "Conformal quantum dot\u2013SnO2 layers as electron transporters for efficient perovskite solar cells, 2022"
+      },
+      {
+        "DOI": "https://doi.org/10.1038/s41586-021-03285-w",
+        "Title": "Efficient perovskite solar cells via improved carrier management"
+      },
+      {
+        "DOI": "https://doi.org/10.1038/s41586-023-05825-y",
+        "Title": "Controlled growth of perovskite layers with volatile alkylammonium chlorides"
+      },
+      {
+        "DOI": "https://doi.org/10.1038/s41586-021-03406-5",
+        "Title": "Pseudo-halide anion engineering for \u03b1-FAPbI3 perovskite solar cells"
+      },
+      {
+        "DOI": "https://doi.org/10.1126/science.abp8873",
+        "Title": "Inactive (PbI2)2RbCl stabilizes perovskite films for efficient solar cells, 2022"
+      }
+    ],
+    "Top citing clusters": [
+      "https://sciencemap.eto.tech/cluster/?cluster_id=467",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=7842",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=27446",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=5064",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=13863",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=21952",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=4729",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=17940",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=54348",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=70725"
+    ],
+    "Top cited clusters": [
+      "https://sciencemap.eto.tech/cluster/?cluster_id=4729",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=21952",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=5064",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=27446",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=17940",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=7842",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=467",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=13863",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=4509",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=3472"
+    ]
+  },
+  "1": {
+    "Research fields": "Chemistry, Materials science, Physics",
+    "Research subfields": "Nuclear chemistry, Inorganic chemistry, Physical chemistry",
+    "Key concepts": "corrosion inhibitors, mild steel corrosion, mild steel, inhibition efficiency, carbon steel",
+    "Number of articles": 5364,
+    "Article age": 10.0,
+    "Growth rating": 61.22,
+    "Articles": [
+      {
+        "DOI": "https://doi.org/10.3390/pr8080942",
+        "Title": "Plant Extracts as Green Corrosion Inhibitors for Different Metal Surfaces and Corrosive Media: A Review"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.jcis.2020.08.093",
+        "Title": "Papaya leaves extract as a novel eco-friendly corrosion inhibitor for Cu in H2SO4 medium"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.cej.2020.126863",
+        "Title": "Fabrication of environmentally friendly Losartan potassium film for corrosion inhibition of mild steel in HCl medium"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.molliq.2024.124117",
+        "Title": "Pyracantha fortuneana alcohol extracts as biodegradable corrosion inhibitors for copper in H2SO4 media"
+      },
+      {
+        "DOI": "https://doi.org/10.1039/d3gc05207a",
+        "Title": "Principles and theories of green chemistry for corrosion science and engineering: design and application"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.jtice.2023.104712",
+        "Title": "Investigation of adsorption, corrosion inhibition, synergistic inhibition effect and stability studies of Rheum ribes\nleaf extract on mild steel in 1 M HCl solution"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.jiec.2023.02.013",
+        "Title": "The use of methanol extract of Rheum Ribes (I\u015fg\u0131n) flower as a natural and promising corrosion inhibitor for mild\nsteel protection in 1 M HCl solution"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.jtice.2019.12.006",
+        "Title": "Dardagan Fruit extract as eco-friendly corrosion inhibitor for mild steel in 1 M HCl: Electrochemical and surface\nmorphological studies"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.jcis.2020.11.059",
+        "Title": "Insight into anti-corrosion nature of Betel leaves water extracts as the novel and eco-friendly inhibitors"
+      },
+      {
+        "DOI": "https://doi.org/10.1007/s13369-021-05699-0",
+        "Title": "Corrosion Inhibition Applications of Natural and Eco-Friendly Corrosion Inhibitors on Steel in the Acidic\nEnvironment: An Overview"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.inoche.2024.113273",
+        "Title": "Synthesis, structural characterization, thermal analysis and anticorrosion properties of novel AZO-based\nimidazo[1,2-a]pyridine derivatives: Experimental study and theoretical approaches"
+      },
+      {
+        "DOI": "https://doi.org/10.17675/2305-6894-2022-11-1-1",
+        "Title": "Plant extracts as corrosion inhibitors for mild steel in H2SO4 and H3PO4 media \u2013 Review II"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.molliq.2021.118383",
+        "Title": "Investigation of inhibitive performance of Betahistine dihydrochloride on mild steel in 1 M HCl solution"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.cej.2021.133481",
+        "Title": "Mechanistic evaluation of adsorption and corrosion inhibition capabilities of novel indoline compounds for oil\nwell/tubing steel in 15% HCl"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.jece.2024.112354",
+        "Title": "Corrosion inhibition of mild steel in acidic environments: Mechanistic insights and protective effects of azo-cum\ninhibitor"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/b978-0-323-90589-3.00009-4",
+        "Title": "Chemical medicines (drugs) as green corrosion inhibitors"
+      },
+      {
+        "DOI": "https://doi.org/10.3390/pr8080942",
+        "Title": "Plant Extracts as Green Corrosion Inhibitors for Different Metal Surfaces and Corrosive Media: A Review"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.jcis.2020.08.093",
+        "Title": "Papaya leaves extract as a novel eco-friendly corrosion inhibitor for Cu in H2SO4 medium"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.jcis.2020.03.001",
+        "Title": "Multidimensional insights into the corrosion inhibition of 3,3-dithiodipropionic acid on Q235 steel in H2SO4\nmedium: A combined experimental and in silico investigation."
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.cej.2020.126863",
+        "Title": "Fabrication of environmentally friendly Losartan potassium film for corrosion inhibition of mild steel in HCl medium"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.jmst.2020.04.005",
+        "Title": "Self-assembling anchored film basing on two tetrazole derivatives for application to protect copper in sulfuric acid\nenvironment"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.molliq.2020.114666",
+        "Title": "Challenges and advantages of using plant extract as inhibitors in modern corrosion inhibition systems: Recent\nadvancements"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.jcis.2020.11.059",
+        "Title": "Insight into anti-corrosion nature of Betel leaves water extracts as the novel and eco-friendly inhibitors"
+      }
+    ],
+    "Top citing clusters": [
+      "https://sciencemap.eto.tech/cluster/?cluster_id=10613",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=11070",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=20750",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=5092",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=25798",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=72619",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=3999",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=73168",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=47582",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=6779"
+    ],
+    "Top cited clusters": [
+      "https://sciencemap.eto.tech/cluster/?cluster_id=10613",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=5092",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=11070",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=5552",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=20750",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=84",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=25798",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=5668",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=10608",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=6779"
+    ]
+  },
+  "2": {
+    "Research fields": "Medicine, Biology, Psychology",
+    "Research subfields": "Gastroenterology, Radiology, Urology",
+    "Key concepts": "Gastrointestinal Stromal Tumors, GIST patients, Stromal Tumors, advanced GIST, PDGFRA mutations",
+    "Number of articles": 2184,
+    "Article age": 12.63,
+    "Growth rating": 25.32,
+    "Articles": [
+      {
+        "DOI": "https://doi.org/10.1016/s1470-2045(20)30269-2",
+        "Title": "Avapritinib in advanced PDGFRA D842V-mutant gastrointestinal stromal tumour (NAVIGATOR): a multicentre,\nopen-label, phase 1 trial"
+      },
+      {
+        "DOI": "https://doi.org/10.1038/s41572-021-00254-5",
+        "Title": "Gastrointestinal stromal tumours"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/S1470-2045(20)30168-6",
+        "Title": "Ripretinib in patients with advanced gastrointestinal stromal tumours (INVICTUS): a double-blind, randomised,\nplacebo-controlled, phase 3 trial."
+      },
+      {
+        "DOI": "https://doi.org/10.1001/jamaoncol.2020.2091",
+        "Title": "Survival Outcomes Associated With 3 Years vs 1 Year of Adjuvant Imatinib for Patients With High-Risk\nGastrointestinal Stromal Tumors: An Analysis of a Randomized Clinical Trial After 10-Year Follow-up."
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.ejca.2020.12.008",
+        "Title": "Avapritinib in unresectable or metastatic PDGFRA D842V-mutant gastrointestinal stromal tumours: Long-term\nefficacy and safety data from the NAVIGATOR phase I trial, 2021"
+      },
+      {
+        "DOI": "https://doi.org/10.1186/s13045-020-01026-6",
+        "Title": "The management of metastatic GIST: current standard and investigational therapeutics"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.annonc.2021.09.005",
+        "Title": "Gastrointestinal stromal tumours: ESMO-EURACAN-GENTURIS Clinical Practice Guidelines for diagnosis, treatment\nand follow-up."
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.tranon.2020.100812",
+        "Title": "Prognostic indicators for gastrointestinal stromal tumors: a review"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.cancergen.2022.09.002",
+        "Title": "A literature review and database of how the primary KIT/PDGFRA variant of a gastrointestinal stromal tumour\npredicts for sensitivity to imatinib"
+      },
+      {
+        "DOI": "https://doi.org/10.1007/s10555-021-09961-7",
+        "Title": "Gastrointestinal stromal tumor: a review of current and emerging therapies"
+      },
+      {
+        "DOI": "https://doi.org/10.3892/ol.2022.13573",
+        "Title": "Clinical characteristics and prognosis of gastrointestinal stromal tumors with rare site metastasis (Review)"
+      },
+      {
+        "DOI": "https://doi.org/10.1200/edbk_351231",
+        "Title": "The GIST of Advances in Treatment of Advanced Gastrointestinal Stromal Tumor."
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.cpsurg.2024.101622",
+        "Title": "Management of Gastrointestinal Stromal Tumors: An Update for Surgeons"
+      },
+      {
+        "DOI": "https://doi.org/10.1177/17588359231192388",
+        "Title": "2023 GEIS Guidelines for gastrointestinal stromal tumors"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/s1470-2045(20)30269-2",
+        "Title": "Avapritinib in advanced PDGFRA D842V-mutant gastrointestinal stromal tumour (NAVIGATOR): a multicentre,\nopen-label, phase 1 trial"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.tranon.2020.100812",
+        "Title": "Prognostic indicators for gastrointestinal stromal tumors: a review"
+      },
+      {
+        "DOI": "https://doi.org/10.1038/s41572-021-00254-5",
+        "Title": "Gastrointestinal stromal tumours"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/S1470-2045(20)30168-6",
+        "Title": "Ripretinib in patients with advanced gastrointestinal stromal tumours (INVICTUS): a double-blind, randomised,\nplacebo-controlled, phase 3 trial."
+      },
+      {
+        "DOI": "https://doi.org/10.1038/s41572-021-00262-5",
+        "Title": "Gastrointestinal stromal tumours"
+      },
+      {
+        "DOI": "https://doi.org/10.1001/jamaoncol.2020.2091",
+        "Title": "Survival Outcomes Associated With 3 Years vs 1 Year of Adjuvant Imatinib for Patients With High-Risk\nGastrointestinal Stromal Tumors: An Analysis of a Randomized Clinical Trial After 10-Year Follow-up."
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.ejca.2020.12.008",
+        "Title": "Avapritinib in unresectable or metastatic PDGFRA D842V-mutant gastrointestinal stromal tumours: Long-term\nefficacy and safety data from the NAVIGATOR phase I trial, 2021"
+      },
+      {
+        "DOI": "https://doi.org/10.1186/s13045-020-01026-6",
+        "Title": "The management of metastatic GIST: current standard and investigational therapeutics"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.annonc.2021.09.005",
+        "Title": "Gastrointestinal stromal tumours: ESMO-EURACAN-GENTURIS Clinical Practice Guidelines for diagnosis, treatment\nand follow-up."
+      }
+    ],
+    "Top citing clusters": [
+      "https://sciencemap.eto.tech/cluster/?cluster_id=11263",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=22147",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=1516",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=20051",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=738",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=6888",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=43657",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=1309",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=3715",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=66845"
+    ],
+    "Top cited clusters": [
+      "https://sciencemap.eto.tech/cluster/?cluster_id=11263",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=1516",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=738",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=6888",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=5998",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=44955",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=3715",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=22147",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=429",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=19"
+    ]
+  },
+  "3": {
+    "Research fields": "Computer science, Mathematics, Engineering",
+    "Research subfields": "Distributed computing, Computer network, Real-time computing",
+    "Key concepts": "wireless sensor networks, sensor nodes, routing protocol, network lifetime, Energy Efficient Clustering",
+    "Number of articles": 1725,
+    "Article age": 10.94,
+    "Growth rating": 4.01,
+    "Articles": [
+      {
+        "DOI": "https://doi.org/10.3390/electronics11152282",
+        "Title": "Energy-Efficient Routing Protocols for Wireless Sensor Networks: Architectures, Strategies, and Performance"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.cosrev.2021.100396",
+        "Title": "Clustering protocols in wireless sensor network: A survey, classification, issues, and future directions"
+      },
+      {
+        "DOI": "https://doi.org/10.1142/s0218126620502047",
+        "Title": "Energy-Efficient Clusterhead Selection Scheme in Heterogeneous Wireless Sensor Network, 2020"
+      },
+      {
+        "DOI": "https://doi.org/10.1007/s11276-020-02260-z",
+        "Title": "Hierarchical routing protocols for wireless sensor network: a compressive survey"
+      },
+      {
+        "DOI": "https://doi.org/10.1007/s00542-020-04874-x",
+        "Title": "Three level heterogeneous clustering protocol for wireless sensor network"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.adhoc.2020.102409",
+        "Title": "A comprehensive survey on LEACH-based clustering routing protocols in Wireless Sensor Networks"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.comnet.2020.107376",
+        "Title": "Clustering objectives in wireless sensor networks: A survey and research direction analysis"
+      },
+      {
+        "DOI": "https://doi.org/10.1007/s11277-021-09372-5",
+        "Title": "Unequal Clustering Protocols for Wireless Sensor Networks\u2014Taxonomy, Comparison and Simulation"
+      },
+      {
+        "DOI": "https://doi.org/10.1049/iet-net.2019.0155",
+        "Title": "Survey on fault tolerance-based clustering evolution in WSN"
+      },
+      {
+        "DOI": "https://doi.org/10.3390/electronics11152282",
+        "Title": "Energy-Efficient Routing Protocols for Wireless Sensor Networks: Architectures, Strategies, and Performance"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.cosrev.2021.100396",
+        "Title": "Clustering protocols in wireless sensor network: A survey, classification, issues, and future directions"
+      },
+      {
+        "DOI": "https://doi.org/10.1007/s12652-021-03381-9",
+        "Title": "A survey on clustering protocols in wireless sensor network: taxonomy, comparison, and future scope"
+      },
+      {
+        "DOI": "https://doi.org/10.3390/electronics9101630",
+        "Title": "Optimization of Routing-Based Clustering Approaches in Wireless Sensor Network: Review and Open Research\nIssues"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.comnet.2020.107376",
+        "Title": "Clustering objectives in wireless sensor networks: A survey and research direction analysis"
+      },
+      {
+        "DOI": "https://doi.org/10.3233/jifs-210858",
+        "Title": "A Contemporary approach to review clustering algorithms in wireless sensor networks"
+      },
+      {
+        "DOI": "https://doi.org/10.1155/2020/9040395",
+        "Title": "Optimized Cluster-Based Dynamic Energy-Aware Routing Protocol for Wireless Sensor Networks in Agriculture\nPrecision"
+      },
+      {
+        "DOI": "https://doi.org/10.1007/s11276-020-02260-z",
+        "Title": "Hierarchical routing protocols for wireless sensor network: a compressive survey"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.adhoc.2020.102409",
+        "Title": "A comprehensive survey on LEACH-based clustering routing protocols in Wireless Sensor Networks"
+      },
+      {
+        "DOI": "https://doi.org/10.18535/ijecs/v5i1.16",
+        "Title": "Wireless Sensor Network"
+      },
+      {
+        "DOI": "https://doi.org/10.3390/en14196016",
+        "Title": "Energy-Efficient Clustering Scheme for Flying Ad-Hoc Networks Using an Optimized LEACH Protocol"
+      },
+      {
+        "DOI": "https://doi.org/10.3390/a13030072",
+        "Title": "Energy Efficient Routing in Wireless Sensor Networks: A Comprehensive Survey"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.comnet.2020.107376",
+        "Title": "Clustering objectives in wireless sensor networks: A survey and research direction analysis"
+      },
+      {
+        "DOI": "https://doi.org/10.1109/TNSM.2020.3035315",
+        "Title": "A Survey and Future Directions on Clustering: From WSNs to IoT and Modern Networking Paradigms"
+      }
+    ],
+    "Top citing clusters": [
+      "https://sciencemap.eto.tech/cluster/?cluster_id=23265",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=4887",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=462",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=21520",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=812",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=12319",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=10663",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=40938",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=27130",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=3451"
+    ],
+    "Top cited clusters": [
+      "https://sciencemap.eto.tech/cluster/?cluster_id=23265",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=462",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=4887",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=12319",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=812",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=3451",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=9151",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=11219",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=124",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=10663"
+    ]
+  },
+  "4": {
+    "Research fields": "Engineering, Materials science, Chemistry",
+    "Research subfields": "Composite material, Chemical engineering, Metallurgy",
+    "Key concepts": "natural fiber composites, fiber reinforced polymer, mechanical properties, Hybrid Natural Fiber, reinforced polymer composite",
+    "Number of articles": 5185,
+    "Article age": 8.99,
+    "Growth rating": 60.45,
+    "Articles": [
+      {
+        "DOI": "https://doi.org/10.1016/j.ijbiomac.2020.02.134",
+        "Title": "Characterization of a novel natural cellulosic fiber from Calotropis gigantea fruit bunch for ecofriendly polymer\ncomposites."
+      },
+      {
+        "DOI": "https://doi.org/10.1002/pc.26413",
+        "Title": "Lignocellulosic fiber reinforced composites: Progress, performance, properties, applications, and future\nperspectives"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.jmrt.2021.06.014",
+        "Title": "A review on natural fibers for development of eco-friendly bio-composite: characteristics, and utilizations"
+      },
+      {
+        "DOI": "https://doi.org/10.1007/s13399-023-03843-4",
+        "Title": "Effect of alkali treatment on novel natural fiber extracted from Himalayacalamus falconeri culms for polymer\ncomposite applications"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.jclepro.2020.120978",
+        "Title": "Renewable and sustainable biobased materials: An assessment on biofibers, biofilms, biopolymers and\nbiocomposites"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.rineng.2023.101271",
+        "Title": "A comprehensive review of natural fibers and their composites: An eco-friendly alternative to conventional\nmaterials"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.polymertesting.2020.106437",
+        "Title": "A new study on effect of various chemical treatments on Agave Americana fiber for composite reinforcement:\nPhysico-chemical, thermal, mechanical and morphological properties"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.polymertesting.2023.108083",
+        "Title": "Challenges and advancement in water absorption of natural fiber-reinforced polymer composites"
+      },
+      {
+        "DOI": "https://doi.org/10.1515/ipp-2024-0002",
+        "Title": "Advancements in chemical modifications using NaOH to explore the chemical, mechanical and thermal properties\nof natural fiber polymer composites (NFPC)"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.indcrop.2022.116099",
+        "Title": "Recently explored natural cellulosic plant fibers 2018\u20132022: A potential raw material resource for lightweight\ncomposites"
+      },
+      {
+        "DOI": "https://doi.org/10.1007/s10570-024-06160-9",
+        "Title": "Exploration of Cymbopogon nardus root fibers characteristics for sustainable lightweight composite reinforcement\napplications"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.ijbiomac.2024.136495",
+        "Title": "Extracting and characterizing of a new vegetable lignocellulosic fiber produced from C. humilis palm trunk for\nrenewable and sustainable applications."
+      },
+      {
+        "DOI": "https://doi.org/10.1002/pc.26683",
+        "Title": "Suitability examination of novel cellulosic plant fiber from Furcraea selloa K. Koch peduncle for a potential\npolymeric composite reinforcement"
+      },
+      {
+        "DOI": "https://doi.org/10.1155/2022/2009691",
+        "Title": "A Review on the Effect of Various Chemical Treatments on the Mechanical Properties of Renewable Fiber-\nReinforced Composites"
+      },
+      {
+        "DOI": "https://doi.org/10.1177/15589250211040184",
+        "Title": "Kenaf fibers reinforced unsaturated polyester composites: A review"
+      },
+      {
+        "DOI": "https://doi.org/10.1038/s41529-022-00277-7",
+        "Title": "Recent advances in biodegradable polymers for sustainable applications"
+      },
+      {
+        "DOI": "https://doi.org/10.1002/pc.26413",
+        "Title": "Lignocellulosic fiber reinforced composites: Progress, performance, properties, applications, and future\nperspectives"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.jmrt.2021.06.014",
+        "Title": "A review on natural fibers for development of eco-friendly bio-composite: characteristics, and utilizations"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.jclepro.2020.120978",
+        "Title": "Renewable and sustainable biobased materials: An assessment on biofibers, biofilms, biopolymers and\nbiocomposites"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.rineng.2021.100263",
+        "Title": "Natural fiber reinforced composites: Sustainable materials for emerging applications"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.polymertesting.2020.106437",
+        "Title": "A new study on effect of various chemical treatments on Agave Americana fiber for composite reinforcement:\nPhysico-chemical, thermal, mechanical and morphological properties"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.jclepro.2021.127483",
+        "Title": "Environment friendly, renewable and sustainable poly lactic acid (PLA) based natural fiber reinforced composites \u2013\nA comprehensive review"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.jclepro.2020.124109",
+        "Title": "Recent advancement in the natural fiber polymer composites: A comprehensive review"
+      }
+    ],
+    "Top citing clusters": [
+      "https://sciencemap.eto.tech/cluster/?cluster_id=16035",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=9333",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=414",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=856",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=56081",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=52147",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=82229",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=7768",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=48152",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=741"
+    ],
+    "Top cited clusters": [
+      "https://sciencemap.eto.tech/cluster/?cluster_id=16035",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=856",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=414",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=7768",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=52147",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=9333",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=48152",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=3117",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=56081",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=19159"
+    ]
+  },
+  "5": {
+    "Research fields": "Physics, Engineering, Materials science",
+    "Research subfields": "Acoustics, Mechanical engineering, Electrical engineering",
+    "Key concepts": "Piezoelectric energy harvester, Energy Harvesting, vibration energy, nonlinear piezoelectric energy, Electromagnetic energy",
+    "Number of articles": 2500,
+    "Article age": 9.59,
+    "Growth rating": 40.38,
+    "Articles": [
+      {
+        "DOI": "https://doi.org/10.1016/j.joule.2021.03.006",
+        "Title": "Rotational energy harvesting for self-powered sensing"
+      },
+      {
+        "DOI": "https://doi.org/10.3390/s20123512",
+        "Title": "Piezoelectric Energy Harvesting Solutions: A Review, 2020"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.enconman.2020.113174",
+        "Title": "Bio-inspired bi-stable piezoelectric harvester for broadband vibration energy harvesting"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.ymssp.2020.107167",
+        "Title": "Enhancing energy harvesting in low-frequency rotational motion by a quad-stable energy harvester with time-\nvarying potential wells"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.ijmecsci.2024.109228",
+        "Title": "Magnetic coupling and amplitude truncation based bistable energy harvester"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.ymssp.2022.110034",
+        "Title": "A multi-stable ultra-low frequency energy harvester using a nonlinear pendulum and piezoelectric transduction for\nself-powered sensing"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.jsv.2022.116886",
+        "Title": "Multistable vibration energy harvesters: Principle, progress, and perspectives"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.ymssp.2021.108038",
+        "Title": "Investigation of an ultra-low frequency piezoelectric energy harvester with high frequency up-conversion factor\ncaused by internal resonance mechanism"
+      },
+      {
+        "DOI": "https://doi.org/10.3390/mi12040436",
+        "Title": "A Review of Piezoelectric Vibration Energy Harvesting with Magnetic Coupling Based on Different Structural\nCharacteristics"
+      },
+      {
+        "DOI": "https://doi.org/10.3390/act12120456",
+        "Title": "A Review of Nonlinear Mechanisms for Frequency Up-Conversion in Energy Harvesting"
+      },
+      {
+        "DOI": "https://doi.org/10.1080/15376494.2022.2031357",
+        "Title": "On geometrical configurations of vibration-driven piezoelectric energy harvesters for optimum energy\ntransduction: A critical review"
+      },
+      {
+        "DOI": "https://doi.org/10.1002/er.6832",
+        "Title": "Review of frequency up-conversion vibration energy harvesters using impact and plucking mechanism"
+      },
+      {
+        "DOI": "https://doi.org/https://doi.org/10.1177/1045389x20978292",
+        "Title": "Dynamics of symmetric and asymmetric potential well-based piezoelectric harvesters: A comprehensive review"
+      },
+      {
+        "DOI": "https://doi.org/10.1007/s00542-022-05334-4",
+        "Title": "A review on piezoelectric energy harvesting"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.jsv.2022.116886",
+        "Title": "Multistable vibration energy harvesters: Principle, progress, and perspectives"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.joule.2021.03.006",
+        "Title": "Rotational energy harvesting for self-powered sensing"
+      },
+      {
+        "DOI": "https://doi.org/10.3390/s20123512",
+        "Title": "Piezoelectric Energy Harvesting Solutions: A Review, 2020"
+      },
+      {
+        "DOI": "https://doi.org/10.1002/er.5643",
+        "Title": "Vibration\u2010based piezoelectric, electromagnetic, and hybrid energy harvesters for microsystems applications: A\ncontributed review"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.apenergy.2021.117838",
+        "Title": "A low-frequency rotational electromagnetic energy harvester using a magnetic plucking mechanism"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.energy.2021.121770",
+        "Title": "Piezoelectric energy harvester for rolling bearings with capability of self-powered condition monitoring"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.enconman.2020.113174",
+        "Title": "Bio-inspired bi-stable piezoelectric harvester for broadband vibration energy harvesting"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.jsv.2022.116886",
+        "Title": "Multistable vibration energy harvesters: Principle, progress, and perspectives"
+      }
+    ],
+    "Top citing clusters": [
+      "https://sciencemap.eto.tech/cluster/?cluster_id=17833",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=1399",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=23962",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=62913",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=7686",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=76325",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=57986",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=26919",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=25398",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=20089"
+    ],
+    "Top cited clusters": [
+      "https://sciencemap.eto.tech/cluster/?cluster_id=1399",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=17833",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=7686",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=23962",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=26919",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=23862",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=57986",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=62913",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=8778",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=25398"
+    ]
+  },
+  "6": {
+    "Research fields": "Computer science, Mathematics, Physics",
+    "Research subfields": "Algorithm, Pattern recognition, Computer engineering",
+    "Key concepts": "Sparse Signal Recovery, Compressed Sensing, signal recovery algorithm, signal reconstruction, Measurement Matrix",
+    "Number of articles": 1057,
+    "Article age": 10.85,
+    "Growth rating": 2.51,
+    "Articles": [
+      {
+        "DOI": "https://doi.org/10.1016/j.cam.2023.115264",
+        "Title": "Heavy-ball-based hard thresholding algorithms for sparse signal recovery"
+      },
+      {
+        "DOI": "https://doi.org/10.1088/1742-6596/2419/1/012042",
+        "Title": "Compressed Sensing: Theory and Applications"
+      },
+      {
+        "DOI": "https://doi.org/10.1109/LSP.2023.3252469",
+        "Title": "A Correlation Coefficient Sparsity Adaptive Matching Pursuit Algorithm"
+      },
+      {
+        "DOI": "https://doi.org/10.4208/jcm.2307-m2022-0225",
+        "Title": "Stable Recovery of Sparse Signals With Non-Convex Weighted r-Norm Minus 1-Norm"
+      },
+      {
+        "DOI": "https://doi.org/10.1109/TSP.2021.3060010",
+        "Title": "Optimal Restricted Isometry Condition of Normalized Sampling Matrices for Exact Sparse Recovery With\nOrthogonal Least Squares"
+      },
+      {
+        "DOI": "https://doi.org/10.1007/s10898-022-01143-1",
+        "Title": "Partial gradient optimal thresholding algorithms for a class of sparse optimization problems"
+      },
+      {
+        "DOI": "https://doi.org/10.1109/LSP.2023.3238878",
+        "Title": "Improved RIC Bounds in Terms of \u03b4 _2s for Hard Thresholding-Based Algorithms"
+      },
+      {
+        "DOI": "https://doi.org/10.1137/23m1625846",
+        "Title": "Tight-Frame-Like Analysis-Sparse Recovery Using Nontight Sensing Matrices"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.memori.2023.100060",
+        "Title": "Survey on compressed sensing over the past two decades, 2023, Memories - Materials"
+      },
+      {
+        "DOI": "https://doi.org/10.1088/1757-899X/1099/1/012012",
+        "Title": "Compressive Sensing: Methods, Techniques, and Applications"
+      },
+      {
+        "DOI": "https://doi.org/10.3390/s23104678",
+        "Title": "Comparison of Common Algorithms for Single-Pixel Imaging via Compressed Sensing, 2023"
+      },
+      {
+        "DOI": "https://doi.org/10.1109/TIT.2021.3088090",
+        "Title": "Deterministic Constructions of Compressed Sensing Matrices From Unitary Geometry"
+      },
+      {
+        "DOI": "https://doi.org/10.1088/1742-6596/2419/1/012042",
+        "Title": "Compressed Sensing: Theory and Applications"
+      },
+      {
+        "DOI": "https://doi.org/10.1088/1757-899X/1099/1/012012",
+        "Title": "Compressive Sensing: Methods, Techniques, and Applications"
+      },
+      {
+        "DOI": "https://doi.org/10.1109/TSP.2021.3060010",
+        "Title": "Optimal Restricted Isometry Condition of Normalized Sampling Matrices for Exact Sparse Recovery With\nOrthogonal Least Squares"
+      },
+      {
+        "DOI": "https://doi.org/10.1109/LGRS.2021.3064555",
+        "Title": "MIMO Radar Super-Resolution Imaging Based on Reconstruction of the Measurement Matrix of Compressed\nSensing"
+      },
+      {
+        "DOI": "https://doi.org/10.1109/LSP.2020.3048833",
+        "Title": "Fast Variational Bayesian Inference for Temporally Correlated Sparse Signal Recovery"
+      },
+      {
+        "DOI": "https://doi.org/10.1109/TCSVT.2023.3247944",
+        "Title": "An Iterative Threshold Algorithm of Log-Sum Regularization for Sparse Problem"
+      }
+    ],
+    "Top citing clusters": [
+      "https://sciencemap.eto.tech/cluster/?cluster_id=44483",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=6518",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=19427",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=23533",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=69279",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=21413",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=10935",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=27130",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=47343",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=3205"
+    ],
+    "Top cited clusters": [
+      "https://sciencemap.eto.tech/cluster/?cluster_id=465",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=20587",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=19427",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=3205",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=1940",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=44483",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=47343",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=6518",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=69279",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=2515"
+    ]
+  },
+  "7": {
+    "Research fields": "Materials science, Physics, Chemistry",
+    "Research subfields": "Analytical chemistry, Condensed matter physics, Crystallography",
+    "Key concepts": "magnetic properties, transition temperature, Electrical Transport Properties, x-ray diffraction, manganites",
+    "Number of articles": 169,
+    "Article age": 21.81,
+    "Growth rating": 24.58,
+    "Articles": [
+      {
+        "DOI": "https://doi.org/10.3390/ma16041573",
+        "Title": "Effects of Partial Manganese Substitution by Cobalt on the Physical Properties of Pr0.7Sr0.3Mn(1\u2212x)CoxO3 (0 \u2264 x\n\u2264 0.15) Manganites, 2023"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.jmmm.2022.170255",
+        "Title": "Understanding the effect of Ni and Co doping in magnetic properties of La0.7Ca0.3MnO3: Magnetic Compton\nspectroscopy and DFT strategies"
+      },
+      {
+        "DOI": "https://doi.org/10.4028/www.scientific.net/msf.1023.9",
+        "Title": "Evidence of Hole Self-Doping due to Excess Oxygen Addition in Polycrystal LaMnO3"
+      },
+      {
+        "DOI": "https://doi.org/10.1134/S1063776120020120",
+        "Title": "Description of the Colossal Magnetoresistance of La1.2Sr1.8Mn2O7 Based on the Spin-Polaron Conduction\nMechanism in the Ferromagnetic Temperature Range"
+      },
+      {
+        "DOI": "https://doi.org/10.3897/j.moem.7.4.80758",
+        "Title": "Oxygen nonstoichiometry and magnetic properties of doped manganites La0.7Sr0.3Mn0.95Fe0.05O3-\u03b4"
+      },
+      {
+        "DOI": "https://doi.org/https://doi.org/10.4028/www.scientific.net/ssp.317.10",
+        "Title": "Effect of Fe Doping on the Structural, Electrical and Magnetic Properties of Perovskite La0.7Ca0.3Mn1-xFexO 3 (X\n= 0, 0.01, 0.03 and 0.05)"
+      },
+      {
+        "DOI": "https://doi.org/10.1088/2399-6528/ac104a",
+        "Title": "Pressure-induced phase transition in magnetoresistance perovskite La0.75Ca0.25MnO3: a GGA + U study"
+      },
+      {
+        "DOI": "https://doi.org/https://doi.org/10.1016/b978-0-12-819728-8.00070-x",
+        "Title": "Multifunctional Magnetic Oxides: Neutron Diffraction Studies"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.physrep.2021.02.004",
+        "Title": "Electronic phase separation: Recent progress in the old problem"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.jallcom.2021.158808",
+        "Title": "Structural characterization, magnetic and optical properties of perovskite (La1\u2212xLnx)0.67Ca0.33MnO3 (Ln = Nd\nand Sm; x = 0.0\u20130.5) nanoparticles synthesized via the sol-gel process"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.ceramint.2022.06.216",
+        "Title": "Enhancing magnetoresistive features of iron-substituted La0\u00b78Sr0\u00b72MnO3 ceramic manganites"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.ceramint.2020.08.145",
+        "Title": "Magnetoresistance, magnetothermopower, magnetothermal conductivity and magnetostriction in La1-xNaxMnO3\n(0\u2264x\u22640.05)"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.matchemphys.2021.124586",
+        "Title": "Relaxor ferroelectric phase transition and ac conduction in polycrystalline Gd0.55Ca0.45MnO3 at low temperature"
+      },
+      {
+        "DOI": "https://doi.org/10.1007/s13391-020-00216-1",
+        "Title": "Investigation of Structural, Optical and Electrical Transport Properties of Yttrium Doped La0.7Ca0.3MnO3\nPerovskites"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.jmmm.2021.168111",
+        "Title": "Effects of aliovalent dopants in LaMnO3: Magnetic, structural and transport properties"
+      }
+    ],
+    "Top citing clusters": [
+      "https://sciencemap.eto.tech/cluster/?cluster_id=2855",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=9235",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=8501",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=29138",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=30792",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=30554",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=5866",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=16939",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=66796",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=27453"
+    ],
+    "Top cited clusters": [
+      "https://sciencemap.eto.tech/cluster/?cluster_id=2855",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=9235",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=8501",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=29138",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=30792",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=5866",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=16939",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=30554",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=66796",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=5511"
+    ]
+  },
+  "8": {
+    "Research fields": "Engineering, Materials science, Chemistry",
+    "Research subfields": "Chemical engineering, Inorganic chemistry, Analytical chemistry",
+    "Key concepts": "sulfur batteries, high sulfur loading, lithium polysulfides, Sulfur Redox Kinetics, high energy density",
+    "Number of articles": 6701,
+    "Article age": 5.8,
+    "Growth rating": 65.6,
+    "Articles": [
+      {
+        "DOI": "https://doi.org/10.1021/acsnano.1c00270",
+        "Title": "ZnS-SnS@NC Heterostructure as Robust Lithiophilicity and Sulfiphilicity Mediator toward High-Rate and Long-Life\nLithium-Sulfur Batteries."
+      },
+      {
+        "DOI": "https://doi.org/10.1038/s41929-020-0498-x",
+        "Title": "A fundamental look at electrocatalytic sulfur reduction reaction"
+      },
+      {
+        "DOI": "https://doi.org/10.1038/s41560-022-01001-0",
+        "Title": "Formulating energy density for designing practical lithium\u2013sulfur batteries"
+      },
+      {
+        "DOI": "https://doi.org/10.1021/acs.chemrev.3c00919",
+        "Title": "Rechargeable Metal-Sulfur Batteries: Key Materials to Mechanisms"
+      },
+      {
+        "DOI": "https://doi.org/10.1002/aenm.202202094",
+        "Title": "Sulfur Reduction Reaction in Lithium\u2013Sulfur Batteries: Mechanisms, Catalysts, and Characterization"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.joule.2020.01.001",
+        "Title": "Lithium-Sulfur Batteries: Attaining the Critical Metrics"
+      },
+      {
+        "DOI": "https://doi.org/10.1002/aenm.202002893",
+        "Title": "Emerging Catalysts to Promote Kinetics of Lithium\u2013Sulfur Batteries"
+      },
+      {
+        "DOI": "https://doi.org/10.1002/adma.202003666",
+        "Title": "Advances in Lithium\u2013Sulfur Batteries: From Academic Research to Commercial Viability"
+      },
+      {
+        "DOI": "https://doi.org/10.1002/tcr.202200124",
+        "Title": "The Catalyst Design for Lithium\u2010Sulfur Batteries: Roles and Routes"
+      },
+      {
+        "DOI": "https://doi.org/10.1002/aenm.202201585",
+        "Title": "Advances in High Sulfur Loading Cathodes for Practical Lithium\u2010Sulfur Batteries"
+      },
+      {
+        "DOI": "https://doi.org/10.1007/978-3-030-90899-7_5",
+        "Title": "Catalytic Conversion of Polysulfides in Li\u2013S Batteries"
+      },
+      {
+        "DOI": "https://doi.org/10.1002/sus2.42",
+        "Title": "Designing principles of advanced sulfur cathodes toward practical lithium\u2010sulfur batteries"
+      },
+      {
+        "DOI": "https://doi.org/10.1002/aenm.202001304",
+        "Title": "Host Materials Anchoring Polysulfides in Li\u2013S Batteries Reviewed"
+      },
+      {
+        "DOI": "https://doi.org/10.1021/acs.iecr.0c04960",
+        "Title": "Research Progress on Improving the Sulfur Conversion Efficiency on the Sulfur Cathode Side in Lithium\u2013Sulfur\nBatteries"
+      },
+      {
+        "DOI": "https://doi.org/10.1002/aenm.202202094",
+        "Title": "Sulfur Reduction Reaction in Lithium\u2013Sulfur Batteries: Mechanisms, Catalysts, and Characterization"
+      },
+      {
+        "DOI": "https://doi.org/10.1002/aenm.202000082",
+        "Title": "Strategies toward High\u2010Loading Lithium\u2013Sulfur Battery"
+      },
+      {
+        "DOI": "https://doi.org/10.1021/acsnano.1c00270",
+        "Title": "ZnS-SnS@NC Heterostructure as Robust Lithiophilicity and Sulfiphilicity Mediator toward High-Rate and Long-Life\nLithium-Sulfur Batteries."
+      },
+      {
+        "DOI": "https://doi.org/10.1038/s41929-020-0498-x",
+        "Title": "A fundamental look at electrocatalytic sulfur reduction reaction"
+      },
+      {
+        "DOI": "https://doi.org/10.1002/aenm.202001304",
+        "Title": "Host Materials Anchoring Polysulfides in Li\u2013S Batteries Reviewed"
+      },
+      {
+        "DOI": "https://doi.org/10.1038/s41560-022-01001-0",
+        "Title": "Formulating energy density for designing practical lithium\u2013sulfur batteries"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.joule.2020.01.001",
+        "Title": "Lithium-Sulfur Batteries: Attaining the Critical Metrics"
+      },
+      {
+        "DOI": "https://doi.org/10.1021/acscentsci.0c00449",
+        "Title": "A Perspective toward Practical Lithium\u2013Sulfur Batteries"
+      },
+      {
+        "DOI": "https://doi.org/10.1002/adma.202003666",
+        "Title": "Advances in Lithium\u2013Sulfur Batteries: From Academic Research to Commercial Viability"
+      }
+    ],
+    "Top citing clusters": [
+      "https://sciencemap.eto.tech/cluster/?cluster_id=2105",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=41754",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=5622",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=2592",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=5896",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=13530",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=13815",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=2672",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=18768",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=332"
+    ],
+    "Top cited clusters": [
+      "https://sciencemap.eto.tech/cluster/?cluster_id=2105",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=4509",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=2592",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=5622",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=5896",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=54",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=23",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=13031",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=2672",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=41754"
+    ]
+  },
+  "9": {
+    "Research fields": "Medicine, Biology, Chemistry",
+    "Research subfields": "Gastroenterology, Internal medicine, Oncology",
+    "Key concepts": "HBV DNA, HBV DNA levels, chronic HBV infection, CHB patients, baseline HBV DNA",
+    "Number of articles": 1618,
+    "Article age": 13.39,
+    "Growth rating": 22.77,
+    "Articles": [
+      {
+        "DOI": "https://doi.org/10.1016/j.jhep.2020.06.011",
+        "Title": "Similar risk of hepatocellular carcinoma during long-term entecavir or tenofovir therapy in Caucasian patients with\nchronic hepatitis B"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/S2468-1253(20)30249-1",
+        "Title": "Hepatocellular carcinoma incidence with tenofovir versus entecavir in chronic hepatitis B: a systematic review and\nmeta-analysis."
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.cgh.2020.03.001",
+        "Title": "Persistent Low Level of Hepatitis B Virus Promotes Fibrosis Progression During Therapy"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.cgh.2021.01.019",
+        "Title": "507 NATURAL HISTORY AND HEPATOCELLULAR CARCINOMA RISK IN UNTREATED CHRONIC HEPATITIS B PATIENTS\nWITH INDETERMINATE PHASE"
+      },
+      {
+        "DOI": "https://doi.org/10.1111/apt.15725",
+        "Title": "Moderate levels of serum hepatitis B virus DNA are associated with the highest risk of hepatocellular carcinoma in\nchronic hepatitis B patients"
+      },
+      {
+        "DOI": "https://doi.org/10.1111/apt.17272",
+        "Title": "Significant histological disease of patients with chronic hepatitis B virus infection in the grey zone"
+      },
+      {
+        "DOI": "https://doi.org/10.1053/j.gastro.2021.11.002",
+        "Title": "Off-Therapy Response After Nucleos(t)ide Analogue Withdrawal in Patients With Chronic Hepatitis B: An\nInternational, Multicenter, Multiethnic Cohort (RETRACT-B Study)"
+      },
+      {
+        "DOI": "https://doi.org/10.1007/s12072-021-10153-2",
+        "Title": "High-normal alanine aminotransferase is an indicator for liver histopathology in HBeAg-negative chronic hepatitis\nB"
+      },
+      {
+        "DOI": "https://doi.org/10.2147/HMER.S291976",
+        "Title": "Current Perspectives on Nucleos(t)ide Analogue Therapy for the Long-Term Treatment of Hepatitis B Virus"
+      },
+      {
+        "DOI": "https://doi.org/10.4254/wjh.v13.i9.1042",
+        "Title": "Challenges in the discontinuation of chronic hepatitis B antiviral agents"
+      },
+      {
+        "DOI": "https://doi.org/10.3390/jcm11041126",
+        "Title": "Hepatocellular Carcinoma in Hepatitis B Virus-Infected Patients and the Role of Hepatitis B Surface Antigen\n(HBsAg)"
+      },
+      {
+        "DOI": "https://doi.org/10.1007/s00535-020-01680-0",
+        "Title": "Adverse events of nucleos(t)ide analogues for chronic hepatitis B: a systematic review"
+      },
+      {
+        "DOI": "https://doi.org/10.1007/s12072-021-10223-5",
+        "Title": "APASL guidance on stopping nucleos(t)ide analogues in chronic hepatitis B patients"
+      },
+      {
+        "DOI": "https://doi.org/10.1111/jvh.13988",
+        "Title": "Association of Hepatitis B Surface Antigen Levels With Long-Term Complications in Chronic Hepatitis B Virus\nInfection: A Systematic Literature Review."
+      },
+      {
+        "DOI": "https://doi.org/10.1080/17474124.2020.1738219",
+        "Title": "Current practice and contrasting views on discontinuation of nucleos(t)ide analog therapy in chronic hepatitis B"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.jhep.2020.06.011",
+        "Title": "Similar risk of hepatocellular carcinoma during long-term entecavir or tenofovir therapy in Caucasian patients with\nchronic hepatitis B"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/S2468-1253(20)30249-1",
+        "Title": "Hepatocellular carcinoma incidence with tenofovir versus entecavir in chronic hepatitis B: a systematic review and\nmeta-analysis."
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.cgh.2020.03.001",
+        "Title": "Persistent Low Level of Hepatitis B Virus Promotes Fibrosis Progression During Therapy"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/s2468-1253(23)00197-8",
+        "Title": "Global prevalence, cascade of care, and prophylaxis coverage of hepatitis B in 2022: a modelling study"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.cgh.2021.01.019",
+        "Title": "507 NATURAL HISTORY AND HEPATOCELLULAR CARCINOMA RISK IN UNTREATED CHRONIC HEPATITIS B PATIENTS\nWITH INDETERMINATE PHASE"
+      },
+      {
+        "DOI": "https://doi.org/10.1016/j.cgh.2020.05.008",
+        "Title": "Effects of Tenofovir vs Entecavir on Risk of Hepatocellular Carcinoma in Patients With Chronic HBV Infection: A\nSystematic Review and Meta-analysis."
+      },
+      {
+        "DOI": "https://doi.org/10.1056/NEJMoa2210027",
+        "Title": "Efficacy and Safety of Bepirovirsen in Chronic Hepatitis B Infection."
+      },
+      {
+        "DOI": "https://doi.org/10.1053/j.gastro.2021.11.002",
+        "Title": "Off-Therapy Response After Nucleos(t)ide Analogue Withdrawal in Patients With Chronic Hepatitis B: An\nInternational, Multicenter, Multiethnic Cohort (RETRACT-B Study)"
+      }
+    ],
+    "Top citing clusters": [
+      "https://sciencemap.eto.tech/cluster/?cluster_id=59083",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=3610",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=19567",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=9659",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=1021",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=6598",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=240",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=3856",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=43222",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=13084"
+    ],
+    "Top cited clusters": [
+      "https://sciencemap.eto.tech/cluster/?cluster_id=240",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=3610",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=59083",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=13084",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=1021",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=3856",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=19567",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=9659",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=1454",
+      "https://sciencemap.eto.tech/cluster/?cluster_id=5847"
+    ]
+  }
+}

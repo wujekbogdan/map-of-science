@@ -40,7 +40,7 @@
   "dependencies": {
     "@floating-ui/react": "^0.27.8",
     "@headlessui/react": "^2.2.0",
-    "@map-of-science/csv": "workspace:*",
+    "@map-of-science/parsers": "workspace:*",
     "@uidotdev/usehooks": "^2.4.1",
     "comlink": "^4.4.2",
     "d3": "^7.9.0",

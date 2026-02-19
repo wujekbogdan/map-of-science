@@ -1,4 +1,8 @@
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { defineConfig } from "vitest/config";
+
+const here = dirname(fileURLToPath(import.meta.url));
 
 export const defineNodeConfig = () =>
   defineConfig({
@@ -18,6 +22,7 @@ export const defineNodeConfig = () =>
             name: "integration",
             environment: "node",
             include: ["src/**/*.integration.spec.ts"],
+            setupFiles: [resolve(here, "./setup.js")],
           },
         },
       ],
@@ -42,6 +47,7 @@ export const defineReactConfig = () =>
             name: "integration",
             environment: "happy-dom",
             include: ["src/**/*.integration.spec.{ts,tsx}"],
+            setupFiles: [resolve(here, "./setup.js")],
           },
         },
       ],

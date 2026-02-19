@@ -1,0 +1,28 @@
+{
+  "name": "@map-of-science/openalex",
+  "version": "0.0.0",
+  "description": "OpenAlex API client for academic work metadata",
+  "type": "module",
+  "private": true,
+  "main": "./src/index.ts",
+  "scripts": {
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "test:unit": "vitest --project=unit",
+    "test:integration": "vitest --project=integration"
+  },
+  "devDependencies": {
+    "@map-of-science/eslint": "workspace:*",
+    "@map-of-science/test-utils": "workspace:*",
+    "@map-of-science/typescript": "workspace:*",
+    "@map-of-science/vitest": "workspace:*",
+    "@types/node": "^22.15.18",
+    "msw": "^2.8.6",
+    "typescript": "~5.6.2",
+    "vitest": "^4.0.15"
+  },
+  "dependencies": {
+    "es-toolkit": "^1.43.0",
+    "zod": "^3.25.76"
+  }
+}

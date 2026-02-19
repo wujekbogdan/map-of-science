@@ -34,6 +34,10 @@ jobs:
           cache: 'pnpm'
       - run: pnpm i
       - run: pnpm turbo test:unit test:integration
+        env:
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
+          OPENALEX_EMAIL: ${{ secrets.OPENALEX_EMAIL }}
 
   build:
     runs-on: ubuntu-24.04
