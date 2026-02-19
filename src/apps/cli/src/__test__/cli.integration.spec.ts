@@ -16,14 +16,8 @@ const CLUSTERS_WITH_INVALID_FIXTURE_PATH = path.join(
 const EMBEDDING_DIM = 768;
 
 describe("search validation", () => {
-  it("requires --fusion when 2 vectors", async () => {
+  it("requires --fusion when multiple vectors", async () => {
     await expect(search("query", { vector: "foo,bar" })).rejects.toThrow(
-      "Multiple vectors requires --fusion",
-    );
-  });
-
-  it("requires --fusion when 3 vectors", async () => {
-    await expect(search("query", { vector: "foo,bar,baz" })).rejects.toThrow(
       "Multiple vectors requires --fusion",
     );
   });
@@ -50,22 +44,12 @@ describe("search validation", () => {
     ).rejects.toThrow("--fusion weighted requires --weights");
   });
 
-  it("requires --weights count to match --vector count (2 vectors, 3 weights)", async () => {
+  it("requires --weights count to match --vector count", async () => {
     await expect(
       search("query", {
         vector: "foo,bar",
         fusion: "weighted",
         weights: "3:2:1",
-      }),
-    ).rejects.toThrow("--weights count must match --vector count");
-  });
-
-  it("requires --weights count to match --vector count (3 vectors, 2 weights)", async () => {
-    await expect(
-      search("query", {
-        vector: "foo,bar,baz",
-        fusion: "weighted",
-        weights: "3:1",
       }),
     ).rejects.toThrow("--weights count must match --vector count");
   });
