@@ -1,6 +1,6 @@
 {
   "name": "@map-of-science/cli",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "CLI for map-of-science operations",
   "type": "module",
   "private": true,

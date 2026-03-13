@@ -1,5 +1,25 @@
 # @map-of-science/web
 
+## 1.19.0
+
+### Minor Changes
+
+- e736905: Add LLM-generated cluster names
+
+### Patch Changes
+
+- 7f733cb: - Split test into `test:unit` / `test:integration`.
+  - Add `typecheck` script.
+  - Add `vitest.config.ts` with React config.
+  - Upgrade `vitest` to `^4.0.15`, `vite` to `^7.2.6`, `react` to `^19.2.0`, `@vitejs/plugin-react-swc` to `^3.11.0`.
+- fff35db: Update imports from `@map-of-science/csv` to `@map-of-science/parsers`
+- Updated dependencies [7f733cb]
+- Updated dependencies [fff35db]
+- Updated dependencies [fff35db]
+- Updated dependencies [fff35db]
+- Updated dependencies [fff35db]
+  - @map-of-science/parsers@0.2.0
+
 ## 1.18.1
 
 ### Patch Changes

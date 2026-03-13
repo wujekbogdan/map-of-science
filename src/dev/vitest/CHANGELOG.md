@@ -1,5 +1,14 @@
 # @map-of-science/vitest
 
+## 0.3.0
+
+### Minor Changes
+
+- fff35db: Add integration test setup with `dotenv-mono` for `.env.test` loading
+- 7f733cb: - Add `defineReactConfig()` with `happy-dom`.
+  - Add `unit` + `integration` project separation.
+  - Upgrade `vitest` to `^4.0.15`.
+
 ## 0.2.0
 
 ### Minor Changes

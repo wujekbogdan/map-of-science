@@ -1,5 +1,29 @@
 # @map-of-science/root
 
+## 0.6.0
+
+### Minor Changes
+
+- 7f733cb: - Split test into `test:unit` and `test:integration`.
+  - Add scaffolding scripts (`create:package`, `create:react-app`, `create:node-app`).
+  - Add `@manypkg/cli` with `deps:check` and `deps:fix` scripts.
+  - Update `turbo.json` pipelines accordingly.
+  - Add `src/examples/*` to pnpm workspace.
+- fff35db: Configure integration test infrastructure.
+
+  - Add `passThroughEnv` for Docker, Google, and OpenAlex env vars in `turbo.json`
+  - Add `.env.test.example` with required integration test env vars
+  - Pass API secrets (Google, OpenAlex) to CI workflow
+  - Add `.env*` to `.gitignore`
+
+- fff35db: Change turbo ui mode from `tui` to `stream`.
+- f6821b2: Temporarily restore Github Pages deployment
+
+### Patch Changes
+
+- eae0226: Add a missing `VITE_BASE_URL` environment variable to the Github Pages deployment workflow.
+- fff35db: Add `typecheck` workspace command
+
 ## 0.5.0
 
 ### Minor Changes

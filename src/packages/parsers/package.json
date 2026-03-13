@@ -1,6 +1,6 @@
 {
   "name": "@map-of-science/parsers",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Streaming parsers for CSV and JSON data formats",
   "private": true,
   "type": "module",
