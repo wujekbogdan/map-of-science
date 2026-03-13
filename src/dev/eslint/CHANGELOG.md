@@ -1,5 +1,15 @@
 # @map-of-science/eslint
 
+## 0.4.0
+
+### Minor Changes
+
+- 7f733cb: - Support custom config via `configs` param.
+  - Fix node config globals (`browser` -> `node`).
+  - Add `tsconfigRootDir` for type-aware linting.
+  - Add `eslint-plugin-react` with `jsx-runtime` support.
+  - Add React version detection.
+
 ## 0.3.0
 
 ### Minor Changes

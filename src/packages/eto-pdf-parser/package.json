@@ -1,6 +1,6 @@
 {
   "name": "@map-of-science/eto-pdf-parser",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Parser for ETO Map of Science cluster PDF files",
   "type": "module",
   "private": true,

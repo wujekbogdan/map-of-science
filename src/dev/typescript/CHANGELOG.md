@@ -1,5 +1,15 @@
 # @map-of-science/typescript
 
+## 0.5.0
+
+### Minor Changes
+
+- 7f733cb: - Add `tsconfig.base.json` with shared settings.
+  - Refactor `node/react` configs to extend base.
+  - Switch to `noEmit` + `Bundler` moduleResolution.
+  - Remove `declaration`/`outDir` (bundler handles output).
+  - Drop `vite` config export (node config now includes all `*.ts` files).
+
 ## 0.4.0
 
 ### Minor Changes
