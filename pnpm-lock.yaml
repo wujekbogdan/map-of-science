@@ -516,6 +516,9 @@ importers:
       '@map-of-science/typescript':
         specifier: workspace:*
         version: link:../../dev/typescript
+      '@map-of-science/vector-store':
+        specifier: workspace:*
+        version: link:../vector-store
       '@map-of-science/vitest':
         specifier: workspace:*
         version: link:../../dev/vitest
