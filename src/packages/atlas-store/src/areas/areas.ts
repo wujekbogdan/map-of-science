@@ -1,12 +1,20 @@
 import type { QdrantClient } from "@qdrant/js-client-rest";
 import { z } from "zod";
 import { type Area, type BBox, areaSchema } from "@map-of-science/atlas";
+import { createLogger } from "@map-of-science/logger";
 import { ensureCollectionSchema } from "../collection/ensure-collection-schema.js";
+
+const logger = createLogger();
 
 const COLLECTION = "areas";
 const PLACEHOLDER_VECTOR = "_placeholder";
 const PLACEHOLDER_SIZE = 1;
 const PLACEHOLDER_VALUE: number[] = [0];
+
+// Defensive cap on viewport query results. A warning is logged if a query
+// returns exactly this many rows so the cap can be raised before truncation
+// becomes a real problem.
+const VIEWPORT_LIMIT = 10_000;
 
 const schemaSpec = {
   name: COLLECTION,
@@ -92,10 +100,17 @@ export const createAreasRepository = ({
     ];
     const response = await qdrant.scroll(COLLECTION, {
       filter: { must },
-      limit: 10_000,
+      limit: VIEWPORT_LIMIT,
       with_payload: true,
       with_vector: false,
     });
-    return response.points.map(parsePoint);
+    const areas = response.points.map(parsePoint);
+    if (areas.length === VIEWPORT_LIMIT) {
+      logger.warn(
+        { limit: VIEWPORT_LIMIT, bbox, tier },
+        "areas.findInViewport hit the viewport cap; raise VIEWPORT_LIMIT",
+      );
+    }
+    return areas;
   },
 });

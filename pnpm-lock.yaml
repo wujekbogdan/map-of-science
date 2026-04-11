@@ -503,6 +503,9 @@ importers:
       '@map-of-science/atlas':
         specifier: workspace:*
         version: link:../atlas
+      '@map-of-science/logger':
+        specifier: workspace:*
+        version: link:../logger
       '@qdrant/js-client-rest':
         specifier: ^1.16.2
         version: 1.16.2(typescript@5.6.3)
