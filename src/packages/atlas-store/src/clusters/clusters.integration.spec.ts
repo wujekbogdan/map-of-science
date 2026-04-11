@@ -1,10 +1,21 @@
 import { QdrantClient } from "@qdrant/js-client-rest";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import type { ClusterInput } from "@map-of-science/atlas";
 // TODO: inline the Qdrant testcontainers helper here and drop the
 // vector-store devDep once no other consumer remains.
 import { withQdrantContainer } from "@map-of-science/vector-store/test";
+import { ensureCollectionSchema } from "../collection/ensure-collection-schema.js";
 import { createClustersRepository } from "./clusters.js";
+
+vi.mock("../collection/ensure-collection-schema.js", async () => {
+  const actual = await vi.importActual<
+    typeof import("../collection/ensure-collection-schema.js")
+  >("../collection/ensure-collection-schema.js");
+  return {
+    ...actual,
+    ensureCollectionSchema: vi.fn(actual.ensureCollectionSchema),
+  };
+});
 
 type Deps = {
   repository: ReturnType<typeof createClustersRepository>;
@@ -20,7 +31,7 @@ const withClusterRepository = (test: (deps: Deps) => Promise<void>) =>
 
 const withReadyClusterRepository = (test: (deps: Deps) => Promise<void>) =>
   withClusterRepository(async (deps) => {
-    await deps.repository.ensureCollection();
+    await deps.repository.ensureSchema();
     await test(deps);
   });
 
@@ -41,39 +52,29 @@ const buildClusterInput = (
 
 describe("clusters repository", () => {
   it(
-    "should create the clusters collection with the titles vector",
-    withClusterRepository(async ({ repository, client }) => {
-      await repository.ensureCollection();
-
-      const collection = await client.getCollection("clusters");
-      expect(collection.config.params.vectors).toMatchObject({
-        titles: { size: 768, distance: "Cosine" },
-      });
-    }),
-    60_000,
-  );
-
-  it(
-    "should be idempotent when the collection already exists",
+    "should ensure the clusters schema",
     withClusterRepository(async ({ repository }) => {
-      await repository.ensureCollection();
-      await expect(repository.ensureCollection()).resolves.not.toThrow();
-    }),
-    60_000,
-  );
+      vi.mocked(ensureCollectionSchema).mockClear();
 
-  it(
-    "should create payload indexes for spatial and metric fields",
-    withClusterRepository(async ({ repository, client }) => {
-      await repository.ensureCollection();
+      await repository.ensureSchema();
 
-      const collection = await client.getCollection("clusters");
-      expect(collection.payload_schema).toMatchObject({
-        x: { data_type: "float" },
-        y: { data_type: "float" },
-        articlesCount: { data_type: "integer" },
-        growthRating: { data_type: "float" },
-      });
+      expect(ensureCollectionSchema).toHaveBeenCalledTimes(1);
+      expect(ensureCollectionSchema).toHaveBeenNthCalledWith(
+        1,
+        expect.any(QdrantClient),
+        {
+          name: "clusters",
+          vectors: {
+            titles: { size: 768, distance: "Cosine" },
+          },
+          payloadIndexes: [
+            { field_name: "x", field_schema: "float" },
+            { field_name: "y", field_schema: "float" },
+            { field_name: "articlesCount", field_schema: "integer" },
+            { field_name: "growthRating", field_schema: "float" },
+          ],
+        },
+      );
     }),
     60_000,
   );

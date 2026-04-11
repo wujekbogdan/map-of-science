@@ -7,10 +7,24 @@ import {
   type ClusterMatch,
   clusterSchema,
 } from "@map-of-science/atlas";
+import { ensureCollectionSchema } from "../collection/ensure-collection-schema.js";
 
 const COLLECTION = "clusters";
 const TITLES_VECTOR = "titles";
 const TITLES_VECTOR_SIZE = 768;
+
+const schemaSpec = {
+  name: COLLECTION,
+  vectors: {
+    [TITLES_VECTOR]: { size: TITLES_VECTOR_SIZE, distance: "Cosine" },
+  },
+  payloadIndexes: [
+    { field_name: "x", field_schema: "float" },
+    { field_name: "y", field_schema: "float" },
+    { field_name: "articlesCount", field_schema: "integer" },
+    { field_name: "growthRating", field_schema: "float" },
+  ],
+} as const;
 
 const rawPointSchema = z.object({
   id: z.union([z.string(), z.number()]).transform(String),
@@ -62,36 +76,8 @@ export const createClustersRepository = ({
 }: {
   qdrant: QdrantClient;
 }) => ({
-  async ensureCollection() {
-    const { exists } = await qdrant.collectionExists(COLLECTION);
-    if (exists) return;
-    await qdrant.createCollection(COLLECTION, {
-      vectors: {
-        [TITLES_VECTOR]: { size: TITLES_VECTOR_SIZE, distance: "Cosine" },
-      },
-    });
-    await Promise.all([
-      qdrant.createPayloadIndex(COLLECTION, {
-        field_name: "x",
-        field_schema: "float",
-        wait: true,
-      }),
-      qdrant.createPayloadIndex(COLLECTION, {
-        field_name: "y",
-        field_schema: "float",
-        wait: true,
-      }),
-      qdrant.createPayloadIndex(COLLECTION, {
-        field_name: "articlesCount",
-        field_schema: "integer",
-        wait: true,
-      }),
-      qdrant.createPayloadIndex(COLLECTION, {
-        field_name: "growthRating",
-        field_schema: "float",
-        wait: true,
-      }),
-    ]);
+  async ensureSchema() {
+    await ensureCollectionSchema(qdrant, schemaSpec);
   },
 
   async upsert(items: ClusterInput[]) {

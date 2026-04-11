@@ -27,7 +27,7 @@ export type EntityRef = z.infer<typeof entityRefSchema>;
 export type ContentItem = z.infer<typeof contentItemSchema>;
 
 export type ContentRepository = {
-  ensureCollection(): Promise<void>;
+  ensureSchema(): Promise<void>;
   upsert(items: ContentItem[]): Promise<void>;
   findByClusterId(clusterId: string): Promise<ContentItem[]>;
 };

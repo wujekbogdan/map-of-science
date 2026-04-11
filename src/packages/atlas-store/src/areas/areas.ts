@@ -1,11 +1,24 @@
 import type { QdrantClient } from "@qdrant/js-client-rest";
 import { z } from "zod";
 import { type Area, type BBox, areaSchema } from "@map-of-science/atlas";
+import { ensureCollectionSchema } from "../collection/ensure-collection-schema.js";
 
 const COLLECTION = "areas";
 const PLACEHOLDER_VECTOR = "_placeholder";
 const PLACEHOLDER_SIZE = 1;
 const PLACEHOLDER_VALUE: number[] = [0];
+
+const schemaSpec = {
+  name: COLLECTION,
+  vectors: {
+    [PLACEHOLDER_VECTOR]: { size: PLACEHOLDER_SIZE, distance: "Cosine" },
+  },
+  payloadIndexes: [
+    { field_name: "x", field_schema: "float" },
+    { field_name: "y", field_schema: "float" },
+    { field_name: "tier", field_schema: "integer" },
+  ],
+} as const;
 
 const rawPointSchema = z.object({
   id: z.union([z.string(), z.number()]).transform(String),
@@ -39,34 +52,8 @@ export const createAreasRepository = ({
 }: {
   qdrant: QdrantClient;
 }) => ({
-  async ensureCollection() {
-    const { exists } = await qdrant.collectionExists(COLLECTION);
-    if (exists) return;
-    await qdrant.createCollection(COLLECTION, {
-      vectors: {
-        [PLACEHOLDER_VECTOR]: {
-          size: PLACEHOLDER_SIZE,
-          distance: "Cosine",
-        },
-      },
-    });
-    await Promise.all([
-      qdrant.createPayloadIndex(COLLECTION, {
-        field_name: "x",
-        field_schema: "float",
-        wait: true,
-      }),
-      qdrant.createPayloadIndex(COLLECTION, {
-        field_name: "y",
-        field_schema: "float",
-        wait: true,
-      }),
-      qdrant.createPayloadIndex(COLLECTION, {
-        field_name: "tier",
-        field_schema: "integer",
-        wait: true,
-      }),
-    ]);
+  async ensureSchema() {
+    await ensureCollectionSchema(qdrant, schemaSpec);
   },
 
   async upsert(items: Area[]) {

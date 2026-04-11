@@ -1,10 +1,21 @@
 import { QdrantClient } from "@qdrant/js-client-rest";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import type { Area } from "@map-of-science/atlas";
 // TODO: inline the Qdrant testcontainers helper here and drop the
 // vector-store devDep once no other consumer remains.
 import { withQdrantContainer } from "@map-of-science/vector-store/test";
+import { ensureCollectionSchema } from "../collection/ensure-collection-schema.js";
 import { createAreasRepository } from "./areas.js";
+
+vi.mock("../collection/ensure-collection-schema.js", async () => {
+  const actual = await vi.importActual<
+    typeof import("../collection/ensure-collection-schema.js")
+  >("../collection/ensure-collection-schema.js");
+  return {
+    ...actual,
+    ensureCollectionSchema: vi.fn(actual.ensureCollectionSchema),
+  };
+});
 
 type Deps = {
   repository: ReturnType<typeof createAreasRepository>;
@@ -20,7 +31,7 @@ const withAreasRepository = (test: (deps: Deps) => Promise<void>) =>
 
 const withReadyAreasRepository = (test: (deps: Deps) => Promise<void>) =>
   withAreasRepository(async (deps) => {
-    await deps.repository.ensureCollection();
+    await deps.repository.ensureSchema();
     await test(deps);
   });
 
@@ -35,36 +46,28 @@ const buildArea = (overrides: Partial<Area> = {}): Area => ({
 
 describe("areas repository", () => {
   it(
-    "should create the areas collection",
-    withAreasRepository(async ({ repository, client }) => {
-      await repository.ensureCollection();
-
-      const { exists } = await client.collectionExists("areas");
-      expect(exists).toBe(true);
-    }),
-    60_000,
-  );
-
-  it(
-    "should be idempotent when the collection already exists",
+    "should ensure the areas schema",
     withAreasRepository(async ({ repository }) => {
-      await repository.ensureCollection();
-      await expect(repository.ensureCollection()).resolves.not.toThrow();
-    }),
-    60_000,
-  );
+      vi.mocked(ensureCollectionSchema).mockClear();
 
-  it(
-    "should create payload indexes for spatial and tier fields",
-    withAreasRepository(async ({ repository, client }) => {
-      await repository.ensureCollection();
+      await repository.ensureSchema();
 
-      const collection = await client.getCollection("areas");
-      expect(collection.payload_schema).toMatchObject({
-        x: { data_type: "float" },
-        y: { data_type: "float" },
-        tier: { data_type: "integer" },
-      });
+      expect(ensureCollectionSchema).toHaveBeenCalledTimes(1);
+      expect(ensureCollectionSchema).toHaveBeenNthCalledWith(
+        1,
+        expect.any(QdrantClient),
+        {
+          name: "areas",
+          vectors: {
+            _placeholder: { size: 1, distance: "Cosine" },
+          },
+          payloadIndexes: [
+            { field_name: "x", field_schema: "float" },
+            { field_name: "y", field_schema: "float" },
+            { field_name: "tier", field_schema: "integer" },
+          ],
+        },
+      );
     }),
     60_000,
   );
