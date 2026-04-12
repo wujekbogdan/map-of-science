@@ -1,3 +1,4 @@
+import { QdrantClient } from "@qdrant/js-client-rest";
 import { Command } from "commander";
 import { z } from "zod";
 import { createSearch } from "@map-of-science/atlas";
@@ -42,10 +43,11 @@ const compose = (config: SearchConfig) => {
     { provider: "gemini", apiKey: config.gemini.apiKey },
     "query",
   );
-  const store = createAtlasStore({
+  const qdrant = new QdrantClient({
     url: config.qdrant.url,
-    apiKey: config.qdrant.apiKey,
+    ...(config.qdrant.apiKey && { apiKey: config.qdrant.apiKey }),
   });
+  const store = createAtlasStore({ qdrant });
 
   return createSearch({
     clusters: store.clusters,

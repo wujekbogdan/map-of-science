@@ -1,20 +1,9 @@
-import { QdrantClient } from "@qdrant/js-client-rest";
+import type { QdrantClient } from "@qdrant/js-client-rest";
 import { createAreasRepository } from "./areas/areas.js";
 import { createClustersRepository } from "./clusters/clusters.js";
 import { createContentRepository } from "./content/content.js";
 
-export const createAtlasStore = ({
-  url,
-  apiKey,
-}: {
-  url: string;
-  apiKey?: string;
-}) => {
-  const qdrant = new QdrantClient({
-    url,
-    ...(apiKey && { apiKey }),
-  });
-
+export const createAtlasStore = ({ qdrant }: { qdrant: QdrantClient }) => {
   const clusters = createClustersRepository({ qdrant });
   const areas = createAreasRepository({ qdrant });
   const content = createContentRepository({ qdrant });
