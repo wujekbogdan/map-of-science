@@ -24,10 +24,9 @@ const compose = (config: Config) => {
 
   const embedCluster = createClusterEmbedder({
     embed: createRateLimitedFunction(embedder.embed, config.rateLimits.gemini),
-    upsert: (params) => store.upsert(params),
   });
 
-  return { embedCluster };
+  return { embedCluster, store };
 };
 
 type EmbedOptions = {
@@ -39,7 +38,7 @@ type EmbedOptions = {
 
 export const embed = async (options: EmbedOptions) => {
   const config = createConfig(options);
-  const { embedCluster } = compose(config);
+  const { embedCluster, store } = compose(config);
 
   const processed = await forEachEntry(
     streamNdjsonFile(config.input),
@@ -56,7 +55,22 @@ export const embed = async (options: EmbedOptions) => {
         `Processing cluster ${position}/${config.limit} (id: ${result.data.id})`,
       );
 
-      await embedCluster(result.data, { maxTitles: config.maxTitles });
+      // TODO: this command will be replaced by `ingest:clusters` which
+      // combines data from multiple sources (PDFs + TSVs) and upserts
+      // full ClusterInput via atlas-store. Until then, the upsert goes
+      // directly to vector-store with the old metadata shape.
+      const { vector } = await embedCluster(result.data, {
+        maxTitles: config.maxTitles,
+      });
+      await store.upsert({
+        id: result.data.id,
+        vectors: { titles: vector },
+        metadata: {
+          clusterId: result.data.id,
+          totalArticles: result.data.totalArticles,
+          embedding: { titlesCount: result.data.titles.length },
+        },
+      });
     },
   );
 
