@@ -26,4 +26,4 @@ export type {
 } from "./content/content.js";
 
 export { createSearch } from "./search/search.js";
-export type { EmbedQuery } from "./search/search.js";
+export type { EmbedQuery, Search } from "./search/search.js";

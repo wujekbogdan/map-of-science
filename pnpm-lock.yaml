@@ -48,7 +48,7 @@ importers:
         specifier: ^2.5.4
         version: 2.5.4
 
-  src/apps/api:
+  src/apps/api-server:
     devDependencies:
       '@map-of-science/eslint':
         specifier: workspace:*
@@ -475,6 +475,43 @@ importers:
       vite:
         specifier: ^7.2.6
         version: 7.3.0(@types/node@22.15.18)(jiti@2.4.2)(less@4.3.0)(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
+      vitest:
+        specifier: ^4.0.15
+        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
+
+  src/packages/api:
+    dependencies:
+      '@map-of-science/atlas':
+        specifier: workspace:*
+        version: link:../atlas
+      '@map-of-science/atlas-store':
+        specifier: workspace:*
+        version: link:../atlas-store
+      '@map-of-science/embeddings':
+        specifier: workspace:*
+        version: link:../embeddings
+      '@trpc/server':
+        specifier: ^11.16.0
+        version: 11.16.0(typescript@5.6.3)
+      zod:
+        specifier: ^4.3.6
+        version: 4.3.6
+    devDependencies:
+      '@map-of-science/eslint':
+        specifier: workspace:*
+        version: link:../../dev/eslint
+      '@map-of-science/typescript':
+        specifier: workspace:*
+        version: link:../../dev/typescript
+      '@map-of-science/vitest':
+        specifier: workspace:*
+        version: link:../../dev/vitest
+      '@types/node':
+        specifier: ^22.15.18
+        version: 22.15.18
+      typescript:
+        specifier: ~5.6.2
+        version: 5.6.3
       vitest:
         specifier: ^4.0.15
         version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
@@ -2226,6 +2263,12 @@ packages:
         optional: true
       svelte:
         optional: true
+
+  '@trpc/server@11.16.0':
+    resolution: {integrity: sha512-XgGuUMddrUTd04+za/WE5GFuZ1/YU9XQG0t3VL5WOIu2JspkOlq6k4RYEiqS6HSJt+S0RXaPdIoE2anIP/BBRQ==}
+    hasBin: true
+    peerDependencies:
+      typescript: '>=5.7.2'
 
   '@tybys/wasm-util@0.10.1':
     resolution: {integrity: sha512-9tTaPJLSiejZKx+Bmog4uSubteqTvFrVrURwkmHixBo0G4seD0zUxp98E1DzUBJxLQ3NPwXrGKDiVjwx/DpPsg==}
@@ -7471,6 +7514,10 @@ snapshots:
       prettier: 3.3.3
     transitivePeerDependencies:
       - supports-color
+
+  '@trpc/server@11.16.0(typescript@5.6.3)':
+    dependencies:
+      typescript: 5.6.3
 
   '@tybys/wasm-util@0.10.1':
     dependencies:

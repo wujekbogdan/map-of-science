@@ -16,3 +16,5 @@ export const createSearch = (deps: {
     });
   },
 });
+
+export type Search = ReturnType<typeof createSearch>;

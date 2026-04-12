@@ -32,3 +32,5 @@ export const createAtlasStore = ({
     },
   };
 };
+
+export type AtlasStore = ReturnType<typeof createAtlasStore>;

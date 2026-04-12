@@ -11,7 +11,7 @@ services:
     container_name: api
     build:
       context: .
-      dockerfile: ./src/apps/api/Dockerfile
+      dockerfile: ./src/apps/api-server/Dockerfile
     restart: always
     ports:
       - "3001:3001"

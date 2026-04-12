@@ -11,7 +11,7 @@ FROM pnpm AS pruner
 WORKDIR /app
 RUN pnpm add -g turbo
 COPY . .
-RUN turbo prune @map-of-science/api --docker
+RUN turbo prune @map-of-science/api-server --docker
 
 FROM pnpm AS builder
 WORKDIR /app
@@ -43,4 +43,4 @@ COPY --from=builder /app/src/apps ./src/apps
 # TODO: The above COPY commands copied too much - not only `dist` and `node_modules`, but also the source code.
 # To fix this, I could either write a cleanup script, use selective per-package copying, or add a bundler.
 
-CMD ["node", "src/apps/api/dist/index.js"]
+CMD ["node", "src/apps/api-server/dist/index.js"]
