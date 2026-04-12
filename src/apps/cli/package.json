@@ -18,6 +18,8 @@
     "test:integration": "vitest --project=integration"
   },
   "dependencies": {
+    "@map-of-science/atlas": "workspace:*",
+    "@map-of-science/atlas-store": "workspace:*",
     "@map-of-science/cluster-embedder": "workspace:*",
     "@map-of-science/cluster-namer": "workspace:*",
     "@map-of-science/embeddings": "workspace:*",

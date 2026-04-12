@@ -86,6 +86,12 @@ importers:
 
   src/apps/cli:
     dependencies:
+      '@map-of-science/atlas':
+        specifier: workspace:*
+        version: link:../../packages/atlas
+      '@map-of-science/atlas-store':
+        specifier: workspace:*
+        version: link:../../packages/atlas-store
       '@map-of-science/cluster-embedder':
         specifier: workspace:*
         version: link:../../packages/cluster-embedder
