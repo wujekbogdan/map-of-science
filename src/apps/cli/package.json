@@ -31,6 +31,7 @@
     "@map-of-science/rate-limiter": "workspace:*",
     "@map-of-science/text-generator": "workspace:*",
     "@map-of-science/vector-store": "workspace:*",
+    "@qdrant/js-client-rest": "^1.16.2",
     "commander": "^14.0.2",
     "dotenv": "^17.2.3",
     "zod": "^4.2.1"

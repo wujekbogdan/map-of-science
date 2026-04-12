@@ -125,6 +125,9 @@ importers:
       '@map-of-science/vector-store':
         specifier: workspace:*
         version: link:../../packages/vector-store
+      '@qdrant/js-client-rest':
+        specifier: ^1.16.2
+        version: 1.16.2(typescript@5.6.3)
       commander:
         specifier: ^14.0.2
         version: 14.0.2
