@@ -2,11 +2,10 @@ import type { QdrantClient } from "@qdrant/js-client-rest";
 import { z } from "zod";
 import { type ContentItem, contentItemSchema } from "@map-of-science/atlas";
 import { createLogger } from "@map-of-science/logger";
+import { CONTENT_COLLECTION as COLLECTION } from "../collection/collections.js";
 import { ensureCollectionSchema } from "../collection/ensure-collection-schema.js";
 
 const logger = createLogger();
-
-const COLLECTION = "content_items";
 const PLACEHOLDER_VECTOR = "_placeholder";
 const PLACEHOLDER_SIZE = 1;
 const PLACEHOLDER_VALUE: number[] = [0];

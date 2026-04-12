@@ -2,11 +2,10 @@ import type { QdrantClient } from "@qdrant/js-client-rest";
 import { z } from "zod";
 import { type Area, type BBox, areaSchema } from "@map-of-science/atlas";
 import { createLogger } from "@map-of-science/logger";
+import { AREAS_COLLECTION as COLLECTION } from "../collection/collections.js";
 import { ensureCollectionSchema } from "../collection/ensure-collection-schema.js";
 
 const logger = createLogger();
-
-const COLLECTION = "areas";
 const PLACEHOLDER_VECTOR = "_placeholder";
 const PLACEHOLDER_SIZE = 1;
 const PLACEHOLDER_VALUE: number[] = [0];

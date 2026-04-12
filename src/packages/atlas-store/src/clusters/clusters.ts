@@ -7,9 +7,9 @@ import {
   type ClusterMatch,
   clusterSchema,
 } from "@map-of-science/atlas";
+import { CLUSTERS_COLLECTION as COLLECTION } from "../collection/collections.js";
 import { ensureCollectionSchema } from "../collection/ensure-collection-schema.js";
 
-const COLLECTION = "clusters";
 const TITLES_VECTOR = "titles";
 const TITLES_VECTOR_SIZE = 768;
 
