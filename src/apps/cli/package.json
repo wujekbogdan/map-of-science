@@ -34,6 +34,7 @@
     "@qdrant/js-client-rest": "^1.16.2",
     "commander": "^14.0.2",
     "dotenv": "^17.2.3",
+    "uuid": "^11.1.0",
     "zod": "^4.2.1"
   },
   "devDependencies": {
@@ -42,6 +43,7 @@
     "@map-of-science/typescript": "workspace:*",
     "@map-of-science/vitest": "workspace:*",
     "@types/node": "^22.15.18",
+    "@types/uuid": "^11.0.0",
     "@yao-pkg/pkg": "^6.11.0",
     "eslint": "^9.13.0",
     "testcontainers": "^11.10.0",
