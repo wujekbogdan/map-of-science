@@ -9,12 +9,16 @@ export type CollectionSchemaSpec = {
   payloadIndexes: readonly CreatePayloadIndexBody[];
 };
 
-export const ensureCollectionSchema = async (
+export const createCollectionSchema = async (
   qdrant: QdrantClient,
   spec: CollectionSchemaSpec,
 ) => {
   const { exists } = await qdrant.collectionExists(spec.name);
-  if (exists) return;
+  if (exists) {
+    throw new Error(
+      `Collection '${spec.name}' already exists. Drop it manually and re-run.`,
+    );
+  }
   await qdrant.createCollection(spec.name, { vectors: spec.vectors });
   await Promise.all(
     spec.payloadIndexes.map((index) =>

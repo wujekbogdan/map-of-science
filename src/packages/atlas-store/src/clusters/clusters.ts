@@ -8,7 +8,7 @@ import {
   clusterSchema,
 } from "@map-of-science/atlas";
 import { CLUSTERS_COLLECTION as COLLECTION } from "../collection/collections.js";
-import { ensureCollectionSchema } from "../collection/ensure-collection-schema.js";
+import { createCollectionSchema } from "../collection/create-collection-schema.js";
 
 const TITLES_VECTOR = "titles";
 const TITLES_VECTOR_SIZE = 768;
@@ -76,8 +76,8 @@ export const createClustersRepository = ({
 }: {
   qdrant: QdrantClient;
 }) => ({
-  async ensureSchema() {
-    await ensureCollectionSchema(qdrant, schemaSpec);
+  async createSchema() {
+    await createCollectionSchema(qdrant, schemaSpec);
   },
 
   async upsert(items: ClusterInput[]) {

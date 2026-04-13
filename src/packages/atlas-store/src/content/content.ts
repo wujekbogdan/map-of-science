@@ -3,7 +3,7 @@ import { z } from "zod";
 import { type ContentItem, contentItemSchema } from "@map-of-science/atlas";
 import { createLogger } from "@map-of-science/logger";
 import { CONTENT_COLLECTION as COLLECTION } from "../collection/collections.js";
-import { ensureCollectionSchema } from "../collection/ensure-collection-schema.js";
+import { createCollectionSchema } from "../collection/create-collection-schema.js";
 
 const logger = createLogger();
 const PLACEHOLDER_VECTOR = "_placeholder";
@@ -66,8 +66,8 @@ export const createContentRepository = ({
 }: {
   qdrant: QdrantClient;
 }) => ({
-  async ensureSchema() {
-    await ensureCollectionSchema(qdrant, schemaSpec);
+  async createSchema() {
+    await createCollectionSchema(qdrant, schemaSpec);
   },
 
   async upsert(items: ContentItem[]) {

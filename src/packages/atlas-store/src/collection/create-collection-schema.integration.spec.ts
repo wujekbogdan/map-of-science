@@ -1,10 +1,10 @@
 import { QdrantClient } from "@qdrant/js-client-rest";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import { withQdrantContainer } from "@map-of-science/test-utils";
 import {
   type CollectionSchemaSpec,
-  ensureCollectionSchema,
-} from "./ensure-collection-schema.js";
+  createCollectionSchema,
+} from "./create-collection-schema.js";
 
 type Deps = {
   client: QdrantClient;
@@ -25,7 +25,7 @@ const buildSpec = (overrides: Partial<CollectionSchemaSpec> = {}) => ({
   ...overrides,
 });
 
-describe("ensureCollectionSchema", () => {
+describe("createCollectionSchema", () => {
   it(
     "should create the collection with the given named vectors",
     withQdrant(async ({ client }) => {
@@ -37,7 +37,7 @@ describe("ensureCollectionSchema", () => {
         },
       });
 
-      await ensureCollectionSchema(client, spec);
+      await createCollectionSchema(client, spec);
 
       const collection = await client.getCollection("with-vectors");
       expect(collection.config.params.vectors).toMatchObject({
@@ -49,21 +49,14 @@ describe("ensureCollectionSchema", () => {
   );
 
   it(
-    "should skip creation when the collection already exists",
+    "should throw when the collection already exists",
     withQdrant(async ({ client }) => {
-      const spec = buildSpec({
-        name: "already-there",
-        payloadIndexes: [{ field_name: "x", field_schema: "float" }],
-      });
-      await ensureCollectionSchema(client, spec);
+      const spec = buildSpec({ name: "fresh-only" });
+      await createCollectionSchema(client, spec);
 
-      const createCollection = vi.spyOn(client, "createCollection");
-      const createPayloadIndex = vi.spyOn(client, "createPayloadIndex");
-
-      await ensureCollectionSchema(client, spec);
-
-      expect(createCollection).not.toHaveBeenCalled();
-      expect(createPayloadIndex).not.toHaveBeenCalled();
+      await expect(createCollectionSchema(client, spec)).rejects.toThrow(
+        /Collection 'fresh-only' already exists/,
+      );
     }),
     60_000,
   );
@@ -80,7 +73,7 @@ describe("ensureCollectionSchema", () => {
         ],
       });
 
-      await ensureCollectionSchema(client, spec);
+      await createCollectionSchema(client, spec);
 
       const collection = await client.getCollection("with-indexes");
       expect(collection.payload_schema).toMatchObject({

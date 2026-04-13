@@ -18,7 +18,7 @@ export const areaSchema = z.object({
 export type Area = z.infer<typeof areaSchema>;
 
 export type AreaRepository = {
-  ensureSchema(): Promise<void>;
+  createSchema(): Promise<void>;
   upsert(items: Area[]): Promise<void>;
   findById(id: string): Promise<Area | null>;
   findInViewport(args: { bbox: BBox; tier?: number }): Promise<Area[]>;

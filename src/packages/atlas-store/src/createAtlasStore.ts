@@ -3,23 +3,10 @@ import { createAreasRepository } from "./areas/areas.js";
 import { createClustersRepository } from "./clusters/clusters.js";
 import { createContentRepository } from "./content/content.js";
 
-export const createAtlasStore = ({ qdrant }: { qdrant: QdrantClient }) => {
-  const clusters = createClustersRepository({ qdrant });
-  const areas = createAreasRepository({ qdrant });
-  const content = createContentRepository({ qdrant });
-
-  return {
-    clusters,
-    areas,
-    content,
-    async ensureSchemas() {
-      await Promise.all([
-        clusters.ensureSchema(),
-        areas.ensureSchema(),
-        content.ensureSchema(),
-      ]);
-    },
-  };
-};
+export const createAtlasStore = ({ qdrant }: { qdrant: QdrantClient }) => ({
+  clusters: createClustersRepository({ qdrant }),
+  areas: createAreasRepository({ qdrant }),
+  content: createContentRepository({ qdrant }),
+});
 
 export type AtlasStore = ReturnType<typeof createAtlasStore>;

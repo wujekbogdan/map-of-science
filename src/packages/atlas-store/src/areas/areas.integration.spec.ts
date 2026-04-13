@@ -2,16 +2,16 @@ import { QdrantClient } from "@qdrant/js-client-rest";
 import { describe, expect, it, vi } from "vitest";
 import type { Area } from "@map-of-science/atlas";
 import { withQdrantContainer } from "@map-of-science/test-utils";
-import { ensureCollectionSchema } from "../collection/ensure-collection-schema.js";
+import { createCollectionSchema } from "../collection/create-collection-schema.js";
 import { createAreasRepository } from "./areas.js";
 
-vi.mock("../collection/ensure-collection-schema.js", async () => {
+vi.mock("../collection/create-collection-schema.js", async () => {
   const actual = await vi.importActual<
-    typeof import("../collection/ensure-collection-schema.js")
-  >("../collection/ensure-collection-schema.js");
+    typeof import("../collection/create-collection-schema.js")
+  >("../collection/create-collection-schema.js");
   return {
     ...actual,
-    ensureCollectionSchema: vi.fn(actual.ensureCollectionSchema),
+    createCollectionSchema: vi.fn(actual.createCollectionSchema),
   };
 });
 
@@ -29,7 +29,7 @@ const withAreasRepository = (test: (deps: Deps) => Promise<void>) =>
 
 const withReadyAreasRepository = (test: (deps: Deps) => Promise<void>) =>
   withAreasRepository(async (deps) => {
-    await deps.repository.ensureSchema();
+    await deps.repository.createSchema();
     await test(deps);
   });
 
@@ -44,14 +44,14 @@ const buildArea = (overrides: Partial<Area> = {}): Area => ({
 
 describe("areas repository", () => {
   it(
-    "should ensure the areas schema",
+    "should create the areas schema",
     withAreasRepository(async ({ repository }) => {
-      vi.mocked(ensureCollectionSchema).mockClear();
+      vi.mocked(createCollectionSchema).mockClear();
 
-      await repository.ensureSchema();
+      await repository.createSchema();
 
-      expect(ensureCollectionSchema).toHaveBeenCalledTimes(1);
-      expect(ensureCollectionSchema).toHaveBeenNthCalledWith(
+      expect(createCollectionSchema).toHaveBeenCalledTimes(1);
+      expect(createCollectionSchema).toHaveBeenNthCalledWith(
         1,
         expect.any(QdrantClient),
         {

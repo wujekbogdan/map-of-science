@@ -43,7 +43,6 @@ export const runIngestAreas = async (options: Options) => {
   const atlasStore = createAtlasStore({ qdrant });
 
   const result = await ingestAreas({
-    qdrant,
     areasRepo: atlasStore.areas,
     readAreas: () => readTsv(args.areas),
     readI18n: () => readTsv(args.i18n),

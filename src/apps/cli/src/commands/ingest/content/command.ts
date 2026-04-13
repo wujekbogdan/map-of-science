@@ -42,7 +42,6 @@ export const runIngestContent = async (options: Options) => {
   const atlasStore = createAtlasStore({ qdrant });
 
   const result = await ingestContent({
-    qdrant,
     contentRepo: atlasStore.content,
     readContent: () => readTsv(args.input),
   });

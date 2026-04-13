@@ -2,16 +2,16 @@ import { QdrantClient } from "@qdrant/js-client-rest";
 import { describe, expect, it, vi } from "vitest";
 import type { ContentItem } from "@map-of-science/atlas";
 import { withQdrantContainer } from "@map-of-science/test-utils";
-import { ensureCollectionSchema } from "../collection/ensure-collection-schema.js";
+import { createCollectionSchema } from "../collection/create-collection-schema.js";
 import { createContentRepository } from "./content.js";
 
-vi.mock("../collection/ensure-collection-schema.js", async () => {
+vi.mock("../collection/create-collection-schema.js", async () => {
   const actual = await vi.importActual<
-    typeof import("../collection/ensure-collection-schema.js")
-  >("../collection/ensure-collection-schema.js");
+    typeof import("../collection/create-collection-schema.js")
+  >("../collection/create-collection-schema.js");
   return {
     ...actual,
-    ensureCollectionSchema: vi.fn(actual.ensureCollectionSchema),
+    createCollectionSchema: vi.fn(actual.createCollectionSchema),
   };
 });
 
@@ -29,7 +29,7 @@ const withContentRepository = (test: (deps: Deps) => Promise<void>) =>
 
 const withReadyContentRepository = (test: (deps: Deps) => Promise<void>) =>
   withContentRepository(async (deps) => {
-    await deps.repository.ensureSchema();
+    await deps.repository.createSchema();
     await test(deps);
   });
 
@@ -52,12 +52,14 @@ const buildContentItem = (
 
 describe("content repository", () => {
   it(
-    "should ensure the content schema",
+    "should create the content schema",
     withContentRepository(async ({ repository }) => {
-      await repository.ensureSchema();
+      vi.mocked(createCollectionSchema).mockClear();
 
-      expect(ensureCollectionSchema).toHaveBeenCalledTimes(1);
-      expect(ensureCollectionSchema).toHaveBeenNthCalledWith(
+      await repository.createSchema();
+
+      expect(createCollectionSchema).toHaveBeenCalledTimes(1);
+      expect(createCollectionSchema).toHaveBeenNthCalledWith(
         1,
         expect.any(QdrantClient),
         {

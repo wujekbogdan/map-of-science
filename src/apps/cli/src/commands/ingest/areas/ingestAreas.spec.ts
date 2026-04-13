@@ -1,4 +1,3 @@
-import type { QdrantClient } from "@qdrant/js-client-rest";
 import { describe, expect, it, vi } from "vitest";
 import type { AtlasStore } from "@map-of-science/atlas-store";
 import { ingestAreas } from "./ingestAreas.js";
@@ -13,18 +12,21 @@ const areaRow = {
 
 const i18nRow = { id: "a-1", "pl-PL": "P", "en-US": "E" };
 
-const buildDeps = (exists = false) => {
+const buildDeps = (
+  { collectionExists }: { collectionExists: boolean } = {
+    collectionExists: false,
+  },
+) => {
+  const createSchema = collectionExists
+    ? vi.fn().mockRejectedValueOnce(new Error("Collection already exists"))
+    : vi.fn().mockResolvedValueOnce(undefined);
   const areasRepo = {
-    ensureSchema: vi.fn().mockResolvedValueOnce(undefined),
+    createSchema,
     upsert: vi.fn().mockResolvedValueOnce(undefined),
     findById: vi.fn(),
     findInViewport: vi.fn(),
   } satisfies AtlasStore["areas"];
-  const qdrant = {
-    collectionExists: vi.fn().mockResolvedValueOnce({ exists }),
-  } as Pick<QdrantClient, "collectionExists">;
   return {
-    qdrant: qdrant as QdrantClient,
     areasRepo,
     readAreas: vi.fn().mockResolvedValueOnce([areaRow]),
     readI18n: vi.fn().mockResolvedValueOnce([i18nRow]),
@@ -32,11 +34,11 @@ const buildDeps = (exists = false) => {
 };
 
 describe("ingestAreas", () => {
-  it("should pre-check the collection, ensure schema, and upsert joined areas", async () => {
+  it("should create schema and upsert joined areas", async () => {
     const deps = buildDeps();
     const result = await ingestAreas(deps);
 
-    expect(deps.areasRepo.ensureSchema).toHaveBeenCalledTimes(1);
+    expect(deps.areasRepo.createSchema).toHaveBeenCalledTimes(1);
     expect(deps.areasRepo.upsert).toHaveBeenNthCalledWith(1, [
       {
         id: "a-1",
@@ -49,10 +51,9 @@ describe("ingestAreas", () => {
     expect(result).toEqual({ count: 1 });
   });
 
-  it("should abort when the areas collection already exists", async () => {
-    const deps = buildDeps(true);
+  it("should abort when createSchema rejects (collection already exists)", async () => {
+    const deps = buildDeps({ collectionExists: true });
     await expect(ingestAreas(deps)).rejects.toThrow(/already exists/);
-    expect(deps.areasRepo.ensureSchema).not.toHaveBeenCalled();
     expect(deps.areasRepo.upsert).not.toHaveBeenCalled();
   });
 });

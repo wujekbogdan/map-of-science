@@ -1,20 +1,15 @@
-import type { QdrantClient } from "@qdrant/js-client-rest";
 import type { ClusterInput } from "@map-of-science/atlas";
 import type { AtlasStore } from "@map-of-science/atlas-store";
-import { CLUSTERS_COLLECTION } from "@map-of-science/atlas-store";
-import { assertCollectionMissing } from "../assertCollectionMissing.js";
 
 type EtoRecord = { id: string; titles: string[] };
 
 export const ingestClusters = async ({
-  qdrant,
   clustersRepo,
   buildCluster,
   embedCluster,
   streamEto,
   batchSize,
 }: {
-  qdrant: QdrantClient;
   clustersRepo: AtlasStore["clusters"];
   buildCluster: (args: {
     externalId: string;
@@ -26,8 +21,7 @@ export const ingestClusters = async ({
   streamEto: AsyncIterable<EtoRecord>;
   batchSize: number;
 }) => {
-  await assertCollectionMissing(qdrant, CLUSTERS_COLLECTION);
-  await clustersRepo.ensureSchema();
+  await clustersRepo.createSchema();
 
   let batch: ClusterInput[] = [];
   let count = 0;

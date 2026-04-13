@@ -124,7 +124,6 @@ export const runIngestClusters = async (options: Options) => {
   const buildCluster = createBuildCluster(lookups);
 
   const result = await ingestClusters({
-    qdrant,
     clustersRepo: atlasStore.clusters,
     buildCluster,
     embedCluster: (cluster) =>

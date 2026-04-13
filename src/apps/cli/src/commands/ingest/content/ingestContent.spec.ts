@@ -1,4 +1,3 @@
-import type { QdrantClient } from "@qdrant/js-client-rest";
 import { describe, expect, it, vi } from "vitest";
 import type { AtlasStore } from "@map-of-science/atlas-store";
 import { ingestContent } from "./ingestContent.js";
@@ -19,37 +18,39 @@ const youtubeRow = {
   classification: "area-1",
 };
 
-const buildDeps = (exists = false) => {
+const buildDeps = (
+  { collectionExists }: { collectionExists: boolean } = {
+    collectionExists: false,
+  },
+) => {
+  const createSchema = collectionExists
+    ? vi.fn().mockRejectedValueOnce(new Error("Collection already exists"))
+    : vi.fn().mockResolvedValueOnce(undefined);
   const contentRepo = {
-    ensureSchema: vi.fn().mockResolvedValueOnce(undefined),
+    createSchema,
     upsert: vi.fn().mockResolvedValueOnce(undefined),
     findByClusterId: vi.fn(),
   } satisfies AtlasStore["content"];
-  const qdrant = {
-    collectionExists: vi.fn().mockResolvedValueOnce({ exists }),
-  } as Pick<QdrantClient, "collectionExists">;
   return {
-    qdrant: qdrant as QdrantClient,
     contentRepo,
     readContent: vi.fn().mockResolvedValueOnce([youtubeRow]),
   };
 };
 
 describe("ingestContent", () => {
-  it("should pre-check the collection, ensure schema, and upsert built items", async () => {
+  it("should create schema and upsert built items", async () => {
     const deps = buildDeps();
     const result = await ingestContent(deps);
 
-    expect(deps.contentRepo.ensureSchema).toHaveBeenCalledTimes(1);
+    expect(deps.contentRepo.createSchema).toHaveBeenCalledTimes(1);
     expect(deps.contentRepo.upsert).toHaveBeenCalledTimes(1);
     expect(deps.contentRepo.upsert.mock.calls[0][0]).toHaveLength(1);
     expect(result).toEqual({ count: 1 });
   });
 
-  it("should abort when the content collection already exists", async () => {
-    const deps = buildDeps(true);
+  it("should abort when createSchema rejects (collection already exists)", async () => {
+    const deps = buildDeps({ collectionExists: true });
     await expect(ingestContent(deps)).rejects.toThrow(/already exists/);
-    expect(deps.contentRepo.ensureSchema).not.toHaveBeenCalled();
     expect(deps.contentRepo.upsert).not.toHaveBeenCalled();
   });
 });

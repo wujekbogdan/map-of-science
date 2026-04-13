@@ -1,4 +1,3 @@
-import type { QdrantClient } from "@qdrant/js-client-rest";
 import { describe, expect, it, vi } from "vitest";
 import type { AtlasStore } from "@map-of-science/atlas-store";
 import { ingestClusters } from "./ingestClusters.js";
@@ -14,20 +13,23 @@ const stream = <T>(items: T[]): AsyncIterable<T> => ({
   },
 });
 
-const buildDeps = (exists = false) => {
+const buildDeps = (
+  { collectionExists }: { collectionExists: boolean } = {
+    collectionExists: false,
+  },
+) => {
+  const createSchema = collectionExists
+    ? vi.fn().mockRejectedValueOnce(new Error("Collection already exists"))
+    : vi.fn().mockResolvedValueOnce(undefined);
   const clustersRepo = {
-    ensureSchema: vi.fn().mockResolvedValueOnce(undefined),
+    createSchema,
     upsert: vi.fn().mockResolvedValue(undefined),
     findById: vi.fn(),
     findByIds: vi.fn(),
     findInViewport: vi.fn(),
     findByVector: vi.fn(),
   } satisfies AtlasStore["clusters"];
-  const qdrant = {
-    collectionExists: vi.fn().mockResolvedValueOnce({ exists }),
-  } as Pick<QdrantClient, "collectionExists">;
   return {
-    qdrant: qdrant as QdrantClient,
     clustersRepo,
     embedCluster: vi.fn().mockResolvedValue({ vector }),
   };
@@ -46,8 +48,8 @@ const buildFake = (externalId: string) => ({
 });
 
 describe("ingestClusters", () => {
-  it("should abort when the clusters collection already exists", async () => {
-    const deps = buildDeps(true);
+  it("should abort when createSchema rejects (collection already exists)", async () => {
+    const deps = buildDeps({ collectionExists: true });
     await expect(
       ingestClusters({
         ...deps,
@@ -56,7 +58,6 @@ describe("ingestClusters", () => {
         batchSize: 10,
       }),
     ).rejects.toThrow(/already exists/);
-    expect(deps.clustersRepo.ensureSchema).not.toHaveBeenCalled();
     expect(deps.clustersRepo.upsert).not.toHaveBeenCalled();
   });
 
@@ -69,6 +70,7 @@ describe("ingestClusters", () => {
       batchSize: 2,
     });
 
+    expect(deps.clustersRepo.createSchema).toHaveBeenCalledTimes(1);
     expect(deps.embedCluster).toHaveBeenCalledTimes(3);
     expect(deps.clustersRepo.upsert).toHaveBeenCalledTimes(2);
     expect(deps.clustersRepo.upsert.mock.calls[0][0]).toHaveLength(2);

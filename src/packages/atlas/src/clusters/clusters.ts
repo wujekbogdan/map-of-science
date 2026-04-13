@@ -42,7 +42,7 @@ export type BBox = z.infer<typeof bboxSchema>;
 export type ClusterMatch = Cluster & { score: number };
 
 export type ClusterRepository = {
-  ensureSchema(): Promise<void>;
+  createSchema(): Promise<void>;
   upsert(items: ClusterInput[]): Promise<void>;
   findById(id: string): Promise<Cluster | null>;
   findByIds(ids: string[]): Promise<Cluster[]>;
