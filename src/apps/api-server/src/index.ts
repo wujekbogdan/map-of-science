@@ -1,5 +1,3 @@
-const run = () => {
-  console.log("API is running...");
-};
+import { startServer } from "./server.js";
 
-setInterval(run, 10_000);
+startServer();
