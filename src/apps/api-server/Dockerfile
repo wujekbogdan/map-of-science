@@ -1,46 +1,36 @@
-FROM node:22.15.0-alpine3.20 AS base
+ARG NODE_VERSION=22.15.0
+ARG PACKAGE_NAME=@map-of-science/api-server
+ARG APP_PATH=src/apps/api-server
+
+FROM node:${NODE_VERSION}-slim AS base
 
 FROM base AS pnpm
-RUN apk update
-RUN apk add --no-cache libc6-compat
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
 
 FROM pnpm AS pruner
+ARG PACKAGE_NAME
 WORKDIR /app
 RUN pnpm add -g turbo
 COPY . .
-RUN turbo prune @map-of-science/api-server --docker
+RUN turbo prune ${PACKAGE_NAME} --docker
 
 FROM pnpm AS builder
+ARG PACKAGE_NAME
 WORKDIR /app
 COPY --from=pruner /app/out/json/ .
 RUN pnpm install --frozen-lockfile
 COPY --from=pruner /app/out/full/ .
-RUN pnpm turbo build
-# `pnpm prune` does not recursively remove node_modules in a monorepo, so as a workaround we use `rimraf` to remove all
-# node_modules directories and re-run `pnpm install`, but now with the `--prod` flag. This replicates the behavior of
-# `pnpm prune --prod`
-RUN npx --yes rimraf --glob "**/node_modules"
-RUN pnpm install  --prod
-# If I had a bundler. I would do it differently - I would change the WORKDIR and prune just the `@my-namespace/my-app`
+RUN pnpm turbo build --filter=${PACKAGE_NAME}
 
 FROM base AS runner
+ARG APP_PATH
 WORKDIR /app
 RUN addgroup --system --gid 1001 app
 RUN adduser --system --uid 1001 app
 USER app
 
-COPY --from=builder /app/node_modules ./node_modules
-# If Docker supported wildcard COPY, I would do:
-#  `COPY --from=builder /app/src/apps/**/dist ./src/apps`
-#  `COPY --from=builder /app/src/apps/**/node_modules ./src/apps`
-#  `COPY --from=builder /app/src/packages/**/dist ./src/packages`
-#  `COPY --from=builder /app/src/packages/**/node_modules ./src/packages`
-# But instead, for simplicity, I copy entire directories
-COPY --from=builder /app/src/apps ./src/apps
-# TODO: The above COPY commands copied too much - not only `dist` and `node_modules`, but also the source code.
-# To fix this, I could either write a cleanup script, use selective per-package copying, or add a bundler.
+COPY --from=builder --chown=app:app /app/${APP_PATH}/dist/ ./
 
-CMD ["node", "src/apps/api-server/dist/index.js"]
+CMD ["node", "index.mjs"]
