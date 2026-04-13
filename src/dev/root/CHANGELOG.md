@@ -1,5 +1,14 @@
 # @map-of-science/root
 
+## 0.7.0
+
+### Minor Changes
+
+- 6f522d7: - Add api-server and qdrant services to docker-compose
+  - Add `.dockerignore`
+  - Update CI workflow for api → api-server rename
+  - Document the full data pipeline and full-stack docker compose in the README
+
 ## 0.6.0
 
 ### Minor Changes

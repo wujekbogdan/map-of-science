@@ -1,5 +1,24 @@
 # @map-of-science/cli
 
+## 0.2.0
+
+### Minor Changes
+
+- 6f522d7: - Add ingest commands for clusters, areas, and content
+  - Drop the embed command (superseded by ingest:clusters)
+  - Drop fusion search from the search command
+
+### Patch Changes
+
+- Updated dependencies [6f522d7]
+- Updated dependencies [6f522d7]
+- Updated dependencies [6f522d7]
+  - @map-of-science/atlas-store@0.2.0
+  - @map-of-science/atlas@0.2.0
+  - @map-of-science/cluster-embedder@0.2.0
+  - @map-of-science/openalex@0.1.0
+  - @map-of-science/parsers@0.2.0
+
 ## 0.1.0
 
 ### Minor Changes

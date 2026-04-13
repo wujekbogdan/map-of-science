@@ -1,5 +1,20 @@
 # @map-of-science/api
 
+## 0.2.0
+
+### Minor Changes
+
+- 6f522d7: Rename from apps/api and wire up the tRPC HTTP server.
+
+### Patch Changes
+
+- Updated dependencies [6f522d7]
+- Updated dependencies [6f522d7]
+- Updated dependencies [6f522d7]
+  - @map-of-science/atlas-store@0.2.0
+  - @map-of-science/atlas@0.2.0
+  - @map-of-science/api@0.2.0
+
 ## 0.1.1
 
 ### Patch Changes
