@@ -1,9 +1,7 @@
 import { QdrantClient } from "@qdrant/js-client-rest";
 import { describe, expect, it, vi } from "vitest";
 import type { ContentItem } from "@map-of-science/atlas";
-// TODO: inline the Qdrant testcontainers helper here and drop the
-// vector-store devDep once no other consumer remains.
-import { withQdrantContainer } from "@map-of-science/vector-store/test";
+import { withQdrantContainer } from "@map-of-science/test-utils";
 import { ensureCollectionSchema } from "../collection/ensure-collection-schema.js";
 import { createContentRepository } from "./content.js";
 

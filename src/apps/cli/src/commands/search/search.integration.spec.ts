@@ -1,7 +1,7 @@
 import { writeFile } from "node:fs/promises";
 import { dir as tmpDir } from "tmp-promise";
 import { beforeAll, describe, expect, it, vi } from "vitest";
-import { withQdrantContainer } from "@map-of-science/vector-store/test";
+import { withQdrantContainer } from "@map-of-science/test-utils";
 import { toTsv } from "../../__test__/tsv.js";
 import { runIngestClusters } from "../ingest/clusters/command.js";
 import { search } from "./search.js";

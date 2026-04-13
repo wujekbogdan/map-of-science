@@ -2,7 +2,7 @@ import { QdrantClient } from "@qdrant/js-client-rest";
 import { writeFile } from "node:fs/promises";
 import { dir as tmpDir } from "tmp-promise";
 import { describe, expect, it, vi } from "vitest";
-import { withQdrantContainer } from "@map-of-science/vector-store/test";
+import { withQdrantContainer } from "@map-of-science/test-utils";
 import { toTsv } from "../../../__test__/tsv.js";
 import { runIngestAreas } from "./command.js";
 

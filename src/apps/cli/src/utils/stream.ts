@@ -11,7 +11,7 @@ type State = {
 const processNext = async <T>(
   generator: AsyncGenerator<T>,
   options: Options,
-  onEntry: (entry: T, position: number) => Promise<void>,
+  onEntry: (entry: T, position: number) => Promise<void> | void,
   state: State,
 ): Promise<number> => {
   if (state.processed >= options.limit) {
@@ -42,5 +42,5 @@ const processNext = async <T>(
 export const forEachEntry = <T>(
   generator: AsyncGenerator<T>,
   options: Options,
-  onEntry: (entry: T, position: number) => Promise<void>,
+  onEntry: (entry: T, position: number) => Promise<void> | void,
 ) => processNext(generator, options, onEntry, { index: 0, processed: 0 });

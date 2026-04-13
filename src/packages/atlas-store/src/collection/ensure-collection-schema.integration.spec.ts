@@ -1,6 +1,6 @@
 import { QdrantClient } from "@qdrant/js-client-rest";
 import { describe, expect, it, vi } from "vitest";
-import { withQdrantContainer } from "@map-of-science/vector-store/test";
+import { withQdrantContainer } from "@map-of-science/test-utils";
 import {
   type CollectionSchemaSpec,
   ensureCollectionSchema,
