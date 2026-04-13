@@ -62,13 +62,13 @@ corepack enable
 
 #### Running inside a Docker container
 
-1. Install and run [Docker](https://docs.docker.com/get-docker/).
-2. Build and run the application:
-   ```bash
-   cd src/apps/web
-   docker compose up # or docker-compose up
-   ```
-3. Open the application in the browser at [http://localhost:8080/](http://localhost:8080/)
+The root `docker-compose.yml` runs the full stack (web, api-server, qdrant):
+
+```bash
+docker compose up
+```
+
+Web at [http://localhost:8080/](http://localhost:8080/), api at [http://localhost:4000/](http://localhost:4000/), qdrant at [http://localhost:6333/](http://localhost:6333/).
 
 #### Building for production
 
@@ -86,6 +86,42 @@ corepack enable
    cd src/apps/web
    npx http-server dist
    ```
+
+## Data pipeline
+
+The API reads all its data from Qdrant. This pipeline loads Qdrant from scratch using ETO cluster PDFs and the curated TSVs in `src/apps/web/asset/`. Requires Qdrant running and a `GOOGLE_API_KEY`.
+
+Download the ETO PDFs from [Zenodo](https://doi.org/10.5281/zenodo.12628195) and extract them so each file is named `cluster_<id>.pdf`. Then, from the repo root:
+
+```bash
+# 1. Pull article titles out of each PDF into NDJSON.
+pnpm --filter @map-of-science/cli start scrape-eto \
+  --input <pdfs-dir> --output eto.ndjson \
+  --start <from-id> --limit <count>
+
+# 2. Generate en-US and pl-PL names for each cluster via Gemini.
+pnpm --filter @map-of-science/cli start name \
+  --input eto.ndjson --output cluster_names_i18n.tsv
+
+# 3. Embed titles via Gemini and upsert clusters.
+pnpm --filter @map-of-science/cli start ingest:clusters \
+  --eto-input eto.ndjson \
+  --clusters src/apps/web/asset/clusters.tsv \
+  --names cluster_names_i18n.tsv \
+  --places src/apps/web/asset/places.tsv \
+  --entities src/apps/web/asset/map_entities_i18n.tsv
+
+# 4. Upsert region labels.
+pnpm --filter @map-of-science/cli start ingest:areas \
+  --areas src/apps/web/asset/areas.tsv \
+  --i18n src/apps/web/asset/map_entities_i18n.tsv
+
+# 5. Upsert YouTube video segments.
+pnpm --filter @map-of-science/cli start ingest:content \
+  --input src/apps/web/asset/youtube.tsv
+```
+
+Each `ingest:*` fails if its collection already exists; drop it and re-run.
 
 ## Editing
 

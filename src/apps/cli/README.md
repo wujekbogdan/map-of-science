@@ -29,7 +29,35 @@ Commands:
   search [options] <query>  Search clusters using vector similarity
   name [options]            Generate names for clusters using LLM
   scrape-eto [options]      Scrape article titles from ETO cluster PDFs to NDJSON
+  ingest:areas [options]    Ingest areas (tiers 1-3) from TSV files into Qdrant
+  ingest:content [options]  Ingest YouTube segments as ContentItems into Qdrant
+  ingest:clusters [options] Ingest clusters (embeddings + positions + names) into Qdrant
   help [command]            display help for command
+```
+
+## Ingestion
+
+Full-population sequence (commands are independent; run in any order):
+
+<!-- TODO: asset paths below point at `src/apps/web/asset/` because the web app
+currently parses these TSVs at runtime. Once the frontend is wired to the API,
+the raw data moves out of the web package and these paths need updating. -->
+
+```bash
+cli ingest:areas \
+  --areas   src/apps/web/asset/areas.tsv \
+  --i18n    src/apps/web/asset/map_entities_i18n.tsv
+
+cli ingest:content \
+  --input   src/apps/web/asset/youtube.tsv
+
+# Clusters embeds via Gemini. Requires ETO NDJSON from `cli scrape-eto`.
+cli ingest:clusters \
+  --eto-input src/apps/web/asset/eto.ndjson \
+  --clusters  src/apps/web/asset/clusters.tsv \
+  --names     src/apps/web/asset/cluster_names_i18n.tsv \
+  --places    src/apps/web/asset/places.tsv \
+  --entities  src/apps/web/asset/map_entities_i18n.tsv
 ```
 
 ### embed
