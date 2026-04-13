@@ -16,7 +16,7 @@ export type ClusterLookups = {
   curatedNames: Map<string, LocalizedName>;
 };
 
-const CLUSTER_NAMESPACE = "7a5c3f2a-1d42-4e9a-9c30-5f4b3a2c1e77";
+const CLUSTER_NAMESPACE = "6ba7b810-9dad-11d1-80b4-00c04fd430c8";
 const EMBEDDING_MODEL = "gemini-embedding-001";
 const EMBEDDING_SOURCE = "article-titles";
 
