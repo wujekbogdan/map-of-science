@@ -1,4 +1,4 @@
-import { ZodSchema, ZodTypeDef } from "zod";
+import { ZodType } from "zod";
 import {
   arrayCollector,
   mapCollector,
@@ -8,7 +8,7 @@ import {
 
 type Options<T> = {
   url: string;
-  schema: ZodSchema<T, ZodTypeDef, unknown>;
+  schema: ZodType<T, unknown>;
 };
 
 export const loadAsArray = async <T>({ url, schema }: Options<T>) => {

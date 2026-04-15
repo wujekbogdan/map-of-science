@@ -9,10 +9,10 @@ export const youtubeSegmentContentSchema = z.object({
   id: z.string(),
   type: z.literal("youtube-segment"),
   title: z.string(),
-  url: z.string().url(),
+  url: z.url(),
   metadata: z.object({
     videoId: z.string(),
-    segmentUrl: z.string().url(),
+    segmentUrl: z.url(),
     segmentName: z.string(),
     date: z.string(),
   }),

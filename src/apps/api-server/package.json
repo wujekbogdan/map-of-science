@@ -35,9 +35,9 @@
     "@map-of-science/atlas-store": "workspace:*",
     "@map-of-science/embeddings": "workspace:*",
     "@qdrant/js-client-rest": "^1.16.2",
-    "@trpc/server": "11.16.0",
+    "@trpc/server": "^11.16.0",
     "cors": "2.8.6",
-    "dotenv": "17.4.2",
+    "dotenv": "^17.2.3",
     "zod": "^4.3.6"
   }
 }
