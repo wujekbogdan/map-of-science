@@ -1,4 +1,4 @@
-import { ZodTypeDef, ZodSchema } from "zod";
+import { ZodType } from "zod";
 
 export type Collector<Item, Result> = {
   add: (item: Item) => Result;
@@ -6,12 +6,12 @@ export type Collector<Item, Result> = {
 };
 
 export const validateWithSchema =
-  <T>(schema: ZodSchema<T, ZodTypeDef, unknown>) =>
+  <T>(schema: ZodType<T, unknown>) =>
   (data: unknown): T =>
     schema.parse(data);
 
 export const createProcessor = <Item, Result>(
-  schema: ZodSchema<Item, ZodTypeDef, unknown>,
+  schema: ZodType<Item, unknown>,
   collector: Collector<Item, Result>,
 ) => ({
   process: (data: unknown) => {

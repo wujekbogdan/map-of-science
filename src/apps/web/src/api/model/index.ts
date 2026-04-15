@@ -94,8 +94,8 @@ export const YoutubeVideoSchema = (z: typeof zod) =>
     .object({
       video_id: z.string(),
       video_title: z.string(),
-      date: z.string().datetime(),
-      segment_url: z.string().url(),
+      date: z.iso.datetime(),
+      segment_url: z.url(),
       segment_name: z.string(),
       classification: z.string(),
     })
