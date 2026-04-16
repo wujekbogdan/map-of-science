@@ -27,20 +27,11 @@ const MapLoader = () => {
 
 function App() {
   const { language } = useLanguage();
-  const [setMapSize, setClusters, setConcepts, setYoutubeVideos, setAreas] =
-    useMapStore(
-      useShallow((s) => [
-        s.setMapSize,
-        s.setClusters,
-        s.setConcepts,
-        s.setYoutubeVideos,
-        s.setAreas,
-      ]),
-    );
+  const [setMapSize, setYoutubeVideos, setAreas] = useMapStore(
+    useShallow((s) => [s.setMapSize, s.setYoutubeVideos, s.setAreas]),
+  );
   const { isLoading } = useSWR(["data", language], () => loadData(language), {
-    onSuccess: ({ clusters, concepts, youtube, areas }) => {
-      setClusters(clusters);
-      setConcepts(concepts);
+    onSuccess: ({ youtube, areas }) => {
       setYoutubeVideos(youtube);
       setAreas(areas);
     },

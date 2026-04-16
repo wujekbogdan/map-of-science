@@ -1,18 +1,27 @@
-import { ZoomTransform } from "d3";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { useDebounce } from "@uidotdev/usehooks";
 import { CSSProperties, useMemo, useRef, useState } from "react";
 import styled from "styled-components";
 import useSWR from "swr";
 import { useShallow } from "zustand/react/shallow";
-import { Cluster } from "../../api/model";
+import { useTRPC } from "../../api-client/index.ts";
 import { useArticleStore } from "../../article/articleStore.ts";
+import { transformToBbox } from "../../map/bbox.ts";
+import {
+  flipPositionY,
+  renderBboxToQdrantBbox,
+} from "../../map/coords.ts";
 import { useMapStore } from "../../map/mapStore.ts";
+import { mergeClustersById } from "../../map/mergeClusters.ts";
 import { useSelectionStore } from "../../map/selectionStore.ts";
 import { useD3Zoom } from "../../map/useD3Zoom.ts";
 import { useFlashState } from "../../map/useFlashState.ts";
 import { useLayersOpacity } from "../../map/useLayersOpacity.ts";
 import { useLanguage } from "../../useLanguage.ts";
-import { Clusters, ClusterWithScaledPlace } from "./Clusters/Clusters.tsx";
+import { Clusters } from "./Clusters/Clusters.tsx";
 import Label, { OnLabelClick } from "./Label/Label.tsx";
+
+const BBOX_DEBOUNCE_MS = 150;
 
 const fetchMapSvg = async () => {
   // At this point only the URL is resolved, the SVG is not yet loaded.
@@ -27,56 +36,6 @@ const fetchMapSvg = async () => {
   });
 };
 
-type Filter = {
-  clusters: Cluster[];
-  transform: ZoomTransform;
-  limit: number;
-  size: {
-    width: number;
-    height: number;
-  };
-  places: {
-    visible: boolean;
-    fontSize: number;
-    opacity: number;
-  };
-};
-
-const processClustersForViewport = (args: Filter) => {
-  const clustersInViewport: ClusterWithScaledPlace[] = [];
-
-  // Although .filter() would feel more natural, the regular for loop is way
-  // faster since we can easily break the loop when we reach the limit.
-  for (const point of args.clusters) {
-    const screenX = args.transform.applyX(point.x);
-    const screenY = args.transform.applyY(point.y);
-
-    if (
-      screenX >= 0 &&
-      screenX <= args.size.width &&
-      screenY >= 0 &&
-      screenY <= args.size.height
-    ) {
-      const place =
-        point.place && args.places.visible
-          ? {
-              ...point.place,
-              fontSize: args.places.fontSize,
-              opacity: args.places.opacity,
-              offset: 15 / args.transform.k,
-            }
-          : null;
-      clustersInViewport.push({
-        ...point,
-        place,
-      });
-      if (clustersInViewport.length >= args.limit) break;
-    }
-  }
-
-  return clustersInViewport;
-};
-
 type Props = {
   size: {
     width: number;
@@ -87,11 +46,13 @@ type Props = {
   };
 };
 
+// TODO: Split Map into a data container and a pure view. The useQuery below
+// lives here only because the bbox depends on transform owned by this
+// component. MAP-64 tracks lifting transform to the store and moving the
+// fetch into a container wrapper.
 export default function Map(props: Props) {
   const [
     areas,
-    clusters,
-    concepts,
     youtube,
     scaleFactor,
     fontSize,
@@ -103,8 +64,6 @@ export default function Map(props: Props) {
   ] = useMapStore(
     useShallow((s) => [
       s.areas,
-      s.clusters,
-      s.concepts,
       s.youtubeVideos,
       s.scaleFactor,
       s.fontSize,
@@ -161,6 +120,42 @@ export default function Map(props: Props) {
     layer4: scaleFontSize(fontSize.layer4),
   };
 
+  const bbox = useMemo(
+    () => (transform ? transformToBbox(transform, props.size) : null),
+    [transform, props.size],
+  );
+  const debouncedBbox = useDebounce(bbox, BBOX_DEBOUNCE_MS);
+
+  const trpc = useTRPC();
+  const { data: rawViewportClusters = [] } = useQuery(
+    trpc.cluster.viewport.queryOptions(
+      debouncedBbox
+        ? {
+            bbox: renderBboxToQdrantBbox(debouncedBbox),
+            limit: maxDataPointsInViewport,
+          }
+        : { bbox: { x: { min: 0, max: 0 }, y: { min: 0, max: 0 } } },
+      {
+        enabled: debouncedBbox !== null,
+        placeholderData: keepPreviousData,
+      },
+    ),
+  );
+
+  const viewportClusters = useMemo(
+    () =>
+      rawViewportClusters.map((cluster) => ({
+        ...cluster,
+        position: flipPositionY(cluster.position),
+      })),
+    [rawViewportClusters],
+  );
+
+  const clustersToRender = useMemo(
+    () => mergeClustersById(viewportClusters, [...selectedClusters.values()]),
+    [viewportClusters, selectedClusters],
+  );
+
   const labelsScaled = useMemo(() => {
     return areas.map((label) => {
       const { fontSize, opacity: labelOpacity } = {
@@ -203,36 +198,6 @@ export default function Map(props: Props) {
     scaledFontSize.layer4,
   ]);
 
-  // TODO: replace TSV-backed cluster rendering with cluster.viewport query and
-  // join with selection store for full highlight behavior. Until then, the map
-  // shows all TSV clusters capped by the knob, and search-driven ripple is off.
-  const hasSelection = selectedClusters.size > 0;
-  const clustersAsArray = useMemo(() => [...clusters.values()], [clusters]);
-  const clustersInViewport = useMemo(() => {
-    if (!transform) {
-      return [];
-    }
-
-    return processClustersForViewport({
-      clusters: clustersAsArray,
-      transform,
-      limit: maxDataPointsInViewport,
-      size: props.size,
-      places: {
-        visible: true,
-        fontSize: scaledFontSize.layer4,
-        opacity: opacity.layer4,
-      },
-    });
-  }, [
-    transform,
-    clustersAsArray,
-    maxDataPointsInViewport,
-    props.size,
-    scaledFontSize.layer4,
-    opacity.layer4,
-  ]);
-
   const mapSvgBackgroundCss = useMemo(() => {
     if (!transform || !mapSvgUrl) {
       return {};
@@ -271,6 +236,7 @@ export default function Map(props: Props) {
     };
   }, [transform, svgOffset, svgScaleFactor, mapSvgUrl]);
 
+  const hasSelection = selectedClusters.size > 0;
   const ripple = useFlashState(selectedClusters);
 
   return (
@@ -284,8 +250,12 @@ export default function Map(props: Props) {
     >
       <g transform={transformValue}>
         <Clusters
-          clusters={clustersInViewport}
-          concepts={concepts}
+          clusters={clustersToRender}
+          label={{
+            fontSize: scaledFontSize.layer4,
+            opacity: opacity.layer4,
+            offset: 15 / zoom,
+          }}
           mode={mapMode}
           ripple={hasSelection && ripple}
         />

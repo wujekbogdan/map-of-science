@@ -12,11 +12,11 @@ type ArticleState =
       videos: YoutubeVideo[];
     }
   | { id: null; type: "local"; article: string | null; videos: null }
-  | { id: number; type: "iframe"; article: null; videos: YoutubeVideo[] };
+  | { id: string; type: "iframe"; article: null; videos: YoutubeVideo[] };
 
 type ArticleActions = {
   reset: () => void;
-  setRemoteArticleId: (id: number) => void;
+  setRemoteArticleId: (id: string) => void;
   fetchLocalArticle: (label: string, lang: Lang) => Promise<void>;
   fetchGeneralInfo: (lang: Lang) => Promise<void>;
   setVideos: (videos: YoutubeVideo[]) => void;
@@ -33,7 +33,7 @@ export const useArticleStore = create<ArticleState & ArticleActions>((set) => ({
   reset: () => {
     set({ id: null, type: null, article: null, videos: [] });
   },
-  setRemoteArticleId: (id: number) => {
+  setRemoteArticleId: (id: string) => {
     set({ id, type: "iframe", article: null });
   },
   fetchLocalArticle: async (label: string, lang: Lang) => {

@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { combine } from "zustand/middleware";
 import { AreaLocalized } from "../api/data.ts";
-import { Cluster, Concept, YoutubeVideo } from "../api/model";
+import { YoutubeVideo } from "../api/model";
 
 type Zoom = { x: number; y: number; scale: number };
 type Size = {
@@ -30,10 +30,6 @@ const partialDefaults = {
     middle: { r: 255, g: 255, b: 255 },
     end: { r: 201, g: 42, b: 42 },
   },
-  // TODO: drop once cluster.viewport replaces TSV loading.
-  clusters: new Map<number, Cluster>(),
-  // TODO: drop once cluster names are fully resolved server-side.
-  concepts: new Map<number, Concept>(),
   // TODO: drop once the video panel is removed.
   youtubeVideos: new Map<string, YoutubeVideo[]>(),
   // TODO: drop once area.viewport replaces TSV loading.
@@ -108,12 +104,6 @@ export const useMapStore = create(
     },
     setMaxDataPointsInViewport: (maxDataPointsInViewport: number) => {
       set({ maxDataPointsInViewport });
-    },
-    setClusters: (clusters: Map<number, Cluster>) => {
-      set({ clusters });
-    },
-    setConcepts: (concepts: Map<number, Concept>) => {
-      set({ concepts });
     },
     setYoutubeVideos: (youtubeVideos: Map<string, YoutubeVideo[]>) => {
       set({ youtubeVideos });

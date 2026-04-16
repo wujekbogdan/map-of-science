@@ -9,7 +9,7 @@ import {
 } from "@floating-ui/react";
 import { useState } from "react";
 import { createPortal } from "react-dom";
-import { Concept, Cluster } from "../../../api/model";
+import type { RouterOutputs } from "../../../api-client/index.ts";
 import { useArticleStore } from "../../../article/articleStore.ts";
 import { useMapStore } from "../../../map/mapStore.ts";
 import LabelText from "../Label/LabelText.tsx";
@@ -18,20 +18,18 @@ import Shape from "./Shape.tsx";
 import css from "./clusters.module.scss";
 
 type Mode = "growth" | "regular";
-export type ClusterWithScaledPlace = Cluster & {
-  place:
-    | (Cluster["place"] & {
-        fontSize: number;
-        opacity: number;
-        offset: number;
-      })
-    | null;
+export type MapCluster = RouterOutputs["cluster"]["viewport"][number];
+
+type Label = {
+  fontSize: number;
+  opacity: number;
+  offset: number;
 };
 
 type Props = {
-  concepts: Map<number, Concept>;
+  clusters: MapCluster[];
+  label: Label;
   ripple?: boolean;
-  clusters: ClusterWithScaledPlace[];
   mode: Mode;
 };
 
@@ -46,17 +44,15 @@ const getLevelByArticlesCount = (articlesCount: number) => {
 
 const classes = (classList: string[]) => classList.join(" ");
 
-const getPercentage = (index: number, total: number) => {
-  return Math.round(((index + 1) / total) * 100);
-};
+const getPercentage = (index: number, total: number) =>
+  Math.round(((index + 1) / total) * 100);
 
-export const Clusters = ({ clusters, concepts, ripple, mode }: Props) => {
+export const Clusters = ({ clusters, label, ripple, mode }: Props) => {
   const growthRatingColors = useMapStore((state) => state.growthRatingColors);
   const setRemoteArticleId = useArticleStore(
-    ({ setRemoteArticleId }) => setRemoteArticleId,
+    (state) => state.setRemoteArticleId,
   );
-  const [hoveredPoint, setHoveredCluster] =
-    useState<ClusterWithScaledPlace | null>(null);
+  const [hoveredCluster, setHoveredCluster] = useState<MapCluster | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const { refs, floatingStyles, context } = useFloating({
     middleware: [offset(10), flip(), shift({ padding: 10 })],
@@ -68,7 +64,7 @@ export const Clusters = ({ clusters, concepts, ripple, mode }: Props) => {
     initial: { opacity: 0 },
     open: { opacity: 1 },
   });
-  const shouldCreatePortal = isMounted && hoveredPoint !== null;
+  const shouldCreatePortal = isMounted && hoveredCluster !== null;
   const hover = useHover(context, {
     delay: {
       open: 50,
@@ -80,18 +76,16 @@ export const Clusters = ({ clusters, concepts, ripple, mode }: Props) => {
   return (
     <>
       {clusters.map((cluster, index) => {
-        const label = concepts.get(cluster.clusterId)?.key;
+        const isHovered = hoveredCluster?.id === cluster.id;
+        const showLabel =
+          cluster.nameSource === "curated" && label.opacity > 0;
 
         return (
           <g
             className={classes([css.group, css.fadeIn])}
-            key={cluster.clusterId}
-            aria-label={label}
-            ref={
-              hoveredPoint?.clusterId === cluster.clusterId
-                ? refs.setReference
-                : null
-            }
+            key={cluster.id}
+            aria-label={cluster.displayName}
+            ref={isHovered ? refs.setReference : null}
             onPointerEnter={() => {
               setHoveredCluster(cluster);
             }}
@@ -99,36 +93,34 @@ export const Clusters = ({ clusters, concepts, ripple, mode }: Props) => {
               setHoveredCluster(null);
             }}
             onClick={() => {
-              setRemoteArticleId(cluster.clusterId);
+              setRemoteArticleId(cluster.id);
             }}
-            {...(hoveredPoint?.clusterId === cluster.clusterId
-              ? getReferenceProps()
-              : {})}
+            {...(isHovered ? getReferenceProps() : {})}
           >
             <Shape
               progress={getPercentage(index, clusters.length)}
               level={getLevelByArticlesCount(cluster.articlesCount)}
               point={{
                 growthRating: cluster.growthRating,
-                x: cluster.x,
-                y: cluster.y,
+                x: cluster.position.x,
+                y: cluster.position.y,
               }}
               ripple={!!ripple}
               mode={mode}
-              forcedHover={hoveredPoint?.clusterId === cluster.clusterId}
+              forcedHover={isHovered}
               growthRatingColors={growthRatingColors}
             />
-            {cluster.place && cluster.place.opacity > 0 && (
+            {showLabel && (
               <LabelText
-                id={cluster.clusterId.toString()}
-                x={cluster.x}
-                y={cluster.y - cluster.place.offset}
-                fontSize={cluster.place.fontSize}
-                opacity={cluster.place.opacity}
-                forcedHover={hoveredPoint?.clusterId === cluster.clusterId}
+                id={cluster.id}
+                x={cluster.position.x}
+                y={cluster.position.y - label.offset}
+                fontSize={label.fontSize}
+                opacity={label.opacity}
+                forcedHover={isHovered}
                 level={4}
               >
-                {cluster.place.text}
+                {cluster.displayName}
               </LabelText>
             )}
           </g>
@@ -143,7 +135,7 @@ export const Clusters = ({ clusters, concepts, ripple, mode }: Props) => {
               style={{ ...floatingStyles, ...styles }}
               {...getFloatingProps()}
             >
-              <ClusterDetails cluster={hoveredPoint} concepts={concepts} />
+              <ClusterDetails cluster={hoveredCluster} />
             </div>,
             document.body,
           )}

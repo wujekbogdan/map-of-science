@@ -4,6 +4,7 @@ import debounce from "lodash/debounce";
 import { useMemo, useState } from "react";
 import styled from "styled-components";
 import { useTRPC } from "../../../api-client";
+import { flipPositionY } from "../../../map/coords.ts";
 import { useMapStore } from "../../../map/mapStore.ts";
 import {
   type SelectedCluster,
@@ -30,11 +31,19 @@ export const Search = () => {
 
   const [searchTerm, setSearchTerm] = useState("");
 
-  const { data: results = [], isFetching } = useQuery(
+  const { data: rawResults = [], isFetching } = useQuery(
     trpc.search.query.queryOptions(
       { text: searchTerm, limit: SEARCH_LIMIT },
       { enabled: searchTerm.length >= MIN_QUERY_LENGTH },
     ),
+  );
+  const results = useMemo(
+    () =>
+      rawResults.map((cluster) => ({
+        ...cluster,
+        position: flipPositionY(cluster.position),
+      })),
+    [rawResults],
   );
   const isLoading = useDebounce(isFetching, LOADING_DELAY_MS);
 
