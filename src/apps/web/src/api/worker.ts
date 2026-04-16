@@ -1,11 +1,11 @@
-import { Lang } from "./data.ts";
+import { Lang } from "./i18n.ts";
 
-export const loadData = (lang: Lang) => {
+export const loadData = () => {
   const worker = new ComlinkWorker<typeof import("./data.ts")>(
     new URL("./data.ts", import.meta.url),
   );
 
-  return worker.loadData(lang);
+  return worker.loadData();
 };
 
 export const loadI18n = (lang: Lang) => {

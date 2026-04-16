@@ -1,6 +1,5 @@
 import { create } from "zustand";
 import { combine } from "zustand/middleware";
-import { AreaLocalized } from "../api/data.ts";
 import { YoutubeVideo } from "../api/model";
 
 type Zoom = { x: number; y: number; scale: number };
@@ -32,8 +31,6 @@ const partialDefaults = {
   },
   // TODO: drop once the video panel is removed.
   youtubeVideos: new Map<string, YoutubeVideo[]>(),
-  // TODO: drop once area.viewport replaces TSV loading.
-  areas: [] as AreaLocalized[],
   zoomStepFactor: 1.6,
   mapSize: { width: 0, height: 0 },
   fontSize: {
@@ -107,9 +104,6 @@ export const useMapStore = create(
     },
     setYoutubeVideos: (youtubeVideos: Map<string, YoutubeVideo[]>) => {
       set({ youtubeVideos });
-    },
-    setAreas: (areas: AreaLocalized[]) => {
-      set({ areas });
     },
     setGrowthRatingColors: (colors: Colors) => {
       set({ growthRatingColors: colors });

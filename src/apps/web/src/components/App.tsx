@@ -6,7 +6,6 @@ import { useShallow } from "zustand/react/shallow";
 import { loadData } from "../api/worker.ts";
 import { config } from "../config.ts";
 import { useMapStore } from "../map/mapStore.ts";
-import { useLanguage } from "../useLanguage.ts";
 import { useWindowSize } from "../useWindowSize.ts";
 import { Article } from "./Article/Article.tsx";
 import { DevTool } from "./DevTool.tsx";
@@ -26,14 +25,12 @@ const MapLoader = () => {
 };
 
 function App() {
-  const { language } = useLanguage();
-  const [setMapSize, setYoutubeVideos, setAreas] = useMapStore(
-    useShallow((s) => [s.setMapSize, s.setYoutubeVideos, s.setAreas]),
+  const [setMapSize, setYoutubeVideos] = useMapStore(
+    useShallow((s) => [s.setMapSize, s.setYoutubeVideos]),
   );
-  const { isLoading } = useSWR(["data", language], () => loadData(language), {
-    onSuccess: ({ youtube, areas }) => {
+  const { isLoading } = useSWR("data", () => loadData(), {
+    onSuccess: ({ youtube }) => {
       setYoutubeVideos(youtube);
-      setAreas(areas);
     },
     onError: (err) => {
       console.error("Error loading data:", err);

@@ -52,7 +52,6 @@ type Props = {
 // fetch into a container wrapper.
 export default function Map(props: Props) {
   const [
-    areas,
     youtube,
     scaleFactor,
     fontSize,
@@ -63,7 +62,6 @@ export default function Map(props: Props) {
     mapMode,
   ] = useMapStore(
     useShallow((s) => [
-      s.areas,
       s.youtubeVideos,
       s.scaleFactor,
       s.fontSize,
@@ -156,34 +154,45 @@ export default function Map(props: Props) {
     [viewportClusters, selectedClusters],
   );
 
-  const labelsScaled = useMemo(() => {
-    return areas.map((label) => {
-      const { fontSize, opacity: labelOpacity } = {
-        1: {
-          fontSize: scaledFontSize.layer1,
-          opacity: opacity.layer1,
-        },
-        2: {
-          fontSize: scaledFontSize.layer2,
-          opacity: opacity.layer2,
-        },
-        3: {
-          fontSize: scaledFontSize.layer3,
-          opacity: opacity.layer3,
-        },
-        4: {
-          fontSize: scaledFontSize.layer4,
-          opacity: opacity.layer4,
-        },
-      }[label.level];
+  const { data: areas = [] } = useQuery(
+    trpc.area.viewport.queryOptions(
+      debouncedBbox
+        ? { bbox: debouncedBbox }
+        : { bbox: { x: { min: 0, max: 0 }, y: { min: 0, max: 0 } } },
+      {
+        enabled: debouncedBbox !== null,
+        placeholderData: keepPreviousData,
+      },
+    ),
+  );
 
-      return {
-        ...label,
-        key: label.id,
-        fontSize,
-        opacity: labelOpacity,
-        videos: youtube.get(label.id) ?? [],
-      };
+  const labelsScaled = useMemo(() => {
+    const layers: Record<
+      1 | 2 | 3 | 4,
+      { fontSize: number; opacity: number }
+    > = {
+      1: { fontSize: scaledFontSize.layer1, opacity: opacity.layer1 },
+      2: { fontSize: scaledFontSize.layer2, opacity: opacity.layer2 },
+      3: { fontSize: scaledFontSize.layer3, opacity: opacity.layer3 },
+      4: { fontSize: scaledFontSize.layer4, opacity: opacity.layer4 },
+    };
+
+    return areas.flatMap((area) => {
+      const layer = layers[area.tier as 1 | 2 | 3 | 4];
+      if (!layer) return [];
+      return [
+        {
+          id: area.id,
+          key: area.id,
+          text: area.name,
+          x: area.position.x,
+          y: area.position.y,
+          level: area.tier as 1 | 2 | 3 | 4,
+          fontSize: layer.fontSize,
+          opacity: layer.opacity,
+          videos: youtube.get(area.id) ?? [],
+        },
+      ];
     });
   }, [
     youtube,
