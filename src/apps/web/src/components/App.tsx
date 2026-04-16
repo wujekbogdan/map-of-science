@@ -5,7 +5,7 @@ import useSWR from "swr";
 import { useShallow } from "zustand/react/shallow";
 import { loadData } from "../api/worker.ts";
 import { config } from "../config.ts";
-import { useStore } from "../store.ts";
+import { useMapStore } from "../map/mapStore.ts";
 import { useLanguage } from "../useLanguage.ts";
 import { useWindowSize } from "../useWindowSize.ts";
 import { Article } from "./Article/Article.tsx";
@@ -28,7 +28,7 @@ const MapLoader = () => {
 function App() {
   const { language } = useLanguage();
   const [setMapSize, setClusters, setConcepts, setYoutubeVideos, setAreas] =
-    useStore(
+    useMapStore(
       useShallow((s) => [
         s.setMapSize,
         s.setClusters,

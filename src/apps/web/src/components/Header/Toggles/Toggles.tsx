@@ -13,7 +13,7 @@ import { ChangeEvent, Fragment, useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { useShallow } from "zustand/react/shallow";
-import { useStore } from "../../../store.ts";
+import { useMapStore } from "../../../map/mapStore.ts";
 import { breakpoints, useBreakpointMin } from "../../../useBreakpoint.ts";
 import { LangCode } from "../../../useLanguage.ts";
 import LanguageSelector from "./LanguageSelector.tsx";
@@ -50,7 +50,7 @@ const Toggles = () => {
     setMapMode,
     maxDataPointsInViewport,
     setMaxDataPointsInViewport,
-  ] = useStore(
+  ] = useMapStore(
     useShallow((s) => [
       s.mapMode,
       s.setMapMode,

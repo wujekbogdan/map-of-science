@@ -44,6 +44,7 @@ const buildFake = (externalId: string) => ({
   articlesCount: 0,
   growthRating: 0,
   embedding: { model: "m", source: "s" },
+  keyConcepts: [],
   vector,
 });
 

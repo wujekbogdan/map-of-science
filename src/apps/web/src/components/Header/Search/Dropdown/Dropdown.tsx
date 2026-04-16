@@ -4,46 +4,30 @@ import {
   ComboboxOptions as ComboboxOptionsHeadless,
   ComboboxOption as ComboboxOptionHeadless,
 } from "@headlessui/react";
-import { ChangeEvent, useMemo, useState, memo, useRef } from "react";
+import { ChangeEvent, memo, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
+import type { SelectedCluster } from "../../../../map/selectionStore.ts";
 import Label, { Token } from "./Label.tsx";
 import CloseIcon from "./close.svg";
-
-export type BoundingBox = {
-  min: { x: number; y: number };
-  max: { x: number; y: number };
-  center: { x: number; y: number };
-};
-type Cluster = {
-  clusterId: number;
-  x: number;
-  y: number;
-};
 
 type OptionBase = {
   label: string;
   keyword: string;
   id: string;
 };
+
 export type Option =
   | (OptionBase & {
-      type: "label";
-      level: 1 | 2 | 3 | 4;
-      x: number;
-      y: number;
-      videosCount: number;
-    })
-  | (OptionBase & {
-      type: "point";
-      clusters: Cluster[];
+      type: "cluster";
+      cluster: SelectedCluster;
     })
   | (OptionBase & {
       type: "query";
-      clusters: Cluster[];
+      clusters: SelectedCluster[];
     });
 
-type Dropdown = {
+type DropdownProps = {
   options: Option[];
   onSelect: (option: Option) => void;
   onReset: () => void;
@@ -67,83 +51,67 @@ const tokenizeLabel = (label: string, query: string): Token[] => {
 };
 
 type OptionRowProps = {
-  t: (text: string) => string;
   id: string;
   focus: boolean;
   selected: boolean;
   tokens: Token[];
-  type: "query" | "label" | "point";
-  videosCount?: number;
+  type: "query" | "cluster";
 };
 
 const OptionRow = memo(
   function OptionRow(props: OptionRowProps) {
-    const videosCountToken =
-      props.videosCount === undefined
-        ? undefined
-        : {
-            text: ` [${props.t("search.dropdown.youtubeCount")}: ${props.videosCount}]`,
-            type: "regular",
-          };
-
-    const tokens = [...props.tokens, videosCountToken].filter(
-      Boolean,
-    ) as Token[];
-
     return (
       <ComboboxOption $focus={props.focus} $selected={props.selected}>
-        <Label tokens={tokens} type={props.type} />
+        <Label tokens={props.tokens} type={props.type} />
       </ComboboxOption>
     );
   },
-  (prev, next) => {
-    return (
-      prev.id === next.id &&
-      prev.selected == next.selected &&
-      prev.focus === next.focus
-    );
-  },
+  (prev, next) =>
+    prev.id === next.id &&
+    prev.selected === next.selected &&
+    prev.focus === next.focus,
 );
 
-export const Dropdown = (props: Dropdown) => {
+export const Dropdown = (props: DropdownProps) => {
   const { t } = useTranslation();
   const { options: rawOptions } = props;
   const [query, setQuery] = useState("");
   const [selection, setSelection] = useState<Option | null>(null);
-  const { options, allClusters } = useMemo(() => {
-    const options = rawOptions.map((option) => ({
-      ...option,
-      tokens: tokenizeLabel(option.label, query),
-    }));
-    const allClusters = [
-      ...new Map(
-        options
-          .filter((option) => option.type === "point")
-          .flatMap((option) => option.clusters)
-          .map((cluster) => [cluster.clusterId, cluster]), // Guarantee uniqueness
-      ).values(),
-    ];
 
-    return { options, allClusters };
-  }, [rawOptions, query]);
+  const options = useMemo(
+    () =>
+      rawOptions.map((option) => ({
+        ...option,
+        tokens: tokenizeLabel(option.label, query),
+      })),
+    [rawOptions, query],
+  );
+  const allClusters = useMemo(
+    () =>
+      rawOptions
+        .filter((option) => option.type === "cluster")
+        .map((option) => option.cluster),
+    [rawOptions],
+  );
+
   const hasNoResultsText = query.length > 1 && options.length === 0;
   const noResultsText = (() => {
     if (query.length < 3) {
       return t("search.dropdown.enterMin");
     }
-
     if (props.isLoading) {
       return `${t("search.dropdown.loading")}…`;
     }
-
     return t("search.dropdown.noResults");
   })();
+
   const placeholders = Array.from({ length: 10 }, (_, i) =>
     t(`search.dropdown.placeholder.${i + 1}`),
   );
   const { current: randomPlaceholder } = useRef<string>(
     placeholders[Math.floor(Math.random() * placeholders.length)],
   );
+
   const queryOption: Option = {
     type: "query",
     id: "dummy-id",
@@ -154,17 +122,16 @@ export const Dropdown = (props: Dropdown) => {
   const hasHighlightAllOption = query.length >= 3 && allClusters.length > 0;
 
   const onQueryChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const query = event.target.value;
+    const newQuery = event.target.value;
     setSelection(null);
-    setQuery(query);
-    props.onInput(query);
+    setQuery(newQuery);
+    props.onInput(newQuery);
   };
 
-  const onSelectionChange = (selection: Option | null) => {
-    if (!selection) return;
-
-    setSelection(selection);
-    props.onSelect(selection);
+  const onSelectionChange = (selected: Option | null) => {
+    if (!selected) return;
+    setSelection(selected);
+    props.onSelect(selected);
   };
 
   const onResetClick = () => {
@@ -213,17 +180,11 @@ export const Dropdown = (props: Dropdown) => {
                     <ComboboxOptionHeadless key={option.id} value={option}>
                       {({ focus, selected }) => (
                         <OptionRow
-                          t={t}
                           type={option.type}
                           id={option.id}
                           focus={focus}
                           selected={selected}
                           tokens={option.tokens}
-                          videosCount={
-                            option.type === "label"
-                              ? option.videosCount
-                              : undefined
-                          }
                         />
                       )}
                     </ComboboxOptionHeadless>

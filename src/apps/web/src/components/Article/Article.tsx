@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { useArticleStore } from "../../store.ts";
+import { useArticleStore } from "../../article/articleStore.ts";
 import { ArticleModal } from "./ArticleModal.tsx";
 import { ArticleWithVideos } from "./ArticleWithVideos.tsx";
 import HtmlArticle from "./HtmlArticle.tsx";

@@ -9,9 +9,9 @@ import {
 } from "@floating-ui/react";
 import { useState } from "react";
 import { createPortal } from "react-dom";
-import { useShallow } from "zustand/react/shallow";
 import { Concept, Cluster } from "../../../api/model";
-import { useArticleStore, useStore } from "../../../store.ts";
+import { useArticleStore } from "../../../article/articleStore.ts";
+import { useMapStore } from "../../../map/mapStore.ts";
 import LabelText from "../Label/LabelText.tsx";
 import { ClusterDetails } from "./ClusterDetails.tsx";
 import Shape from "./Shape.tsx";
@@ -51,9 +51,7 @@ const getPercentage = (index: number, total: number) => {
 };
 
 export const Clusters = ({ clusters, concepts, ripple, mode }: Props) => {
-  const [growthRatingColors] = useStore(
-    useShallow((state) => [state.growthRatingColors]),
-  );
+  const growthRatingColors = useMapStore((state) => state.growthRatingColors);
   const setRemoteArticleId = useArticleStore(
     ({ setRemoteArticleId }) => setRemoteArticleId,
   );

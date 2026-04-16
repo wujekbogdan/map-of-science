@@ -1,7 +1,7 @@
 import { useState } from "react";
 import styled from "styled-components";
 import { useShallow } from "zustand/react/shallow";
-import { useStore, RGB } from "../store.ts";
+import { useMapStore, RGB } from "../map/mapStore.ts";
 
 const i18n = (str: string) => str;
 
@@ -52,7 +52,7 @@ export const DevTool = () => {
     setSvgScaleFactor,
     growthRatingColors,
     setGrowthRatingColors,
-  ] = useStore(
+  ] = useMapStore(
     useShallow((state) => [
       state.currentZoom?.scale.toFixed(2) ?? 1,
       state.fontSize,

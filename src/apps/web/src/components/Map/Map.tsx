@@ -4,11 +4,13 @@ import styled from "styled-components";
 import useSWR from "swr";
 import { useShallow } from "zustand/react/shallow";
 import { Cluster } from "../../api/model";
-import { useArticleStore, useStore } from "../../store.ts";
-import { useD3Zoom } from "../../useD3Zoom.ts";
-import { useFlashState } from "../../useFlashState.ts";
+import { useArticleStore } from "../../article/articleStore.ts";
+import { useMapStore } from "../../map/mapStore.ts";
+import { useSelectionStore } from "../../map/selectionStore.ts";
+import { useD3Zoom } from "../../map/useD3Zoom.ts";
+import { useFlashState } from "../../map/useFlashState.ts";
+import { useLayersOpacity } from "../../map/useLayersOpacity.ts";
 import { useLanguage } from "../../useLanguage.ts";
-import { useLayersOpacity } from "../../useLayersOpacity.ts";
 import { Clusters, ClusterWithScaledPlace } from "./Clusters/Clusters.tsx";
 import Label, { OnLabelClick } from "./Label/Label.tsx";
 
@@ -95,11 +97,10 @@ export default function Map(props: Props) {
     fontSize,
     desiredZoom,
     maxDataPointsInViewport,
-    clustersToHighlight,
     svgScaleFactor,
     svgOffset,
     mapMode,
-  ] = useStore(
+  ] = useMapStore(
     useShallow((s) => [
       s.areas,
       s.clusters,
@@ -109,12 +110,12 @@ export default function Map(props: Props) {
       s.fontSize,
       s.desiredZoom,
       s.maxDataPointsInViewport,
-      s.pointsToHighlight,
       s.temp__svgScaleFactor,
       s.temp__svgOffset,
       s.mapMode,
     ]),
   );
+  const selectedClusters = useSelectionStore((s) => s.selectedClusters);
   const { language } = useLanguage();
 
   const [fetchLocalArticle, setVideos] = useArticleStore(
@@ -202,24 +203,20 @@ export default function Map(props: Props) {
     scaledFontSize.layer4,
   ]);
 
-  const hasSearchResults = clustersToHighlight.length > 0;
+  // TODO: replace TSV-backed cluster rendering with cluster.viewport query and
+  // join with selection store for full highlight behavior. Until then, the map
+  // shows all TSV clusters capped by the knob, and search-driven ripple is off.
+  const hasSelection = selectedClusters.size > 0;
   const clustersAsArray = useMemo(() => [...clusters.values()], [clusters]);
   const clustersInViewport = useMemo(() => {
     if (!transform) {
       return [];
     }
 
-    const allClusters = hasSearchResults
-      ? clustersToHighlight
-          .map((id) => clusters.get(id))
-          .filter((point) => point !== undefined)
-      : clustersAsArray;
-    const limit = hasSearchResults ? Infinity : maxDataPointsInViewport;
-
     return processClustersForViewport({
-      clusters: allClusters,
+      clusters: clustersAsArray,
       transform,
-      limit,
+      limit: maxDataPointsInViewport,
       size: props.size,
       places: {
         visible: true,
@@ -228,15 +225,12 @@ export default function Map(props: Props) {
       },
     });
   }, [
-    hasSearchResults,
     transform,
-    clustersToHighlight,
     clustersAsArray,
     maxDataPointsInViewport,
     props.size,
     scaledFontSize.layer4,
     opacity.layer4,
-    clusters,
   ]);
 
   const mapSvgBackgroundCss = useMemo(() => {
@@ -277,7 +271,7 @@ export default function Map(props: Props) {
     };
   }, [transform, svgOffset, svgScaleFactor, mapSvgUrl]);
 
-  const ripple = useFlashState(clustersToHighlight);
+  const ripple = useFlashState(selectedClusters);
 
   return (
     <MapSvg
@@ -293,7 +287,7 @@ export default function Map(props: Props) {
           clusters={clustersInViewport}
           concepts={concepts}
           mode={mapMode}
-          ripple={hasSearchResults && ripple}
+          ripple={hasSelection && ripple}
         />
         {labelsScaled.map((label) => (
           <Label

@@ -13,6 +13,7 @@ const buildCluster = () => ({
   articlesCount: 1200,
   growthRating: 75.5,
   embedding: { model: "gemini-embedding-001", source: "article-titles" },
+  keyConcepts: ["machine learning", "neural networks"],
 });
 
 const buildAtlas = (overrides?: Partial<AtlasStore["clusters"]>): AtlasStore =>
@@ -50,6 +51,45 @@ describe("cluster.byId", () => {
     const result = await callerFor("en_US", atlas).cluster.byId({ id: "c-1" });
 
     expect(result?.name).toBeNull();
+  });
+
+  it("should include keyConcepts in the response", async () => {
+    const result = await callerFor("en_US").cluster.byId({ id: "c-1" });
+    expect(result?.keyConcepts).toEqual(["machine learning", "neural networks"]);
+  });
+
+  it("should use the localized name as displayName", async () => {
+    const result = await callerFor("en_US").cluster.byId({ id: "c-1" });
+    expect(result?.displayName).toBe("Machine Learning");
+  });
+
+  it("should fall back to joined keyConcepts when name is null", async () => {
+    const atlas = buildAtlas({
+      findById: vi.fn().mockResolvedValue({
+        ...buildCluster(),
+        name: null,
+        nameSource: null,
+      }),
+    });
+
+    const result = await callerFor("en_US", atlas).cluster.byId({ id: "c-1" });
+
+    expect(result?.displayName).toBe("machine learning, neural networks");
+  });
+
+  it("should fall back to externalId when name and keyConcepts are both missing", async () => {
+    const atlas = buildAtlas({
+      findById: vi.fn().mockResolvedValue({
+        ...buildCluster(),
+        name: null,
+        nameSource: null,
+        keyConcepts: [],
+      }),
+    });
+
+    const result = await callerFor("en_US", atlas).cluster.byId({ id: "c-1" });
+
+    expect(result?.displayName).toBe("Cluster 1");
   });
 });
 

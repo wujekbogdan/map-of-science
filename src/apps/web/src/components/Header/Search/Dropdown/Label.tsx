@@ -2,27 +2,24 @@ import { ReactNode } from "react";
 import styled from "styled-components";
 import pin from "../icons/pin.svg";
 import search from "../icons/search.svg";
-import zone from "../icons/zone.svg";
 
 export type Token = { text: string; type: "regular" | "bold" };
 
 type Props = {
   tokens?: Token[];
-  type: "query" | "label" | "point";
+  type: "query" | "cluster";
   children?: ReactNode;
-  videosCount?: number;
 };
 
 const Label = ({ tokens, type, children }: Props) => {
-  const types = {
+  const icons = {
     query: search,
-    label: zone,
-    point: pin,
+    cluster: pin,
   };
 
   return (
     <LabelRoot>
-      <Icon src={types[type]} role="presentation" alt={type} />
+      <Icon src={icons[type]} role="presentation" alt={type} />
       <span>
         {tokens?.map((token, index) => (
           <Token key={index} $type={token.type}>

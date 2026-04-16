@@ -1,16 +1,9 @@
 import { create } from "zustand";
 import { combine } from "zustand/middleware";
-import { fetchArticle } from "./api";
-import { AreaLocalized } from "./api/data.ts";
-import { Lang } from "./api/i18n.ts";
-import { Concept, Cluster, YoutubeVideo } from "./api/model";
+import { AreaLocalized } from "../api/data.ts";
+import { Cluster, Concept, YoutubeVideo } from "../api/model";
 
 type Zoom = { x: number; y: number; scale: number };
-type PartialDefaults = typeof partialDefaults;
-type State = PartialDefaults & {
-  currentZoom: Zoom | null;
-  desiredZoom: Zoom | null;
-};
 type Size = {
   width: number;
   height: number;
@@ -27,37 +20,26 @@ type Colors = {
   middle: RGB;
   end: RGB;
 };
+
 type MapMode = "regular" | "growth";
 
 const partialDefaults = {
   mapMode: "regular" as MapMode,
   growthRatingColors: {
-    start: {
-      r: 24,
-      g: 100,
-      b: 171,
-    },
-    middle: {
-      r: 255,
-      g: 255,
-      b: 255,
-    },
-    end: {
-      r: 201,
-      g: 42,
-      b: 42,
-    },
+    start: { r: 24, g: 100, b: 171 },
+    middle: { r: 255, g: 255, b: 255 },
+    end: { r: 201, g: 42, b: 42 },
   },
+  // TODO: drop once cluster.viewport replaces TSV loading.
   clusters: new Map<number, Cluster>(),
+  // TODO: drop once cluster names are fully resolved server-side.
   concepts: new Map<number, Concept>(),
+  // TODO: drop once the video panel is removed.
   youtubeVideos: new Map<string, YoutubeVideo[]>(),
+  // TODO: drop once area.viewport replaces TSV loading.
   areas: [] as AreaLocalized[],
-  pointsToHighlight: [] as number[],
   zoomStepFactor: 1.6,
-  mapSize: {
-    width: 0,
-    height: 0,
-  },
+  mapSize: { width: 0, height: 0 },
   fontSize: {
     layer1: 16,
     layer2: 12.8,
@@ -71,10 +53,13 @@ const partialDefaults = {
   },
   maxDataPointsInViewport: 500,
   temp__svgScaleFactor: 0.0581,
-  temp__svgOffset: {
-    x: -16.0,
-    y: 27,
-  },
+  temp__svgOffset: { x: -16.0, y: 27 },
+};
+
+type PartialDefaults = typeof partialDefaults;
+type State = PartialDefaults & {
+  currentZoom: Zoom | null;
+  desiredZoom: Zoom | null;
 };
 
 const defaults: State = {
@@ -83,9 +68,7 @@ const defaults: State = {
   currentZoom: null,
 };
 
-// TODO: break the main store into per-feature stores
-// https://github.com/wujekbogdan/map-of-science/issues/61
-export const useStore = create(
+export const useMapStore = create(
   combine(defaults, (set) => ({
     setDesiredZoom: (zoom: Zoom | null) => {
       set({ desiredZoom: zoom });
@@ -138,13 +121,8 @@ export const useStore = create(
     setAreas: (areas: AreaLocalized[]) => {
       set({ areas });
     },
-    setPointsToHighlight: (clusterIds: number[]) => {
-      set({ pointsToHighlight: clusterIds });
-    },
     setGrowthRatingColors: (colors: Colors) => {
-      set({
-        growthRatingColors: colors,
-      });
+      set({ growthRatingColors: colors });
     },
     setMapMode: (mode: MapMode) => {
       set({ mapMode: mode });
@@ -157,49 +135,3 @@ export const useStore = create(
     },
   })),
 );
-
-type ArticleState =
-  | { id: null; type: null; article: null; videos: YoutubeVideo[] }
-  | {
-      id: null;
-      type: "local-with-videos";
-      article: string | null;
-      videos: YoutubeVideo[];
-    }
-  | { id: null; type: "local"; article: string | null; videos: null }
-  | { id: number; type: "iframe"; article: null; videos: YoutubeVideo[] };
-
-type ArticleActions = {
-  reset: () => void;
-  setRemoteArticleId: (id: number) => void;
-  fetchLocalArticle: (label: string, lang: Lang) => Promise<void>;
-  fetchGeneralInfo: (lang: Lang) => Promise<void>;
-  setVideos: (videos: YoutubeVideo[]) => void;
-};
-
-export const useArticleStore = create<ArticleState & ArticleActions>((set) => ({
-  id: null,
-  type: null,
-  article: null,
-  // TODO: Videos and local articles should not be handled separately.
-  // Fetch logic should be encapsulated in the store, so that videos and articles can be fetched together rather
-  // than set from the outside.
-  videos: [],
-  reset: () => {
-    set({ id: null, type: null, article: null, videos: [] });
-  },
-  setRemoteArticleId: (id: number) => {
-    set({ id, type: "iframe", article: null });
-  },
-  fetchLocalArticle: async (label: string, lang: Lang) => {
-    const articleHTML = await fetchArticle(label, lang);
-    set({ id: null, type: "local-with-videos", article: articleHTML });
-  },
-  fetchGeneralInfo: async (lang: Lang) => {
-    const articleHTML = await fetchArticle("general-info", lang);
-    set({ id: null, type: "local", article: articleHTML });
-  },
-  setVideos: (videos: YoutubeVideo[]) => {
-    set({ videos, id: null, type: "local-with-videos" });
-  },
-}));

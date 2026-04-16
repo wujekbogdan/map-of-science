@@ -44,6 +44,7 @@ const toPayload = (cluster: ClusterInput) => ({
   articlesCount: cluster.articlesCount,
   growthRating: cluster.growthRating,
   embedding: cluster.embedding,
+  keyConcepts: cluster.keyConcepts,
 });
 
 const payloadToCluster = (
@@ -59,6 +60,7 @@ const payloadToCluster = (
     articlesCount: payload.articlesCount,
     growthRating: payload.growthRating,
     embedding: payload.embedding,
+    keyConcepts: payload.keyConcepts ?? [],
   });
 
 const parsePoint = (raw: unknown): Cluster => {

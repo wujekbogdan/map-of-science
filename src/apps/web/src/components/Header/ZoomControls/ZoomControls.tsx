@@ -1,9 +1,9 @@
 import styled from "styled-components";
 import { useShallow } from "zustand/react/shallow";
-import { useStore } from "../../../store.ts";
+import { useMapStore } from "../../../map/mapStore.ts";
 
 export const ZoomControls = () => {
-  const [setDesiredZoom, currentZoom, zoomStepFactor] = useStore(
+  const [setDesiredZoom, currentZoom, zoomStepFactor] = useMapStore(
     useShallow((s) => [s.setDesiredZoom, s.currentZoom, s.zoomStepFactor]),
   );
   const scale = currentZoom ? currentZoom.scale : 1;

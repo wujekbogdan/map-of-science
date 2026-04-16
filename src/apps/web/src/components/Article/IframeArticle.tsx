@@ -1,10 +1,10 @@
 import { Trans, useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { useStore } from "../../store.ts";
+import { useMapStore } from "../../map/mapStore.ts";
 
 export const IframeArticle = ({ id }: { id: number }) => {
   const { t } = useTranslation("article");
-  const clusters = useStore((state) => state.clusters);
+  const clusters = useMapStore((state) => state.clusters);
   const cluster = clusters.get(id);
   // Prefer curated place name, fall back to LLM-generated name
   const clusterName = cluster?.place?.text ?? cluster?.name;

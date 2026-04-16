@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { styled } from "styled-components";
 import { useShallow } from "zustand/react/shallow";
-import { useArticleStore } from "../../store.ts";
+import { useArticleStore } from "../../article/articleStore.ts";
 import { breakpoints } from "../../useBreakpoint.ts";
 import { useLanguage } from "../../useLanguage.ts";
 import helpIon from "./help.svg";
