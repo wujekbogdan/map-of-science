@@ -2,7 +2,6 @@ import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useDebounce } from "@uidotdev/usehooks";
 import { CSSProperties, useMemo, useRef, useState } from "react";
 import styled from "styled-components";
-import useSWR from "swr";
 import { useShallow } from "zustand/react/shallow";
 import { useTRPC } from "../../api-client/index.ts";
 import { useArticleStore } from "../../article/articleStore.ts";
@@ -79,7 +78,11 @@ export default function Map(props: Props) {
   const [mapVisibility, setMapVisibility] = useState<"visible" | "hidden">(
     "hidden",
   );
-  const { data: mapSvgUrl } = useSWR("map-svg", fetchMapSvg);
+  const { data: mapSvgUrl } = useQuery({
+    queryKey: ["map-svg"],
+    queryFn: fetchMapSvg,
+    staleTime: Infinity,
+  });
 
   const { transform, zoom } = useD3Zoom({
     svg: svgRoot,

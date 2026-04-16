@@ -1,4 +1,4 @@
-import { Lang } from "./i18n.ts";
+import { type LangCode } from "../useLanguage.ts";
 
 const articles: Record<string, () => Promise<{ default: string }>> =
   Object.entries(import.meta.glob("../articles/*.md")).reduce(
@@ -11,7 +11,7 @@ const articles: Record<string, () => Promise<{ default: string }>> =
     {},
   );
 
-const localizedLabelId = (label: string, lang: Lang) => {
+const localizedLabelId = (label: string, lang: LangCode) => {
   const prefix = label.toLowerCase().replace(/[^a-z0-9]/g, "_"); // Replace non-alphanumeric characters with underscores
   const suffix = (
     {
@@ -33,7 +33,7 @@ const markdownToHtml = async (markdown: string) => {
   return marked.parse(markdown);
 };
 
-export const fetchArticle = async (label: string, lang: Lang) => {
+export const fetchArticle = async (label: string, lang: LangCode) => {
   const localizedId = localizedLabelId(label, lang);
   console.log(localizedId);
 

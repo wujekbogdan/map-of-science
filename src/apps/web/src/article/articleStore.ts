@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { fetchArticle } from "../api";
-import { Lang } from "../api/i18n.ts";
+import { type LangCode } from "../useLanguage.ts";
 
 type ArticleState =
   | { id: null; type: null; article: null }
@@ -10,8 +10,8 @@ type ArticleState =
 type ArticleActions = {
   reset: () => void;
   setRemoteArticleId: (id: string) => void;
-  fetchLocalArticle: (label: string, lang: Lang) => Promise<void>;
-  fetchGeneralInfo: (lang: Lang) => Promise<void>;
+  fetchLocalArticle: (label: string, lang: LangCode) => Promise<void>;
+  fetchGeneralInfo: (lang: LangCode) => Promise<void>;
 };
 
 export const useArticleStore = create<ArticleState & ArticleActions>((set) => ({
@@ -24,11 +24,11 @@ export const useArticleStore = create<ArticleState & ArticleActions>((set) => ({
   setRemoteArticleId: (id: string) => {
     set({ id, type: "iframe", article: null });
   },
-  fetchLocalArticle: async (label: string, lang: Lang) => {
+  fetchLocalArticle: async (label: string, lang: LangCode) => {
     const articleHTML = await fetchArticle(label, lang);
     set({ id: null, type: "local", article: articleHTML });
   },
-  fetchGeneralInfo: async (lang: Lang) => {
+  fetchGeneralInfo: async (lang: LangCode) => {
     const articleHTML = await fetchArticle("general-info", lang);
     set({ id: null, type: "local", article: articleHTML });
   },

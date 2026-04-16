@@ -1,7 +1,6 @@
 import react from "@vitejs/plugin-react-swc";
 import { defineConfig, loadEnv } from "vite";
 import checker from "vite-plugin-checker";
-import { comlink } from "vite-plugin-comlink";
 import svgr from "vite-plugin-svgr";
 
 export default defineConfig(({ mode }) => {
@@ -17,7 +16,6 @@ export default defineConfig(({ mode }) => {
         },
       }),
       react(),
-      comlink(),
       svgr(),
     ],
     base: env.VITE_BASE_URL,
@@ -26,9 +24,6 @@ export default defineConfig(({ mode }) => {
     build: {
       outDir: "../dist",
       emptyOutDir: true,
-    },
-    worker: {
-      plugins: () => [comlink()],
     },
     assetsInclude: ["src/articles/*.md"],
   };
