@@ -1,7 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { useArticleStore } from "../../article/articleStore.ts";
 import { ArticleModal } from "./ArticleModal.tsx";
-import { ArticleWithVideos } from "./ArticleWithVideos.tsx";
 import HtmlArticle from "./HtmlArticle.tsx";
 import { IframeArticle } from "./IframeArticle.tsx";
 
@@ -11,7 +10,7 @@ const Error = () => {
 };
 
 export const Article = () => {
-  const { type, id, article, videos, reset } = useArticleStore();
+  const { type, id, article, reset } = useArticleStore();
 
   if (!type) {
     return null;
@@ -21,8 +20,6 @@ export const Article = () => {
     switch (type) {
       case "iframe":
         return <IframeArticle id={id} />;
-      case "local-with-videos":
-        return <ArticleWithVideos html={article} videos={videos} />;
       case "local":
         return !article ? <Error /> : <HtmlArticle html={article} />;
     }

@@ -1,6 +1,5 @@
 import { create } from "zustand";
 import { combine } from "zustand/middleware";
-import { YoutubeVideo } from "../api/model";
 
 type Zoom = { x: number; y: number; scale: number };
 type Size = {
@@ -29,8 +28,6 @@ const partialDefaults = {
     middle: { r: 255, g: 255, b: 255 },
     end: { r: 201, g: 42, b: 42 },
   },
-  // TODO: drop once the video panel is removed.
-  youtubeVideos: new Map<string, YoutubeVideo[]>(),
   zoomStepFactor: 1.6,
   mapSize: { width: 0, height: 0 },
   fontSize: {
@@ -101,9 +98,6 @@ export const useMapStore = create(
     },
     setMaxDataPointsInViewport: (maxDataPointsInViewport: number) => {
       set({ maxDataPointsInViewport });
-    },
-    setYoutubeVideos: (youtubeVideos: Map<string, YoutubeVideo[]>) => {
-      set({ youtubeVideos });
     },
     setGrowthRatingColors: (colors: Colors) => {
       set({ growthRatingColors: colors });

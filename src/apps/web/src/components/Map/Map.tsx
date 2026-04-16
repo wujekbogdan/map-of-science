@@ -52,7 +52,6 @@ type Props = {
 // fetch into a container wrapper.
 export default function Map(props: Props) {
   const [
-    youtube,
     scaleFactor,
     fontSize,
     desiredZoom,
@@ -62,7 +61,6 @@ export default function Map(props: Props) {
     mapMode,
   ] = useMapStore(
     useShallow((s) => [
-      s.youtubeVideos,
       s.scaleFactor,
       s.fontSize,
       s.desiredZoom,
@@ -75,9 +73,7 @@ export default function Map(props: Props) {
   const selectedClusters = useSelectionStore((s) => s.selectedClusters);
   const { language } = useLanguage();
 
-  const [fetchLocalArticle, setVideos] = useArticleStore(
-    useShallow((s) => [s.fetchLocalArticle, s.setVideos]),
-  );
+  const fetchLocalArticle = useArticleStore((s) => s.fetchLocalArticle);
 
   const svgRoot = useRef<SVGSVGElement>(null);
   const [mapVisibility, setMapVisibility] = useState<"visible" | "hidden">(
@@ -190,12 +186,10 @@ export default function Map(props: Props) {
           level: area.tier as 1 | 2 | 3 | 4,
           fontSize: layer.fontSize,
           opacity: layer.opacity,
-          videos: youtube.get(area.id) ?? [],
         },
       ];
     });
   }, [
-    youtube,
     areas,
     opacity.layer1,
     opacity.layer2,
@@ -273,8 +267,7 @@ export default function Map(props: Props) {
             {...label}
             id={label.key}
             key={label.key}
-            onClick={({ text, videos }) => {
-              setVideos(videos);
+            onClick={({ text }) => {
               void fetchLocalArticle(text, language);
             }}
           />
