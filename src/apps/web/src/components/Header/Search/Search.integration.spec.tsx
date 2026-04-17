@@ -177,7 +177,7 @@ describe("Search", () => {
       });
       expect(
         useSelectionStore.getState().selectedClusters.get("c1")?.position,
-      ).toEqual({ x: 100, y: -200 });
+      ).toEqual({ x: 100, y: 200 });
       expect(useMapStore.getState().desiredZoom).not.toBeNull();
     }),
   );

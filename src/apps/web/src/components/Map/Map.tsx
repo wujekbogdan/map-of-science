@@ -6,7 +6,6 @@ import { useShallow } from "zustand/react/shallow";
 import { useTRPC } from "../../api-client/index.ts";
 import { useArticleStore } from "../../article/articleStore.ts";
 import { transformToBbox } from "../../map/bbox.ts";
-import { flipPositionY, renderBboxToQdrantBbox } from "../../map/coords.ts";
 import { useMapStore } from "../../map/mapStore.ts";
 import { mergeClustersById } from "../../map/mergeClusters.ts";
 import { useSelectionStore } from "../../map/selectionStore.ts";
@@ -120,28 +119,16 @@ export default function Map(props: Props) {
   const debouncedBbox = useDebounce(bbox, BBOX_DEBOUNCE_MS);
 
   const trpc = useTRPC();
-  const { data: rawViewportClusters = [] } = useQuery(
+  const { data: viewportClusters = [] } = useQuery(
     trpc.cluster.viewport.queryOptions(
       debouncedBbox
-        ? {
-            bbox: renderBboxToQdrantBbox(debouncedBbox),
-            limit: maxDataPointsInViewport,
-          }
+        ? { bbox: debouncedBbox, limit: maxDataPointsInViewport }
         : { bbox: { x: { min: 0, max: 0 }, y: { min: 0, max: 0 } } },
       {
         enabled: debouncedBbox !== null,
         placeholderData: keepPreviousData,
       },
     ),
-  );
-
-  const viewportClusters = useMemo(
-    () =>
-      rawViewportClusters.map((cluster) => ({
-        ...cluster,
-        position: flipPositionY(cluster.position),
-      })),
-    [rawViewportClusters],
   );
 
   const clustersToRender = useMemo(

@@ -1,11 +1,11 @@
 import { z } from "zod";
 import type { ClusterMatch } from "@map-of-science/atlas";
-import { localizeCluster } from "../cluster/cluster.js";
+import { present } from "../cluster/cluster.js";
 import type { Lang } from "../context.js";
 import { publicProcedure, router } from "../trpc.js";
 
-const localizeMatch = (match: ClusterMatch, lang: Lang) => ({
-  ...localizeCluster(match, lang),
+const presentMatch = (match: ClusterMatch, lang: Lang) => ({
+  ...present(match, lang),
   score: match.score,
 });
 
@@ -17,6 +17,6 @@ export const searchRouter = router({
         text: input.text,
         ...(input.limit !== undefined ? { limit: input.limit } : {}),
       });
-      return matches.map((match) => localizeMatch(match, ctx.lang));
+      return matches.map((match) => presentMatch(match, ctx.lang));
     }),
 });
