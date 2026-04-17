@@ -30,6 +30,7 @@ const buildDeps = (
     createSchema,
     upsert: vi.fn().mockResolvedValueOnce(undefined),
     findByClusterId: vi.fn(),
+    findByAreaId: vi.fn(),
   } satisfies AtlasStore["content"];
   return {
     contentRepo,

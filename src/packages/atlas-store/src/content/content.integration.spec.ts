@@ -69,6 +69,7 @@ describe("content repository", () => {
           },
           payloadIndexes: [
             { field_name: "cluster_ids", field_schema: "keyword" },
+            { field_name: "area_ids", field_schema: "keyword" },
             { field_name: "type", field_schema: "keyword" },
           ],
         },
@@ -131,6 +132,81 @@ describe("content repository", () => {
         "550e8400-e29b-41d4-a716-446655440998",
       );
       expect(found).toEqual([]);
+    }),
+    60_000,
+  );
+
+  it(
+    "should save a content item with an area ref and read it back by area id",
+    withReadyContentRepository(async ({ repository }) => {
+      const areaId = "550e8400-e29b-41d4-a716-446655441001";
+      const item = buildContentItem({
+        entityRefs: [{ type: "area", id: areaId }],
+      });
+      await repository.upsert([item]);
+
+      const found = await repository.findByAreaId(areaId);
+      expect(found).toEqual([item]);
+    }),
+    60_000,
+  );
+
+  it(
+    "should return every content item linked to a given area",
+    withReadyContentRepository(async ({ repository }) => {
+      const areaId = "550e8400-e29b-41d4-a716-446655441002";
+      const first = buildContentItem({
+        id: "550e8400-e29b-41d4-a716-446655441210",
+        title: "First video",
+        entityRefs: [{ type: "area", id: areaId }],
+      });
+      const second = buildContentItem({
+        id: "550e8400-e29b-41d4-a716-446655441211",
+        title: "Second video",
+        entityRefs: [{ type: "area", id: areaId }],
+      });
+      const unrelated = buildContentItem({
+        id: "550e8400-e29b-41d4-a716-446655441212",
+        title: "Unrelated video",
+        entityRefs: [
+          { type: "area", id: "550e8400-e29b-41d4-a716-446655441999" },
+        ],
+      });
+      await repository.upsert([first, second, unrelated]);
+
+      const found = await repository.findByAreaId(areaId);
+      expect(found).toHaveLength(2);
+      expect(found).toEqual(expect.arrayContaining([first, second]));
+    }),
+    60_000,
+  );
+
+  it(
+    "should return an empty array when no content links to the area",
+    withReadyContentRepository(async ({ repository }) => {
+      const found = await repository.findByAreaId(
+        "550e8400-e29b-41d4-a716-446655441998",
+      );
+      expect(found).toEqual([]);
+    }),
+    60_000,
+  );
+
+  it(
+    "should find an item by either cluster or area when its entityRefs mix both",
+    withReadyContentRepository(async ({ repository }) => {
+      const clusterId = "550e8400-e29b-41d4-a716-446655440003";
+      const areaId = "550e8400-e29b-41d4-a716-446655441003";
+      const item = buildContentItem({
+        entityRefs: [
+          { type: "cluster", id: clusterId },
+          { type: "area", id: areaId },
+        ],
+      });
+      await repository.upsert([item]);
+
+      expect(await repository.findByClusterId(clusterId)).toEqual([item]);
+      expect(await repository.findByAreaId(areaId)).toEqual([item]);
     }),
     60_000,
   );

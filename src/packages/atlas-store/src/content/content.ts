@@ -22,6 +22,7 @@ const schemaSpec = {
   },
   payloadIndexes: [
     { field_name: "cluster_ids", field_schema: "keyword" },
+    { field_name: "area_ids", field_schema: "keyword" },
     { field_name: "type", field_schema: "keyword" },
   ],
 } as const;
@@ -34,6 +35,9 @@ const rawPointSchema = z.object({
 const clusterIdsOf = (item: ContentItem) =>
   item.entityRefs.filter((ref) => ref.type === "cluster").map((ref) => ref.id);
 
+const areaIdsOf = (item: ContentItem) =>
+  item.entityRefs.filter((ref) => ref.type === "area").map((ref) => ref.id);
+
 const toPayload = (item: ContentItem) => ({
   type: item.type,
   title: item.title,
@@ -41,6 +45,7 @@ const toPayload = (item: ContentItem) => ({
   metadata: item.metadata,
   entityRefs: item.entityRefs,
   cluster_ids: clusterIdsOf(item),
+  area_ids: areaIdsOf(item),
 });
 
 const payloadToContentItem = (
@@ -96,6 +101,25 @@ export const createContentRepository = ({
       logger.warn(
         { limit: FIND_BY_CLUSTER_LIMIT, clusterId },
         "content.findByClusterId hit the query cap; raise FIND_BY_CLUSTER_LIMIT",
+      );
+    }
+    return items;
+  },
+
+  async findByAreaId(areaId: string): Promise<ContentItem[]> {
+    const response = await qdrant.scroll(COLLECTION, {
+      filter: {
+        must: [{ key: "area_ids", match: { value: areaId } }],
+      },
+      limit: FIND_BY_CLUSTER_LIMIT,
+      with_payload: true,
+      with_vector: false,
+    });
+    const items = response.points.map(parsePoint);
+    if (items.length === FIND_BY_CLUSTER_LIMIT) {
+      logger.warn(
+        { limit: FIND_BY_CLUSTER_LIMIT, areaId },
+        "content.findByAreaId hit the query cap; raise FIND_BY_CLUSTER_LIMIT",
       );
     }
     return items;
