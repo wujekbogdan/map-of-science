@@ -3,9 +3,8 @@ import { Trans, useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { useTRPC } from "../../api-client/index.ts";
 
-// TODO: Render a loading state while the cluster is being fetched. The modal
-// now opens blank for a beat because rendering waits on a tRPC round-trip.
-// MAP-65 tracks adding a debounced spinner + error state.
+// TODO: render a loading state while the cluster is being fetched. The modal
+// opens blank for a beat because rendering waits on a tRPC round-trip.
 export const IframeArticle = ({ id }: { id: string }) => {
   const { t } = useTranslation("article");
   const trpc = useTRPC();

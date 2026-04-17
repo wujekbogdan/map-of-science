@@ -45,10 +45,9 @@ type Props = {
   };
 };
 
-// TODO: Split Map into a data container and a pure view. The useQuery below
-// lives here only because the bbox depends on transform owned by this
-// component. MAP-64 tracks lifting transform to the store and moving the
-// fetch into a container wrapper.
+// TODO: split into a data container and a pure view. useQuery lives here only
+// because the bbox depends on transform owned by this component. Lift
+// transform to the store, move the fetch into a container wrapper.
 export default function Map(props: Props) {
   const [
     scaleFactor,
