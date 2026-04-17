@@ -1,4 +1,3 @@
-import { YoutubeVideo } from "../../../api/model";
 import LabelText from "./LabelText.tsx";
 
 type Label = {
@@ -9,13 +8,10 @@ type Label = {
   fontSize: number;
   opacity: number;
   level: 1 | 2 | 3 | 4;
-  videos: YoutubeVideo[];
   onClick?: OnLabelClick;
 };
 
-export type OnLabelClick = (
-  label: Pick<Label, "text" | "x" | "y" | "videos">,
-) => void;
+export type OnLabelClick = (label: Pick<Label, "text" | "x" | "y">) => void;
 
 const Label = (props: Label) => {
   const onClick = props.onClick
@@ -24,7 +20,6 @@ const Label = (props: Label) => {
           text: props.text,
           x: props.x,
           y: props.y,
-          videos: props.videos,
         });
       }
     : undefined;

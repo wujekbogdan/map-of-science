@@ -1,206 +1,107 @@
+import { useQuery } from "@tanstack/react-query";
+import { useDebounce } from "@uidotdev/usehooks";
 import debounce from "lodash/debounce";
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 import styled from "styled-components";
-import useSWR from "swr";
-import { useShallow } from "zustand/react/shallow";
-import { useStore } from "../../../store.ts";
-import { BoundingBox, Dropdown, Option } from "./Dropdown/Dropdown.tsx";
+import { useTRPC } from "../../../api-client";
+import { flipPositionY } from "../../../map/coords.ts";
+import { useMapStore } from "../../../map/mapStore.ts";
+import {
+  type SelectedCluster,
+  useSelectionStore,
+} from "../../../map/selectionStore.ts";
+import { Dropdown, Option } from "./Dropdown/Dropdown.tsx";
+import {
+  computeZoomToFit,
+  getBoundingBox,
+  getCenteredBoundingBox,
+} from "./viewport.ts";
 
-const worker = new ComlinkWorker<typeof import("./search.ts")>(
-  new URL("./search.ts", import.meta.url),
-);
+const MIN_QUERY_LENGTH = 3;
+const SEARCH_LIMIT = 20;
+const INPUT_DEBOUNCE_MS = 300;
+const LOADING_DELAY_MS = 250;
 
 export const Search = () => {
-  const [
-    setDesiredZoom,
-    setPointsToHighlight,
-    mapSize,
-    clusters,
-    concepts,
-    youtube,
-    areas,
-  ] = useStore(
-    useShallow((s) => [
-      s.setDesiredZoom,
-      s.setPointsToHighlight,
-      s.mapSize,
-      s.clusters,
-      s.concepts,
-      s.youtubeVideos,
-      s.areas,
-    ]),
-  );
+  const trpc = useTRPC();
+  const setDesiredZoom = useMapStore((s) => s.setDesiredZoom);
+  const mapSize = useMapStore((s) => s.mapSize);
+  const setSelectedClusters = useSelectionStore((s) => s.setSelectedClusters);
+  const clearSelection = useSelectionStore((s) => s.clearSelection);
+
   const [searchTerm, setSearchTerm] = useState("");
 
-  const { data: results, isLoading } = useSWR(
-    searchTerm ? [searchTerm] : null,
-    async ([query]) => {
-      if (!query)
-        return {
-          labels: [],
-          points: [],
-        };
-
-      return worker.search(
-        {
-          areas,
-          clusters,
-          concepts,
-          youtube,
-        },
-        query,
-      );
-    },
+  const { data: rawResults = [], isFetching } = useQuery(
+    trpc.search.query.queryOptions(
+      { text: searchTerm, limit: SEARCH_LIMIT },
+      { enabled: searchTerm.length >= MIN_QUERY_LENGTH },
+    ),
   );
+  const results = useMemo(
+    () =>
+      rawResults.map((cluster) => ({
+        ...cluster,
+        position: flipPositionY(cluster.position),
+      })),
+    [rawResults],
+  );
+  const isLoading = useDebounce(isFetching, LOADING_DELAY_MS);
 
-  const { labels, points } = results ?? {
-    labels: [],
-    points: [],
-  };
-
-  const getCenteredBoundingBox = (
-    point: { x: number; y: number },
-    mapSize: { width: number; height: number },
-  ): BoundingBox => {
-    const halfWidth = mapSize.width / 2;
-    const halfHeight = mapSize.height / 2;
-
-    return {
-      min: { x: point.x - halfWidth, y: point.y - halfHeight },
-      max: { x: point.x + halfWidth, y: point.y + halfHeight },
-      center: { x: point.x, y: point.y },
-    };
-  };
-
-  const getBoundingBox = (
-    clusters: { x: number; y: number }[],
-    mapSize: {
-      width: number;
-      height: number;
-    },
-  ) => {
-    if (clusters.length === 1) {
-      return getCenteredBoundingBox(clusters[0], mapSize);
-    }
-
-    const xs = clusters.map((c) => c.x);
-    const ys = clusters.map((c) => c.y);
-
-    const minX = Math.min(...xs);
-    const maxX = Math.max(...xs);
-    const minY = Math.min(...ys);
-    const maxY = Math.max(...ys);
-
-    const width = maxX - minX;
-    const height = maxY - minY;
-
-    const paddingX = width * 0.1;
-    const paddingY = height * 0.1;
-
-    const paddedMinX = minX - paddingX;
-    const paddedMaxX = maxX + paddingX;
-    const paddedMinY = minY - paddingY;
-    const paddedMaxY = maxY + paddingY;
-
-    return {
-      min: { x: paddedMinX, y: paddedMinY },
-      max: { x: paddedMaxX, y: paddedMaxY },
-      center: {
-        x: (paddedMinX + paddedMaxX) / 2,
-        y: (paddedMinY + paddedMaxY) / 2,
-      },
-    };
-  };
-
-  const dropdownOptions = [
-    ...labels.map(({ id, label, videosCount, x, y, level }) => ({
-      type: "label" as const,
-      id,
-      label,
-      keyword: label,
-      videosCount,
-      x,
-      y,
-      level,
-    })),
-    ...points.map(({ id, name, clusters }) => {
-      // TODO: Consider moving cords to the model, but getting cords here is more efficient
-      return {
-        type: "point" as const,
-        id: id.toString(),
-        keyword: name,
-        label: `${name} [${clusters.length.toString()}]`,
-        clusters,
-      };
-    }),
-  ];
+  const dropdownOptions = useMemo<Option[]>(
+    () =>
+      results.map((cluster) => ({
+        type: "cluster" as const,
+        id: cluster.id,
+        label: cluster.displayName,
+        keyword: cluster.displayName,
+        cluster,
+      })),
+    [results],
+  );
 
   const onInput = useMemo(
     () =>
       debounce((query: string) => {
-        if (query.length < 3) {
+        if (query.length < MIN_QUERY_LENGTH) {
           setSearchTerm("");
           return;
         }
-
         setSearchTerm(query);
-      }, 300),
+      }, INPUT_DEBOUNCE_MS),
     [],
   );
 
-  const zoomToBoundingBox = (bbox: BoundingBox) => {
-    const boxWidth = bbox.max.x - bbox.min.x;
-    const boxHeight = bbox.max.y - bbox.min.y;
-
-    const zoomX = mapSize.width / boxWidth;
-    const zoomY = mapSize.height / boxHeight;
-
-    const zoom = Math.min(zoomX, zoomY); // fit entire box
-
-    const x = -bbox.center.x * zoom + mapSize.width / 2;
-    const y = -bbox.center.y * zoom + mapSize.height / 2;
-
-    setDesiredZoom({
-      x,
-      y,
-      scale: zoom,
-    });
+  const focusCluster = (cluster: SelectedCluster) => {
+    setSelectedClusters([cluster]);
+    setDesiredZoom(
+      computeZoomToFit(
+        getCenteredBoundingBox(cluster.position, mapSize),
+        mapSize,
+      ),
+    );
   };
 
-  const zoomToArea = (args: { level: 1 | 2 | 3 | 4; x: number; y: number }) => {
-    const zoom = {
-      1: 4,
-      2: 15,
-      3: 40,
-      4: 50,
-    }[args.level];
-    const x = -args.x * zoom + mapSize.width / 2;
-    const y = -args.y * zoom + mapSize.height / 2;
-
-    setDesiredZoom({
-      x: x,
-      y: y,
-      scale: zoom,
-    });
+  const focusClusters = (clusters: SelectedCluster[]) => {
+    if (clusters.length === 0) return;
+    setSelectedClusters(clusters);
+    const positions = clusters.map((cluster) => cluster.position);
+    setDesiredZoom(
+      computeZoomToFit(getBoundingBox(positions, mapSize), mapSize),
+    );
   };
 
   const onSelectionChange = (option: Option) => {
-    if (option.type === "label") {
-      setPointsToHighlight([]);
-      zoomToArea(option);
+    if (option.type === "cluster") {
+      focusCluster(option.cluster);
       return;
     }
-
-    if (option.type === "point" || option.type === "query") {
-      const boundingBox = getBoundingBox(option.clusters, mapSize);
-      zoomToBoundingBox(boundingBox);
-      setPointsToHighlight(option.clusters.map(({ clusterId }) => clusterId));
-      return;
+    if (option.type === "query") {
+      focusClusters(option.clusters);
     }
   };
 
   const onReset = () => {
-    setPointsToHighlight([]);
+    clearSelection();
   };
 
   return (

@@ -20,6 +20,7 @@ export const clusterSchema = z.object({
     model: z.string(),
     source: z.string(),
   }),
+  keyConcepts: z.array(z.string()).default([]),
 });
 
 export const clusterInputSchema = clusterSchema.extend({

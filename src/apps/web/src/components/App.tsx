@@ -1,12 +1,7 @@
 import { Suspense, useCallback } from "react";
-import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import useSWR from "swr";
-import { useShallow } from "zustand/react/shallow";
-import { loadData } from "../api/worker.ts";
 import { config } from "../config.ts";
-import { useStore } from "../store.ts";
-import { useLanguage } from "../useLanguage.ts";
+import { useMapStore } from "../map/mapStore.ts";
 import { useWindowSize } from "../useWindowSize.ts";
 import { Article } from "./Article/Article.tsx";
 import { DevTool } from "./DevTool.tsx";
@@ -20,35 +15,8 @@ const AppLoader = () => {
   return "";
 };
 
-const MapLoader = () => {
-  const { t } = useTranslation();
-  return <LoadingWrapper>{t("map.loading")}&hellip;</LoadingWrapper>;
-};
-
 function App() {
-  const { language } = useLanguage();
-  const [setMapSize, setClusters, setConcepts, setYoutubeVideos, setAreas] =
-    useStore(
-      useShallow((s) => [
-        s.setMapSize,
-        s.setClusters,
-        s.setConcepts,
-        s.setYoutubeVideos,
-        s.setAreas,
-      ]),
-    );
-  const { isLoading } = useSWR(["data", language], () => loadData(language), {
-    onSuccess: ({ clusters, concepts, youtube, areas }) => {
-      setClusters(clusters);
-      setConcepts(concepts);
-      setYoutubeVideos(youtube);
-      setAreas(areas);
-    },
-    onError: (err) => {
-      console.error("Error loading data:", err);
-    },
-  });
-
+  const setMapSize = useMapStore((s) => s.setMapSize);
   const size = useWindowSize(
     useCallback(
       (size: { width: number; height: number }) => {
@@ -61,7 +29,7 @@ function App() {
     <Container>
       <Suspense fallback={<AppLoader />}>
         <Header />
-        {isLoading ? <MapLoader /> : <MapComponent size={size} />}
+        <MapComponent size={size} />
         <Article />
 
         <InfoWrapper>
@@ -110,13 +78,6 @@ const DevToolsWrapper = styled.div`
   left: 0;
   max-height: 100vh;
   overflow-y: auto;
-`;
-
-const LoadingWrapper = styled.div`
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
 `;
 
 export default App;

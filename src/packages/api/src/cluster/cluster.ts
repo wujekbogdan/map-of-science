@@ -3,12 +3,28 @@ import { bboxSchema, type Cluster } from "@map-of-science/atlas";
 import type { Lang } from "../context.js";
 import { publicProcedure, router } from "../trpc.js";
 
-type LocalizedCluster = Omit<Cluster, "name"> & { name: string | null };
+const resolveDisplayName = (
+  name: string | null,
+  keyConcepts: string[],
+  externalId: number,
+) => {
+  if (name) return name;
+  if (keyConcepts.length > 0) return keyConcepts.join(", ");
+  return `Cluster ${externalId.toString()}`;
+};
 
-const localizeCluster = (cluster: Cluster, lang: Lang): LocalizedCluster => ({
-  ...cluster,
-  name: cluster.name?.[lang] ?? null,
-});
+export const localizeCluster = (cluster: Cluster, lang: Lang) => {
+  const name = cluster.name?.[lang] ?? null;
+  return {
+    ...cluster,
+    name,
+    displayName: resolveDisplayName(
+      name,
+      cluster.keyConcepts,
+      cluster.externalId,
+    ),
+  };
+};
 
 const DEFAULT_VIEWPORT_LIMIT = 500;
 

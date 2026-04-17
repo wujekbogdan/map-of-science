@@ -1,13 +1,12 @@
 import { z } from "zod";
 import type { ClusterMatch } from "@map-of-science/atlas";
+import { localizeCluster } from "../cluster/cluster.js";
 import type { Lang } from "../context.js";
 import { publicProcedure, router } from "../trpc.js";
 
-type LocalizedMatch = Omit<ClusterMatch, "name"> & { name: string | null };
-
-const localizeMatch = (match: ClusterMatch, lang: Lang): LocalizedMatch => ({
-  ...match,
-  name: match.name?.[lang] ?? null,
+const localizeMatch = (match: ClusterMatch, lang: Lang) => ({
+  ...localizeCluster(match, lang),
+  score: match.score,
 });
 
 export const searchRouter = router({

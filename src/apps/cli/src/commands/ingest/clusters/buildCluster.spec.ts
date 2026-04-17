@@ -66,4 +66,9 @@ describe("buildCluster", () => {
     });
     expect(cluster).toBeNull();
   });
+
+  it("should emit empty keyConcepts", () => {
+    const cluster = createBuildCluster(baseLookups)({ externalId, vector });
+    expect(cluster?.keyConcepts).toEqual([]);
+  });
 });

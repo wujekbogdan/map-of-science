@@ -12,6 +12,7 @@ const buildMatch = (id: string, score: number) =>
     articlesCount: 0,
     growthRating: 0,
     embedding: { model: "gemini-embedding-001", source: "article-titles" },
+    keyConcepts: [],
     score,
   }) satisfies Cluster & { score: number };
 

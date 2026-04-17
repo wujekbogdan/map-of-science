@@ -6,8 +6,7 @@ import {
   ZoomTransform,
 } from "d3";
 import { useEffect, useRef, useState, RefObject, useCallback } from "react";
-import { useShallow } from "zustand/react/shallow";
-import { useStore } from "./store.ts";
+import { useMapStore } from "./mapStore.ts";
 
 type Zoom = {
   x: number;
@@ -31,7 +30,7 @@ export const useD3Zoom = (options: Options) => {
   const hasInitialized = useRef(false);
   const hasZoomed = useRef(false);
   const [transform, setTransform] = useState<ZoomTransform>();
-  const [setCurrentZoom] = useStore(useShallow((s) => [s.setCurrentZoom]));
+  const setCurrentZoom = useMapStore((s) => s.setCurrentZoom);
   const zoom = transform ? transform.k : 1;
 
   const zoomTo = useCallback(

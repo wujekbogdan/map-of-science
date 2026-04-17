@@ -10,6 +10,7 @@ const validCluster = {
   articlesCount: 1200,
   growthRating: 75.5,
   embedding: { model: "gemini-embedding-001", source: "article-titles" },
+  keyConcepts: ["machine learning", "neural networks", "deep learning"],
 };
 
 describe("clusterSchema", () => {
@@ -45,6 +46,22 @@ describe("clusterSchema", () => {
   it("should reject missing embedding metadata", () => {
     const withoutEmbedding = { ...validCluster, embedding: undefined };
     expect(() => clusterSchema.parse(withoutEmbedding)).toThrow();
+  });
+
+  it("should accept keyConcepts", () => {
+    const parsed = clusterSchema.parse({
+      ...validCluster,
+      keyConcepts: ["a", "b"],
+    });
+    expect(parsed.keyConcepts).toEqual(["a", "b"]);
+  });
+
+  it("should default keyConcepts to empty array when omitted", () => {
+    const parsed = clusterSchema.parse({
+      ...validCluster,
+      keyConcepts: undefined,
+    });
+    expect(parsed.keyConcepts).toEqual([]);
   });
 });
 

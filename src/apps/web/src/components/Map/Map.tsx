@@ -1,16 +1,23 @@
-import { ZoomTransform } from "d3";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { useDebounce } from "@uidotdev/usehooks";
 import { CSSProperties, useMemo, useRef, useState } from "react";
 import styled from "styled-components";
-import useSWR from "swr";
 import { useShallow } from "zustand/react/shallow";
-import { Cluster } from "../../api/model";
-import { useArticleStore, useStore } from "../../store.ts";
-import { useD3Zoom } from "../../useD3Zoom.ts";
-import { useFlashState } from "../../useFlashState.ts";
+import { useTRPC } from "../../api-client/index.ts";
+import { useArticleStore } from "../../article/articleStore.ts";
+import { transformToBbox } from "../../map/bbox.ts";
+import { flipPositionY, renderBboxToQdrantBbox } from "../../map/coords.ts";
+import { useMapStore } from "../../map/mapStore.ts";
+import { mergeClustersById } from "../../map/mergeClusters.ts";
+import { useSelectionStore } from "../../map/selectionStore.ts";
+import { useD3Zoom } from "../../map/useD3Zoom.ts";
+import { useFlashState } from "../../map/useFlashState.ts";
+import { useLayersOpacity } from "../../map/useLayersOpacity.ts";
 import { useLanguage } from "../../useLanguage.ts";
-import { useLayersOpacity } from "../../useLayersOpacity.ts";
-import { Clusters, ClusterWithScaledPlace } from "./Clusters/Clusters.tsx";
+import { Clusters } from "./Clusters/Clusters.tsx";
 import Label, { OnLabelClick } from "./Label/Label.tsx";
+
+const BBOX_DEBOUNCE_MS = 150;
 
 const fetchMapSvg = async () => {
   // At this point only the URL is resolved, the SVG is not yet loaded.
@@ -25,56 +32,6 @@ const fetchMapSvg = async () => {
   });
 };
 
-type Filter = {
-  clusters: Cluster[];
-  transform: ZoomTransform;
-  limit: number;
-  size: {
-    width: number;
-    height: number;
-  };
-  places: {
-    visible: boolean;
-    fontSize: number;
-    opacity: number;
-  };
-};
-
-const processClustersForViewport = (args: Filter) => {
-  const clustersInViewport: ClusterWithScaledPlace[] = [];
-
-  // Although .filter() would feel more natural, the regular for loop is way
-  // faster since we can easily break the loop when we reach the limit.
-  for (const point of args.clusters) {
-    const screenX = args.transform.applyX(point.x);
-    const screenY = args.transform.applyY(point.y);
-
-    if (
-      screenX >= 0 &&
-      screenX <= args.size.width &&
-      screenY >= 0 &&
-      screenY <= args.size.height
-    ) {
-      const place =
-        point.place && args.places.visible
-          ? {
-              ...point.place,
-              fontSize: args.places.fontSize,
-              opacity: args.places.opacity,
-              offset: 15 / args.transform.k,
-            }
-          : null;
-      clustersInViewport.push({
-        ...point,
-        place,
-      });
-      if (clustersInViewport.length >= args.limit) break;
-    }
-  }
-
-  return clustersInViewport;
-};
-
 type Props = {
   size: {
     width: number;
@@ -85,47 +42,43 @@ type Props = {
   };
 };
 
+// TODO: split into a data container and a pure view. useQuery lives here only
+// because the bbox depends on transform owned by this component. Lift
+// transform to the store, move the fetch into a container wrapper.
 export default function Map(props: Props) {
   const [
-    areas,
-    clusters,
-    concepts,
-    youtube,
     scaleFactor,
     fontSize,
     desiredZoom,
     maxDataPointsInViewport,
-    clustersToHighlight,
     svgScaleFactor,
     svgOffset,
     mapMode,
-  ] = useStore(
+  ] = useMapStore(
     useShallow((s) => [
-      s.areas,
-      s.clusters,
-      s.concepts,
-      s.youtubeVideos,
       s.scaleFactor,
       s.fontSize,
       s.desiredZoom,
       s.maxDataPointsInViewport,
-      s.pointsToHighlight,
       s.temp__svgScaleFactor,
       s.temp__svgOffset,
       s.mapMode,
     ]),
   );
+  const selectedClusters = useSelectionStore((s) => s.selectedClusters);
   const { language } = useLanguage();
 
-  const [fetchLocalArticle, setVideos] = useArticleStore(
-    useShallow((s) => [s.fetchLocalArticle, s.setVideos]),
-  );
+  const fetchLocalArticle = useArticleStore((s) => s.fetchLocalArticle);
 
   const svgRoot = useRef<SVGSVGElement>(null);
   const [mapVisibility, setMapVisibility] = useState<"visible" | "hidden">(
     "hidden",
   );
-  const { data: mapSvgUrl } = useSWR("map-svg", fetchMapSvg);
+  const { data: mapSvgUrl } = useQuery({
+    queryKey: ["map-svg"],
+    queryFn: fetchMapSvg,
+    staleTime: Infinity,
+  });
 
   const { transform, zoom } = useD3Zoom({
     svg: svgRoot,
@@ -160,37 +113,80 @@ export default function Map(props: Props) {
     layer4: scaleFontSize(fontSize.layer4),
   };
 
-  const labelsScaled = useMemo(() => {
-    return areas.map((label) => {
-      const { fontSize, opacity: labelOpacity } = {
-        1: {
-          fontSize: scaledFontSize.layer1,
-          opacity: opacity.layer1,
-        },
-        2: {
-          fontSize: scaledFontSize.layer2,
-          opacity: opacity.layer2,
-        },
-        3: {
-          fontSize: scaledFontSize.layer3,
-          opacity: opacity.layer3,
-        },
-        4: {
-          fontSize: scaledFontSize.layer4,
-          opacity: opacity.layer4,
-        },
-      }[label.level];
+  const bbox = useMemo(
+    () => (transform ? transformToBbox(transform, props.size) : null),
+    [transform, props.size],
+  );
+  const debouncedBbox = useDebounce(bbox, BBOX_DEBOUNCE_MS);
 
-      return {
-        ...label,
-        key: label.id,
-        fontSize,
-        opacity: labelOpacity,
-        videos: youtube.get(label.id) ?? [],
+  const trpc = useTRPC();
+  const { data: rawViewportClusters = [] } = useQuery(
+    trpc.cluster.viewport.queryOptions(
+      debouncedBbox
+        ? {
+            bbox: renderBboxToQdrantBbox(debouncedBbox),
+            limit: maxDataPointsInViewport,
+          }
+        : { bbox: { x: { min: 0, max: 0 }, y: { min: 0, max: 0 } } },
+      {
+        enabled: debouncedBbox !== null,
+        placeholderData: keepPreviousData,
+      },
+    ),
+  );
+
+  const viewportClusters = useMemo(
+    () =>
+      rawViewportClusters.map((cluster) => ({
+        ...cluster,
+        position: flipPositionY(cluster.position),
+      })),
+    [rawViewportClusters],
+  );
+
+  const clustersToRender = useMemo(
+    () => mergeClustersById(viewportClusters, [...selectedClusters.values()]),
+    [viewportClusters, selectedClusters],
+  );
+
+  const { data: areas = [] } = useQuery(
+    trpc.area.viewport.queryOptions(
+      debouncedBbox
+        ? { bbox: debouncedBbox }
+        : { bbox: { x: { min: 0, max: 0 }, y: { min: 0, max: 0 } } },
+      {
+        enabled: debouncedBbox !== null,
+        placeholderData: keepPreviousData,
+      },
+    ),
+  );
+
+  const labelsScaled = useMemo(() => {
+    const layers: Record<1 | 2 | 3 | 4, { fontSize: number; opacity: number }> =
+      {
+        1: { fontSize: scaledFontSize.layer1, opacity: opacity.layer1 },
+        2: { fontSize: scaledFontSize.layer2, opacity: opacity.layer2 },
+        3: { fontSize: scaledFontSize.layer3, opacity: opacity.layer3 },
+        4: { fontSize: scaledFontSize.layer4, opacity: opacity.layer4 },
       };
+
+    return areas.flatMap((area) => {
+      const layer = layers[area.tier as 1 | 2 | 3 | 4];
+      if (!layer) return [];
+      return [
+        {
+          id: area.id,
+          key: area.id,
+          text: area.name,
+          x: area.position.x,
+          y: area.position.y,
+          level: area.tier as 1 | 2 | 3 | 4,
+          fontSize: layer.fontSize,
+          opacity: layer.opacity,
+        },
+      ];
     });
   }, [
-    youtube,
     areas,
     opacity.layer1,
     opacity.layer2,
@@ -200,43 +196,6 @@ export default function Map(props: Props) {
     scaledFontSize.layer2,
     scaledFontSize.layer3,
     scaledFontSize.layer4,
-  ]);
-
-  const hasSearchResults = clustersToHighlight.length > 0;
-  const clustersAsArray = useMemo(() => [...clusters.values()], [clusters]);
-  const clustersInViewport = useMemo(() => {
-    if (!transform) {
-      return [];
-    }
-
-    const allClusters = hasSearchResults
-      ? clustersToHighlight
-          .map((id) => clusters.get(id))
-          .filter((point) => point !== undefined)
-      : clustersAsArray;
-    const limit = hasSearchResults ? Infinity : maxDataPointsInViewport;
-
-    return processClustersForViewport({
-      clusters: allClusters,
-      transform,
-      limit,
-      size: props.size,
-      places: {
-        visible: true,
-        fontSize: scaledFontSize.layer4,
-        opacity: opacity.layer4,
-      },
-    });
-  }, [
-    hasSearchResults,
-    transform,
-    clustersToHighlight,
-    clustersAsArray,
-    maxDataPointsInViewport,
-    props.size,
-    scaledFontSize.layer4,
-    opacity.layer4,
-    clusters,
   ]);
 
   const mapSvgBackgroundCss = useMemo(() => {
@@ -277,7 +236,8 @@ export default function Map(props: Props) {
     };
   }, [transform, svgOffset, svgScaleFactor, mapSvgUrl]);
 
-  const ripple = useFlashState(clustersToHighlight);
+  const hasSelection = selectedClusters.size > 0;
+  const ripple = useFlashState(selectedClusters);
 
   return (
     <MapSvg
@@ -290,18 +250,21 @@ export default function Map(props: Props) {
     >
       <g transform={transformValue}>
         <Clusters
-          clusters={clustersInViewport}
-          concepts={concepts}
+          clusters={clustersToRender}
+          label={{
+            fontSize: scaledFontSize.layer4,
+            opacity: opacity.layer4,
+            offset: 15 / zoom,
+          }}
           mode={mapMode}
-          ripple={hasSearchResults && ripple}
+          ripple={hasSelection && ripple}
         />
         {labelsScaled.map((label) => (
           <Label
             {...label}
             id={label.key}
             key={label.key}
-            onClick={({ text, videos }) => {
-              setVideos(videos);
+            onClick={({ text }) => {
               void fetchLocalArticle(text, language);
             }}
           />

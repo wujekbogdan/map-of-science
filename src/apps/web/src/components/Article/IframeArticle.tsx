@@ -1,29 +1,37 @@
+import { useQuery } from "@tanstack/react-query";
 import { Trans, useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { useStore } from "../../store.ts";
+import { useTRPC } from "../../api-client/index.ts";
 
-export const IframeArticle = ({ id }: { id: number }) => {
+// TODO: render a loading state while the cluster is being fetched. The modal
+// opens blank for a beat because rendering waits on a tRPC round-trip.
+export const IframeArticle = ({ id }: { id: string }) => {
   const { t } = useTranslation("article");
-  const clusters = useStore((state) => state.clusters);
-  const cluster = clusters.get(id);
-  // Prefer curated place name, fall back to LLM-generated name
-  const clusterName = cluster?.place?.text ?? cluster?.name;
-  const url = `https://sciencemap.eto.tech/cluster/?version=2&cluster_id=${id.toString()}`;
+  const trpc = useTRPC();
+  const { data: cluster } = useQuery(trpc.cluster.byId.queryOptions({ id }));
+  const externalId = cluster?.externalId;
+  const url = externalId
+    ? `https://sciencemap.eto.tech/cluster/?version=2&cluster_id=${externalId.toString()}`
+    : null;
   return (
     <Wrapper>
-      <p>
-        <Trans
-          i18nKey="article.info"
-          values={{ id, name: clusterName }}
-          components={{ bold: <strong /> }}
-        />
-      </p>
-      <Iframe src={url} />
-      <p>
-        <a href={url} target="_blank" rel="noopener noreferrer">
-          {t("article.openInNewTab")} »
-        </a>
-      </p>
+      {cluster && externalId !== undefined && (
+        <p>
+          <Trans
+            i18nKey="article.info"
+            values={{ id: externalId, name: cluster.displayName }}
+            components={{ bold: <strong /> }}
+          />
+        </p>
+      )}
+      {url && <Iframe src={url} />}
+      {url && (
+        <p>
+          <a href={url} target="_blank" rel="noopener noreferrer">
+            {t("article.openInNewTab")} »
+          </a>
+        </p>
+      )}
     </Wrapper>
   );
 };

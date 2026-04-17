@@ -13,6 +13,7 @@ const buildMatch = () => ({
   articlesCount: 1200,
   growthRating: 75.5,
   embedding: { model: "gemini-embedding-001", source: "article-titles" },
+  keyConcepts: ["machine learning", "neural networks"],
   score: 0.95,
 });
 
@@ -36,6 +37,19 @@ describe("search.query", () => {
       expect(result[0].name).toBe(expected);
     },
   );
+
+  it("should include displayName on each match", async () => {
+    const result = await callerFor("en_US").search.query({ text: "quantum" });
+    expect(result[0].displayName).toBe("Machine Learning");
+  });
+
+  it("should include keyConcepts on each match", async () => {
+    const result = await callerFor("en_US").search.query({ text: "quantum" });
+    expect(result[0].keyConcepts).toEqual([
+      "machine learning",
+      "neural networks",
+    ]);
+  });
 
   it("should forward the text and limit to search.query", async () => {
     const query = vi.fn().mockResolvedValue([]);

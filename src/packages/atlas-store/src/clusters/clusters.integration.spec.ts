@@ -44,6 +44,7 @@ const buildClusterInput = (
   articlesCount: 1200,
   growthRating: 73.4,
   embedding: { model: "gemini-embedding-001", source: "article-titles" },
+  keyConcepts: [],
   vector: Array.from({ length: 768 }, (_, index) => (index === 0 ? 1 : 0)),
   ...overrides,
 });
@@ -87,6 +88,61 @@ describe("clusters repository", () => {
       expect(vector).toHaveLength(768);
       const found = await repository.findById(input.id);
       expect(found).toEqual(expected);
+    }),
+    60_000,
+  );
+
+  it(
+    "should save and load keyConcepts",
+    withReadyClusterRepository(async ({ repository }) => {
+      const input = buildClusterInput({
+        keyConcepts: ["edible coatings", "shelf life", "Chitosan"],
+      });
+      await repository.upsert([input]);
+
+      const found = await repository.findById(input.id);
+      expect(found?.keyConcepts).toEqual([
+        "edible coatings",
+        "shelf life",
+        "Chitosan",
+      ]);
+    }),
+    60_000,
+  );
+
+  it(
+    "should return an empty keyConcepts array when the payload has none",
+    withReadyClusterRepository(async ({ repository, client }) => {
+      const id = "550e8400-e29b-41d4-a716-446655440099";
+      await client.upsert("clusters", {
+        wait: true,
+        points: [
+          {
+            id,
+            vector: {
+              titles: Array.from({ length: 768 }, (_, index) =>
+                index === 0 ? 1 : 0,
+              ),
+            },
+            payload: {
+              externalId: 99,
+              x: 0,
+              y: 0,
+              name: null,
+              nameSource: null,
+              articlesCount: 1,
+              growthRating: 0,
+              embedding: {
+                model: "gemini-embedding-001",
+                source: "article-titles",
+              },
+            },
+          },
+        ],
+      });
+
+      const found = await repository.findById(id);
+      expect(found?.keyConcepts).toEqual([]);
     }),
     60_000,
   );

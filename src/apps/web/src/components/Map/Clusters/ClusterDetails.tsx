@@ -1,15 +1,9 @@
 import { useTranslation } from "react-i18next";
-import { Concept, Cluster } from "../../../api/model";
+import type { MapCluster } from "./Clusters.tsx";
 
-export const ClusterDetails = (props: {
-  cluster: Cluster;
-  concepts: Map<number, Concept>;
-}) => {
+export const ClusterDetails = ({ cluster }: { cluster: MapCluster }) => {
   const { t } = useTranslation();
-  const { cluster, concepts } = props;
-  // Prefer curated place name, fall back to LLM-generated name
-  const name = cluster.place?.text ?? cluster.name ?? "";
-  const id = `#${cluster.clusterId.toString()}`;
+  const id = `#${cluster.externalId.toString()}`;
 
   return (
     <div
@@ -20,13 +14,7 @@ export const ClusterDetails = (props: {
       }}
     >
       <p>
-        {name ? (
-          <>
-            <strong>{name}</strong> {id}
-          </>
-        ) : (
-          <strong>{id}</strong>
-        )}
+        <strong>{cluster.displayName}</strong> {id}
       </p>
 
       <span>
@@ -46,13 +34,16 @@ export const ClusterDetails = (props: {
       <br />
       <br />
 
-      <strong>{t("map.clusterDetails.keywordsLabel")}:</strong>
-      <ul>
-        {cluster.keyConcepts.map((conceptId) => {
-          const concept = concepts.get(Number(conceptId));
-          return <li key={conceptId}>{concept?.key}</li>;
-        })}
-      </ul>
+      {cluster.keyConcepts.length > 0 && (
+        <>
+          <strong>{t("map.clusterDetails.keywordsLabel")}:</strong>
+          <ul>
+            {cluster.keyConcepts.map((concept) => (
+              <li key={concept}>{concept}</li>
+            ))}
+          </ul>
+        </>
+      )}
     </div>
   );
 };

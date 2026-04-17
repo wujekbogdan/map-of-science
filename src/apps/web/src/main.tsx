@@ -4,6 +4,7 @@ import { createRoot } from "react-dom/client";
 import App from "./components/App.tsx";
 import "./css/global.css";
 import "./i18n";
+import { Providers } from "./providers/Providers.tsx";
 
 const root = document.getElementById("root");
 
@@ -13,6 +14,8 @@ if (!root) {
 
 createRoot(root).render(
   <StrictMode>
-    <App />
+    <Providers>
+      <App />
+    </Providers>
   </StrictMode>,
 );
