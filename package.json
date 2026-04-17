@@ -15,7 +15,8 @@
     "create:node-app": "yes | turbo gen workspace --copy @map-of-science/node-app --type package --name @map-of-science/${name} --destination src/apps/${name}",
     "deps:check": "manypkg check",
     "deps:fix": "manypkg fix",
-    "commit": "cz"
+    "commit": "cz",
+    "prepare": "husky"
   },
   "keywords": [],
   "author": "",
