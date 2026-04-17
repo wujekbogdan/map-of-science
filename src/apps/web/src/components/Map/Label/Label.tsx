@@ -11,12 +11,15 @@ type Label = {
   onClick?: OnLabelClick;
 };
 
-export type OnLabelClick = (label: Pick<Label, "text" | "x" | "y">) => void;
+export type OnLabelClick = (
+  label: Pick<Label, "id" | "text" | "x" | "y">,
+) => void;
 
 const Label = (props: Label) => {
   const onClick = props.onClick
     ? () => {
         props.onClick?.({
+          id: props.id,
           text: props.text,
           x: props.x,
           y: props.y,

@@ -67,7 +67,7 @@ export default function Map(props: Props) {
   const selectedClusters = useSelectionStore((s) => s.selectedClusters);
   const { language } = useLanguage();
 
-  const fetchLocalArticle = useArticleStore((s) => s.fetchLocalArticle);
+  const fetchAreaArticle = useArticleStore((s) => s.fetchAreaArticle);
 
   const svgRoot = useRef<SVGSVGElement>(null);
   const [mapVisibility, setMapVisibility] = useState<"visible" | "hidden">(
@@ -251,8 +251,8 @@ export default function Map(props: Props) {
             {...label}
             id={label.key}
             key={label.key}
-            onClick={({ text }) => {
-              void fetchLocalArticle(text, language);
+            onClick={({ id, text }) => {
+              void fetchAreaArticle(id, text, language);
             }}
           />
         ))}
