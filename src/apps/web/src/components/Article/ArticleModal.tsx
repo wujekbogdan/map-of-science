@@ -1,6 +1,6 @@
 import { ReactElement, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { useClickAway } from "react-use";
+import { useClickAway, useKey } from "react-use";
 import styled from "styled-components";
 import { breakpoints } from "../../useBreakpoint.ts";
 
@@ -14,6 +14,10 @@ export const ArticleModal = ({ children, onClose }: Props) => {
   const ref = useRef(null);
 
   useClickAway(ref, () => {
+    onClose?.();
+  });
+
+  useKey("Escape", () => {
     onClose?.();
   });
 

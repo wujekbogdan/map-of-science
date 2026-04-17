@@ -46,4 +46,5 @@ export type ContentRepository = {
   upsert(items: ContentItem[]): Promise<void>;
   /* Get all content items linked to a cluster. */
   findByClusterId(clusterId: string): Promise<ContentItem[]>;
+  findByAreaId(areaId: string): Promise<ContentItem[]>;
 };
