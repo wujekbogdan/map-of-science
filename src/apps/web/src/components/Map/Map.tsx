@@ -6,10 +6,7 @@ import { useShallow } from "zustand/react/shallow";
 import { useTRPC } from "../../api-client/index.ts";
 import { useArticleStore } from "../../article/articleStore.ts";
 import { transformToBbox } from "../../map/bbox.ts";
-import {
-  flipPositionY,
-  renderBboxToQdrantBbox,
-} from "../../map/coords.ts";
+import { flipPositionY, renderBboxToQdrantBbox } from "../../map/coords.ts";
 import { useMapStore } from "../../map/mapStore.ts";
 import { mergeClustersById } from "../../map/mergeClusters.ts";
 import { useSelectionStore } from "../../map/selectionStore.ts";
@@ -165,15 +162,13 @@ export default function Map(props: Props) {
   );
 
   const labelsScaled = useMemo(() => {
-    const layers: Record<
-      1 | 2 | 3 | 4,
-      { fontSize: number; opacity: number }
-    > = {
-      1: { fontSize: scaledFontSize.layer1, opacity: opacity.layer1 },
-      2: { fontSize: scaledFontSize.layer2, opacity: opacity.layer2 },
-      3: { fontSize: scaledFontSize.layer3, opacity: opacity.layer3 },
-      4: { fontSize: scaledFontSize.layer4, opacity: opacity.layer4 },
-    };
+    const layers: Record<1 | 2 | 3 | 4, { fontSize: number; opacity: number }> =
+      {
+        1: { fontSize: scaledFontSize.layer1, opacity: opacity.layer1 },
+        2: { fontSize: scaledFontSize.layer2, opacity: opacity.layer2 },
+        3: { fontSize: scaledFontSize.layer3, opacity: opacity.layer3 },
+        4: { fontSize: scaledFontSize.layer4, opacity: opacity.layer4 },
+      };
 
     return areas.flatMap((area) => {
       const layer = layers[area.tier as 1 | 2 | 3 | 4];

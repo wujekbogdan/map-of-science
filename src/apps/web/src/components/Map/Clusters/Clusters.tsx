@@ -77,8 +77,7 @@ export const Clusters = ({ clusters, label, ripple, mode }: Props) => {
     <>
       {clusters.map((cluster, index) => {
         const isHovered = hoveredCluster?.id === cluster.id;
-        const showLabel =
-          cluster.nameSource === "curated" && label.opacity > 0;
+        const showLabel = cluster.nameSource === "curated" && label.opacity > 0;
 
         return (
           <g

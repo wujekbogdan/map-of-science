@@ -21,13 +21,13 @@ describe("getCenteredBoundingBox", () => {
 
 describe("getBoundingBox", () => {
   it("should fall back to centered box for a single point", () => {
-    expect(
-      getBoundingBox([{ x: 5, y: 5 }], { width: 20, height: 10 }),
-    ).toEqual({
-      min: { x: -5, y: 0 },
-      max: { x: 15, y: 10 },
-      center: { x: 5, y: 5 },
-    });
+    expect(getBoundingBox([{ x: 5, y: 5 }], { width: 20, height: 10 })).toEqual(
+      {
+        min: { x: -5, y: 0 },
+        max: { x: 15, y: 10 },
+        center: { x: 5, y: 5 },
+      },
+    );
   });
 
   it("should compute a 10% padded bbox around multiple points", () => {

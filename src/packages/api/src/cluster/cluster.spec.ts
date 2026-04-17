@@ -55,7 +55,10 @@ describe("cluster.byId", () => {
 
   it("should include keyConcepts in the response", async () => {
     const result = await callerFor("en_US").cluster.byId({ id: "c-1" });
-    expect(result?.keyConcepts).toEqual(["machine learning", "neural networks"]);
+    expect(result?.keyConcepts).toEqual([
+      "machine learning",
+      "neural networks",
+    ]);
   });
 
   it("should use the localized name as displayName", async () => {

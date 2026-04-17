@@ -1,8 +1,8 @@
 import { z } from "zod";
 import type { ClusterMatch } from "@map-of-science/atlas";
+import { localizeCluster } from "../cluster/cluster.js";
 import type { Lang } from "../context.js";
 import { publicProcedure, router } from "../trpc.js";
-import { localizeCluster } from "../cluster/cluster.js";
 
 const localizeMatch = (match: ClusterMatch, lang: Lang) => ({
   ...localizeCluster(match, lang),

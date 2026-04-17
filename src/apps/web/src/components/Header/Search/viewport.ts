@@ -20,10 +20,7 @@ export const getCenteredBoundingBox = (
   };
 };
 
-export const getBoundingBox = (
-  points: Point[],
-  mapSize: Size,
-): BoundingBox => {
+export const getBoundingBox = (points: Point[], mapSize: Size): BoundingBox => {
   if (points.length === 1) {
     return getCenteredBoundingBox(points[0], mapSize);
   }

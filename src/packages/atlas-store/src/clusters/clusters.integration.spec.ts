@@ -120,9 +120,8 @@ describe("clusters repository", () => {
           {
             id,
             vector: {
-              titles: Array.from(
-                { length: 768 },
-                (_, index) => (index === 0 ? 1 : 0),
+              titles: Array.from({ length: 768 }, (_, index) =>
+                index === 0 ? 1 : 0,
               ),
             },
             payload: {
