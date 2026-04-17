@@ -30,4 +30,5 @@ export type ContentRepository = {
   createSchema(): Promise<void>;
   upsert(items: ContentItem[]): Promise<void>;
   findByClusterId(clusterId: string): Promise<ContentItem[]>;
+  findByAreaId(areaId: string): Promise<ContentItem[]>;
 };

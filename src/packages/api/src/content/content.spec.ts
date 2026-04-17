@@ -23,6 +23,7 @@ const buildAtlas = (overrides?: Partial<AtlasStore["content"]>): AtlasStore =>
   ({
     content: {
       findByClusterId: vi.fn().mockResolvedValue([buildContentItem()]),
+      findByAreaId: vi.fn().mockResolvedValue([buildContentItem()]),
       ...overrides,
     },
   }) as unknown as AtlasStore;
@@ -48,5 +49,22 @@ describe("content.byCluster", () => {
     await caller(atlas).content.byCluster({ clusterId: "c-42" });
 
     expect(findByClusterId).toHaveBeenNthCalledWith(1, "c-42");
+  });
+});
+
+describe("content.byArea", () => {
+  it("should return content items linked to the given area", async () => {
+    const result = await caller().content.byArea({ areaId: "a-1" });
+    expect(result).toHaveLength(1);
+    expect(result[0].id).toBe("content-1");
+  });
+
+  it("should forward the area id to findByAreaId", async () => {
+    const findByAreaId = vi.fn().mockResolvedValue([]);
+    const atlas = buildAtlas({ findByAreaId });
+
+    await caller(atlas).content.byArea({ areaId: "a-42" });
+
+    expect(findByAreaId).toHaveBeenNthCalledWith(1, "a-42");
   });
 });
