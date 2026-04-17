@@ -11,11 +11,18 @@ const presentMatch = (match: ClusterMatch, lang: Lang) => ({
 
 export const searchRouter = router({
   query: publicProcedure
-    .input(z.object({ text: z.string(), limit: z.number().int().optional() }))
+    .input(
+      z.object({
+        text: z.string(),
+        limit: z.number().int().optional(),
+        minScore: z.number().optional(),
+      }),
+    )
     .query(async ({ input, ctx }) => {
       const matches = await ctx.search.query({
         text: input.text,
         ...(input.limit !== undefined ? { limit: input.limit } : {}),
+        ...(input.minScore !== undefined ? { minScore: input.minScore } : {}),
       });
       return matches.map((match) => presentMatch(match, ctx.lang));
     }),

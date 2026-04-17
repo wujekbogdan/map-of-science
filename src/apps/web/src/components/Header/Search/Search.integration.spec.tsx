@@ -143,7 +143,7 @@ describe("Search", () => {
       await waitFor(() => {
         expect(calls).toContainEqual({
           path: "search.query",
-          input: { text: "quantum", limit: 20 },
+          input: { text: "quantum", limit: 500, minScore: 0.65 },
         });
       });
     }),

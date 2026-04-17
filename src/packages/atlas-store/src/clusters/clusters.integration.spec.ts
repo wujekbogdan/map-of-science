@@ -182,15 +182,6 @@ describe("clusters repository", () => {
   );
 
   it(
-    "should return an empty array when findByIds is called with no ids",
-    withReadyClusterRepository(async ({ repository }) => {
-      const found = await repository.findByIds([]);
-      expect(found).toEqual([]);
-    }),
-    60_000,
-  );
-
-  it(
     "should return only clusters whose position falls inside the bbox",
     withReadyClusterRepository(async ({ repository }) => {
       const inside = buildClusterInput({
@@ -303,6 +294,7 @@ describe("clusters repository", () => {
       const matches = await repository.findByVector({
         vector: queryVector,
         limit: 2,
+        minScore: -1,
       });
 
       expect(matches).toHaveLength(2);

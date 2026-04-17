@@ -17,7 +17,6 @@ import {
 } from "./viewport.ts";
 
 const MIN_QUERY_LENGTH = 3;
-const SEARCH_LIMIT = 20;
 const INPUT_DEBOUNCE_MS = 300;
 const LOADING_DELAY_MS = 250;
 
@@ -25,6 +24,8 @@ export const Search = () => {
   const trpc = useTRPC();
   const setDesiredZoom = useMapStore((s) => s.setDesiredZoom);
   const mapSize = useMapStore((s) => s.mapSize);
+  const searchMinScore = useMapStore((s) => s.searchMinScore);
+  const maxResults = useMapStore((s) => s.maxDataPointsInViewport);
   const setSelectedClusters = useSelectionStore((s) => s.setSelectedClusters);
   const clearSelection = useSelectionStore((s) => s.clearSelection);
 
@@ -32,7 +33,7 @@ export const Search = () => {
 
   const { data: results = [], isFetching } = useQuery(
     trpc.search.query.queryOptions(
-      { text: searchTerm, limit: SEARCH_LIMIT },
+      { text: searchTerm, limit: maxResults, minScore: searchMinScore },
       { enabled: searchTerm.length >= MIN_QUERY_LENGTH },
     ),
   );

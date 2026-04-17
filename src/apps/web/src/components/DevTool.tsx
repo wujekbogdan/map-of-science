@@ -46,6 +46,8 @@ export const DevTool = () => {
     setZoomStepFactor,
     maxDataPointsInViewport,
     setMaxDataPointsInViewport,
+    searchMinScore,
+    setSearchMinScore,
     svgScaleFactor,
     svgOffset,
     setSvgOffset,
@@ -63,6 +65,8 @@ export const DevTool = () => {
       state.setZoomStepFactor,
       state.maxDataPointsInViewport,
       state.setMaxDataPointsInViewport,
+      state.searchMinScore,
+      state.setSearchMinScore,
       state.temp__svgScaleFactor,
       state.temp__svgOffset,
       state.temp__setSvgOffset,
@@ -120,6 +124,21 @@ export const DevTool = () => {
                   value={maxDataPointsInViewport}
                   onChange={(e) => {
                     setMaxDataPointsInViewport(Number(e.target.value));
+                  }}
+                />
+              </FormControl>
+            </Section>
+            <Section>
+              <FormControl>
+                <Label>{i18n("Search min score (0-1)")}</Label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  max="1"
+                  value={searchMinScore}
+                  onChange={(e) => {
+                    setSearchMinScore(Number(e.target.value));
                   }}
                 />
               </FormControl>

@@ -51,15 +51,20 @@ describe("search.query", () => {
     ]);
   });
 
-  it("should forward the text and limit to search.query", async () => {
+  it("should forward the text, limit, and minScore to search.query", async () => {
     const query = vi.fn().mockResolvedValue([]);
     const search = buildSearch(query);
 
     await callerFor("en_US", search).search.query({
       text: "physics",
       limit: 5,
+      minScore: 0.8,
     });
 
-    expect(query).toHaveBeenNthCalledWith(1, { text: "physics", limit: 5 });
+    expect(query).toHaveBeenNthCalledWith(1, {
+      text: "physics",
+      limit: 5,
+      minScore: 0.8,
+    });
   });
 });
