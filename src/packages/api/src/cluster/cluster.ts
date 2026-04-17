@@ -13,10 +13,11 @@ const resolveDisplayName = (
   return `Cluster ${externalId.toString()}`;
 };
 
-export const localizeCluster = (cluster: Cluster, lang: Lang) => {
+export const present = (cluster: Cluster, lang: Lang) => {
   const name = cluster.name?.[lang] ?? null;
   return {
     ...cluster,
+    position: { x: cluster.position.x, y: -cluster.position.y },
     name,
     displayName: resolveDisplayName(
       name,
@@ -33,23 +34,27 @@ export const clusterRouter = router({
     .input(z.object({ id: z.string() }))
     .query(async ({ input, ctx }) => {
       const cluster = await ctx.atlas.clusters.findById(input.id);
-      return cluster ? localizeCluster(cluster, ctx.lang) : null;
+      return cluster ? present(cluster, ctx.lang) : null;
     }),
 
   byIds: publicProcedure
     .input(z.object({ ids: z.array(z.string()) }))
     .query(async ({ input, ctx }) => {
       const clusters = await ctx.atlas.clusters.findByIds(input.ids);
-      return clusters.map((cluster) => localizeCluster(cluster, ctx.lang));
+      return clusters.map((cluster) => present(cluster, ctx.lang));
     }),
 
   viewport: publicProcedure
     .input(z.object({ bbox: bboxSchema, limit: z.number().int().optional() }))
     .query(async ({ input, ctx }) => {
+      const { bbox } = input;
       const clusters = await ctx.atlas.clusters.findInViewport({
-        bbox: input.bbox,
+        bbox: {
+          x: bbox.x,
+          y: { min: -bbox.y.max, max: -bbox.y.min },
+        },
         limit: input.limit ?? DEFAULT_VIEWPORT_LIMIT,
       });
-      return clusters.map((cluster) => localizeCluster(cluster, ctx.lang));
+      return clusters.map((cluster) => present(cluster, ctx.lang));
     }),
 });

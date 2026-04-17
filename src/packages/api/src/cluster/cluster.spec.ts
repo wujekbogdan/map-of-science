@@ -80,6 +80,11 @@ describe("cluster.byId", () => {
     expect(result?.displayName).toBe("machine learning, neural networks");
   });
 
+  it("should negate position.y to convert to screen-space", async () => {
+    const result = await callerFor("en_US").cluster.byId({ id: "c-1" });
+    expect(result?.position).toEqual({ x: 10, y: 5 });
+  });
+
   it("should fall back to externalId when name and keyConcepts are both missing", async () => {
     const atlas = buildAtlas({
       findById: vi.fn().mockResolvedValue({
@@ -120,7 +125,7 @@ describe("cluster.byIds", () => {
 });
 
 describe("cluster.viewport", () => {
-  const bbox = { x: { min: 0, max: 10 }, y: { min: 0, max: 10 } };
+  const bbox = { x: { min: 0, max: 10 }, y: { min: 1, max: 10 } };
 
   it("should localize every cluster in the viewport result", async () => {
     const atlas = buildAtlas({
@@ -132,14 +137,18 @@ describe("cluster.viewport", () => {
     expect(result[0].name).toBe("Uczenie Maszynowe");
   });
 
-  it("should apply the default limit when none is provided", async () => {
+  it("should flip bbox y from screen-space to natural before querying store", async () => {
     const findInViewport = vi.fn().mockResolvedValue([]);
     const atlas = buildAtlas({ findInViewport });
+    const screenBbox = { x: { min: 0, max: 10 }, y: { min: 2, max: 8 } };
 
-    await callerFor("en_US", atlas).cluster.viewport({ bbox });
+    await callerFor("en_US", atlas).cluster.viewport({ bbox: screenBbox });
 
     expect(findInViewport).toHaveBeenCalledTimes(1);
-    expect(findInViewport).toHaveBeenNthCalledWith(1, { bbox, limit: 500 });
+    expect(findInViewport).toHaveBeenNthCalledWith(1, {
+      bbox: { x: { min: 0, max: 10 }, y: { min: -8, max: -2 } },
+      limit: 500,
+    });
   });
 
   it("should forward a caller-provided limit", async () => {
@@ -148,6 +157,9 @@ describe("cluster.viewport", () => {
 
     await callerFor("en_US", atlas).cluster.viewport({ bbox, limit: 25 });
 
-    expect(findInViewport).toHaveBeenNthCalledWith(1, { bbox, limit: 25 });
+    expect(findInViewport).toHaveBeenNthCalledWith(1, {
+      bbox: { x: { min: 0, max: 10 }, y: { min: -10, max: -1 } },
+      limit: 25,
+    });
   });
 });
