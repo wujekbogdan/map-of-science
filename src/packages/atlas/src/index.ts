@@ -1,3 +1,5 @@
+/* See ../README.md for the domain overview. */
+
 export {
   bboxSchema,
   clusterInputSchema,

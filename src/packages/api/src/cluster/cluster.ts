@@ -13,6 +13,13 @@ const resolveDisplayName = (
   return `Cluster ${externalId.toString()}`;
 };
 
+/*
+ * Maps a domain Cluster into its API DTO. Resolves name to the requested
+ * language, outputs y in screen-space (y-down), and computes displayName
+ * with fallbacks to keyConcepts or externalId.
+ *
+ * Every Cluster leaving the API goes through this.
+ */
 export const present = (cluster: Cluster, lang: Lang) => {
   const name = cluster.name?.[lang] ?? null;
   return {
