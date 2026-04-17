@@ -31,7 +31,7 @@ export const clusterSchema = z
       ),
     embedding: z
       .object({
-        model: z.string().describe("Which embedder produced the vector."),
+        model: z.string().describe("Which embedder produced it."),
         source: z
           .string()
           .describe("What kind of content was used as input to the embedding."),
