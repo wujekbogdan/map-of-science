@@ -1,5 +1,30 @@
 # @map-of-science/api
 
+## 0.2.1
+
+### Patch Changes
+
+- 88fe63f: normalize `@trpc/server` (`11.16.0` → `^11.16.0`) and `dotenv` (`17.4.2` → `^17.2.3`) to caret ranges to align with the rest of the workspace
+- Updated dependencies [0fe48aa]
+- Updated dependencies [9f59ca4]
+- Updated dependencies [c9e5bbd]
+- Updated dependencies [88fe63f]
+- Updated dependencies [7d54d51]
+- Updated dependencies [7d54d51]
+- Updated dependencies [88fe63f]
+- Updated dependencies [7d54d51]
+- Updated dependencies [0fe48aa]
+- Updated dependencies [0fe48aa]
+- Updated dependencies [790b1b0]
+- Updated dependencies [c9e5bbd]
+- Updated dependencies [9f59ca4]
+- Updated dependencies [790b1b0]
+- Updated dependencies [c9e5bbd]
+  - @map-of-science/atlas@0.3.0
+  - @map-of-science/api@0.3.0
+  - @map-of-science/atlas-store@0.3.0
+  - @map-of-science/embeddings@0.1.1
+
 ## 0.2.0
 
 ### Minor Changes

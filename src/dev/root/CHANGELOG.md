@@ -1,5 +1,15 @@
 # @map-of-science/root
 
+## 0.7.1
+
+### Patch Changes
+
+- 60ebcb2: - Cache turbo tasks in CI
+- 100a3ec: Run services from Frankfurt so the api sits close to the database
+- 4dbde08: Add `prepare` script so husky auto-installs git hooks on `pnpm install`
+- c9e94df: - Add api-server service to Render blueprint
+  - Pin prod static to main and point dev services at develop
+
 ## 0.7.0
 
 ### Minor Changes

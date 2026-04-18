@@ -1,5 +1,36 @@
 # @map-of-science/web
 
+## 1.20.0
+
+### Minor Changes
+
+- 7d54d51: - Narrow the map to the selected cluster(s) while a search result is active
+  - Pass `searchMinScore` to the search API and add it to the dev tool
+  - Use `maxDataPointsInViewport` as the search query limit
+- 0fe48aa: - Replace in-browser TSV parsing with tRPC backend calls for clusters, areas, and search
+  - Viewport-aware on-demand cluster and area fetching
+  - Embedding-based semantic search
+  - Remove YouTube video panel
+  - Remove all TSV assets and in-browser parsing
+
+### Patch Changes
+
+- 88fe63f: bump `zod` to `^4.3.6` and migrate to v4 API:
+
+  - `z.string().url()` → `z.url()`
+  - `z.string().datetime()` → `z.iso.datetime()`
+  - `ZodSchema<T, ZodTypeDef, unknown>` → `ZodType<T, unknown>`
+
+- c9e5bbd: Close the article modal on `Esc`.
+- c9e5bbd: Bring back the YouTube panel, powered by the `content.byArea` tRPC query.
+- 9f59ca4: Remove local y-flip helpers. Map and Search consume API cluster positions directly now that the backend returns screen-space coords.
+- Updated dependencies [9f59ca4]
+- Updated dependencies [7d54d51]
+- Updated dependencies [0fe48aa]
+- Updated dependencies [790b1b0]
+- Updated dependencies [c9e5bbd]
+  - @map-of-science/api@0.3.0
+
 ## 1.19.0
 
 ### Minor Changes
