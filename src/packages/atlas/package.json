@@ -1,0 +1,25 @@
+{
+  "name": "@map-of-science/atlas",
+  "version": "0.2.0",
+  "description": "Cluster and Area aggregates with Qdrant-backed storage",
+  "type": "module",
+  "private": true,
+  "main": "./src/index.ts",
+  "scripts": {
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "test:unit": "vitest --project=unit",
+    "test:integration": "vitest --project=integration"
+  },
+  "devDependencies": {
+    "@map-of-science/eslint": "workspace:*",
+    "@map-of-science/typescript": "workspace:*",
+    "@map-of-science/vitest": "workspace:*",
+    "@types/node": "^22.15.18",
+    "typescript": "~5.6.2",
+    "vitest": "^4.0.15"
+  },
+  "dependencies": {
+    "zod": "^4.3.6"
+  }
+}

@@ -1,0 +1,48 @@
+#$schema:https://render.com/schema/render.yaml.json
+version: "1"
+services:
+  - type: web
+    name: map-of-science
+    runtime: static
+    repo: https://github.com/wujekbogdan/map-of-science
+    branch: main
+    buildCommand: pnpm i --frozen-lockfile && pnpm build
+    staticPublishPath: ./src/apps/web/dist/
+    envVars:
+      - fromGroup: prod
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    autoDeployTrigger: checksPass
+    previews:
+      generation: off
+  - type: web
+    name: dev-map-of-science
+    runtime: static
+    repo: https://github.com/wujekbogdan/map-of-science
+    branch: develop
+    buildCommand: pnpm i --frozen-lockfile && pnpm build
+    staticPublishPath: ./src/apps/web/dist/
+    envVars:
+      - fromGroup: dev
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    autoDeployTrigger: commit
+    previews:
+      generation: off
+  - type: web
+    name: dev-map-of-science-api
+    runtime: docker
+    plan: free
+    repo: https://github.com/wujekbogdan/map-of-science
+    branch: develop
+    dockerfilePath: ./src/apps/api-server/Dockerfile
+    dockerContext: .
+    envVars:
+      - fromGroup: dev
+    autoDeployTrigger: commit
+    previews:
+      generation: off

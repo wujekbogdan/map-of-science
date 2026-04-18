@@ -4,15 +4,14 @@ Discover the landscape of human knowledge through an interactive map.
 
 Navigate continents of scientific fields, dive into countries of subfields, and discover cities - whose size reflects the volume of research on each topic. The proximity of areas on the map mirrors how closely related the fields are.
 
-[**👉 LIVE DEMO HERE**](https://dsonyy.github.io/map_of_science/)
-
 ## Installation
 
 ### Prerequisites
 
 1. Required: [Node.js@^22](https://nodejs.org/en/download/)
-2. Required: [npm](https://www.npmjs.com/get-npm) (Node Package Manager), which comes with Node.js.
-3. Optional: [nvm](https://github.com/nvm-sh/nvm) for managing Node.js versions.
+2. Required: [pnpm](https://pnpm.io/) package manager. You can either install it globally or follow the Corepack setup instructions below to let Node.js manage it for you.
+3. Optional: [nvm](https://github.com/nvm-sh/nvm) or [fnm](https://github.com/Schniz/fnm) for managing Node.js versions.
+4. Optional: [Docker](https://docs.docker.com/get-docker/) for running the application in a container.
 
 You can verify the installation by running in the command line:
 
@@ -21,28 +20,108 @@ node -v
 npm -v
 ```
 
-If you're an `nvm` user, you can install the required Node.js version by running:
+If you're an `nvm` or `fnm` user, you can install the required Node.js version by running:
 
 ```
 nvm install
 ```
 
-### Build and run
+or
 
-1. Clone this repository.
-2. Install dependencies:
+```
+fnm install
+```
+
+### Package manager setup
+
+This is a one-off task that lets you use the pnpm command for this project without installing it globally.
+
+[Corepack](https://nodejs.org/api/corepack.html) manages package manager versions by running the specified package
+manager (e.g., Yarn, PNPM) for your project as configured in `package.json`. Using Corepack eliminates the need to
+install package managers globally.
+
+Corepack currently needs to be explicitly enabled to have any effect. To do that, run:
+
+```
+corepack enable
+```
+
+### Building and running
+
+#### Running for development
+
+1. Install dependencies:
    ```bash
-   npm install
+   pnpm install
    ```
-3. Build the application:
+2. Start the application locally:
    ```bash
-   npm run build
+   pnpm turbo @map-of-science/web#dev
    ```
-4. Start the application locally:
+3. Open the application in the browser at the address displayed in the logs, probably [http://localhost:5173/](http://localhost:5173/)
+
+#### Running inside a Docker container
+
+The root `docker-compose.yml` runs the full stack (web, api-server, qdrant):
+
+```bash
+docker compose up
+```
+
+Web at [http://localhost:8080/](http://localhost:8080/), api at [http://localhost:4000/](http://localhost:4000/), qdrant at [http://localhost:6333/](http://localhost:6333/).
+
+#### Building for production
+
+1. Install dependencies:
    ```bash
-   npm run start
+   pnpm install
    ```
-5. Open the application in the browser at the address displayed in the logs, probably [http://localhost:8080/](http://localhost:8080/)
+2. Build the application:
+   ```bash
+   pnpm turbo @map-of-science/web#build
+   ```
+3. Compiled files will be located in the `dist` directory.
+4. Serve the application using a static server, e.g., [http-server](https://www.npmjs.com/package/http-server):
+   ```bash
+   cd src/apps/web
+   npx http-server dist
+   ```
+
+## Data pipeline
+
+The API reads all its data from Qdrant. This pipeline loads Qdrant from scratch using ETO cluster PDFs and the curated TSVs in `src/apps/web/asset/`. Requires Qdrant running and a `GOOGLE_API_KEY`.
+
+Download the ETO PDFs from [Zenodo](https://doi.org/10.5281/zenodo.12628195) and extract them so each file is named `cluster_<id>.pdf`. Then, from the repo root:
+
+```bash
+# 1. Pull article titles out of each PDF into NDJSON.
+pnpm --filter @map-of-science/cli start scrape-eto \
+  --input <pdfs-dir> --output eto.ndjson \
+  --start <from-id> --limit <count>
+
+# 2. Generate en-US and pl-PL names for each cluster via Gemini.
+pnpm --filter @map-of-science/cli start name \
+  --input eto.ndjson --output cluster_names_i18n.tsv
+
+# 3. Embed titles via Gemini and upsert clusters.
+pnpm --filter @map-of-science/cli start ingest:clusters \
+  --eto-input eto.ndjson \
+  --clusters src/apps/web/asset/clusters.tsv \
+  --names cluster_names_i18n.tsv \
+  --places src/apps/web/asset/places.tsv \
+  --entities src/apps/web/asset/map_entities_i18n.tsv
+
+# 4. Upsert region labels.
+pnpm --filter @map-of-science/cli start ingest:areas \
+  --areas src/apps/web/asset/areas.tsv \
+  --i18n src/apps/web/asset/map_entities_i18n.tsv
+
+# 5. Upsert YouTube video segments.
+pnpm --filter @map-of-science/cli start ingest:content \
+  --input src/apps/web/asset/youtube.tsv
+```
+
+Each `ingest:*` fails if its collection already exists; drop it and re-run.
 
 ## Editing
 

@@ -1,0 +1,1 @@
+export { fetchArticle } from "./article";

@@ -1,0 +1,21 @@
+onlyBuiltDependencies:
+  - '@parcel/watcher'
+  - '@swc/core'
+  - esbuild
+  - msw
+  - normalize-diacritics
+
+packages:
+  # Deployable apps (e.g. Node.js, React)
+  - 'src/apps/*'
+  # Shared runtime code (e.g. UI components, utils)
+  - 'src/packages/*'
+  # Development-only tooling (e.g. configs, linters, build tools)
+  - 'src/dev/*'
+  # Templates for creating apps and packages
+  - src/examples/*
+
+# These two settings ensure that peer dependencies are explicitly listed in package.json
+# instead of being auto-installed by pnpm, and that their versions are strictly enforced.
+strictPeerDependencies: true
+autoInstallPeers: false

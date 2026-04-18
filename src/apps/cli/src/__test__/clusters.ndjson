@@ -1,0 +1,3 @@
+{"id":0,"totalArticles":100,"articles":{"core":["Title A","Title B"],"review":["Title C"],"highlyCited":["Title D"]}}
+{"id":1,"totalArticles":200,"articles":{"core":["Title E"],"review":["Title F"],"highlyCited":["Title G","Title H"]}}
+{"id":2,"totalArticles":300,"articles":{"core":["Title I"],"review":[],"highlyCited":["Title J"]}}

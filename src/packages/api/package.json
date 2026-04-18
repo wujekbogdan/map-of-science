@@ -1,0 +1,29 @@
+{
+  "name": "@map-of-science/api",
+  "version": "0.2.0",
+  "description": "tRPC router and procedures for the Map of Science API",
+  "type": "module",
+  "private": true,
+  "main": "./src/index.ts",
+  "scripts": {
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "test:unit": "vitest --project=unit",
+    "test:integration": "vitest --project=integration"
+  },
+  "devDependencies": {
+    "@map-of-science/eslint": "workspace:*",
+    "@map-of-science/typescript": "workspace:*",
+    "@map-of-science/vitest": "workspace:*",
+    "@types/node": "^22.15.18",
+    "typescript": "~5.6.2",
+    "vitest": "^4.0.15"
+  },
+  "dependencies": {
+    "@map-of-science/atlas": "workspace:*",
+    "@map-of-science/atlas-store": "workspace:*",
+    "@map-of-science/embeddings": "workspace:*",
+    "@trpc/server": "^11.16.0",
+    "zod": "^4.3.6"
+  }
+}

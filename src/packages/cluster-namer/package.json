@@ -1,0 +1,26 @@
+{
+  "name": "@map-of-science/cluster-namer",
+  "version": "0.1.0",
+  "description": "Domain logic for naming scientific clusters via LLM",
+  "type": "module",
+  "private": true,
+  "main": "./src/index.ts",
+  "scripts": {
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "test:unit": "vitest --project=unit",
+    "test:integration": "vitest --project=integration"
+  },
+  "devDependencies": {
+    "@map-of-science/eslint": "workspace:*",
+    "@map-of-science/typescript": "workspace:*",
+    "@map-of-science/vitest": "workspace:*",
+    "@types/node": "^22.15.18",
+    "typescript": "~5.6.2",
+    "vitest": "^4.0.15"
+  },
+  "dependencies": {
+    "@map-of-science/text-generator": "workspace:*",
+    "zod": "^4.3.6"
+  }
+}
