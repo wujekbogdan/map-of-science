@@ -91,5 +91,6 @@ export type ClusterRepository = {
   findByVector(args: {
     vector: number[];
     limit: number;
+    minScore: number;
   }): Promise<ClusterMatch[]>;
 };
