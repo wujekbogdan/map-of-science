@@ -34,7 +34,11 @@ describe("createSearch", () => {
     expect(embedQuery).toHaveBeenCalledTimes(1);
     expect(embedQuery).toHaveBeenNthCalledWith(1, "quantum computing");
     expect(findByVector).toHaveBeenCalledTimes(1);
-    expect(findByVector).toHaveBeenNthCalledWith(1, { vector, limit: 50 });
+    expect(findByVector).toHaveBeenNthCalledWith(1, {
+      vector,
+      limit: 50,
+      minScore: 0.65,
+    });
     expect(results).toHaveLength(1);
   });
 
@@ -48,6 +52,27 @@ describe("createSearch", () => {
 
     await search.query({ text: "anything", limit: 5 });
 
-    expect(findByVector).toHaveBeenNthCalledWith(1, { vector, limit: 5 });
+    expect(findByVector).toHaveBeenNthCalledWith(1, {
+      vector,
+      limit: 5,
+      minScore: 0.65,
+    });
+  });
+
+  it("should use the caller-provided minScore when set", async () => {
+    const vector = [0];
+    const findByVector = vi.fn().mockResolvedValueOnce([]);
+    const search = createSearch({
+      clusters: { findByVector },
+      embedQuery: vi.fn().mockResolvedValueOnce(vector),
+    });
+
+    await search.query({ text: "anything", minScore: 0.9 });
+
+    expect(findByVector).toHaveBeenNthCalledWith(1, {
+      vector,
+      limit: 50,
+      minScore: 0.9,
+    });
   });
 });

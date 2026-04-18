@@ -7,7 +7,7 @@ import { useTRPC } from "../../api-client/index.ts";
 import { useArticleStore } from "../../article/articleStore.ts";
 import { transformToBbox } from "../../map/bbox.ts";
 import { useMapStore } from "../../map/mapStore.ts";
-import { mergeClustersById } from "../../map/mergeClusters.ts";
+import { pickClustersToRender } from "../../map/pickClustersToRender.ts";
 import { useSelectionStore } from "../../map/selectionStore.ts";
 import { useD3Zoom } from "../../map/useD3Zoom.ts";
 import { useFlashState } from "../../map/useFlashState.ts";
@@ -132,7 +132,8 @@ export default function Map(props: Props) {
   );
 
   const clustersToRender = useMemo(
-    () => mergeClustersById(viewportClusters, [...selectedClusters.values()]),
+    () =>
+      pickClustersToRender(viewportClusters, [...selectedClusters.values()]),
     [viewportClusters, selectedClusters],
   );
 

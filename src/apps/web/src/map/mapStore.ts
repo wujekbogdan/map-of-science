@@ -42,6 +42,7 @@ const partialDefaults = {
     zoom: 0.5,
   },
   maxDataPointsInViewport: 500,
+  searchMinScore: 0.65,
   temp__svgScaleFactor: 0.0581,
   temp__svgOffset: { x: -16.0, y: 27 },
 };
@@ -98,6 +99,9 @@ export const useMapStore = create(
     },
     setMaxDataPointsInViewport: (maxDataPointsInViewport: number) => {
       set({ maxDataPointsInViewport });
+    },
+    setSearchMinScore: (searchMinScore: number) => {
+      set({ searchMinScore });
     },
     setGrowthRatingColors: (colors: Colors) => {
       set({ growthRatingColors: colors });

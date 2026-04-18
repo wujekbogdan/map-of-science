@@ -139,14 +139,17 @@ export const createClustersRepository = ({
   async findByVector({
     vector,
     limit,
+    minScore,
   }: {
     vector: number[];
     limit: number;
+    minScore: number;
   }): Promise<ClusterMatch[]> {
     const response = await qdrant.query(COLLECTION, {
       query: vector,
       using: TITLES_VECTOR,
       limit,
+      score_threshold: minScore,
       with_payload: true,
       with_vector: false,
     });
