@@ -20,6 +20,7 @@ services:
     name: dev-map-of-science
     runtime: static
     repo: https://github.com/wujekbogdan/map-of-science
+    branch: chore/deploy-api-server-render
     buildCommand: pnpm i --frozen-lockfile && pnpm build
     staticPublishPath: ./src/apps/web/dist/
     envVars:
@@ -28,6 +29,19 @@ services:
       - type: rewrite
         source: /*
         destination: /index.html
-    autoDeployTrigger: off
+    autoDeployTrigger: commit
     previews:
-      generation: automatic
+      generation: off
+  - type: web
+    name: dev-map-of-science-api
+    runtime: docker
+    plan: free
+    repo: https://github.com/wujekbogdan/map-of-science
+    branch: chore/deploy-api-server-render
+    dockerfilePath: ./src/apps/api-server/Dockerfile
+    dockerContext: .
+    envVars:
+      - fromGroup: dev
+    autoDeployTrigger: commit
+    previews:
+      generation: off
