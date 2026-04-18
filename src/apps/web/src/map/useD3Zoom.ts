@@ -1,3 +1,28 @@
+/*
+ * Wraps d3-zoom for an SVG map. Declarative from the caller's side - they
+ * pass refs, receive React state, but imperative under the hood.
+ *
+ * d3-zoom emits one event per pointer sample, which on modern displays
+ * means 120+ Hz during a pan. Routing every event through React state
+ * re-renders the entire Map subtree at that rate; the reconciler can't
+ * keep up and the UI drops frames.
+ *
+ * The per-tick path skips React entirely: the panned <g> gets its
+ * `transform` attribute set via the DOM, and other consumers that need
+ * to stay in sync hook in via `subscribe`. React still holds what it's
+ * good at - component tree and data flow - and receives two React-shaped
+ * outputs:
+ *   - `zoom`: the current scale, throttled to one update per animation
+ *     frame.
+ *   - `transform`: updated once per gesture, after the user has stopped
+ *     moving. Drives the bbox-based data fetch so we fire one request
+ *     per gesture, not one per intermediate frame.
+ *
+ * `subscribe(fn)` registers a per-tick listener. It fires synchronously
+ * on every zoom event, and also once on subscribe with the current
+ * transform so late-mounting consumers can paint themselves correctly
+ * without waiting for the next tick.
+ */
 import {
   D3ZoomEvent,
   select,
@@ -5,7 +30,13 @@ import {
   zoomIdentity,
   ZoomTransform,
 } from "d3";
-import { useEffect, useRef, useState, RefObject, useCallback } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type RefObject,
+} from "react";
 import { useMapStore } from "./mapStore.ts";
 
 type Zoom = {
@@ -15,23 +46,47 @@ type Zoom = {
 };
 
 type Options = {
+  /** Root <svg> element that d3-zoom listens on for pointer/wheel input. */
   svg: RefObject<SVGSVGElement | null>;
+  /** The <g> that receives the pan/zoom transform. Everything inside it moves. */
+  foreground: RefObject<SVGGElement | null>;
   initialZoom: Zoom;
   initialized?: () => void;
   desiredZoom: Zoom | null;
 };
 
-export const useD3Zoom = (options: Options) => {
-  const { svg, initialZoom, initialized, desiredZoom } = options;
+const SETTLE_MS = 150;
 
+export const useD3Zoom = ({
+  svg,
+  foreground,
+  initialZoom,
+  initialized,
+  desiredZoom,
+}: Options) => {
   const zoomBehavior = useRef<ReturnType<
     typeof d3Zoom<SVGSVGElement, unknown>
   > | null>(null);
   const hasInitialized = useRef(false);
   const hasZoomed = useRef(false);
-  const [transform, setTransform] = useState<ZoomTransform>();
+
+  const liveTransformRef = useRef<ZoomTransform>(zoomIdentity);
+  const subscribersRef = useRef(new Set<(transform: ZoomTransform) => void>());
+
+  const [transform, setSettledTransform] = useState<ZoomTransform>();
+  const [zoom, setZoom] = useState(1);
   const setCurrentZoom = useMapStore((s) => s.setCurrentZoom);
-  const zoom = transform ? transform.k : 1;
+
+  const zoomFrameRef = useRef<number | null>(null);
+  const settleTimerRef = useRef<number | null>(null);
+
+  const subscribe = useCallback((fn: (transform: ZoomTransform) => void) => {
+    subscribersRef.current.add(fn);
+    fn(liveTransformRef.current);
+    return () => {
+      subscribersRef.current.delete(fn);
+    };
+  }, []);
 
   const zoomTo = useCallback(
     (
@@ -51,14 +106,14 @@ export const useD3Zoom = (options: Options) => {
         .transition()
         .duration(duration)
         .call((sel) => {
-          if (!zoomBehavior.current) return; // Isn't really required because we check it above, but it makes TS happy.
+          if (!zoomBehavior.current) return;
           zoomBehavior.current.transform(sel, transform);
         })
         .on("end", () => {
           onEnd?.();
         });
     },
-    [svg, zoomBehavior],
+    [svg],
   );
 
   useEffect(() => {
@@ -68,14 +123,29 @@ export const useD3Zoom = (options: Options) => {
     zoomBehavior.current = d3Zoom<SVGSVGElement, unknown>()
       .scaleExtent([0.5, 50])
       .on("zoom", (event: D3ZoomEvent<SVGSVGElement, unknown>) => {
-        // TODO: consider moving transform to Zustand
-        // https://github.com/wujekbogdan/map-of-science/issues/61
-        setTransform(event.transform);
-        setCurrentZoom({
-          x: event.transform.x,
-          y: event.transform.y,
-          scale: event.transform.k,
+        const transform = event.transform;
+        liveTransformRef.current = transform;
+
+        foreground.current?.setAttribute("transform", transform.toString());
+        for (const fn of subscribersRef.current) fn(transform);
+
+        // Update React state at most once per frame. Pan doesn't change
+        // scale, so setZoom gets the same value and React skips the
+        // re-render. Only wheel zoom actually re-renders consumers.
+        zoomFrameRef.current ??= requestAnimationFrame(() => {
+          zoomFrameRef.current = null;
+          const latest = liveTransformRef.current;
+          setZoom(latest.k);
+          setCurrentZoom({ x: latest.x, y: latest.y, scale: latest.k });
         });
+
+        if (settleTimerRef.current !== null) {
+          clearTimeout(settleTimerRef.current);
+        }
+        settleTimerRef.current = window.setTimeout(() => {
+          settleTimerRef.current = null;
+          setSettledTransform(liveTransformRef.current);
+        }, SETTLE_MS);
       });
 
     select<SVGSVGElement, unknown>(svg.current).call(zoomBehavior.current);
@@ -86,11 +156,7 @@ export const useD3Zoom = (options: Options) => {
     if (hasZoomed.current) return;
     if (!svg.current || !zoomBehavior.current) return;
 
-    const center = {
-      x: initialZoom.x,
-      y: initialZoom.y,
-    };
-    zoomTo(center.x, center.y, 1, false, () => {
+    zoomTo(initialZoom.x, initialZoom.y, 1, false, () => {
       initialized?.();
     });
     hasZoomed.current = true;
@@ -98,13 +164,27 @@ export const useD3Zoom = (options: Options) => {
 
   useEffect(() => {
     if (!desiredZoom) return;
-
     zoomTo(desiredZoom.x, desiredZoom.y, desiredZoom.scale, true);
   }, [desiredZoom, desiredZoom?.x, desiredZoom?.y, desiredZoom?.scale, zoomTo]);
+
+  useEffect(
+    () => () => {
+      if (zoomFrameRef.current !== null) {
+        cancelAnimationFrame(zoomFrameRef.current);
+      }
+      if (settleTimerRef.current !== null) {
+        clearTimeout(settleTimerRef.current);
+      }
+    },
+    [],
+  );
 
   return {
     zoom,
     zoomTo,
     transform,
+    subscribe,
   };
 };
+
+export type ZoomSubscribe = ReturnType<typeof useD3Zoom>["subscribe"];
