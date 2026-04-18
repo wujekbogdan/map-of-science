@@ -5,6 +5,7 @@ services:
     name: map-of-science
     runtime: static
     repo: https://github.com/wujekbogdan/map-of-science
+    branch: main
     buildCommand: pnpm i --frozen-lockfile && pnpm build
     staticPublishPath: ./src/apps/web/dist/
     envVars:
