@@ -12,8 +12,9 @@
  * to stay in sync hook in via `subscribe`. React still holds what it's
  * good at - component tree and data flow - and receives two React-shaped
  * outputs:
- *   - `zoom`: the current scale, throttled to one update per animation
- *     frame.
+ *   - `zoom`: the current scale. Updated on every zoom event, but pan
+ *     doesn't change scale so setZoom returns the same value and React
+ *     skips the commit. Only wheel zoom actually re-renders consumers.
  *   - `transform`: updated once per gesture, after the user has stopped
  *     moving. Drives the bbox-based data fetch so we fire one request
  *     per gesture, not one per intermediate frame.
@@ -77,7 +78,6 @@ export const useD3Zoom = ({
   const [zoom, setZoom] = useState(1);
   const setCurrentZoom = useMapStore((s) => s.setCurrentZoom);
 
-  const zoomFrameRef = useRef<number | null>(null);
   const settleTimerRef = useRef<number | null>(null);
 
   const subscribe = useCallback((fn: (transform: ZoomTransform) => void) => {
@@ -129,15 +129,12 @@ export const useD3Zoom = ({
         foreground.current?.setAttribute("transform", transform.toString());
         for (const fn of subscribersRef.current) fn(transform);
 
-        // Update React state at most once per frame. Pan doesn't change
-        // scale, so setZoom gets the same value and React skips the
-        // re-render. Only wheel zoom actually re-renders consumers.
-        zoomFrameRef.current ??= requestAnimationFrame(() => {
-          zoomFrameRef.current = null;
-          const latest = liveTransformRef.current;
-          setZoom(latest.k);
-          setCurrentZoom({ x: latest.x, y: latest.y, scale: latest.k });
-        });
+        // Pan doesn't change scale, so setZoom gets the same value and
+        // React skips the re-render via Object.is. Only wheel zoom
+        // actually re-renders scale consumers. React 18 batches the two
+        // setters inside this event handler into a single commit.
+        setZoom(transform.k);
+        setCurrentZoom({ x: transform.x, y: transform.y, scale: transform.k });
 
         if (settleTimerRef.current !== null) {
           clearTimeout(settleTimerRef.current);
@@ -169,9 +166,6 @@ export const useD3Zoom = ({
 
   useEffect(
     () => () => {
-      if (zoomFrameRef.current !== null) {
-        cancelAnimationFrame(zoomFrameRef.current);
-      }
       if (settleTimerRef.current !== null) {
         clearTimeout(settleTimerRef.current);
       }
