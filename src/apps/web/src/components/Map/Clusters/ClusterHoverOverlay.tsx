@@ -1,4 +1,5 @@
 import {
+  autoUpdate,
   flip,
   offset,
   shift,
@@ -40,6 +41,7 @@ export const ClusterHoverOverlay = ({
   const { refs, floatingStyles, context } = useFloating({
     open: isOpen,
     middleware: [offset(10), flip(), shift({ padding: 10 })],
+    whileElementsMounted: autoUpdate,
   });
   const { isMounted, styles } = useTransitionStyles(context, {
     duration: { open: 300, close: 0 },
@@ -53,7 +55,11 @@ export const ClusterHoverOverlay = ({
 
   return (
     <>
-      <g ref={refs.setReference} data-cluster-id={cluster.id}>
+      <g
+        ref={refs.setReference}
+        data-cluster-id={cluster.id}
+        pointerEvents="none"
+      >
         <Shape
           progress={100}
           level={getLevelByArticlesCount(cluster.articlesCount)}
