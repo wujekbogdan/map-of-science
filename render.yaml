@@ -4,6 +4,7 @@ services:
   - type: web
     name: map-of-science
     runtime: static
+    region: frankfurt
     repo: https://github.com/wujekbogdan/map-of-science
     branch: main
     buildCommand: pnpm i --frozen-lockfile && pnpm build
@@ -20,6 +21,7 @@ services:
   - type: web
     name: dev-map-of-science
     runtime: static
+    region: frankfurt
     repo: https://github.com/wujekbogdan/map-of-science
     branch: develop
     buildCommand: pnpm i --frozen-lockfile && pnpm build
