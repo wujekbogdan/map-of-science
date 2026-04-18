@@ -1,5 +1,15 @@
 # @map-of-science/parsers
 
+## 0.2.1
+
+### Patch Changes
+
+- 88fe63f: bump `zod` to `^4.3.6` and migrate to v4 API:
+
+  - `z.string().url()` → `z.url()`
+  - `z.string().datetime()` → `z.iso.datetime()`
+  - `ZodSchema<T, ZodTypeDef, unknown>` → `ZodType<T, unknown>`
+
 ## 0.2.0
 
 ### Minor Changes
