@@ -43,6 +43,15 @@ const partialDefaults = {
   },
   maxDataPointsInViewport: 500,
   searchMinScore: 0.65,
+  // const [xMin, xMax] = extent(clusters, (c) => c.position.x);
+  // const xRange = xMax - xMin;
+  // const scaleFactor = xRange / viewBox.width;
+  // scaleFactor = 0.0584202596593384;
+  // TODO: We can't fully rely on the extent of the cluster positions and the
+  // ratio between their range and the viewBox width because this calculation
+  // doesn't include the padding around the map. We use the calculated scale
+  // factor as a base value that needs some manual adjustment. Let's sort it
+  // out so that we can rely on calculated values only.
   temp__svgScaleFactor: 0.0581,
   temp__svgOffset: { x: -16.0, y: 27 },
 };
