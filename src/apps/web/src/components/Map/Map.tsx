@@ -4,14 +4,12 @@ import styled from "styled-components";
 import { useShallow } from "zustand/react/shallow";
 import { useTRPC } from "../../api-client/index.ts";
 import { useArticleStore } from "../../article/articleStore.ts";
-import { transformToBbox } from "../../map/bbox.ts";
 import { useMapStore } from "../../map/mapStore.ts";
 import { pickClustersToRender } from "../../map/pickClustersToRender.ts";
 import { useSelectionStore } from "../../map/selectionStore.ts";
-import { useD3Zoom } from "../../map/useD3Zoom.ts";
 import { useFlashState } from "../../map/useFlashState.ts";
 import { useLayersOpacity } from "../../map/useLayersOpacity.ts";
-import { useMapBackground } from "../../map/useMapBackground.ts";
+import { useZoom } from "../../map/zoom/useZoom.ts";
 import { useLanguage } from "../../useLanguage.ts";
 import { Clusters } from "./Clusters/Clusters.tsx";
 import Label, { OnLabelClick } from "./Label/Label.tsx";
@@ -39,9 +37,6 @@ type Props = {
   };
 };
 
-// TODO: split into a data container and a pure view. useQuery lives here only
-// because the bbox depends on transform owned by this component. Lift
-// transform to the store, move the fetch into a container wrapper.
 export default function Map(props: Props) {
   const [
     scaleFactor,
@@ -78,33 +73,34 @@ export default function Map(props: Props) {
     staleTime: Infinity,
   });
 
-  const { transform, zoom, subscribe } = useD3Zoom({
+  const zoom = useZoom({
     svg: svgRoot,
-    foreground: foregroundRef,
     initialZoom: {
       x: props.size.width / 2,
       y: props.size.height / 2,
       scale: 1,
     },
     desiredZoom,
-    initialized: () => {
+    onInitialized: () => {
       setMapVisibility("visible");
     },
   });
 
-  useMapBackground(svgRoot, subscribe, {
-    mapSvgUrl,
-    svgScaleFactor,
-    svgOffset,
+  zoom.useZoomed(foregroundRef);
+  zoom.useZoomedBackground(svgRoot, {
+    imageUrl: mapSvgUrl,
+    scaleFactor: svgScaleFactor,
+    offset: svgOffset,
   });
+  zoom.usePublish();
 
-  const opacity = useLayersOpacity(zoom);
+  const opacity = useLayersOpacity(zoom.scale);
 
   const scaleFontSize = (size: number) => {
-    const baseScaleFactor = 1 / zoom;
+    const baseScaleFactor = 1 / zoom.scale;
     const factor = Math.sqrt(
       Math.min(
-        Math.max(scaleFactor.min, zoom * scaleFactor.zoom),
+        Math.max(scaleFactor.min, zoom.scale * scaleFactor.zoom),
         scaleFactor.max,
       ),
     );
@@ -118,10 +114,7 @@ export default function Map(props: Props) {
     layer4: scaleFontSize(fontSize.layer4),
   };
 
-  const bbox = useMemo(
-    () => (transform ? transformToBbox(transform, props.size) : null),
-    [transform, props.size],
-  );
+  const bbox = zoom.useBbox(props.size);
 
   const trpc = useTRPC();
   const { data: viewportClusters = [] } = useQuery(
@@ -198,7 +191,7 @@ export default function Map(props: Props) {
     <MapSvg
       ref={svgRoot}
       $visibility={mapVisibility}
-      $zoom={zoom}
+      $zoom={zoom.scale}
       width={props.size.width}
       height={props.size.height}
     >
@@ -208,7 +201,7 @@ export default function Map(props: Props) {
           label={{
             fontSize: scaledFontSize.layer4,
             opacity: opacity.layer4,
-            offset: 15 / zoom,
+            offset: 15 / zoom.scale,
           }}
           mode={mapMode}
           ripple={hasSelection && ripple}
