@@ -1,6 +1,6 @@
 {
   "name": "@map-of-science/api",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "tRPC router and procedures for the Map of Science API",
   "type": "module",
   "private": true,

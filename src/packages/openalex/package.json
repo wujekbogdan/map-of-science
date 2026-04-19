@@ -1,6 +1,6 @@
 {
   "name": "@map-of-science/openalex",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "OpenAlex API client for academic work metadata",
   "type": "module",
   "private": true,

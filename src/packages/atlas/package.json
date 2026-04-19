@@ -1,6 +1,6 @@
 {
   "name": "@map-of-science/atlas",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Cluster and Area aggregates with Qdrant-backed storage",
   "type": "module",
   "private": true,
