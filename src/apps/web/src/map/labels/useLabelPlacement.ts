@@ -29,23 +29,29 @@ export const useLabelPlacement = ({
   return useMemo(() => {
     if (!transform || transform.k < LABEL_MIN_ZOOM) return [];
 
-    // Server returns clusters ordered by articlesCount DESC; the biggest cluster
-    // wins placement first.
+    // Server returns clusters ordered by articlesCount DESC; the biggest
+    // cluster wins placement first.
     const withLayout = clusters.map((cluster) => ({
       id: cluster.id,
-      cluster,
+      position: cluster.position,
       layout: layouter(cluster.displayName, MAX_LABEL_WIDTH_PX),
     }));
 
-    const candidates = withLayout.map(({ id, cluster, layout }) => ({
+    const candidates = withLayout.map(({ id, position, layout }) => ({
       id,
-      bbox: labelBbox({ cluster, layout, transform, fontSize, offset }),
+      bbox: labelBbox({
+        cluster: { position },
+        layout,
+        transform,
+        fontSize,
+        offset,
+      }),
     }));
 
     const kept = placeLabels({ candidates });
 
-    return withLayout
-      .filter(({ id }) => kept.has(id))
-      .map(({ id, layout }) => ({ id, layout }));
+    return withLayout.filter(({ id }) => kept.has(id));
   }, [clusters, transform, fontSize, offset, layouter]);
 };
+
+export type PlacedLabel = ReturnType<typeof useLabelPlacement>[number];

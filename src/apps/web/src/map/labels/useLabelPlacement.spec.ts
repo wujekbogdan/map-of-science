@@ -38,10 +38,7 @@ describe("useLabelPlacement", () => {
       }),
     );
 
-    expect(result.current).toEqual([
-      { id: "a", layout: stubLayouter() },
-      { id: "b", layout: stubLayouter() },
-    ]);
+    expect(result.current.map((p) => p.id)).toEqual(["a", "b"]);
   });
 
   it("should drop a later cluster whose label overlaps an earlier one", () => {

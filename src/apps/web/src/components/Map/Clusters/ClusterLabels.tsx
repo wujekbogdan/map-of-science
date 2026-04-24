@@ -1,31 +1,38 @@
+import { LINE_HEIGHT } from "../../../map/labels/config.ts";
+import type { PlacedLabel } from "../../../map/labels/useLabelPlacement.ts";
 import LabelText from "../Label/LabelText.tsx";
-import type { MapCluster } from "./ClusterShapes.tsx";
 
 type Props = {
-  clusters: MapCluster[];
-  label: { fontSize: number; opacity: number; offset: number };
+  labels: PlacedLabel[];
+  fontSize: number;
+  offset: number;
 };
 
-export const ClusterLabels = ({ clusters, label }: Props) => {
-  if (label.opacity <= 0) return null;
+// SVG dy expressed in em units so the line gap scales with the <text>
+// font-size. First line sits at the anchor; each next line drops by LINE_HEIGHT.
+const lineOffsetEm = (index: number) =>
+  index === 0 ? 0 : `${LINE_HEIGHT.toString()}em`;
 
+export const ClusterLabels = ({ labels, fontSize, offset }: Props) => {
   return (
     <>
-      {clusters
-        .filter((cluster) => cluster.nameSource === "curated")
-        .map((cluster) => (
-          <LabelText
-            key={cluster.id}
-            id={cluster.id}
-            x={cluster.position.x}
-            y={cluster.position.y - label.offset}
-            fontSize={label.fontSize}
-            opacity={label.opacity}
-            level={4}
-          >
-            {cluster.displayName}
-          </LabelText>
-        ))}
+      {labels.map(({ id, position, layout }) => (
+        <LabelText
+          key={id}
+          id={id}
+          x={position.x}
+          y={position.y - offset}
+          fontSize={fontSize}
+          opacity={1}
+          level={4}
+        >
+          {layout.lines.map((line, index) => (
+            <tspan key={line} x={position.x} dy={lineOffsetEm(index)}>
+              {line}
+            </tspan>
+          ))}
+        </LabelText>
+      ))}
     </>
   );
 };

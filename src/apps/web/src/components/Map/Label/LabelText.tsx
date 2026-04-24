@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import styled from "styled-components";
 
 type Label = {
@@ -7,7 +8,7 @@ type Label = {
   fontSize: number;
   opacity: number;
   level: 1 | 2 | 3 | 4;
-  children: string;
+  children: ReactNode;
   forcedHover?: boolean;
 };
 

@@ -1,19 +1,12 @@
 import { cleanup, render } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
+import type { PlacedLabel } from "../../../map/labels/useLabelPlacement.ts";
 import { ClusterLabels } from "./ClusterLabels.tsx";
-import { type MapCluster } from "./ClusterShapes.tsx";
 
-const makeCluster = (overrides: Partial<MapCluster> = {}): MapCluster => ({
-  id: "cluster-1",
-  externalId: 1,
-  position: { x: 10, y: 20 },
-  name: "Black Holes",
-  displayName: "Black Holes",
-  nameSource: "curated",
-  articlesCount: 100,
-  growthRating: 50,
-  embedding: { model: "test", source: "titles" },
-  keyConcepts: [],
+const makeLabel = (overrides: Partial<PlacedLabel> = {}): PlacedLabel => ({
+  id: "a",
+  position: { x: 10, y: 100 },
+  layout: { lines: ["Alpha"], widthAtRefFont: 30, heightAtRefFont: 11.5 },
   ...overrides,
 });
 
@@ -29,48 +22,46 @@ afterEach(() => {
 });
 
 describe("ClusterLabels", () => {
-  it("should render labels only for curated clusters, positioned above each cluster", () => {
-    const clusters: MapCluster[] = [
-      makeCluster({
-        id: "a",
-        displayName: "Alpha",
-        nameSource: "curated",
-        position: { x: 10, y: 100 },
-      }),
-      makeCluster({
-        id: "b",
-        displayName: "Beta",
-        nameSource: "llm",
-      }),
-      makeCluster({
-        id: "c",
-        displayName: "Gamma",
-        nameSource: null,
-      }),
-    ];
-
-    const { queryByText } = renderInSvg(
+  it("should render one text per label, positioned above the cluster", () => {
+    const { container, queryByText } = renderInSvg(
       <ClusterLabels
-        clusters={clusters}
-        label={{ fontSize: 12, opacity: 1, offset: 15 }}
+        labels={[makeLabel({ id: "a", position: { x: 10, y: 100 } })]}
+        fontSize={12}
+        offset={15}
       />,
     );
 
-    const alpha = queryByText("Alpha");
-    expect(alpha).toBeTruthy();
-    expect(alpha!.getAttribute("y")).toBe("85");
-    expect(queryByText("Beta")).toBeNull();
-    expect(queryByText("Gamma")).toBeNull();
+    const textEl = container.querySelector("text");
+    expect(textEl?.getAttribute("y")).toBe("85");
+    expect(queryByText("Alpha")).toBeTruthy();
   });
 
-  it("should render nothing when label opacity is zero", () => {
+  it("should render a tspan per wrapped line", () => {
     const { queryByText } = renderInSvg(
       <ClusterLabels
-        clusters={[makeCluster({ displayName: "Alpha" })]}
-        label={{ fontSize: 12, opacity: 0, offset: 15 }}
+        labels={[
+          makeLabel({
+            layout: {
+              lines: ["Fundamental research", "in quantum"],
+              widthAtRefFont: 120,
+              heightAtRefFont: 23,
+            },
+          }),
+        ]}
+        fontSize={12}
+        offset={15}
       />,
     );
 
-    expect(queryByText("Alpha")).toBeNull();
+    expect(queryByText("Fundamental research")).toBeTruthy();
+    expect(queryByText("in quantum")).toBeTruthy();
+  });
+
+  it("should render nothing when there are no labels", () => {
+    const { container } = renderInSvg(
+      <ClusterLabels labels={[]} fontSize={12} offset={15} />,
+    );
+
+    expect(container.querySelector("text")).toBeNull();
   });
 });

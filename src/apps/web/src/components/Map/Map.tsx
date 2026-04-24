@@ -203,6 +203,7 @@ export default function Map(props: Props) {
             opacity: opacity.layer4,
             offset: 15 / zoom.scale,
           }}
+          transform={zoom.transform}
           mode={mapMode}
           ripple={hasSelection && ripple}
         />
