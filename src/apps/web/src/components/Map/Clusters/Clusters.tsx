@@ -11,7 +11,7 @@ import { ClusterShapes, type MapCluster } from "./ClusterShapes.tsx";
 
 type Props = {
   clusters: MapCluster[];
-  label: { fontSize: number; opacity: number; offset: number };
+  label: { fontSize: number; offset: number };
   transform: ZoomTransform | undefined;
   ripple?: boolean;
   mode: "regular" | "growth";

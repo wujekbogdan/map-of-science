@@ -19,7 +19,9 @@ export const labelBbox = ({
     cluster.position.x,
     cluster.position.y,
   ]);
-  const anchorY = screenY - offset;
+  // offset comes in world units; lift in screen space so the bbox matches the
+  // rendered label's on-screen position regardless of zoom.
+  const anchorY = screenY - offset * transform.k;
 
   const scale = fontSize / REF_FONT_SIZE;
   const halfWidth = (layout.widthAtRefFont * scale) / 2;

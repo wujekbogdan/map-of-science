@@ -4,6 +4,7 @@ import styled from "styled-components";
 import { useShallow } from "zustand/react/shallow";
 import { useTRPC } from "../../api-client/index.ts";
 import { useArticleStore } from "../../article/articleStore.ts";
+import { CLUSTER_LABEL_OFFSET_PX } from "../../map/labels/config.ts";
 import { useMapStore } from "../../map/mapStore.ts";
 import { pickClustersToRender } from "../../map/pickClustersToRender.ts";
 import { useSelectionStore } from "../../map/selectionStore.ts";
@@ -200,8 +201,7 @@ export default function Map(props: Props) {
           clusters={clustersToRender}
           label={{
             fontSize: scaledFontSize.layer4,
-            opacity: opacity.layer4,
-            offset: 15 / zoom.scale,
+            offset: CLUSTER_LABEL_OFFSET_PX / zoom.scale,
           }}
           transform={zoom.transform}
           mode={mapMode}

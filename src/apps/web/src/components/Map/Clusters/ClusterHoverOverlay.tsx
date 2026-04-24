@@ -15,7 +15,7 @@ import Shape from "./Shape.tsx";
 
 type Props = {
   cluster: MapCluster | null;
-  label: { fontSize: number; opacity: number; offset: number };
+  label: { fontSize: number; offset: number };
   mode: "regular" | "growth";
   ripple: boolean;
   growthRatingColors: { start: RGB; middle: RGB; end: RGB };
@@ -51,8 +51,6 @@ export const ClusterHoverOverlay = ({
 
   if (!cluster) return null;
 
-  const showLabel = cluster.nameSource === "curated" && label.opacity > 0;
-
   return (
     <>
       <g
@@ -73,19 +71,17 @@ export const ClusterHoverOverlay = ({
           forcedHover={true}
           growthRatingColors={growthRatingColors}
         />
-        {showLabel && (
-          <LabelText
-            id={cluster.id}
-            x={cluster.position.x}
-            y={cluster.position.y - label.offset}
-            fontSize={label.fontSize}
-            opacity={label.opacity}
-            forcedHover={true}
-            level={4}
-          >
-            {cluster.displayName}
-          </LabelText>
-        )}
+        <LabelText
+          id={cluster.id}
+          x={cluster.position.x}
+          y={cluster.position.y - label.offset}
+          fontSize={label.fontSize}
+          opacity={1}
+          forcedHover={true}
+          level={4}
+        >
+          {cluster.displayName}
+        </LabelText>
       </g>
       {isMounted &&
         createPortal(
