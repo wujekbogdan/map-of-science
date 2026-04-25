@@ -11,7 +11,8 @@
     "preview": "vite preview",
     "typecheck": "tsc -b --noEmit",
     "test:unit": "vitest --project=unit",
-    "test:integration": "vitest --project=integration"
+    "test:integration": "vitest --project=integration",
+    "test:browser": "vitest --project=browser"
   },
   "dependencies": {
     "react": "^19.2.0",
@@ -24,10 +25,13 @@
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.1.5",
     "@vitejs/plugin-react-swc": "^3.11.0",
+    "@vitest/browser-playwright": "4.0.16",
     "eslint": "^9.13.0",
     "happy-dom": "^20.0.11",
+    "playwright": "1.59.1",
     "typescript": "~5.6.2",
     "vite": "^7.2.6",
-    "vitest": "^4.0.15"
+    "vitest": "^4.0.15",
+    "vitest-browser-react": "2.2.0"
   }
 }

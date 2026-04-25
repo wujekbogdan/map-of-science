@@ -1,5 +1,27 @@
 # @map-of-science/cli
 
+## 0.2.1
+
+### Patch Changes
+
+- 88fe63f: bump `zod` to `^4.3.6` to align with the rest of the workspace
+- Updated dependencies [0fe48aa]
+- Updated dependencies [c9e5bbd]
+- Updated dependencies [88fe63f]
+- Updated dependencies [7d54d51]
+- Updated dependencies [7d54d51]
+- Updated dependencies [88fe63f]
+- Updated dependencies [0fe48aa]
+- Updated dependencies [790b1b0]
+- Updated dependencies [88fe63f]
+- Updated dependencies [c9e5bbd]
+- Updated dependencies [9f59ca4]
+  - @map-of-science/atlas@0.3.0
+  - @map-of-science/atlas-store@0.3.0
+  - @map-of-science/parsers@0.2.1
+  - @map-of-science/embeddings@0.1.1
+  - @map-of-science/openalex@0.1.1
+
 ## 0.2.0
 
 ### Minor Changes

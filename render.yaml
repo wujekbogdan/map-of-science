@@ -37,6 +37,7 @@ services:
     name: dev-map-of-science-api
     runtime: docker
     plan: free
+    region: frankfurt
     repo: https://github.com/wujekbogdan/map-of-science
     branch: develop
     dockerfilePath: ./src/apps/api-server/Dockerfile

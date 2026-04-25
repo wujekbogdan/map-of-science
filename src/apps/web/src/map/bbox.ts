@@ -7,3 +7,5 @@ export const transformToBbox = (
   x: { min: transform.invertX(0), max: transform.invertX(size.width) },
   y: { min: transform.invertY(0), max: transform.invertY(size.height) },
 });
+
+export type BBox = ReturnType<typeof transformToBbox>;

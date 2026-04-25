@@ -1,3 +1,4 @@
+import { playwright } from "@vitest/browser-playwright";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { defineConfig } from "vitest/config";
@@ -39,7 +40,10 @@ export const defineReactConfig = () =>
             name: "unit",
             environment: "happy-dom",
             include: ["src/**/*.spec.{ts,tsx}"],
-            exclude: ["src/**/*.integration.spec.{ts,tsx}"],
+            exclude: [
+              "src/**/*.integration.spec.{ts,tsx}",
+              "src/**/*.browser.spec.{ts,tsx}",
+            ],
           },
         },
         {
@@ -48,6 +52,18 @@ export const defineReactConfig = () =>
             environment: "happy-dom",
             include: ["src/**/*.integration.spec.{ts,tsx}"],
             setupFiles: [resolve(here, "./setup.js")],
+          },
+        },
+        {
+          test: {
+            name: "browser",
+            include: ["src/**/*.browser.spec.{ts,tsx}"],
+            browser: {
+              enabled: true,
+              provider: playwright(),
+              headless: true,
+              instances: [{ browser: "chromium" }],
+            },
           },
         },
       ],
