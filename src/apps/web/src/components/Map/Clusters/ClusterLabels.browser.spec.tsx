@@ -3,51 +3,52 @@ import { useMemo } from "react";
 import type { CSSProperties } from "react";
 import { describe, expect, it } from "vitest";
 import { render } from "vitest-browser-react";
-import { LABEL_DOT_GAP_PX } from "../../../map/labels/config.ts";
 import { createLabelLayouter } from "../../../map/labels/createLabelLayouter.ts";
 import { createSvgMeasureText } from "../../../map/labels/createSvgMeasureText.ts";
 import { useLabelPlacement } from "../../../map/labels/useLabelPlacement.ts";
 import { ClusterLabels } from "./ClusterLabels.tsx";
-import { CLUSTER_DOT_RADII_PX, getClusterLevel } from "./clusterLevel.ts";
+import type { ClusterLevel } from "./clusterLevel.ts";
 import css from "./clusters.module.scss";
 
-type HarnessCluster = {
+type LabeledCluster = {
   id: string;
   displayName: string;
   position: { x: number; y: number };
-  articlesCount: number;
+  level: ClusterLevel;
+  fontSize: number;
+  labelOffsetPx: number;
 };
 
 const SVG_SIZE = 1000;
+const ZOOM_OK = 10;
+
+// Min zoom is uniform here so the harness exercises rendering and CSS, not
+// the per-level threshold logic - that lives in `useLabelPlacement.spec.ts`.
+const MIN_ZOOM_BY_LEVEL = {
+  1: 1,
+  2: 1,
+  3: 1,
+  4: 1,
+  5: 1,
+  6: 1,
+} as const;
 
 const LabelsHarness = ({
   zoomScale,
   clusters,
 }: {
   zoomScale: number;
-  clusters: HarnessCluster[];
+  clusters: LabeledCluster[];
 }) => {
   const layouter = useMemo(
     () => createLabelLayouter({ measureText: createSvgMeasureText() }),
     [],
   );
-  const labelInputs = useMemo(
-    () =>
-      clusters.map((cluster) => ({
-        id: cluster.id,
-        displayName: cluster.displayName,
-        position: cluster.position,
-        labelOffsetPx:
-          CLUSTER_DOT_RADII_PX[getClusterLevel(cluster.articlesCount)] +
-          LABEL_DOT_GAP_PX,
-      })),
-    [clusters],
-  );
   const labels = useLabelPlacement({
-    clusters: labelInputs,
+    clusters,
     transform: zoomIdentity.scale(zoomScale),
-    fontSize: 12,
     layouter,
+    minZoomByLevel: MIN_ZOOM_BY_LEVEL,
   });
 
   return (
@@ -65,61 +66,29 @@ const LabelsHarness = ({
             data-testid={`${cluster.id}-dot`}
             cx={cluster.position.x}
             cy={cluster.position.y}
-            className={
-              css[`level-${getClusterLevel(cluster.articlesCount).toString()}`]
-            }
+            className={css[`level-${cluster.level.toString()}`]}
             fill="black"
           />
         ))}
-        <ClusterLabels labels={labels} fontSize={12} />
+        <ClusterLabels labels={labels} zoomScale={zoomScale} />
       </g>
     </svg>
   );
 };
 
-const alpha = (overrides: Partial<HarnessCluster> = {}): HarnessCluster => ({
+const labeled = (overrides: Partial<LabeledCluster> = {}): LabeledCluster => ({
   id: "a",
   displayName: "Alpha",
   position: { x: 100, y: 100 },
-  articlesCount: 5000,
+  level: 1,
+  // World-space font size at zoom 10. The outer scale(10) brings it back to
+  // 16 screen px - the screen-px size of the level-1 label.
+  fontSize: 16 / ZOOM_OK,
+  labelOffsetPx: 8 + 14,
   ...overrides,
 });
 
 describe("ClusterLabels in a browser-rendered SVG", () => {
-  it("should render a label for a cluster above the zoom threshold", async () => {
-    const { container } = await render(
-      <LabelsHarness zoomScale={10} clusters={[alpha()]} />,
-    );
-
-    const texts = container.querySelectorAll("text");
-    expect(texts.length).toBe(1);
-    expect(texts[0]?.textContent).toBe("Alpha");
-  });
-
-  it("should render no labels below the zoom threshold", async () => {
-    const { container } = await render(
-      <LabelsHarness zoomScale={1} clusters={[alpha()]} />,
-    );
-
-    expect(container.querySelectorAll("text").length).toBe(0);
-  });
-
-  it("should drop the lower-priority label when two clusters occupy the same position", async () => {
-    const { container } = await render(
-      <LabelsHarness
-        zoomScale={10}
-        clusters={[
-          alpha({ id: "a", displayName: "Alpha", articlesCount: 5000 }),
-          alpha({ id: "b", displayName: "Bravo", articlesCount: 1000 }),
-        ]}
-      />,
-    );
-
-    const texts = container.querySelectorAll("text");
-    expect(texts.length).toBe(1);
-    expect(texts[0]?.textContent).toBe("Alpha");
-  });
-
   it("should keep a constant screen-pixel gap between the dot and the label across zoom levels", async () => {
     const measureGap = (container: Element) => {
       const dotRect = container
@@ -131,16 +100,77 @@ describe("ClusterLabels in a browser-rendered SVG", () => {
     };
 
     const atZoom10 = await render(
-      <LabelsHarness zoomScale={10} clusters={[alpha()]} />,
+      <LabelsHarness
+        zoomScale={10}
+        clusters={[labeled({ fontSize: 16 / 10 })]}
+      />,
     );
     const gap10 = measureGap(atZoom10.container);
-    void atZoom10.unmount();
+    await atZoom10.unmount();
 
     const atZoom20 = await render(
-      <LabelsHarness zoomScale={20} clusters={[alpha()]} />,
+      <LabelsHarness
+        zoomScale={20}
+        clusters={[labeled({ fontSize: 16 / 20 })]}
+      />,
     );
     const gap20 = measureGap(atZoom20.container);
 
-    expect({ gap10, gap20 }).toEqual({ gap10: 22, gap20: 22 });
+    expect(gap10).toBe(gap20);
+  });
+
+  it("should render cluster dots at a constant screen-pixel diameter across zoom levels", async () => {
+    const measureDiameter = (container: Element) =>
+      Math.round(
+        container
+          .querySelector(`[data-testid="a-dot"]`)!
+          .getBoundingClientRect().width,
+      );
+
+    const atZoom10 = await render(
+      <LabelsHarness zoomScale={10} clusters={[labeled()]} />,
+    );
+    const diameter10 = measureDiameter(atZoom10.container);
+    await atZoom10.unmount();
+
+    const atZoom20 = await render(
+      <LabelsHarness
+        zoomScale={20}
+        clusters={[labeled({ fontSize: 16 / 20 })]}
+      />,
+    );
+    const diameter20 = measureDiameter(atZoom20.container);
+
+    // Level-1 radius is 8 px, so the diameter is 16 px.
+    expect({ diameter10, diameter20 }).toEqual({
+      diameter10: 16,
+      diameter20: 16,
+    });
+  });
+
+  it("should render the cluster label at a constant screen-pixel size across zoom levels", async () => {
+    const measureLabelHeight = (container: Element) =>
+      Math.round(
+        container.querySelector("text")!.getBoundingClientRect().height,
+      );
+
+    const atZoom10 = await render(
+      <LabelsHarness
+        zoomScale={10}
+        clusters={[labeled({ fontSize: 16 / 10 })]}
+      />,
+    );
+    const height10 = measureLabelHeight(atZoom10.container);
+    await atZoom10.unmount();
+
+    const atZoom20 = await render(
+      <LabelsHarness
+        zoomScale={20}
+        clusters={[labeled({ fontSize: 16 / 20 })]}
+      />,
+    );
+    const height20 = measureLabelHeight(atZoom20.container);
+
+    expect(height10).toBe(height20);
   });
 });

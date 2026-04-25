@@ -9,16 +9,20 @@ describe("useZoom", () => {
   it(
     "should expose scale 1 and no settled transform before any gesture",
     withSvg((svg) => {
-      const { result } = renderHook(() =>
-        useZoom({
+      const { result } = renderHook(() => {
+        const zoom = useZoom({
           svg: { current: svg },
           initialZoom: { x: 0, y: 0, scale: 1 },
           desiredZoom: null,
-        }),
-      );
+        });
+        return {
+          scale: zoom.scale,
+          debouncedTransform: zoom.useDebouncedTransform(),
+        };
+      });
 
       expect(result.current.scale).toBe(1);
-      expect(result.current.transform).toBeUndefined();
+      expect(result.current.debouncedTransform).toBeUndefined();
     }),
   );
 

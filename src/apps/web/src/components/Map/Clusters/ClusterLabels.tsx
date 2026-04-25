@@ -1,21 +1,34 @@
 import type { CSSProperties } from "react";
-import { LINE_HEIGHT } from "../../../map/labels/config.ts";
+import styled from "styled-components";
+import { LABEL_DOT_GAP_PX, LINE_HEIGHT } from "../../../map/labels/config.ts";
 import type { PlacedLabel } from "../../../map/labels/useLabelPlacement.ts";
 import LabelText from "../Label/LabelText.tsx";
 import css from "./clusters.module.scss";
 
 type Props = {
   labels: PlacedLabel[];
-  fontSize: number;
+  zoomScale: number;
+  hoveredClusterId?: string | null;
+  onHoveredClusterChange?: (id: string | null) => void;
+  onClusterClick?: (id: string) => void;
 };
 
 const lineOffsetEm = (index: number) =>
   index === 0 ? 0 : `${LINE_HEIGHT.toString()}em`;
 
-export const ClusterLabels = ({ labels, fontSize }: Props) => {
+export const ClusterLabels = ({
+  labels,
+  zoomScale,
+  hoveredClusterId,
+  onHoveredClusterChange,
+  onClusterClick,
+}: Props) => {
+  const gapWorld = LABEL_DOT_GAP_PX / zoomScale;
+  const strokeWorld = 1 / zoomScale;
+
   return (
     <>
-      {labels.map(({ id, position, layout, labelOffsetPx }) => (
+      {labels.map(({ id, position, layout, labelOffsetPx, fontSize }) => (
         <g
           key={id}
           className={css.label}
@@ -24,7 +37,24 @@ export const ClusterLabels = ({ labels, fontSize }: Props) => {
               "--label-offset-px": `${labelOffsetPx.toString()}px`,
             } as CSSProperties
           }
+          onPointerEnter={() => {
+            onHoveredClusterChange?.(id);
+          }}
+          onPointerLeave={() => {
+            onHoveredClusterChange?.(null);
+          }}
+          onClick={() => {
+            onClusterClick?.(id);
+          }}
         >
+          <Connector
+            x1={position.x}
+            x2={position.x}
+            y1={position.y - gapWorld}
+            y2={position.y}
+            strokeWidth={strokeWorld}
+            $hovered={hoveredClusterId === id}
+          />
           <LabelText
             id={id}
             x={position.x}
@@ -33,6 +63,7 @@ export const ClusterLabels = ({ labels, fontSize }: Props) => {
             fontSize={fontSize}
             opacity={1}
             level={4}
+            variant="cluster"
           >
             {layout.lines.map((line, index) => (
               <tspan key={line} x={position.x} dy={lineOffsetEm(index)}>
@@ -45,3 +76,7 @@ export const ClusterLabels = ({ labels, fontSize }: Props) => {
     </>
   );
 };
+
+const Connector = styled.line<{ $hovered: boolean }>`
+  stroke: ${(props) => (props.$hovered ? "#fff" : "#333")};
+`;

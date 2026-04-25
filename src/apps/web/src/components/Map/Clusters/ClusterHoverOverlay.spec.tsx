@@ -31,6 +31,7 @@ const baseProps = {
   mode: "regular" as const,
   ripple: false,
   growthRatingColors,
+  articleThresholds: { 1: 2000, 2: 1000, 3: 500, 4: 200, 5: 50 } as const,
 };
 
 afterEach(() => {

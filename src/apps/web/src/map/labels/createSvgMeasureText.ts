@@ -7,9 +7,22 @@ const SVG_NS = "http://www.w3.org/2000/svg";
 // elements use, so measurements match rendered widths exactly.
 export const createSvgMeasureText = () => {
   const svg = document.createElementNS(SVG_NS, "svg");
+  // sr-only: takes the node out of the visual flow and the layout, but keeps
+  // it laid out by the SVG renderer so getComputedTextLength stays accurate.
   svg.setAttribute(
     "style",
-    "position:absolute;visibility:hidden;pointer-events:none",
+    [
+      "position:absolute",
+      "width:1px",
+      "height:1px",
+      "padding:0",
+      "margin:-1px",
+      "overflow:hidden",
+      "clip:rect(0,0,0,0)",
+      "white-space:nowrap",
+      "border:0",
+      "pointer-events:none",
+    ].join(";"),
   );
   svg.setAttribute("aria-hidden", "true");
 

@@ -11,10 +11,11 @@ import type { RGB } from "../../../map/mapStore.ts";
 import { ClusterDetails } from "./ClusterDetails.tsx";
 import { type MapCluster } from "./ClusterShapes.tsx";
 import Shape from "./Shape.tsx";
-import { getClusterLevel } from "./clusterLevel.ts";
+import { getClusterLevel, type ArticleThresholds } from "./clusterLevel.ts";
 
 type Props = {
   cluster: MapCluster | null;
+  articleThresholds: ArticleThresholds;
   mode: "regular" | "growth";
   ripple: boolean;
   growthRatingColors: { start: RGB; middle: RGB; end: RGB };
@@ -22,6 +23,7 @@ type Props = {
 
 export const ClusterHoverOverlay = ({
   cluster,
+  articleThresholds,
   mode,
   ripple,
   growthRatingColors,
@@ -49,7 +51,7 @@ export const ClusterHoverOverlay = ({
       >
         <Shape
           progress={100}
-          level={getClusterLevel(cluster.articlesCount)}
+          level={getClusterLevel(cluster.articlesCount, articleThresholds)}
           point={{
             growthRating: cluster.growthRating,
             x: cluster.position.x,

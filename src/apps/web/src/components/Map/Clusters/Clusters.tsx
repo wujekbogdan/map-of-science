@@ -1,7 +1,7 @@
 import type { ZoomTransform } from "d3";
 import { useMemo, useState } from "react";
+import { useShallow } from "zustand/react/shallow";
 import { useArticleStore } from "../../../article/articleStore.ts";
-import { LABEL_DOT_GAP_PX } from "../../../map/labels/config.ts";
 import { createLabelLayouter } from "../../../map/labels/createLabelLayouter.ts";
 import { createSvgMeasureText } from "../../../map/labels/createSvgMeasureText.ts";
 import { useLabelPlacement } from "../../../map/labels/useLabelPlacement.ts";
@@ -9,24 +9,31 @@ import { useMapStore } from "../../../map/mapStore.ts";
 import { ClusterHoverOverlay } from "./ClusterHoverOverlay.tsx";
 import { ClusterLabels } from "./ClusterLabels.tsx";
 import { ClusterShapes, type MapCluster } from "./ClusterShapes.tsx";
-import { CLUSTER_DOT_RADII_PX, getClusterLevel } from "./clusterLevel.ts";
+import { toLabeledCluster } from "./clusterLevel.ts";
 
 type Props = {
   clusters: MapCluster[];
-  label: { fontSize: number };
   transform: ZoomTransform | undefined;
   ripple?: boolean;
   mode: "regular" | "growth";
 };
 
-export const Clusters = ({
-  clusters,
-  label,
-  transform,
-  ripple,
-  mode,
-}: Props) => {
-  const growthRatingColors = useMapStore((state) => state.growthRatingColors);
+export const Clusters = ({ clusters, transform, ripple, mode }: Props) => {
+  const [
+    growthRatingColors,
+    fontSizeByLevel,
+    articleThresholds,
+    minZoomByLevel,
+    maxLabels,
+  ] = useMapStore(
+    useShallow((state) => [
+      state.growthRatingColors,
+      state.clusterLabelFontSize,
+      state.clusterLevelArticleThreshold,
+      state.clusterLabelMinZoom,
+      state.maxLabelsInViewport,
+    ]),
+  );
   const setRemoteArticleId = useArticleStore(
     (state) => state.setRemoteArticleId,
   );
@@ -42,38 +49,48 @@ export const Clusters = ({
     () => createLabelLayouter({ measureText: createSvgMeasureText() }),
     [],
   );
-  const labelInputs = useMemo(
+  const zoomScale = transform?.k ?? 1;
+  const labeledClusters = useMemo(
     () =>
-      clusters.map((cluster) => ({
-        id: cluster.id,
-        displayName: cluster.displayName,
-        position: cluster.position,
-        labelOffsetPx:
-          CLUSTER_DOT_RADII_PX[getClusterLevel(cluster.articlesCount)] +
-          LABEL_DOT_GAP_PX,
-      })),
-    [clusters],
+      clusters.map((cluster) =>
+        toLabeledCluster({
+          cluster,
+          articleThresholds,
+          fontSizeByLevel,
+          zoomScale,
+        }),
+      ),
+    [clusters, fontSizeByLevel, articleThresholds, zoomScale],
   );
   const labels = useLabelPlacement({
-    clusters: labelInputs,
+    clusters: labeledClusters,
     transform,
-    fontSize: label.fontSize,
     layouter,
+    minZoomByLevel,
+    maxLabels,
   });
 
   return (
     <>
       <ClusterShapes
         clusters={clusters}
+        articleThresholds={articleThresholds}
         mode={mode}
         ripple={!!ripple}
         growthRatingColors={growthRatingColors}
         onHoveredClusterChange={setHoveredClusterId}
         onClusterClick={setRemoteArticleId}
       />
-      <ClusterLabels labels={labels} fontSize={label.fontSize} />
+      <ClusterLabels
+        labels={labels}
+        zoomScale={zoomScale}
+        hoveredClusterId={hoveredClusterId}
+        onHoveredClusterChange={setHoveredClusterId}
+        onClusterClick={setRemoteArticleId}
+      />
       <ClusterHoverOverlay
         cluster={hoveredCluster}
+        articleThresholds={articleThresholds}
         mode={mode}
         ripple={!!ripple}
         growthRatingColors={growthRatingColors}

@@ -35,6 +35,7 @@ const Label = (props: Label) => {
       fontSize={props.fontSize}
       opacity={props.opacity}
       level={props.level}
+      variant="area"
       onClick={onClick}
     >
       {props.text}

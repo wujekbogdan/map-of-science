@@ -93,6 +93,7 @@ export default function Map(props: Props) {
     offset: svgOffset,
   });
   zoom.usePublish();
+  const liveTransform = zoom.useLiveTransform();
 
   const opacity = useLayersOpacity(zoom.scale);
 
@@ -111,7 +112,6 @@ export default function Map(props: Props) {
     layer1: scaleFontSize(fontSize.layer1),
     layer2: scaleFontSize(fontSize.layer2),
     layer3: scaleFontSize(fontSize.layer3),
-    clusterLabels: scaleFontSize(fontSize.clusterLabels),
   };
 
   const bbox = zoom.useBbox(props.size);
@@ -194,8 +194,7 @@ export default function Map(props: Props) {
       <g ref={foregroundRef}>
         <Clusters
           clusters={clustersToRender}
-          label={{ fontSize: scaledFontSize.clusterLabels }}
-          transform={zoom.transform}
+          transform={liveTransform}
           mode={mapMode}
           ripple={hasSelection && ripple}
         />

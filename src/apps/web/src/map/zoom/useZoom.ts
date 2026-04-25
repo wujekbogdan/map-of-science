@@ -14,6 +14,7 @@ import {
   type RefObject,
 } from "react";
 import type { BBox } from "../bbox.ts";
+import { useLiveZoomTransform as useLiveZoomTransformInternal } from "./useLiveZoomTransform.ts";
 import { usePublishZoom } from "./usePublishZoom.ts";
 import { useZoomBbox } from "./useZoomBbox.ts";
 import { useZoomed as useZoomedInternal } from "./useZoomed.ts";
@@ -37,8 +38,6 @@ const SETTLE_MS = 150;
 export type Zoom = {
   /** Current zoom scale. */
   scale: number;
-  /** Current pan/zoom transform. Undefined before the first settled gesture. */
-  transform: ZoomTransform | undefined;
   /** Moves and scales the map. */
   zoomTo: (
     x: number,
@@ -59,6 +58,12 @@ export type Zoom = {
   /** Bounding box of the currently visible region. Null before the first
    *  settled gesture. */
   useBbox: (size: { width: number; height: number }) => BBox | null;
+  /** Live transform mirror; new reference only when k changes. Undefined
+   *  until the first zoom event fires. */
+  useLiveTransform: () => ZoomTransform | undefined;
+  /** Settled transform after the gesture stops (~150 ms debounce). Undefined
+   *  before the first settled gesture. */
+  useDebouncedTransform: () => ZoomTransform | undefined;
 };
 
 export const useZoom = ({
@@ -189,13 +194,17 @@ export const useZoom = ({
   const useBbox = (size: { width: number; height: number }) =>
     useZoomBbox(transform, size);
 
+  const useLiveTransform = () => useLiveZoomTransformInternal(subscribe);
+  const useDebouncedTransform = () => transform;
+
   return {
     scale,
-    transform,
     zoomTo,
     useZoomed,
     useZoomedBackground,
     usePublish,
     useBbox,
+    useLiveTransform,
+    useDebouncedTransform,
   };
 };

@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 
 type Label = {
   id: string;
@@ -8,6 +8,7 @@ type Label = {
   fontSize: number;
   opacity: number;
   level: 1 | 2 | 3 | 4;
+  variant: "area" | "cluster";
   children: ReactNode;
   alignmentBaseline?: "middle" | "hanging" | "text-before-edge";
   forcedHover?: boolean;
@@ -28,6 +29,7 @@ export const LabelText = <T extends Props>(props: T) => {
       $fontSize={props.fontSize}
       $opacity={props.opacity}
       $level={props.level}
+      $variant={props.variant}
       $forcedHover={!!props.forcedHover}
       onClick={() => {
         props.onClick?.(props);
@@ -53,21 +55,8 @@ const labelFillColor = ($level: 1 | 2 | 3 | 4) => {
   }
 };
 
-const Text = styled.text.attrs<{
-  $fontSize: number;
-  $opacity: number;
-  $forcedHover: boolean;
-}>((props) => ({
-  style: {
-    fontSize: `${props.$fontSize.toString()}px`,
-    opacity: props.$opacity,
-  },
-}))<{
-  $level: 1 | 2 | 3 | 4;
-}>`
-  cursor: pointer;
+const areaTreatment = css`
   font-weight: bold;
-  // TODO: It can be, very likely, replaced with a simplified text-shadow
   text-shadow:
     0 0 1px #f2efe9,
     0 0 2px #f2efe9,
@@ -79,6 +68,33 @@ const Text = styled.text.attrs<{
     0 0 5px #f2efe9,
     0 0 5px #f2efe9,
     0 0 5px #f2efe9;
+`;
+
+const clusterTreatment = css`
+  font-weight: 500;
+  text-shadow:
+    0 0 1px #f2efe9,
+    0 0 2px #f2efe9,
+    0 0 5px #f2efe9,
+    0 0 5px #f2efe9;
+  transition: font-size 30ms ease-out;
+`;
+
+const Text = styled.text.attrs<{
+  $fontSize: number;
+  $opacity: number;
+  $forcedHover: boolean;
+}>((props) => ({
+  style: {
+    fontSize: `${props.$fontSize.toString()}px`,
+    opacity: props.$opacity,
+  },
+}))<{
+  $level: 1 | 2 | 3 | 4;
+  $variant: "area" | "cluster";
+}>`
+  cursor: pointer;
+  ${(props) => (props.$variant === "area" ? areaTreatment : clusterTreatment)}
   fill: ${(props) => {
     return props.$forcedHover ? "#4a90e2" : labelFillColor(props.$level);
   }};
