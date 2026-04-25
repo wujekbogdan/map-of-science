@@ -45,6 +45,7 @@ describe("ClusterShapes", () => {
     const { container } = renderInSvg(
       <ClusterShapes
         clusters={clusters}
+        articleThresholds={{ 1: 2000, 2: 1000, 3: 500, 4: 200, 5: 50 }}
         mode="regular"
         ripple={false}
         growthRatingColors={growthRatingColors}

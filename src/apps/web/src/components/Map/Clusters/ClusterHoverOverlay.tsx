@@ -8,31 +8,22 @@ import {
 } from "@floating-ui/react";
 import { createPortal } from "react-dom";
 import type { RGB } from "../../../map/mapStore.ts";
-import LabelText from "../Label/LabelText.tsx";
 import { ClusterDetails } from "./ClusterDetails.tsx";
 import { type MapCluster } from "./ClusterShapes.tsx";
 import Shape from "./Shape.tsx";
+import { getClusterLevel, type ArticleThresholds } from "./clusterLevel.ts";
 
 type Props = {
   cluster: MapCluster | null;
-  label: { fontSize: number; opacity: number; offset: number };
+  articleThresholds: ArticleThresholds;
   mode: "regular" | "growth";
   ripple: boolean;
   growthRatingColors: { start: RGB; middle: RGB; end: RGB };
 };
 
-const getLevelByArticlesCount = (articlesCount: number) => {
-  if (articlesCount > 2000) return 1;
-  if (articlesCount > 1000) return 2;
-  if (articlesCount > 500) return 3;
-  if (articlesCount > 200) return 4;
-  if (articlesCount >= 50) return 5;
-  return 6;
-};
-
 export const ClusterHoverOverlay = ({
   cluster,
-  label,
+  articleThresholds,
   mode,
   ripple,
   growthRatingColors,
@@ -51,8 +42,6 @@ export const ClusterHoverOverlay = ({
 
   if (!cluster) return null;
 
-  const showLabel = cluster.nameSource === "curated" && label.opacity > 0;
-
   return (
     <>
       <g
@@ -62,7 +51,7 @@ export const ClusterHoverOverlay = ({
       >
         <Shape
           progress={100}
-          level={getLevelByArticlesCount(cluster.articlesCount)}
+          level={getClusterLevel(cluster.articlesCount, articleThresholds)}
           point={{
             growthRating: cluster.growthRating,
             x: cluster.position.x,
@@ -73,19 +62,6 @@ export const ClusterHoverOverlay = ({
           forcedHover={true}
           growthRatingColors={growthRatingColors}
         />
-        {showLabel && (
-          <LabelText
-            id={cluster.id}
-            x={cluster.position.x}
-            y={cluster.position.y - label.offset}
-            fontSize={label.fontSize}
-            opacity={label.opacity}
-            forcedHover={true}
-            level={4}
-          >
-            {cluster.displayName}
-          </LabelText>
-        )}
       </g>
       {isMounted &&
         createPortal(

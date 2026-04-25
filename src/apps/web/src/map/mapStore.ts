@@ -34,7 +34,34 @@ const partialDefaults = {
     layer1: 16,
     layer2: 12.8,
     layer3: 6.4,
-    layer4: 3,
+  },
+  // Screen-pixel font size for cluster labels per level.
+  clusterLabelFontSize: {
+    1: 14,
+    2: 13,
+    3: 12,
+    4: 11,
+    5: 10,
+    6: 10,
+  },
+  // Minimum article count to promote a cluster into each level. Anything
+  // below the level-5 cutoff lands in level 6.
+  clusterLevelArticleThreshold: {
+    1: 2000,
+    2: 1000,
+    3: 500,
+    4: 200,
+    5: 50,
+  },
+  // Minimum zoom (k) at which a cluster's label may appear, per level.
+  // Smaller clusters (higher level numbers) reveal at deeper zooms.
+  clusterLabelMinZoom: {
+    1: 9.6,
+    2: 10.5,
+    3: 11.5,
+    4: 13,
+    5: 15,
+    6: 18,
   },
   scaleFactor: {
     min: 0.5,
@@ -42,6 +69,7 @@ const partialDefaults = {
     zoom: 0.5,
   },
   maxDataPointsInViewport: 500,
+  maxLabelsInViewport: 300,
   searchMinScore: 0.65,
   // const [xMin, xMax] = extent(clusters, (c) => c.position.x);
   // const xRange = xMax - xMin;
@@ -108,6 +136,45 @@ export const useMapStore = create(
     },
     setMaxDataPointsInViewport: (maxDataPointsInViewport: number) => {
       set({ maxDataPointsInViewport });
+    },
+    setMaxLabelsInViewport: (maxLabelsInViewport: number) => {
+      set({ maxLabelsInViewport });
+    },
+    setClusterLevelArticleThreshold: (
+      level: keyof typeof defaults.clusterLevelArticleThreshold,
+      value: number | string,
+    ) => {
+      const parsed = typeof value === "string" ? parseFloat(value) : value;
+      set((state) => ({
+        clusterLevelArticleThreshold: {
+          ...state.clusterLevelArticleThreshold,
+          [level]: parsed || defaults.clusterLevelArticleThreshold[level],
+        },
+      }));
+    },
+    setClusterLabelFontSize: (
+      level: keyof typeof defaults.clusterLabelFontSize,
+      value: number | string,
+    ) => {
+      const parsed = typeof value === "string" ? parseFloat(value) : value;
+      set((state) => ({
+        clusterLabelFontSize: {
+          ...state.clusterLabelFontSize,
+          [level]: parsed || defaults.clusterLabelFontSize[level],
+        },
+      }));
+    },
+    setClusterLabelMinZoom: (
+      level: keyof typeof defaults.clusterLabelMinZoom,
+      value: number | string,
+    ) => {
+      const parsed = typeof value === "string" ? parseFloat(value) : value;
+      set((state) => ({
+        clusterLabelMinZoom: {
+          ...state.clusterLabelMinZoom,
+          [level]: parsed || defaults.clusterLabelMinZoom[level],
+        },
+      }));
     },
     setSearchMinScore: (searchMinScore: number) => {
       set({ searchMinScore });

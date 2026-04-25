@@ -113,7 +113,7 @@ importers:
         version: 5.6.3
       vitest:
         specifier: ^4.0.15
-        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
+        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(@vitest/browser-playwright@4.0.16)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
 
   src/apps/cli:
     dependencies:
@@ -213,7 +213,7 @@ importers:
         version: 5.6.3
       vitest:
         specifier: ^4.0.15
-        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
+        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(@vitest/browser-playwright@4.0.16)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
 
   src/apps/web:
     dependencies:
@@ -259,6 +259,9 @@ importers:
       normalize.css:
         specifier: ^8.0.1
         version: 8.0.1
+      rbush:
+        specifier: 4.0.1
+        version: 4.0.1
       react:
         specifier: ^19.2.0
         version: 19.2.3
@@ -320,6 +323,9 @@ importers:
       '@types/lodash':
         specifier: ^4.17.17
         version: 4.17.17
+      '@types/rbush':
+        specifier: 4.0.0
+        version: 4.0.0
       '@types/react':
         specifier: ^19.2.7
         version: 19.2.7
@@ -332,9 +338,15 @@ importers:
       '@vitejs/plugin-react-swc':
         specifier: ^3.11.0
         version: 3.11.0(@swc/helpers@0.5.17)(vite@7.3.0(@types/node@22.15.18)(jiti@2.4.2)(less@4.3.0)(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1))
+      '@vitest/browser-playwright':
+        specifier: 4.0.16
+        version: 4.0.16(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(playwright@1.59.1)(vite@7.3.0(@types/node@22.15.18)(jiti@2.4.2)(less@4.3.0)(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1))(vitest@4.0.16)
       eslint:
         specifier: ^9.13.0
         version: 9.39.2(jiti@2.4.2)
+      playwright:
+        specifier: 1.59.1
+        version: 1.59.1
       sass-embedded:
         specifier: ^1.88.0
         version: 1.89.0
@@ -355,7 +367,10 @@ importers:
         version: 4.3.0(rollup@4.53.5)(typescript@5.6.3)(vite@7.3.0(@types/node@22.15.18)(jiti@2.4.2)(less@4.3.0)(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1))
       vitest:
         specifier: ^4.0.15
-        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
+        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(@vitest/browser-playwright@4.0.16)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
+      vitest-browser-react:
+        specifier: 2.2.0
+        version: 2.2.0(@types/react-dom@19.1.5(@types/react@19.2.7))(@types/react@19.2.7)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(vitest@4.0.16)
 
   src/dev/eslint:
     dependencies:
@@ -423,12 +438,18 @@ importers:
       '@map-of-science/typescript':
         specifier: workspace:*
         version: link:../typescript
+      '@vitest/browser-playwright':
+        specifier: 4.0.16
+        version: 4.0.16(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(playwright@1.59.1)(vite@7.3.0(@types/node@22.15.18)(jiti@2.4.2)(less@4.3.0)(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1))(vitest@4.0.16)
+      playwright:
+        specifier: 1.59.1
+        version: 1.59.1
       typescript:
         specifier: ~5.6.2
         version: 5.6.3
       vitest:
         specifier: ^4.0.15
-        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
+        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(@vitest/browser-playwright@4.0.16)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
 
   src/examples/node-app:
     dependencies:
@@ -468,7 +489,7 @@ importers:
         version: 5.6.3
       vitest:
         specifier: ^4.0.15
-        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
+        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(@vitest/browser-playwright@4.0.16)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
 
   src/examples/package:
     devDependencies:
@@ -489,7 +510,7 @@ importers:
         version: 5.6.3
       vitest:
         specifier: ^4.0.15
-        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
+        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(@vitest/browser-playwright@4.0.16)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
 
   src/examples/react-app:
     dependencies:
@@ -518,12 +539,18 @@ importers:
       '@vitejs/plugin-react-swc':
         specifier: ^3.11.0
         version: 3.11.0(@swc/helpers@0.5.17)(vite@7.3.0(@types/node@22.15.18)(jiti@2.4.2)(less@4.3.0)(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1))
+      '@vitest/browser-playwright':
+        specifier: 4.0.16
+        version: 4.0.16(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(playwright@1.59.1)(vite@7.3.0(@types/node@22.15.18)(jiti@2.4.2)(less@4.3.0)(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1))(vitest@4.0.16)
       eslint:
         specifier: ^9.13.0
         version: 9.39.2(jiti@2.4.2)
       happy-dom:
         specifier: ^20.0.11
         version: 20.0.11
+      playwright:
+        specifier: 1.59.1
+        version: 1.59.1
       typescript:
         specifier: ~5.6.2
         version: 5.6.3
@@ -532,7 +559,10 @@ importers:
         version: 7.3.0(@types/node@22.15.18)(jiti@2.4.2)(less@4.3.0)(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
       vitest:
         specifier: ^4.0.15
-        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
+        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(@vitest/browser-playwright@4.0.16)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
+      vitest-browser-react:
+        specifier: 2.2.0
+        version: 2.2.0(@types/react-dom@19.1.5(@types/react@19.2.7))(@types/react@19.2.7)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(vitest@4.0.16)
 
   src/packages/api:
     dependencies:
@@ -569,7 +599,7 @@ importers:
         version: 5.6.3
       vitest:
         specifier: ^4.0.15
-        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
+        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(@vitest/browser-playwright@4.0.16)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
 
   src/packages/atlas:
     dependencies:
@@ -594,7 +624,7 @@ importers:
         version: 5.6.3
       vitest:
         specifier: ^4.0.15
-        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
+        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(@vitest/browser-playwright@4.0.16)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
 
   src/packages/atlas-store:
     dependencies:
@@ -631,7 +661,7 @@ importers:
         version: 5.6.3
       vitest:
         specifier: ^4.0.15
-        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
+        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(@vitest/browser-playwright@4.0.16)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
 
   src/packages/cluster-embedder:
     devDependencies:
@@ -652,7 +682,7 @@ importers:
         version: 5.6.3
       vitest:
         specifier: ^4.0.15
-        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
+        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(@vitest/browser-playwright@4.0.16)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
 
   src/packages/cluster-namer:
     dependencies:
@@ -680,7 +710,7 @@ importers:
         version: 5.6.3
       vitest:
         specifier: ^4.0.15
-        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
+        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(@vitest/browser-playwright@4.0.16)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
 
   src/packages/embeddings:
     dependencies:
@@ -711,7 +741,7 @@ importers:
         version: 5.6.3
       vitest:
         specifier: ^4.0.15
-        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
+        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(@vitest/browser-playwright@4.0.16)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
 
   src/packages/eto-pdf-parser:
     dependencies:
@@ -736,7 +766,7 @@ importers:
         version: 5.6.3
       vitest:
         specifier: ^4.0.15
-        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
+        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(@vitest/browser-playwright@4.0.16)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
 
   src/packages/llm-price:
     dependencies:
@@ -761,7 +791,7 @@ importers:
         version: 5.6.3
       vitest:
         specifier: ^4.0.15
-        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
+        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(@vitest/browser-playwright@4.0.16)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
 
   src/packages/logger:
     dependencies:
@@ -786,7 +816,7 @@ importers:
         version: 5.6.3
       vitest:
         specifier: ^4.0.15
-        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
+        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(@vitest/browser-playwright@4.0.16)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
 
   src/packages/openalex:
     dependencies:
@@ -820,7 +850,7 @@ importers:
         version: 5.6.3
       vitest:
         specifier: ^4.0.15
-        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
+        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(@vitest/browser-playwright@4.0.16)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
 
   src/packages/parsers:
     dependencies:
@@ -863,7 +893,7 @@ importers:
         version: 5.6.3
       vitest:
         specifier: ^4.0.15
-        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
+        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(@vitest/browser-playwright@4.0.16)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
 
   src/packages/rate-limiter:
     dependencies:
@@ -888,7 +918,7 @@ importers:
         version: 5.6.3
       vitest:
         specifier: ^4.0.15
-        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
+        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(@vitest/browser-playwright@4.0.16)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
 
   src/packages/test-utils:
     dependencies:
@@ -916,7 +946,7 @@ importers:
         version: 5.6.3
       vitest:
         specifier: ^4.0.15
-        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
+        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(@vitest/browser-playwright@4.0.16)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
 
   src/packages/text-generator:
     dependencies:
@@ -950,7 +980,7 @@ importers:
         version: 5.6.3
       vitest:
         specifier: ^4.0.15
-        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
+        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(@vitest/browser-playwright@4.0.16)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
 
 packages:
 
@@ -1735,6 +1765,9 @@ packages:
     resolution: {integrity: sha512-c83qWb22rNRuB0UaVCI0uRPNRr8Z0FWnEIvT47jiHAmOIUHbBOg5XvV7pM5x+rKn9HRpjxquDbXYSXr3fAKFcw==}
     engines: {node: '>=12'}
 
+  '@polka/url@1.0.0-next.29':
+    resolution: {integrity: sha512-wwQAWhWSuHaag8c4q/KN/vCoeOJYshAIvMQwD4GpSb3OiZklFfvAgmj0VCBBImRpuF/aFgIRzllXlVX93Jevww==}
+
   '@protobufjs/aspromise@1.1.2':
     resolution: {integrity: sha512-j+gKExEuLmKwvz3OgROXtrJ2UG2x8Ch2YZUxahh+s1F2HZ+wAceUNLkvy6zKCPVRkU++ZWQrdxsUeQXmcg4uoQ==}
 
@@ -2491,6 +2524,9 @@ packages:
   '@types/postcss-modules-scope@3.0.4':
     resolution: {integrity: sha512-//ygSisVq9kVI0sqx3UPLzWIMCmtSVrzdljtuaAEJtGoGnpjBikZ2sXO5MpH9SnWX9HRfXxHifDAXcQjupWnIQ==}
 
+  '@types/rbush@4.0.0':
+    resolution: {integrity: sha512-+N+2H39P8X+Hy1I5mC6awlTX54k3FhiUmvt7HWzGJZvF+syUAAxP/stwppS8JE84YHqFgRMv6fCy31202CMFxQ==}
+
   '@types/react-dom@19.1.5':
     resolution: {integrity: sha512-CMCjrWucUBZvohgZxkjd6S9h0nZxXjzus6yDfUb+xLxYM7VvjKNH1tQrE9GWLql1XoOP4/Ds3bwFqShHUYraGg==}
     peerDependencies:
@@ -2602,6 +2638,17 @@ packages:
     resolution: {integrity: sha512-YTJCGFdNMHCMfjODYtxRNVAYmTWQ1Lb8PulP/2/f/oEEtglw8oKxKIZmmRkyXrVrHfsKOaVkAc3NT9/dMutO5w==}
     peerDependencies:
       vite: ^4 || ^5 || ^6 || ^7
+
+  '@vitest/browser-playwright@4.0.16':
+    resolution: {integrity: sha512-I2Fy/ANdphi1yI46d15o0M1M4M0UJrUiVKkH5oKeRZZCdPg0fw/cfTKZzv9Ge9eobtJYp4BGblMzXdXH0vcl5g==}
+    peerDependencies:
+      playwright: '*'
+      vitest: 4.0.16
+
+  '@vitest/browser@4.0.16':
+    resolution: {integrity: sha512-t4toy8X/YTnjYEPoY0pbDBg3EvDPg1elCDrfc+VupPHwoN/5/FNQ8Z+xBYIaEnOE2vVEyKwqYBzZ9h9rJtZVcg==}
+    peerDependencies:
+      vitest: 4.0.16
 
   '@vitest/expect@4.0.16':
     resolution: {integrity: sha512-eshqULT2It7McaJkQGLkPjPjNph+uevROGuIMJdG3V+0BSR2w9u6J9Lwu+E8cK5TETlfou8GRijhafIMhXsimA==}
@@ -3818,6 +3865,11 @@ packages:
   fs.realpath@1.0.0:
     resolution: {integrity: sha512-OO0pH2lK6a0hZnAdau5ItzHPI6pUlvI7jMVnxUQRtw4owF2wk8lOSabtGDCTP4Ggrg2MbGnWO9X8K1t4+fGMDw==}
 
+  fsevents@2.3.2:
+    resolution: {integrity: sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==}
+    engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
+    os: [darwin]
+
   fsevents@2.3.3:
     resolution: {integrity: sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==}
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
@@ -4556,6 +4608,10 @@ packages:
     resolution: {integrity: sha512-tzzskb3bG8LvYGFF/mDTpq3jpI6Q9wc3LEmBaghu+DdCssd1FakN7Bc0hVNmEyGq1bq3RgfkCb3cmQLpNPOroA==}
     engines: {node: '>=4'}
 
+  mrmime@2.0.1:
+    resolution: {integrity: sha512-Y3wQdFg2Va6etvQ5I82yUhGdsKrcYox6p7FfL1LbK2J4V01F9TGlepTIhnK24t7koZibmg82KGglhA1XK5IsLQ==}
+    engines: {node: '>=10'}
+
   ms@2.1.3:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}
 
@@ -4866,6 +4922,24 @@ packages:
     resolution: {integrity: sha512-0zZC2ygfdqvqK8zJIr1e+wT1T/L+LF6qvqvbzEQ6tiMAoTqEVK9a1K3YRu8HEUvGEvNqZyPJTtb2sNIoTkB83w==}
     hasBin: true
 
+  pixelmatch@7.1.0:
+    resolution: {integrity: sha512-1wrVzJ2STrpmONHKBy228LM1b84msXDUoAzVEl0R8Mz4Ce6EPr+IVtxm8+yvrqLYMHswREkjYFaMxnyGnaY3Ng==}
+    hasBin: true
+
+  playwright-core@1.59.1:
+    resolution: {integrity: sha512-HBV/RJg81z5BiiZ9yPzIiClYV/QMsDCKUyogwH9p3MCP6IYjUFu/MActgYAvK0oWyV9NlwM3GLBjADyWgydVyg==}
+    engines: {node: '>=18'}
+    hasBin: true
+
+  playwright@1.59.1:
+    resolution: {integrity: sha512-C8oWjPR3F81yljW9o5OxcWzfh6avkVwDD2VYdwIGqTkl+OGFISgypqzfu7dOe4QNLL2aqcWBmI3PMtLIK233lw==}
+    engines: {node: '>=18'}
+    hasBin: true
+
+  pngjs@7.0.0:
+    resolution: {integrity: sha512-LKWqWJRhstyYo9pGvgor/ivk2w94eSjE3RGVuzLGlr3NmD8bf7RcYGze1mNdEHRP6TRP6rMuDHk5t44hnTRyow==}
+    engines: {node: '>=14.19.0'}
+
   possible-typed-array-names@1.1.0:
     resolution: {integrity: sha512-/+5VFTchJDoVj3bhoqi6UeymcD00DAwb1nJwamzPvHEszJ4FpF6SNNbUbOS8yI56qHzdV8eK0qEfOSiodkTdxg==}
     engines: {node: '>= 0.4'}
@@ -4994,6 +5068,12 @@ packages:
 
   quick-format-unescaped@4.0.4:
     resolution: {integrity: sha512-tYC1Q1hgyRuHgloV/YXs2w15unPVh8qfu/qCTfhTYamaw7fyhumKa2yGpdSo87vY32rIclj+4fWYQXUMs9EHvg==}
+
+  quickselect@3.0.0:
+    resolution: {integrity: sha512-XdjUArbK4Bm5fLLvlm5KpTFOiOThgfWWI4axAZDWg4E/0mKdZyI9tNEfds27qCi1ze/vwTR16kvmmGhRra3c2g==}
+
+  rbush@4.0.1:
+    resolution: {integrity: sha512-IP0UpfeWQujYC8Jg162rMNc01Rf0gWMMAb2Uxus/Q0qOFw4lCcq6ZnQEZwUoJqWyUGJ9th7JjwI4yIWo+uvoAQ==}
 
   rc@1.2.8:
     resolution: {integrity: sha512-y3bGgqKj3QBdxLbLkomlohkvsA8gdAiUQlSBJnBhfn+BPxg4bc62d8TcBW15wavDfgexCgccckhcZvywyQYPOw==}
@@ -5449,6 +5529,10 @@ packages:
   simple-get@4.0.1:
     resolution: {integrity: sha512-brv7p5WgH0jmQJr1ZDDfKDOSeWWg+OVypG99A/5vYGPqJ6pxiaHLy8nxtFjBA7oMa01ebA9gfh1uMCFqOuXxvA==}
 
+  sirv@3.0.2:
+    resolution: {integrity: sha512-2wcC/oGxHis/BoHkkPwldgiPSYcpZK3JU28WoMVv55yHJgcZ8rlXvuG9iZggz+sU1d4bRgIGASwyWqjxu3FM0g==}
+    engines: {node: '>=18'}
+
   slash@3.0.0:
     resolution: {integrity: sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==}
     engines: {node: '>=8'}
@@ -5758,6 +5842,10 @@ packages:
 
   toggle-selection@1.0.6:
     resolution: {integrity: sha512-BiZS+C1OS8g/q2RRbJmy59xpyghNBqrr6k5L/uKBGRsTfxmu3ffiRnd8mlGPUVayg8pvfi5urfnu8TU7DVOkLQ==}
+
+  totalist@3.0.1:
+    resolution: {integrity: sha512-sf4i37nQ2LBx4m3wB74y+ubopq6W/dIzXg0FDGjsYnZHVa1Da8FH853wlL2gtUhg+xJXjfk3kUZS3BRoQeoQBQ==}
+    engines: {node: '>=6'}
 
   tough-cookie@6.0.0:
     resolution: {integrity: sha512-kXuRi1mtaKMrsLUxz3sQYvVl37B0Ns6MzfrtV5DvJceE9bPyspOqk9xxv7XbZWcfLWbFmm997vl83qUWVJA64w==}
@@ -6089,6 +6177,20 @@ packages:
       yaml:
         optional: true
 
+  vitest-browser-react@2.2.0:
+    resolution: {integrity: sha512-oY3KM6305kwJMa6nHo92vVtkOsih7mjEf12dLKuphaF+9ywWPEc+qanIBd394SZ6m5LadVEaG6dicvvizOzmjA==}
+    peerDependencies:
+      '@types/react': ^18.0.0 || ^19.0.0
+      '@types/react-dom': ^18.0.0 || ^19.0.0
+      react: ^18.0.0 || ^19.0.0
+      react-dom: ^18.0.0 || ^19.0.0
+      vitest: ^4.0.0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      '@types/react-dom':
+        optional: true
+
   vitest@4.0.16:
     resolution: {integrity: sha512-E4t7DJ9pESL6E3I8nFjPa4xGUd3PmiWDLsDztS2qXSJWfHtbQnwAWylaBvSNY48I3vr8PTqIZlyK8TE3V3CA4Q==}
     engines: {node: ^20.0.0 || ^22.0.0 || >=24.0.0}
@@ -6195,6 +6297,18 @@ packages:
 
   wrappy@1.0.2:
     resolution: {integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==}
+
+  ws@8.20.0:
+    resolution: {integrity: sha512-sAt8BhgNbzCtgGbt2OxmpuryO63ZoDk/sqaB/znQm94T4fCEsy/yV+7CdC1kJhOU9lboAEU7R3kquuycDoibVA==}
+    engines: {node: '>=10.0.0'}
+    peerDependencies:
+      bufferutil: ^4.0.1
+      utf-8-validate: '>=5.0.2'
+    peerDependenciesMeta:
+      bufferutil:
+        optional: true
+      utf-8-validate:
+        optional: true
 
   xml2js@0.6.2:
     resolution: {integrity: sha512-T4rieHaC1EXcES0Kxxj4JWgaUQHDk+qwHcYOCFHfiwKz7tOVPLq7Hjq9dM1WCMhylqMEfP7hMcOIChvotiZegA==}
@@ -7180,6 +7294,8 @@ snapshots:
       '@pnpm/network.ca-file': 1.0.2
       config-chain: 1.1.13
 
+  '@polka/url@1.0.0-next.29': {}
+
   '@protobufjs/aspromise@1.1.2': {}
 
   '@protobufjs/base64@1.1.2': {}
@@ -7814,6 +7930,8 @@ snapshots:
     dependencies:
       postcss: 8.5.4
 
+  '@types/rbush@4.0.0': {}
+
   '@types/react-dom@19.1.5(@types/react@19.2.7)':
     dependencies:
       '@types/react': 19.2.7
@@ -7964,6 +8082,36 @@ snapshots:
       vite: 7.3.0(@types/node@22.15.18)(jiti@2.4.2)(less@4.3.0)(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
     transitivePeerDependencies:
       - '@swc/helpers'
+
+  '@vitest/browser-playwright@4.0.16(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(playwright@1.59.1)(vite@7.3.0(@types/node@22.15.18)(jiti@2.4.2)(less@4.3.0)(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1))(vitest@4.0.16)':
+    dependencies:
+      '@vitest/browser': 4.0.16(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(vite@7.3.0(@types/node@22.15.18)(jiti@2.4.2)(less@4.3.0)(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1))(vitest@4.0.16)
+      '@vitest/mocker': 4.0.16(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(vite@7.3.0(@types/node@22.15.18)(jiti@2.4.2)(less@4.3.0)(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1))
+      playwright: 1.59.1
+      tinyrainbow: 3.0.3
+      vitest: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(@vitest/browser-playwright@4.0.16)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
+    transitivePeerDependencies:
+      - bufferutil
+      - msw
+      - utf-8-validate
+      - vite
+
+  '@vitest/browser@4.0.16(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(vite@7.3.0(@types/node@22.15.18)(jiti@2.4.2)(less@4.3.0)(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1))(vitest@4.0.16)':
+    dependencies:
+      '@vitest/mocker': 4.0.16(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(vite@7.3.0(@types/node@22.15.18)(jiti@2.4.2)(less@4.3.0)(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1))
+      '@vitest/utils': 4.0.16
+      magic-string: 0.30.21
+      pixelmatch: 7.1.0
+      pngjs: 7.0.0
+      sirv: 3.0.2
+      tinyrainbow: 3.0.3
+      vitest: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(@vitest/browser-playwright@4.0.16)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
+      ws: 8.20.0
+    transitivePeerDependencies:
+      - bufferutil
+      - msw
+      - utf-8-validate
+      - vite
 
   '@vitest/expect@4.0.16':
     dependencies:
@@ -9401,6 +9549,9 @@ snapshots:
 
   fs.realpath@1.0.0: {}
 
+  fsevents@2.3.2:
+    optional: true
+
   fsevents@2.3.3:
     optional: true
 
@@ -10101,6 +10252,8 @@ snapshots:
 
   mri@1.2.0: {}
 
+  mrmime@2.0.1: {}
+
   ms@2.1.3: {}
 
   msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3):
@@ -10414,6 +10567,20 @@ snapshots:
       sonic-boom: 4.2.0
       thread-stream: 3.1.0
 
+  pixelmatch@7.1.0:
+    dependencies:
+      pngjs: 7.0.0
+
+  playwright-core@1.59.1: {}
+
+  playwright@1.59.1:
+    dependencies:
+      playwright-core: 1.59.1
+    optionalDependencies:
+      fsevents: 2.3.2
+
+  pngjs@7.0.0: {}
+
   possible-typed-array-names@1.1.0: {}
 
   postcss-load-config@3.1.4(postcss@8.5.4):
@@ -10549,6 +10716,12 @@ snapshots:
   queue-microtask@1.2.3: {}
 
   quick-format-unescaped@4.0.4: {}
+
+  quickselect@3.0.0: {}
+
+  rbush@4.0.1:
+    dependencies:
+      quickselect: 3.0.0
 
   rc@1.2.8:
     dependencies:
@@ -11044,6 +11217,12 @@ snapshots:
       once: 1.4.0
       simple-concat: 1.0.1
 
+  sirv@3.0.2:
+    dependencies:
+      '@polka/url': 1.0.0-next.29
+      mrmime: 2.0.1
+      totalist: 3.0.1
+
   slash@3.0.0: {}
 
   slice-ansi@5.0.0:
@@ -11419,6 +11598,8 @@ snapshots:
 
   toggle-selection@1.0.6: {}
 
+  totalist@3.0.1: {}
+
   tough-cookie@6.0.0:
     dependencies:
       tldts: 7.0.19
@@ -11711,7 +11892,16 @@ snapshots:
       tsx: 4.21.0
       yaml: 2.7.1
 
-  vitest@4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1):
+  vitest-browser-react@2.2.0(@types/react-dom@19.1.5(@types/react@19.2.7))(@types/react@19.2.7)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(vitest@4.0.16):
+    dependencies:
+      react: 19.2.3
+      react-dom: 19.2.3(react@19.2.3)
+      vitest: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(@vitest/browser-playwright@4.0.16)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1)
+    optionalDependencies:
+      '@types/react': 19.2.7
+      '@types/react-dom': 19.1.5(@types/react@19.2.7)
+
+  vitest@4.0.16(@opentelemetry/api@1.9.0)(@types/node@22.15.18)(@vitest/browser-playwright@4.0.16)(happy-dom@20.0.11)(jiti@2.4.2)(less@4.3.0)(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1):
     dependencies:
       '@vitest/expect': 4.0.16
       '@vitest/mocker': 4.0.16(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(vite@7.3.0(@types/node@22.15.18)(jiti@2.4.2)(less@4.3.0)(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1))
@@ -11736,6 +11926,7 @@ snapshots:
     optionalDependencies:
       '@opentelemetry/api': 1.9.0
       '@types/node': 22.15.18
+      '@vitest/browser-playwright': 4.0.16(msw@2.12.4(@types/node@22.15.18)(typescript@5.6.3))(playwright@1.59.1)(vite@7.3.0(@types/node@22.15.18)(jiti@2.4.2)(less@4.3.0)(sass-embedded@1.89.0)(sass@1.89.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.7.1))(vitest@4.0.16)
       happy-dom: 20.0.11
     transitivePeerDependencies:
       - jiti
@@ -11848,6 +12039,8 @@ snapshots:
       strip-ansi: 7.1.0
 
   wrappy@1.0.2: {}
+
+  ws@8.20.0: {}
 
   xml2js@0.6.2:
     dependencies:

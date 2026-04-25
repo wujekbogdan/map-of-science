@@ -1,31 +1,82 @@
+import type { CSSProperties } from "react";
+import styled from "styled-components";
+import { LABEL_DOT_GAP_PX, LINE_HEIGHT } from "../../../map/labels/config.ts";
+import type { PlacedLabel } from "../../../map/labels/useLabelPlacement.ts";
 import LabelText from "../Label/LabelText.tsx";
-import type { MapCluster } from "./ClusterShapes.tsx";
+import css from "./clusters.module.scss";
 
 type Props = {
-  clusters: MapCluster[];
-  label: { fontSize: number; opacity: number; offset: number };
+  labels: PlacedLabel[];
+  zoomScale: number;
+  hoveredClusterId?: string | null;
+  onHoveredClusterChange?: (id: string | null) => void;
+  onClusterClick?: (id: string) => void;
 };
 
-export const ClusterLabels = ({ clusters, label }: Props) => {
-  if (label.opacity <= 0) return null;
+const lineOffsetEm = (index: number) =>
+  index === 0 ? 0 : `${LINE_HEIGHT.toString()}em`;
+
+export const ClusterLabels = ({
+  labels,
+  zoomScale,
+  hoveredClusterId,
+  onHoveredClusterChange,
+  onClusterClick,
+}: Props) => {
+  const gapWorld = LABEL_DOT_GAP_PX / zoomScale;
+  const strokeWorld = 1 / zoomScale;
 
   return (
     <>
-      {clusters
-        .filter((cluster) => cluster.nameSource === "curated")
-        .map((cluster) => (
+      {labels.map(({ id, position, layout, labelOffsetPx, fontSize }) => (
+        <g
+          key={id}
+          className={css.label}
+          style={
+            {
+              "--label-offset-px": `${labelOffsetPx.toString()}px`,
+            } as CSSProperties
+          }
+          onPointerEnter={() => {
+            onHoveredClusterChange?.(id);
+          }}
+          onPointerLeave={() => {
+            onHoveredClusterChange?.(null);
+          }}
+          onClick={() => {
+            onClusterClick?.(id);
+          }}
+        >
+          <Connector
+            x1={position.x}
+            x2={position.x}
+            y1={position.y - gapWorld}
+            y2={position.y}
+            strokeWidth={strokeWorld}
+            $hovered={hoveredClusterId === id}
+          />
           <LabelText
-            key={cluster.id}
-            id={cluster.id}
-            x={cluster.position.x}
-            y={cluster.position.y - label.offset}
-            fontSize={label.fontSize}
-            opacity={label.opacity}
+            id={id}
+            x={position.x}
+            y={position.y}
+            alignmentBaseline="text-before-edge"
+            fontSize={fontSize}
+            opacity={1}
             level={4}
+            variant="cluster"
           >
-            {cluster.displayName}
+            {layout.lines.map((line, index) => (
+              <tspan key={line} x={position.x} dy={lineOffsetEm(index)}>
+                {line}
+              </tspan>
+            ))}
           </LabelText>
-        ))}
+        </g>
+      ))}
     </>
   );
 };
+
+const Connector = styled.line<{ $hovered: boolean }>`
+  stroke: ${(props) => (props.$hovered ? "#fff" : "#333")};
+`;

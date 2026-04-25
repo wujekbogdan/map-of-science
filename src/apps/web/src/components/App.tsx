@@ -76,8 +76,6 @@ const DevToolsWrapper = styled.div`
   position: fixed;
   bottom: 0;
   left: 0;
-  max-height: 100vh;
-  overflow-y: auto;
 `;
 
 export default App;

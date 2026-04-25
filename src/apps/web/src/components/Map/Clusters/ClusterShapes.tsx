@@ -2,12 +2,14 @@ import { memo } from "react";
 import type { RouterOutputs } from "../../../api-client/index.ts";
 import type { RGB } from "../../../map/mapStore.ts";
 import Shape from "./Shape.tsx";
+import { getClusterLevel, type ArticleThresholds } from "./clusterLevel.ts";
 import css from "./clusters.module.scss";
 
 export type MapCluster = RouterOutputs["cluster"]["viewport"][number];
 
 type Props = {
   clusters: MapCluster[];
+  articleThresholds: ArticleThresholds;
   mode: "regular" | "growth";
   ripple: boolean;
   growthRatingColors: { start: RGB; middle: RGB; end: RGB };
@@ -15,20 +17,12 @@ type Props = {
   onClusterClick: (id: string) => void;
 };
 
-const getLevelByArticlesCount = (articlesCount: number) => {
-  if (articlesCount > 2000) return 1;
-  if (articlesCount > 1000) return 2;
-  if (articlesCount > 500) return 3;
-  if (articlesCount > 200) return 4;
-  if (articlesCount >= 50) return 5;
-  return 6;
-};
-
 const getPercentage = (index: number, total: number) =>
   Math.round(((index + 1) / total) * 100);
 
 export const ClusterShapes = memo(function ClusterShapes({
   clusters,
+  articleThresholds,
   mode,
   ripple,
   growthRatingColors,
@@ -55,7 +49,7 @@ export const ClusterShapes = memo(function ClusterShapes({
         >
           <Shape
             progress={getPercentage(index, clusters.length)}
-            level={getLevelByArticlesCount(cluster.articlesCount)}
+            level={getClusterLevel(cluster.articlesCount, articleThresholds)}
             point={{
               growthRating: cluster.growthRating,
               x: cluster.position.x,

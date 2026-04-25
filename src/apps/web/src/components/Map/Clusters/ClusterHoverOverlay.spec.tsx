@@ -28,10 +28,10 @@ const growthRatingColors = {
 };
 
 const baseProps = {
-  label: { fontSize: 12, opacity: 1, offset: 15 },
   mode: "regular" as const,
   ripple: false,
   growthRatingColors,
+  articleThresholds: { 1: 2000, 2: 1000, 3: 500, 4: 200, 5: 50 } as const,
 };
 
 afterEach(() => {
@@ -55,11 +55,10 @@ describe("ClusterHoverOverlay", () => {
   });
 
   it("should render a highlighted shape and tooltip with the hovered cluster's display name", () => {
-    const { container, getAllByText } = renderOverlay(
+    const { container, queryByText } = renderOverlay(
       makeCluster({ id: "hovered", displayName: "Hovered Cluster" }),
     );
     expect(container.querySelector("circle")).toBeTruthy();
-    // Rendered twice: once in the SVG label, once in the portal tooltip.
-    expect(getAllByText("Hovered Cluster").length).toBeGreaterThanOrEqual(2);
+    expect(queryByText("Hovered Cluster")).toBeTruthy();
   });
 });
