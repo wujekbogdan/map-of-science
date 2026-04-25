@@ -4,6 +4,8 @@ onlyBuiltDependencies:
   - esbuild
   - msw
   - normalize-diacritics
+  - playwright
+  - playwright-core
 
 packages:
   # Deployable apps (e.g. Node.js, React)
