@@ -4,7 +4,6 @@ import styled from "styled-components";
 import { useShallow } from "zustand/react/shallow";
 import { useTRPC } from "../../api-client/index.ts";
 import { useArticleStore } from "../../article/articleStore.ts";
-import { CLUSTER_LABEL_OFFSET_PX } from "../../map/labels/config.ts";
 import { useMapStore } from "../../map/mapStore.ts";
 import { pickClustersToRender } from "../../map/pickClustersToRender.ts";
 import { useSelectionStore } from "../../map/selectionStore.ts";
@@ -112,7 +111,7 @@ export default function Map(props: Props) {
     layer1: scaleFontSize(fontSize.layer1),
     layer2: scaleFontSize(fontSize.layer2),
     layer3: scaleFontSize(fontSize.layer3),
-    layer4: scaleFontSize(fontSize.layer4),
+    clusterLabels: scaleFontSize(fontSize.clusterLabels),
   };
 
   const bbox = zoom.useBbox(props.size);
@@ -149,16 +148,14 @@ export default function Map(props: Props) {
   );
 
   const labelsScaled = useMemo(() => {
-    const layers: Record<1 | 2 | 3 | 4, { fontSize: number; opacity: number }> =
-      {
-        1: { fontSize: scaledFontSize.layer1, opacity: opacity.layer1 },
-        2: { fontSize: scaledFontSize.layer2, opacity: opacity.layer2 },
-        3: { fontSize: scaledFontSize.layer3, opacity: opacity.layer3 },
-        4: { fontSize: scaledFontSize.layer4, opacity: opacity.layer4 },
-      };
+    const layers: Record<1 | 2 | 3, { fontSize: number; opacity: number }> = {
+      1: { fontSize: scaledFontSize.layer1, opacity: opacity.layer1 },
+      2: { fontSize: scaledFontSize.layer2, opacity: opacity.layer2 },
+      3: { fontSize: scaledFontSize.layer3, opacity: opacity.layer3 },
+    };
 
     return areas.flatMap((area) => {
-      const layer = layers[area.tier as 1 | 2 | 3 | 4];
+      const layer = layers[area.tier as 1 | 2 | 3];
       if (!layer) return [];
       return [
         {
@@ -167,7 +164,7 @@ export default function Map(props: Props) {
           text: area.name,
           x: area.position.x,
           y: area.position.y,
-          level: area.tier as 1 | 2 | 3 | 4,
+          level: area.tier as 1 | 2 | 3,
           fontSize: layer.fontSize,
           opacity: layer.opacity,
         },
@@ -178,11 +175,9 @@ export default function Map(props: Props) {
     opacity.layer1,
     opacity.layer2,
     opacity.layer3,
-    opacity.layer4,
     scaledFontSize.layer1,
     scaledFontSize.layer2,
     scaledFontSize.layer3,
-    scaledFontSize.layer4,
   ]);
 
   const hasSelection = selectedClusters.size > 0;
@@ -199,10 +194,7 @@ export default function Map(props: Props) {
       <g ref={foregroundRef}>
         <Clusters
           clusters={clustersToRender}
-          label={{
-            fontSize: scaledFontSize.layer4,
-            offset: CLUSTER_LABEL_OFFSET_PX / zoom.scale,
-          }}
+          label={{ fontSize: scaledFontSize.clusterLabels }}
           transform={zoom.transform}
           mode={mapMode}
           ripple={hasSelection && ripple}

@@ -9,6 +9,7 @@ type Label = {
   opacity: number;
   level: 1 | 2 | 3 | 4;
   children: ReactNode;
+  alignmentBaseline?: "middle" | "hanging" | "text-before-edge";
   forcedHover?: boolean;
 };
 
@@ -21,7 +22,7 @@ export const LabelText = <T extends Props>(props: T) => {
     <Text
       display={props.opacity ? "block" : "none"}
       textAnchor="middle"
-      alignmentBaseline="middle"
+      dominantBaseline={props.alignmentBaseline ?? "middle"}
       x={props.x}
       y={props.y}
       $fontSize={props.fontSize}

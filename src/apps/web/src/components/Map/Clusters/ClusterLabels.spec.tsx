@@ -7,6 +7,7 @@ const makeLabel = (overrides: Partial<PlacedLabel> = {}): PlacedLabel => ({
   id: "a",
   position: { x: 10, y: 100 },
   layout: { lines: ["Alpha"], widthAtRefFont: 30, heightAtRefFont: 11.5 },
+  labelOffsetPx: 15,
   ...overrides,
 });
 
@@ -22,17 +23,27 @@ afterEach(() => {
 });
 
 describe("ClusterLabels", () => {
-  it("should render one text per label, positioned above the cluster", () => {
+  it("should anchor the text at the cluster position and expose the screen-space offset as a CSS variable", () => {
     const { container, queryByText } = renderInSvg(
       <ClusterLabels
-        labels={[makeLabel({ id: "a", position: { x: 10, y: 100 } })]}
+        labels={[
+          makeLabel({
+            id: "a",
+            position: { x: 10, y: 100 },
+            labelOffsetPx: 15,
+          }),
+        ]}
         fontSize={12}
-        offset={15}
       />,
     );
 
     const textEl = container.querySelector("text");
-    expect(textEl?.getAttribute("y")).toBe("85");
+    expect(textEl?.getAttribute("y")).toBe("100");
+    expect(textEl?.getAttribute("dominant-baseline")).toBe("text-before-edge");
+
+    const wrapperEl = textEl?.parentElement;
+    expect(wrapperEl?.style.getPropertyValue("--label-offset-px")).toBe("15px");
+
     expect(queryByText("Alpha")).toBeTruthy();
   });
 
@@ -49,7 +60,6 @@ describe("ClusterLabels", () => {
           }),
         ]}
         fontSize={12}
-        offset={15}
       />,
     );
 
@@ -59,7 +69,7 @@ describe("ClusterLabels", () => {
 
   it("should render nothing when there are no labels", () => {
     const { container } = renderInSvg(
-      <ClusterLabels labels={[]} fontSize={12} offset={15} />,
+      <ClusterLabels labels={[]} fontSize={12} />,
     );
 
     expect(container.querySelector("text")).toBeNull();

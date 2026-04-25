@@ -1,6 +1,7 @@
 import type { ZoomTransform } from "d3";
 import { useMemo, useState } from "react";
 import { useArticleStore } from "../../../article/articleStore.ts";
+import { LABEL_DOT_GAP_PX } from "../../../map/labels/config.ts";
 import { createLabelLayouter } from "../../../map/labels/createLabelLayouter.ts";
 import { createSvgMeasureText } from "../../../map/labels/createSvgMeasureText.ts";
 import { useLabelPlacement } from "../../../map/labels/useLabelPlacement.ts";
@@ -8,10 +9,11 @@ import { useMapStore } from "../../../map/mapStore.ts";
 import { ClusterHoverOverlay } from "./ClusterHoverOverlay.tsx";
 import { ClusterLabels } from "./ClusterLabels.tsx";
 import { ClusterShapes, type MapCluster } from "./ClusterShapes.tsx";
+import { CLUSTER_DOT_RADII_PX, getClusterLevel } from "./clusterLevel.ts";
 
 type Props = {
   clusters: MapCluster[];
-  label: { fontSize: number; offset: number };
+  label: { fontSize: number };
   transform: ZoomTransform | undefined;
   ripple?: boolean;
   mode: "regular" | "growth";
@@ -40,11 +42,22 @@ export const Clusters = ({
     () => createLabelLayouter({ measureText: createSvgMeasureText() }),
     [],
   );
+  const labelInputs = useMemo(
+    () =>
+      clusters.map((cluster) => ({
+        id: cluster.id,
+        displayName: cluster.displayName,
+        position: cluster.position,
+        labelOffsetPx:
+          CLUSTER_DOT_RADII_PX[getClusterLevel(cluster.articlesCount)] +
+          LABEL_DOT_GAP_PX,
+      })),
+    [clusters],
+  );
   const labels = useLabelPlacement({
-    clusters,
+    clusters: labelInputs,
     transform,
     fontSize: label.fontSize,
-    offset: label.offset,
     layouter,
   });
 
@@ -58,14 +71,9 @@ export const Clusters = ({
         onHoveredClusterChange={setHoveredClusterId}
         onClusterClick={setRemoteArticleId}
       />
-      <ClusterLabels
-        labels={labels}
-        fontSize={label.fontSize}
-        offset={label.offset}
-      />
+      <ClusterLabels labels={labels} fontSize={label.fontSize} />
       <ClusterHoverOverlay
         cluster={hoveredCluster}
-        label={label}
         mode={mode}
         ripple={!!ripple}
         growthRatingColors={growthRatingColors}

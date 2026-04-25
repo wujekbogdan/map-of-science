@@ -34,7 +34,7 @@ const partialDefaults = {
     layer1: 16,
     layer2: 12.8,
     layer3: 6.4,
-    layer4: 3,
+    clusterLabels: 3,
   },
   scaleFactor: {
     min: 0.5,

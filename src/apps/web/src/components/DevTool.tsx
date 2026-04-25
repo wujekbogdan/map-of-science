@@ -75,7 +75,12 @@ export const DevTool = () => {
       state.setGrowthRatingColors,
     ]),
   );
-  const layers = ["layer1", "layer2", "layer3", "layer4"] as const;
+  const layers = [
+    { key: "layer1", label: "Layer 1" },
+    { key: "layer2", label: "Layer 2" },
+    { key: "layer3", label: "Layer 3" },
+    { key: "clusterLabels", label: "Cluster labels" },
+  ] as const;
   const scaleFactors = ["min", "max", "zoom"] as const;
 
   const onMinimizeClick = () => {
@@ -151,17 +156,15 @@ export const DevTool = () => {
 
           <Panel>
             <Header>{i18n("Font Sizes")}</Header>
-            {layers.map((layer, index) => (
-              <Section key={layer}>
+            {layers.map(({ key, label }) => (
+              <Section key={key}>
                 <FormControl>
-                  <Label>
-                    {i18n("Layer")} {index + 1}
-                  </Label>
+                  <Label>{i18n(label)}</Label>
                   <Input
                     type="number"
-                    value={fontSize[layer]}
+                    value={fontSize[key]}
                     onChange={(e) => {
-                      setFontSize(layer, e.target.value);
+                      setFontSize(key, e.target.value);
                     }}
                   />
                 </FormControl>

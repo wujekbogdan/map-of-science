@@ -61,6 +61,8 @@ $duration: 0.3s;
   }
 }
 
+// Mirrors `CLUSTER_DOT_RADII_PX` in `./clusterLevel.ts` - keep the two lists
+// in sync.
 $sizes: 8px, 7px, 6px, 5px, 4px, 3px;
 
 @for $i from 1 through length($sizes) {
@@ -71,6 +73,23 @@ $sizes: 8px, 7px, 6px, 5px, 4px, 3px;
 
 .group {
   opacity: 1;
+}
+
+// Drops the label below its cluster dot. `--label-offset-px` is the screen-px
+// gap from dot center to label top; dividing by `--zoom-scale` produces a
+// world-space translation that the outer zoom transform multiplies back to a
+// constant visible gap - same trick as `r: calc(Npx / var(--zoom-scale))` on
+// the dots. The `@property` registration is load-bearing: without it the
+// browser treats `--zoom-scale` as an untyped string inside calc() and the
+// transform does not recompute when the var changes.
+@property --zoom-scale {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 1;
+}
+
+.label {
+  transform: translate(0, calc(var(--label-offset-px) / var(--zoom-scale)));
 }
 
 .fadeIn {

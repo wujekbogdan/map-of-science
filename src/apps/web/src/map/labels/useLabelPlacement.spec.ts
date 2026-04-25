@@ -9,14 +9,20 @@ const stubLayouter = () => ({
   heightAtRefFont: 11.5,
 });
 
+const cluster = (id: string, x: number, y: number) => ({
+  id,
+  displayName: id,
+  position: { x, y },
+  labelOffsetPx: 15,
+});
+
 describe("useLabelPlacement", () => {
   it("should return an empty list below the zoom threshold", () => {
     const { result } = renderHook(() =>
       useLabelPlacement({
-        clusters: [{ id: "a", displayName: "Hello", position: { x: 0, y: 0 } }],
-        transform: zoomIdentity.scale(0.5),
+        clusters: [cluster("a", 0, 0)],
+        transform: zoomIdentity,
         fontSize: 10,
-        offset: 15,
         layouter: stubLayouter,
       }),
     );
@@ -27,13 +33,9 @@ describe("useLabelPlacement", () => {
   it("should return placed labels above the threshold for non-overlapping clusters", () => {
     const { result } = renderHook(() =>
       useLabelPlacement({
-        clusters: [
-          { id: "a", displayName: "A", position: { x: 0, y: 0 } },
-          { id: "b", displayName: "B", position: { x: 500, y: 500 } },
-        ],
-        transform: zoomIdentity,
+        clusters: [cluster("a", 0, 0), cluster("b", 500, 500)],
+        transform: zoomIdentity.scale(10),
         fontSize: 10,
-        offset: 15,
         layouter: stubLayouter,
       }),
     );
@@ -42,16 +44,11 @@ describe("useLabelPlacement", () => {
   });
 
   it("should drop a later cluster whose label overlaps an earlier one", () => {
-    // stub layout is 50x11.5. Clusters at (0,0) and (5,0) overlap in x.
     const { result } = renderHook(() =>
       useLabelPlacement({
-        clusters: [
-          { id: "high", displayName: "High", position: { x: 0, y: 0 } },
-          { id: "low", displayName: "Low", position: { x: 5, y: 0 } },
-        ],
-        transform: zoomIdentity,
+        clusters: [cluster("high", 0, 0), cluster("low", 5, 0)],
+        transform: zoomIdentity.scale(10),
         fontSize: 10,
-        offset: 15,
         layouter: stubLayouter,
       }),
     );
@@ -60,42 +57,54 @@ describe("useLabelPlacement", () => {
   });
 
   it("should reuse the result reference when inputs are stable", () => {
-    const clusters = [{ id: "a", displayName: "A", position: { x: 0, y: 0 } }];
+    const clusters = [cluster("a", 0, 0)];
+    const transform = zoomIdentity.scale(10);
     const { result, rerender } = renderHook(
-      ({ offset }) =>
+      ({ fontSize }) =>
         useLabelPlacement({
           clusters,
-          transform: zoomIdentity,
-          fontSize: 10,
-          offset,
+          transform,
+          fontSize,
           layouter: stubLayouter,
         }),
-      { initialProps: { offset: 15 } },
+      { initialProps: { fontSize: 10 } },
     );
 
     const first = result.current;
-    rerender({ offset: 15 });
+    rerender({ fontSize: 10 });
 
     expect(result.current).toBe(first);
   });
 
   it("should recompute when the transform changes", () => {
-    const clusters = [{ id: "a", displayName: "A", position: { x: 0, y: 0 } }];
+    const clusters = [cluster("a", 0, 0)];
     const { result, rerender } = renderHook(
       ({ transform }) =>
         useLabelPlacement({
           clusters,
           transform,
           fontSize: 10,
-          offset: 15,
           layouter: stubLayouter,
         }),
-      { initialProps: { transform: zoomIdentity } },
+      { initialProps: { transform: zoomIdentity.scale(10) } },
     );
 
     const first = result.current;
-    rerender({ transform: zoomIdentity.translate(100, 0) });
+    rerender({ transform: zoomIdentity.scale(10).translate(100, 0) });
 
     expect(result.current).not.toBe(first);
+  });
+
+  it("should carry each placed label's screen-space offset through to the caller", () => {
+    const { result } = renderHook(() =>
+      useLabelPlacement({
+        clusters: [{ ...cluster("a", 0, 0), labelOffsetPx: 20 }],
+        transform: zoomIdentity.scale(10),
+        fontSize: 10,
+        layouter: stubLayouter,
+      }),
+    );
+
+    expect(result.current[0]?.labelOffsetPx).toBe(20);
   });
 });
