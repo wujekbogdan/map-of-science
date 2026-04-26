@@ -1,5 +1,11 @@
 # @map-of-science/vitest
 
+## 0.4.0
+
+### Minor Changes
+
+- a1783d8: - Add browser test mode
+
 ## 0.3.0
 
 ### Minor Changes

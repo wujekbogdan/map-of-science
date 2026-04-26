@@ -1,5 +1,12 @@
 # @map-of-science/root
 
+## 0.7.2
+
+### Patch Changes
+
+- a1783d8: - Add `:browser` test mode
+  - Ignore `__screenshots__` artefacts produced by browser tests
+
 ## 0.7.1
 
 ### Patch Changes
