@@ -117,6 +117,42 @@ describe("ClusterLabels", () => {
     expect(line?.getAttribute("stroke-width")).toBe((1 / 10).toString());
   });
 
+  it("should capture the matching label's element via onHoveredElChange when hoveredId changes", () => {
+    const onHoveredElChange = vi.fn();
+    const labels = [makeLabel({ id: "a" }), makeLabel({ id: "b" })];
+
+    const { container, rerender } = renderInSvg(
+      <ClusterLabels
+        zoomScale={1}
+        labels={labels}
+        hoveredId="a"
+        onHoveredElChange={onHoveredElChange}
+      />,
+    );
+    const elA = container.querySelector('[data-test-cluster-id="a"]');
+    onHoveredElChange.mockClear();
+
+    rerender(
+      <svg>
+        <g>
+          <ClusterLabels
+            zoomScale={1}
+            labels={labels}
+            hoveredId="b"
+            onHoveredElChange={onHoveredElChange}
+          />
+        </g>
+      </svg>,
+    );
+    const elB = container.querySelector('[data-test-cluster-id="b"]');
+
+    const firstArgs = onHoveredElChange.mock.calls.map(
+      (args: unknown[]) => args[0],
+    );
+    expect(firstArgs).toEqual([null, elB]);
+    expect(elA).toBeTruthy();
+  });
+
   it("should report hover and click against the cluster id", () => {
     const onHoveredClusterChange = vi.fn();
     const onClusterClick = vi.fn();

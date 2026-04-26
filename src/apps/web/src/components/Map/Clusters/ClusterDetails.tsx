@@ -11,6 +11,8 @@ export const ClusterDetails = ({ cluster }: { cluster: MapCluster }) => {
         padding: "20px",
         borderRadius: "6px",
         background: "white",
+        maxWidth: "320px",
+        wordBreak: "break-word",
       }}
     >
       <p>
