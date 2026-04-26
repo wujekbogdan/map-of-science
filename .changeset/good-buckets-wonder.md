@@ -1,5 +1,5 @@
 ---
-"map-of-science": patch
+"@map-of-science/root": patch
 ---
 
 - Add `:browser` test mode
