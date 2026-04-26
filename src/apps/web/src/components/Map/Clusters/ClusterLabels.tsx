@@ -8,9 +8,10 @@ import css from "./clusters.module.scss";
 type Props = {
   labels: PlacedLabel[];
   zoomScale: number;
-  hoveredClusterId?: string | null;
+  hoveredId?: string | null;
   onHoveredClusterChange?: (id: string | null) => void;
   onClusterClick?: (id: string) => void;
+  onHoveredElChange?: (el: SVGGElement | null) => void;
 };
 
 const lineOffsetEm = (index: number) =>
@@ -19,9 +20,10 @@ const lineOffsetEm = (index: number) =>
 export const ClusterLabels = ({
   labels,
   zoomScale,
-  hoveredClusterId,
+  hoveredId,
   onHoveredClusterChange,
   onClusterClick,
+  onHoveredElChange,
 }: Props) => {
   const gapWorld = LABEL_DOT_GAP_PX / zoomScale;
   const strokeWorld = 1 / zoomScale;
@@ -32,6 +34,8 @@ export const ClusterLabels = ({
         <g
           key={id}
           className={css.label}
+          data-test-cluster-id={id}
+          ref={id === hoveredId ? onHoveredElChange : undefined}
           style={
             {
               "--label-offset-px": `${labelOffsetPx.toString()}px`,
@@ -53,7 +57,7 @@ export const ClusterLabels = ({
             y1={position.y - gapWorld}
             y2={position.y}
             strokeWidth={strokeWorld}
-            $hovered={hoveredClusterId === id}
+            $hovered={hoveredId === id}
           />
           <LabelText
             id={id}
@@ -64,6 +68,7 @@ export const ClusterLabels = ({
             opacity={1}
             level={4}
             variant="cluster"
+            forcedHover={id === hoveredId}
           >
             {layout.lines.map((line, index) => (
               <tspan key={line} x={position.x} dy={lineOffsetEm(index)}>
