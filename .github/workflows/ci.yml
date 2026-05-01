@@ -24,6 +24,19 @@ jobs:
       - run: pnpm i
       - run: pnpm turbo lint
 
+  typecheck:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: corepack enable
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: 'pnpm'
+      - uses: rharkor/caching-for-turbo@v2.3.13
+      - run: pnpm i
+      - run: pnpm turbo typecheck
+
   test:
     runs-on: ubuntu-24.04
     steps:
