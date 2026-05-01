@@ -1,5 +1,16 @@
 # @map-of-science/web
 
+## 1.20.1
+
+### Patch Changes
+
+- a1783d8: - Add cluster labels with density-aware placement (via `rbush`), per-level zoom thresholds, and a configurable label cap
+  - Add per-level cluster label config (article threshold, min zoom, font size) to the DevTool
+  - Rework DevTool layout: two columns, sticky-bottom toggle, click-outside backdrop
+- a96f2c8: - Switch pan and zoom from declarative to imperative SVG updates; frame pacing is smoother and React no longer re-renders the map on every tick
+  - Stop re-rendering zoom controls on every pan tick
+  - @map-of-science/api@0.3.0
+
 ## 1.20.0
 
 ### Minor Changes
