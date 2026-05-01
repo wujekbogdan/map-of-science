@@ -147,6 +147,19 @@ export const useZoom = ({
 
     zoomBehaviorRef.current = behavior;
     const selection = select<SVGSVGElement, unknown>(element);
+
+    // d3-zoom intentionally skips preventDefault on wheel ticks that clamp
+    // to the same scale at the extent, so touchpad pinch (wheel + ctrlKey)
+    // leaks to browser page zoom at the cap. The d3-zoom docs recommend a
+    // sibling wheel listener that calls preventDefault on every wheel event:
+    // https://d3js.org/d3-zoom#zoom_scaleExtent
+    // Registered before selection.call(behavior) so it runs before d3's
+    // wheel.zoom listener.
+    const preventBrowserWheel = (event: WheelEvent) => {
+      event.preventDefault();
+    };
+    element.addEventListener("wheel", preventBrowserWheel, { passive: false });
+
     selection.call(behavior);
 
     const init = initialZoomRef.current;
@@ -165,6 +178,7 @@ export const useZoom = ({
 
     return () => {
       selection.on(".zoom", null);
+      element.removeEventListener("wheel", preventBrowserWheel);
       zoomBehaviorRef.current = null;
       if (settleTimerRef.current !== null) {
         clearTimeout(settleTimerRef.current);
