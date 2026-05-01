@@ -12,8 +12,9 @@ const DEFAULT_LANG: Lang = "en_US";
 // request header per the Fetch spec, so browser callers can't set it.
 const LANG_HEADER = "x-lang";
 
-const parseLangHeader = (value: string | undefined): Lang =>
-  langSchema.safeParse(value).data ?? DEFAULT_LANG;
+const parseLangHeader = (value: string | string[] | undefined) =>
+  langSchema.safeParse(Array.isArray(value) ? value[0] : value).data ??
+  DEFAULT_LANG;
 
 type CreateInnerContextOptions = {
   lang?: Lang;
@@ -30,9 +31,7 @@ export const createInnerContext = (opts: CreateInnerContextOptions) => ({
 export type Context = ReturnType<typeof createInnerContext>;
 
 export type HttpRequest = {
-  headers: {
-    [LANG_HEADER]?: string;
-  };
+  headers: Record<string, string | string[] | undefined>;
 };
 
 type CreateContextOptions = {
