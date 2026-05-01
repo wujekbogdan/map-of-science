@@ -4,7 +4,7 @@ import { ReactNode, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { Router } from "@map-of-science/api";
 import {
-  langToLocale,
+  toBackendLang,
   TRPCProvider,
   useLanguageQueryInvalidator,
 } from "../api-client/index.ts";
@@ -29,7 +29,7 @@ export const Providers = ({ children }: Props) => {
         httpBatchLink({
           url: config.apiUrl,
           headers: () => ({
-            "accept-language": langToLocale(toLangCode(i18n.language)),
+            "x-lang": toBackendLang(toLangCode(i18n.language)),
           }),
         }),
       ],

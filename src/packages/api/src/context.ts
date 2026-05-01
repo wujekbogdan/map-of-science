@@ -2,17 +2,18 @@ import { z } from "zod";
 import type { Search } from "@map-of-science/atlas";
 import type { AtlasStore } from "@map-of-science/atlas-store";
 
-const langSchema = z
-  .string()
-  .transform((value) => value.replace("-", "_"))
-  .pipe(z.enum(["en_US", "pl_PL"]));
+const langSchema = z.enum(["en_US", "pl_PL"]);
 
 export type Lang = z.infer<typeof langSchema>;
 
 const DEFAULT_LANG: Lang = "en_US";
 
-const parseAcceptLanguage = (value: string | undefined): Lang =>
-  value === undefined ? DEFAULT_LANG : langSchema.parse(value);
+// Lang comes in via `x-lang`. `Accept-Language` can't be used: it's a forbidden
+// request header per the Fetch spec, so browser callers can't set it.
+const LANG_HEADER = "x-lang";
+
+const parseLangHeader = (value: string | undefined): Lang =>
+  langSchema.safeParse(value).data ?? DEFAULT_LANG;
 
 type CreateInnerContextOptions = {
   lang?: Lang;
@@ -30,7 +31,7 @@ export type Context = ReturnType<typeof createInnerContext>;
 
 export type HttpRequest = {
   headers: {
-    "accept-language"?: string;
+    [LANG_HEADER]?: string;
   };
 };
 
@@ -42,7 +43,7 @@ type CreateContextOptions = {
 
 export const createContext = ({ req, atlas, search }: CreateContextOptions) =>
   createInnerContext({
-    lang: parseAcceptLanguage(req.headers["accept-language"]),
+    lang: parseLangHeader(req.headers[LANG_HEADER]),
     atlas,
     search,
   });
