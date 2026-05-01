@@ -33,6 +33,8 @@ type Options = {
 };
 
 const SETTLE_MS = 150;
+const MIN_SCALE = 0.5;
+const MAX_SCALE = 100;
 
 /* The zoom state of a map. */
 export type Zoom = {
@@ -125,7 +127,7 @@ export const useZoom = ({
     if (!element) return;
 
     const behavior = d3Zoom<SVGSVGElement, unknown>()
-      .scaleExtent([0.5, 50])
+      .scaleExtent([MIN_SCALE, MAX_SCALE])
       .on("zoom", (event: D3ZoomEvent<SVGSVGElement, unknown>) => {
         const next = event.transform;
         liveTransformRef.current = next;
