@@ -1,0 +1,1 @@
+var e=`/map-of-science/assets/map-BkwX5oXl.svg`;export{e as default};
