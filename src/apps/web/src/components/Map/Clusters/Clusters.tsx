@@ -38,6 +38,8 @@ export const Clusters = ({ clusters, transform, ripple, mode }: Props) => {
     (state) => state.setRemoteArticleId,
   );
   const [hoveredClusterId, setHoveredClusterId] = useState<string | null>(null);
+  const [dotEl, setDotEl] = useState<SVGGElement | null>(null);
+  const [labelEl, setLabelEl] = useState<SVGGElement | null>(null);
   const hoveredCluster = hoveredClusterId
     ? (clusters.find((cluster) => cluster.id === hoveredClusterId) ?? null)
     : null;
@@ -80,20 +82,21 @@ export const Clusters = ({ clusters, transform, ripple, mode }: Props) => {
         growthRatingColors={growthRatingColors}
         onHoveredClusterChange={setHoveredClusterId}
         onClusterClick={setRemoteArticleId}
+        hoveredId={hoveredClusterId}
+        onHoveredElChange={setDotEl}
       />
       <ClusterLabels
         labels={labels}
         zoomScale={zoomScale}
-        hoveredClusterId={hoveredClusterId}
+        hoveredId={hoveredClusterId}
         onHoveredClusterChange={setHoveredClusterId}
         onClusterClick={setRemoteArticleId}
+        onHoveredElChange={setLabelEl}
       />
       <ClusterHoverOverlay
         cluster={hoveredCluster}
-        articleThresholds={articleThresholds}
-        mode={mode}
-        ripple={!!ripple}
-        growthRatingColors={growthRatingColors}
+        dotEl={dotEl}
+        labelEl={labelEl}
       />
     </>
   );

@@ -5,71 +5,67 @@ import {
   shift,
   useFloating,
   useTransitionStyles,
+  type VirtualElement,
 } from "@floating-ui/react";
+import { useEffect, useMemo } from "react";
 import { createPortal } from "react-dom";
-import type { RGB } from "../../../map/mapStore.ts";
 import { ClusterDetails } from "./ClusterDetails.tsx";
 import { type MapCluster } from "./ClusterShapes.tsx";
-import Shape from "./Shape.tsx";
-import { getClusterLevel, type ArticleThresholds } from "./clusterLevel.ts";
+import { unionRect } from "./unionRect.ts";
 
 type Props = {
   cluster: MapCluster | null;
-  articleThresholds: ArticleThresholds;
-  mode: "regular" | "growth";
-  ripple: boolean;
-  growthRatingColors: { start: RGB; middle: RGB; end: RGB };
+  dotEl?: SVGGElement | null;
+  labelEl?: SVGGElement | null;
 };
 
-export const ClusterHoverOverlay = ({
-  cluster,
-  articleThresholds,
-  mode,
-  ripple,
-  growthRatingColors,
-}: Props) => {
+const EMPTY_RECT = {
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  x: 0,
+  y: 0,
+  width: 0,
+  height: 0,
+};
+
+export const ClusterHoverOverlay = ({ cluster, dotEl, labelEl }: Props) => {
   const isOpen = cluster !== null;
-  const { refs, floatingStyles, context } = useFloating({
+  // The dot and label are one thing from the user's POV. Anchor the popup to
+  // their union so it never covers either, and so neither can lose hover when
+  // the popup mounts.
+  const virtualReference = useMemo<VirtualElement>(
+    () => ({
+      getBoundingClientRect: () => {
+        const rects = [dotEl, labelEl]
+          .filter((el): el is SVGGElement => el != null)
+          .map((el) => el.getBoundingClientRect());
+        return rects.length > 0 ? unionRect(rects) : EMPTY_RECT;
+      },
+    }),
+    [dotEl, labelEl],
+  );
+  const { refs, floatingStyles, context } = useFloating<VirtualElement>({
     open: isOpen,
     middleware: [offset(10), flip(), shift({ padding: 10 })],
     whileElementsMounted: autoUpdate,
   });
+  useEffect(() => {
+    refs.setPositionReference(virtualReference);
+  }, [refs, virtualReference]);
   const { isMounted, styles } = useTransitionStyles(context, {
     duration: { open: 300, close: 0 },
     initial: { opacity: 0 },
     open: { opacity: 1 },
   });
 
-  if (!cluster) return null;
+  if (!cluster || !isMounted) return null;
 
-  return (
-    <>
-      <g
-        ref={refs.setReference}
-        data-cluster-id={cluster.id}
-        pointerEvents="none"
-      >
-        <Shape
-          progress={100}
-          level={getClusterLevel(cluster.articlesCount, articleThresholds)}
-          point={{
-            growthRating: cluster.growthRating,
-            x: cluster.position.x,
-            y: cluster.position.y,
-          }}
-          ripple={ripple}
-          mode={mode}
-          forcedHover={true}
-          growthRatingColors={growthRatingColors}
-        />
-      </g>
-      {isMounted &&
-        createPortal(
-          <div ref={refs.setFloating} style={{ ...floatingStyles, ...styles }}>
-            <ClusterDetails cluster={cluster} />
-          </div>,
-          document.body,
-        )}
-    </>
+  return createPortal(
+    <div ref={refs.setFloating} style={{ ...floatingStyles, ...styles }}>
+      <ClusterDetails cluster={cluster} />
+    </div>,
+    document.body,
   );
 };

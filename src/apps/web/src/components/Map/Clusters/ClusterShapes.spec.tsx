@@ -54,7 +54,7 @@ describe("ClusterShapes", () => {
       />,
     );
 
-    const target = container.querySelector('[data-cluster-id="b"]');
+    const target = container.querySelector('[data-test-cluster-id="b"]');
     expect(target).toBeTruthy();
 
     fireEvent.pointerEnter(target!);
@@ -66,5 +66,70 @@ describe("ClusterShapes", () => {
     fireEvent.click(target!);
     expect(onClusterClick).toHaveBeenNthCalledWith(1, "b");
     expect(onClusterClick).toHaveBeenCalledTimes(1);
+  });
+
+  it("should capture the hovered cluster's element via onHoveredElChange", () => {
+    const onHoveredElChange = vi.fn();
+    const clusters = [
+      makeCluster({ id: "a" }),
+      makeCluster({ id: "b", position: { x: 30, y: 40 } }),
+    ];
+
+    const { container } = renderInSvg(
+      <ClusterShapes
+        clusters={clusters}
+        articleThresholds={{ 1: 2000, 2: 1000, 3: 500, 4: 200, 5: 50 }}
+        mode="regular"
+        ripple={false}
+        growthRatingColors={growthRatingColors}
+        onHoveredClusterChange={vi.fn()}
+        onClusterClick={vi.fn()}
+        hoveredId="b"
+        onHoveredElChange={onHoveredElChange}
+      />,
+    );
+
+    const target = container.querySelector('[data-test-cluster-id="b"]');
+    expect(onHoveredElChange).toHaveBeenCalledTimes(1);
+    expect(onHoveredElChange).toHaveBeenCalledWith(target);
+  });
+
+  it("should clear the previous element and capture the new one when hoveredId changes", () => {
+    const onHoveredElChange = vi.fn();
+    const clusters = [
+      makeCluster({ id: "a" }),
+      makeCluster({ id: "b", position: { x: 30, y: 40 } }),
+    ];
+    const baseProps = {
+      clusters,
+      articleThresholds: { 1: 2000, 2: 1000, 3: 500, 4: 200, 5: 50 } as const,
+      mode: "regular" as const,
+      ripple: false,
+      growthRatingColors,
+      onHoveredClusterChange: vi.fn(),
+      onClusterClick: vi.fn(),
+      onHoveredElChange,
+    };
+
+    const { container, rerender } = renderInSvg(
+      <ClusterShapes {...baseProps} hoveredId="a" />,
+    );
+    const elA = container.querySelector('[data-test-cluster-id="a"]');
+    onHoveredElChange.mockClear();
+
+    rerender(
+      <svg>
+        <g>
+          <ClusterShapes {...baseProps} hoveredId="b" />
+        </g>
+      </svg>,
+    );
+    const elB = container.querySelector('[data-test-cluster-id="b"]');
+
+    const firstArgs = onHoveredElChange.mock.calls.map(
+      (args: unknown[]) => args[0],
+    );
+    expect(firstArgs).toEqual([null, elB]);
+    expect(elA).toBeTruthy();
   });
 });

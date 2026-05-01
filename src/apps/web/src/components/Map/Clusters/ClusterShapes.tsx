@@ -15,6 +15,8 @@ type Props = {
   growthRatingColors: { start: RGB; middle: RGB; end: RGB };
   onHoveredClusterChange: (id: string | null) => void;
   onClusterClick: (id: string) => void;
+  hoveredId?: string | null;
+  onHoveredElChange?: (el: SVGGElement | null) => void;
 };
 
 const getPercentage = (index: number, total: number) =>
@@ -28,6 +30,8 @@ export const ClusterShapes = memo(function ClusterShapes({
   growthRatingColors,
   onHoveredClusterChange,
   onClusterClick,
+  hoveredId,
+  onHoveredElChange,
 }: Props) {
   return (
     <>
@@ -35,7 +39,8 @@ export const ClusterShapes = memo(function ClusterShapes({
         <g
           key={cluster.id}
           className={css.fadeIn}
-          data-cluster-id={cluster.id}
+          data-test-cluster-id={cluster.id}
+          ref={cluster.id === hoveredId ? onHoveredElChange : undefined}
           aria-label={cluster.displayName}
           onPointerEnter={() => {
             onHoveredClusterChange(cluster.id);
@@ -57,7 +62,7 @@ export const ClusterShapes = memo(function ClusterShapes({
             }}
             ripple={ripple}
             mode={mode}
-            forcedHover={false}
+            forcedHover={cluster.id === hoveredId}
             growthRatingColors={growthRatingColors}
           />
         </g>
