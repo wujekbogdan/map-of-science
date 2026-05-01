@@ -3,6 +3,8 @@ export const translations = {
     "article.close": "Close",
     "article.info":
       "More information about the <bold>{{name}}</bold> (<bold>#{{id}}</bold>) cluster from the ETO Map of Science project",
+    "article.infoUnnamed":
+      "More information about cluster <bold>#{{id}}</bold> from the ETO Map of Science project",
     "article.openInNewTab": "Open in a new tab",
     "article.youtubeRelated": 'Related "Czytamy Naturę" segments on YouTube',
     "article.youtubeNone": 'No related "Czytamy Naturę" videos',
@@ -54,6 +56,8 @@ export const translations = {
     "article.close": "Zamknij",
     "article.info":
       "Więcej informacji na temat klastra <bold>{{name}}</bold> (<bold>#{{id}}</bold>) ze strony ETO Map of Science",
+    "article.infoUnnamed":
+      "Więcej informacji na temat klastra <bold>#{{id}}</bold> ze strony ETO Map of Science",
     "article.openInNewTab": "Otwórz w nowej karcie",
     "article.youtubeRelated": 'Powiązane segmenty "Czytamy Naturę"',
     "article.youtubeNone": 'Brak powiązanych segmentów "Czytamy Naturę"',

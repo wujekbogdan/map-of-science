@@ -18,8 +18,8 @@ export const IframeArticle = ({ id }: { id: string }) => {
       {cluster && externalId !== undefined && (
         <p>
           <Trans
-            i18nKey="article.info"
-            values={{ id: externalId, name: cluster.displayName }}
+            i18nKey={cluster.name ? "article.info" : "article.infoUnnamed"}
+            values={{ id: externalId, name: cluster.name }}
             components={{ bold: <strong /> }}
           />
         </p>
