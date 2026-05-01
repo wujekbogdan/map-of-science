@@ -66,38 +66,29 @@ describe("cluster.byId", () => {
     expect(result?.displayName).toBe("Machine Learning");
   });
 
-  it("should fall back to joined keyConcepts when name is null", async () => {
-    const atlas = buildAtlas({
-      findById: vi.fn().mockResolvedValue({
-        ...buildCluster(),
-        name: null,
-        nameSource: null,
-      }),
-    });
+  it.each([
+    ["en_US", "Cluster #1"],
+    ["pl_PL", "Klaster #1"],
+  ] as const)(
+    "should display null-name cluster as a localized placeholder in %s",
+    async (lang, expected) => {
+      const atlas = buildAtlas({
+        findById: vi.fn().mockResolvedValue({
+          ...buildCluster(),
+          name: null,
+          nameSource: null,
+        }),
+      });
 
-    const result = await callerFor("en_US", atlas).cluster.byId({ id: "c-1" });
+      const result = await callerFor(lang, atlas).cluster.byId({ id: "c-1" });
 
-    expect(result?.displayName).toBe("machine learning, neural networks");
-  });
+      expect(result?.displayName).toBe(expected);
+    },
+  );
 
   it("should negate position.y to convert to screen-space", async () => {
     const result = await callerFor("en_US").cluster.byId({ id: "c-1" });
     expect(result?.position).toEqual({ x: 10, y: 5 });
-  });
-
-  it("should fall back to externalId when name and keyConcepts are both missing", async () => {
-    const atlas = buildAtlas({
-      findById: vi.fn().mockResolvedValue({
-        ...buildCluster(),
-        name: null,
-        nameSource: null,
-        keyConcepts: [],
-      }),
-    });
-
-    const result = await callerFor("en_US", atlas).cluster.byId({ id: "c-1" });
-
-    expect(result?.displayName).toBe("Cluster 1");
   });
 });
 

@@ -3,20 +3,24 @@ import { bboxSchema, type Cluster } from "@map-of-science/atlas";
 import type { Lang } from "../context.js";
 import { publicProcedure, router } from "../trpc.js";
 
+const PLACEHOLDER_PREFIX: Record<Lang, string> = {
+  en_US: "Cluster",
+  pl_PL: "Klaster",
+};
+
 const resolveDisplayName = (
   name: string | null,
-  keyConcepts: string[],
   externalId: number,
+  lang: Lang,
 ) => {
   if (name) return name;
-  if (keyConcepts.length > 0) return keyConcepts.join(", ");
-  return `Cluster ${externalId.toString()}`;
+  return `${PLACEHOLDER_PREFIX[lang]} #${externalId.toString()}`;
 };
 
 /*
  * Maps a domain Cluster into its API DTO. Resolves name to the requested
- * language, outputs y in screen-space (y-down), and computes displayName
- * with fallbacks to keyConcepts or externalId.
+ * language, outputs y in screen-space (y-down), and computes a localized
+ * "Cluster #N" / "Klaster #N" placeholder when the cluster has no name.
  *
  * Every Cluster leaving the API goes through this.
  */
@@ -26,11 +30,7 @@ export const present = (cluster: Cluster, lang: Lang) => {
     ...cluster,
     position: { x: cluster.position.x, y: -cluster.position.y },
     name,
-    displayName: resolveDisplayName(
-      name,
-      cluster.keyConcepts,
-      cluster.externalId,
-    ),
+    displayName: resolveDisplayName(name, cluster.externalId, lang),
   };
 };
 
