@@ -6,13 +6,13 @@
   "exports": "./index.mjs",
   "dependencies": {
     "@eslint/js": "^9.13.0",
-    "eslint-config-prettier": "^10.1.5",
-    "eslint-plugin-n": "^17.20.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-n": "^17.24.0",
     "eslint-plugin-react": "^7.37.5",
-    "eslint-plugin-react-hooks": "^5.0.0",
-    "eslint-plugin-react-refresh": "^0.4.14",
-    "globals": "^15.11.0",
-    "typescript-eslint": "^8.11.0"
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.2",
+    "globals": "^17.5.0",
+    "typescript-eslint": "^8.59.1"
   },
   "peerDependencies": {
     "eslint": "^9.13.0"

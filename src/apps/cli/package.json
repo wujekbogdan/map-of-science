@@ -42,7 +42,7 @@
     "@map-of-science/tsdown": "workspace:*",
     "@map-of-science/typescript": "workspace:*",
     "@map-of-science/vitest": "workspace:*",
-    "@types/node": "^22.15.18",
+    "@types/node": "^24.12.2",
     "@types/uuid": "^11.0.0",
     "@yao-pkg/pkg": "^6.11.0",
     "eslint": "^9.39.4",

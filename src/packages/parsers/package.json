@@ -22,7 +22,7 @@
     "@map-of-science/test-utils": "workspace:*",
     "@map-of-science/typescript": "workspace:*",
     "@map-of-science/vitest": "workspace:*",
-    "@types/node": "^22.15.18",
+    "@types/node": "^24.12.2",
     "@types/stream-json": "^1.7.8",
     "eslint": "^9.39.4",
     "tsx": "^4.20.3",
