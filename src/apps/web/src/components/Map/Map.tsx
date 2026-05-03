@@ -1,6 +1,5 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { CSSProperties, useMemo, useRef, useState } from "react";
-import styled from "styled-components";
+import { CSSProperties, useEffect, useMemo, useRef } from "react";
 import { useShallow } from "zustand/react/shallow";
 import { useTRPC } from "../../api-client/index.ts";
 import { useArticleStore } from "../../article/articleStore.ts";
@@ -9,103 +8,56 @@ import { pickClustersToRender } from "../../map/pickClustersToRender.ts";
 import { useSelectionStore } from "../../map/selectionStore.ts";
 import { useFlashState } from "../../map/useFlashState.ts";
 import { useLayersOpacity } from "../../map/useLayersOpacity.ts";
-import { useZoom } from "../../map/zoom/useZoom.ts";
+import {
+  useBindZoomable,
+  useMapView,
+  useMapViewBbox,
+  useMapViewIsReady,
+  useMapViewScale,
+  useMapViewTransform,
+} from "../../map/view/hooks.ts";
 import { useLanguage } from "../../useLanguage.ts";
 import { Clusters } from "./Clusters/Clusters.tsx";
-import Label, { OnLabelClick } from "./Label/Label.tsx";
+import Label from "./Label/Label.tsx";
 
-const fetchMapSvg = async () => {
-  // At this point only the URL is resolved, the SVG is not yet loaded.
-  const url = (await import("./map.svg")).default;
-
-  // We need to ensure that the SVG is loaded before we return the URL.
-  return new Promise<string>((resolve, reject) => {
-    const img = new Image();
-    img.src = url;
-    img.onload = () => resolve(url);
-    img.onerror = reject;
-  });
-};
-
-type Props = {
-  size: {
-    width: number;
-    height: number;
-  };
-  on?: {
-    labelClick?: OnLabelClick;
-  };
-};
-
-export default function Map(props: Props) {
-  const [
-    scaleFactor,
-    fontSize,
-    desiredZoom,
-    maxDataPointsInViewport,
-    svgScaleFactor,
-    svgOffset,
-    mapMode,
-  ] = useMapStore(
+export default function Map() {
+  const [scaleFactor, fontSize, maxDataPointsInViewport, mapMode] = useMapStore(
     useShallow((s) => [
       s.scaleFactor,
       s.fontSize,
-      s.desiredZoom,
       s.maxDataPointsInViewport,
-      s.temp__svgScaleFactor,
-      s.temp__svgOffset,
       s.mapMode,
     ]),
   );
   const selectedClusters = useSelectionStore((s) => s.selectedClusters);
   const { language } = useLanguage();
-
   const fetchAreaArticle = useArticleStore((s) => s.fetchAreaArticle);
 
-  const svgRoot = useRef<SVGSVGElement>(null);
+  const view = useMapView();
+  const isReady = useMapViewIsReady();
+  const scale = useMapViewScale();
+  const liveTransform = useMapViewTransform();
+  const bbox = useMapViewBbox();
+
   const foregroundRef = useRef<SVGGElement>(null);
-  const [mapVisibility, setMapVisibility] = useState<"visible" | "hidden">(
-    "hidden",
-  );
-  const { data: mapSvgUrl } = useQuery({
-    queryKey: ["map-svg"],
-    queryFn: fetchMapSvg,
-    staleTime: Infinity,
-  });
+  useBindZoomable(foregroundRef);
 
-  const zoom = useZoom({
-    svg: svgRoot,
-    initialZoom: {
-      x: props.size.width / 2,
-      y: props.size.height / 2,
-      scale: 1,
-    },
-    desiredZoom,
-    onInitialized: () => {
-      setMapVisibility("visible");
-    },
-  });
+  // Center world (0, 0) in the viewport on first ready.
+  useEffect(() => {
+    if (!isReady) return;
+    view.panTo({ x: 0, y: 0 }, { animate: false });
+  }, [isReady, view]);
 
-  zoom.useZoomed(foregroundRef);
-  zoom.useZoomedBackground(svgRoot, {
-    imageUrl: mapSvgUrl,
-    scaleFactor: svgScaleFactor,
-    offset: svgOffset,
-  });
-  zoom.usePublish();
-  const liveTransform = zoom.useLiveTransform();
-
-  const opacity = useLayersOpacity(zoom.scale);
+  const opacity = useLayersOpacity(scale);
 
   const scaleFontSize = (size: number) => {
-    const baseScaleFactor = 1 / zoom.scale;
+    const baseScaleFactor = 1 / scale;
     const factor = Math.sqrt(
       Math.min(
-        Math.max(scaleFactor.min, zoom.scale * scaleFactor.zoom),
+        Math.max(scaleFactor.min, scale * scaleFactor.zoom),
         scaleFactor.max,
       ),
     );
-
     return size * baseScaleFactor * factor;
   };
   const scaledFontSize = {
@@ -113,8 +65,6 @@ export default function Map(props: Props) {
     layer2: scaleFontSize(fontSize.layer2),
     layer3: scaleFontSize(fontSize.layer3),
   };
-
-  const bbox = zoom.useBbox(props.size);
 
   const trpc = useTRPC();
   const { data: viewportClusters = [] } = useQuery(
@@ -184,63 +134,23 @@ export default function Map(props: Props) {
   const ripple = useFlashState(selectedClusters);
 
   return (
-    <MapSvg
-      ref={svgRoot}
-      $visibility={mapVisibility}
-      $zoom={zoom.scale}
-      width={props.size.width}
-      height={props.size.height}
-    >
-      <g ref={foregroundRef}>
-        <Clusters
-          clusters={clustersToRender}
-          transform={liveTransform}
-          mode={mapMode}
-          ripple={hasSelection && ripple}
+    <g ref={foregroundRef} style={{ "--zoom-scale": scale } as CSSProperties}>
+      <Clusters
+        clusters={clustersToRender}
+        transform={liveTransform}
+        mode={mapMode}
+        ripple={hasSelection && ripple}
+      />
+      {labelsScaled.map((label) => (
+        <Label
+          {...label}
+          id={label.key}
+          key={label.key}
+          onClick={({ id, text }) => {
+            void fetchAreaArticle(id, text, language);
+          }}
         />
-        {labelsScaled.map((label) => (
-          <Label
-            {...label}
-            id={label.key}
-            key={label.key}
-            onClick={({ id, text }) => {
-              void fetchAreaArticle(id, text, language);
-            }}
-          />
-        ))}
-      </g>
-    </MapSvg>
+      ))}
+    </g>
   );
 }
-
-const MapSvg = styled.svg.attrs<{
-  $visibility: "visible" | "hidden";
-  $zoom: number;
-}>((props) => ({
-  style: {
-    "--zoom-scale": props.$zoom,
-  } as CSSProperties,
-}))`
-  visibility: ${(props) => props.$visibility};
-  display: block;
-
-  .fil0 {
-    fill: #4b9232;
-  }
-
-  .fil4 {
-    fill: #5aa53d;
-  }
-
-  .fil1 {
-    fill: #7dbc62;
-  }
-
-  .fil2 {
-    fill: #a3c796;
-  }
-
-  .fil3 {
-    fill: #d6ebce;
-  }
-`;

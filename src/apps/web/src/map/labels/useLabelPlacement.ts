@@ -1,6 +1,6 @@
-import type { ZoomTransform } from "d3";
 import { useMemo } from "react";
 import type { ClusterLevel } from "../../components/Map/Clusters/clusterLevel.ts";
+import type { Transform } from "../view/transform.ts";
 import type { LabelLayout } from "./computeLabelLayout.ts";
 import { MAX_LABEL_WIDTH_PX } from "./config.ts";
 import { labelBbox } from "./labelBbox.ts";
@@ -25,18 +25,19 @@ export const useLabelPlacement = ({
   maxLabels,
 }: {
   clusters: ClusterInput[];
-  transform: ZoomTransform | undefined;
+  transform: Transform | undefined;
   layouter: Layouter;
   minZoomByLevel: Record<ClusterLevel, number>;
   maxLabels?: number;
 }) => {
   return useMemo(() => {
     if (!transform) return [];
+    const { x: tx, y: ty, scale } = transform;
 
     // Smaller clusters need a deeper zoom before their label appears, the
     // same way smaller towns reveal later on a road map.
     const visible = clusters.filter(
-      (cluster) => transform.k >= minZoomByLevel[cluster.level],
+      (cluster) => scale >= minZoomByLevel[cluster.level],
     );
     const capped =
       maxLabels === undefined ? visible : visible.slice(0, maxLabels);
@@ -54,18 +55,18 @@ export const useLabelPlacement = ({
     }));
 
     const candidates = withLayout.map(
-      ({ id, position, layout, labelOffsetPx, fontSize }) => {
-        const [x, y] = transform.apply([position.x, position.y]);
-        return {
-          id,
-          bbox: labelBbox({
-            anchor: { x, y },
-            layout,
-            fontSizePx: fontSize * transform.k,
-            offsetPx: labelOffsetPx,
-          }),
-        };
-      },
+      ({ id, position, layout, labelOffsetPx, fontSize }) => ({
+        id,
+        bbox: labelBbox({
+          anchor: {
+            x: position.x * scale + tx,
+            y: position.y * scale + ty,
+          },
+          layout,
+          fontSizePx: fontSize * scale,
+          offsetPx: labelOffsetPx,
+        }),
+      }),
     );
 
     const kept = placeLabels({ candidates });

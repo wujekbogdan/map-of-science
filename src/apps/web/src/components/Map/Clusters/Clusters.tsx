@@ -1,4 +1,3 @@
-import type { ZoomTransform } from "d3";
 import { useMemo, useState } from "react";
 import { useShallow } from "zustand/react/shallow";
 import { useArticleStore } from "../../../article/articleStore.ts";
@@ -6,6 +5,7 @@ import { createLabelLayouter } from "../../../map/labels/createLabelLayouter.ts"
 import { createSvgMeasureText } from "../../../map/labels/createSvgMeasureText.ts";
 import { useLabelPlacement } from "../../../map/labels/useLabelPlacement.ts";
 import { useMapStore } from "../../../map/mapStore.ts";
+import type { Transform } from "../../../map/view/transform.ts";
 import { ClusterHoverOverlay } from "./ClusterHoverOverlay.tsx";
 import { ClusterLabels } from "./ClusterLabels.tsx";
 import { ClusterShapes, type MapCluster } from "./ClusterShapes.tsx";
@@ -13,7 +13,7 @@ import { toLabeledCluster } from "./clusterLevel.ts";
 
 type Props = {
   clusters: MapCluster[];
-  transform: ZoomTransform | undefined;
+  transform: Transform | undefined;
   ripple?: boolean;
   mode: "regular" | "growth";
 };
@@ -51,7 +51,7 @@ export const Clusters = ({ clusters, transform, ripple, mode }: Props) => {
     () => createLabelLayouter({ measureText: createSvgMeasureText() }),
     [],
   );
-  const zoomScale = transform?.k ?? 1;
+  const zoomScale = transform?.scale ?? 1;
   const labeledClusters = useMemo(
     () =>
       clusters.map((cluster) =>

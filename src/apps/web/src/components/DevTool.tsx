@@ -2,6 +2,7 @@ import { Fragment, useState } from "react";
 import styled from "styled-components";
 import { useShallow } from "zustand/react/shallow";
 import { useMapStore, RGB } from "../map/mapStore.ts";
+import { useMapViewScale } from "../map/view/hooks.ts";
 
 const i18n = (str: string) => str;
 
@@ -36,8 +37,8 @@ export const DevTool = () => {
     "collapsed",
   );
   const isExpanded = visibility === "expanded";
+  const zoom = useMapViewScale().toFixed(2);
   const [
-    zoom,
     fontSize,
     setFontSize,
     scaleFactor,
@@ -64,7 +65,6 @@ export const DevTool = () => {
     setClusterLabelFontSize,
   ] = useMapStore(
     useShallow((state) => [
-      state.currentZoom?.scale.toFixed(2) ?? 1,
       state.fontSize,
       state.setFontSize,
       state.scaleFactor,

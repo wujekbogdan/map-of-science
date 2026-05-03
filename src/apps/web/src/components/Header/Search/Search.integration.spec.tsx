@@ -9,8 +9,13 @@ import { I18nextProvider, initReactI18next } from "react-i18next";
 import { describe, expect, it } from "vitest";
 import type { Router, RouterOutputs } from "@map-of-science/api";
 import { TRPCProvider } from "../../../api-client/index.ts";
-import { useMapStore } from "../../../map/mapStore.ts";
 import { useSelectionStore } from "../../../map/selectionStore.ts";
+import { MapView, type MapViewConfig } from "../../../map/view/mapView.tsx";
+import { createFakeDebouncer } from "../../../map/view/test-utils/createFakeDebouncer.ts";
+import {
+  createFakeDriver,
+  type FakeDriver,
+} from "../../../map/view/test-utils/createFakeDriver.ts";
 import { Search } from "./Search.tsx";
 
 type Match = RouterOutputs["search"]["query"][number];
@@ -52,13 +57,33 @@ const setupI18n = async () => {
   return instance;
 };
 
+const baseConfig = (): {
+  fake: FakeDriver;
+  config: MapViewConfig<SVGSVGElement>;
+} => {
+  const fake = createFakeDriver();
+  const debouncer = createFakeDebouncer();
+  return {
+    fake,
+    config: {
+      scaleExtent: { min: 0.5, max: 100 },
+      debounceMs: 0,
+      initial: { x: 0, y: 0, scale: 1 },
+      defaults: { animate: true, padding: 0.1 },
+      createDriver: fake.create,
+      createDebouncer: debouncer.create,
+    },
+  };
+};
+
 type ProvidersProps = {
   i18n: i18n;
   handler: (path: string, input: unknown) => unknown;
+  config: MapViewConfig<SVGSVGElement>;
   children: ReactNode;
 };
 
-const TestProviders = ({ i18n, handler, children }: ProvidersProps) => {
+const TestProviders = ({ i18n, handler, config, children }: ProvidersProps) => {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false } },
   });
@@ -68,7 +93,13 @@ const TestProviders = ({ i18n, handler, children }: ProvidersProps) => {
   return (
     <QueryClientProvider client={queryClient}>
       <TRPCProvider trpcClient={trpcClient} queryClient={queryClient}>
-        <I18nextProvider i18n={i18n}>{children}</I18nextProvider>
+        <I18nextProvider i18n={i18n}>
+          <MapView
+            config={config}
+            size={{ width: 800, height: 600 }}
+            chrome={children}
+          />
+        </I18nextProvider>
       </TRPCProvider>
     </QueryClientProvider>
   );
@@ -91,7 +122,6 @@ const submitSearchQuery = async (input: HTMLInputElement, query: string) => {
 };
 
 const withStore = (test: () => Promise<void>) => async () => {
-  useMapStore.getState().setMapSize({ width: 800, height: 600 });
   useSelectionStore.getState().clearSelection();
   return Promise.resolve(test()).finally(() => {
     cleanup();
@@ -104,10 +134,12 @@ describe("Search", () => {
     "should fetch and show cluster results when the user types",
     withStore(async () => {
       const i18n = await setupI18n();
+      const { config } = baseConfig();
       const { container, findByText } = render(
         <TestProviders
           i18n={i18n}
           handler={() => [makeCluster({ id: "c1", name: "Black Holes" })]}
+          config={config}
         >
           <Search />
         </TestProviders>,
@@ -124,6 +156,7 @@ describe("Search", () => {
     "should call search.query with the typed text and the search limit",
     withStore(async () => {
       const i18n = await setupI18n();
+      const { config } = baseConfig();
       const calls: { path: string; input: unknown }[] = [];
 
       const { container } = render(
@@ -133,6 +166,7 @@ describe("Search", () => {
             calls.push({ path, input });
             return [];
           }}
+          config={config}
         >
           <Search />
         </TestProviders>,
@@ -150,9 +184,11 @@ describe("Search", () => {
   );
 
   it(
-    "should write the picked cluster into the selection store and set a desired zoom",
+    "should write the picked cluster into the selection store and fit the view to it",
     withStore(async () => {
       const i18n = await setupI18n();
+      const { fake, config } = baseConfig();
+
       const { container, findByRole } = render(
         <TestProviders
           i18n={i18n}
@@ -163,6 +199,7 @@ describe("Search", () => {
               position: { x: 100, y: 200 },
             }),
           ]}
+          config={config}
         >
           <Search />
         </TestProviders>,
@@ -178,7 +215,12 @@ describe("Search", () => {
       expect(
         useSelectionStore.getState().selectedClusters.get("c1")?.position,
       ).toEqual({ x: 100, y: 200 });
-      expect(useMapStore.getState().desiredZoom).not.toBeNull();
+      // fitToPoints([{x:100,y:200}]) at size 800x600 → centered at scale 1:
+      // x = -100 + 400 = 300; y = -200 + 300 = 100
+      expect(fake.applyTransform).toHaveBeenCalledWith(
+        { x: 300, y: 100, scale: 1 },
+        { animate: true },
+      );
     }),
   );
 
@@ -186,6 +228,7 @@ describe("Search", () => {
     'should write all results into the selection store when "highlight all" is picked',
     withStore(async () => {
       const i18n = await setupI18n();
+      const { config } = baseConfig();
       const { container, findByRole } = render(
         <TestProviders
           i18n={i18n}
@@ -197,6 +240,7 @@ describe("Search", () => {
               position: { x: 50, y: 50 },
             }),
           ]}
+          config={config}
         >
           <Search />
         </TestProviders>,

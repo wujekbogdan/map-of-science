@@ -1,12 +1,6 @@
 import { create } from "zustand";
 import { combine } from "zustand/middleware";
 
-type Zoom = { x: number; y: number; scale: number };
-type Size = {
-  width: number;
-  height: number;
-};
-
 export type RGB = {
   r: number;
   g: number;
@@ -29,7 +23,6 @@ const partialDefaults = {
     end: { r: 201, g: 42, b: 42 },
   },
   zoomStepFactor: 1.6,
-  mapSize: { width: 0, height: 0 },
   fontSize: {
     layer1: 16,
     layer2: 12.8,
@@ -84,53 +77,32 @@ const partialDefaults = {
   temp__svgOffset: { x: -16.0, y: 27 },
 };
 
-type PartialDefaults = typeof partialDefaults;
-type State = PartialDefaults & {
-  currentZoom: Zoom | null;
-  desiredZoom: Zoom | null;
-};
-
-const defaults: State = {
-  ...partialDefaults,
-  desiredZoom: null,
-  currentZoom: null,
-};
-
 export const useMapStore = create(
-  combine(defaults, (set) => ({
-    setDesiredZoom: (zoom: Zoom | null) => {
-      set({ desiredZoom: zoom });
-    },
-    setCurrentZoom: (zoom: Zoom | null) => {
-      set({ currentZoom: zoom });
-    },
-    setMapSize: (size: Size) => {
-      set({ mapSize: size });
-    },
+  combine(partialDefaults, (set) => ({
     setZoomStepFactor: (zoomStepFactor: number) => {
       set({ zoomStepFactor });
     },
     setFontSize: (
-      layer: keyof typeof defaults.fontSize,
+      layer: keyof typeof partialDefaults.fontSize,
       size: number | string,
     ) => {
       const parsedSize = typeof size === "string" ? parseFloat(size) : size;
       set((state) => ({
         fontSize: {
           ...state.fontSize,
-          [layer]: parsedSize || defaults.fontSize[layer],
+          [layer]: parsedSize || partialDefaults.fontSize[layer],
         },
       }));
     },
     setScaleFactor: (
-      factor: keyof typeof defaults.scaleFactor,
+      factor: keyof typeof partialDefaults.scaleFactor,
       value: number | string,
     ) => {
       const parsedValue = typeof value === "string" ? parseFloat(value) : value;
       set((state) => ({
         scaleFactor: {
           ...state.scaleFactor,
-          [factor]: parsedValue || defaults.scaleFactor[factor],
+          [factor]: parsedValue || partialDefaults.scaleFactor[factor],
         },
       }));
     },
@@ -141,38 +113,39 @@ export const useMapStore = create(
       set({ maxLabelsInViewport });
     },
     setClusterLevelArticleThreshold: (
-      level: keyof typeof defaults.clusterLevelArticleThreshold,
+      level: keyof typeof partialDefaults.clusterLevelArticleThreshold,
       value: number | string,
     ) => {
       const parsed = typeof value === "string" ? parseFloat(value) : value;
       set((state) => ({
         clusterLevelArticleThreshold: {
           ...state.clusterLevelArticleThreshold,
-          [level]: parsed || defaults.clusterLevelArticleThreshold[level],
+          [level]:
+            parsed || partialDefaults.clusterLevelArticleThreshold[level],
         },
       }));
     },
     setClusterLabelFontSize: (
-      level: keyof typeof defaults.clusterLabelFontSize,
+      level: keyof typeof partialDefaults.clusterLabelFontSize,
       value: number | string,
     ) => {
       const parsed = typeof value === "string" ? parseFloat(value) : value;
       set((state) => ({
         clusterLabelFontSize: {
           ...state.clusterLabelFontSize,
-          [level]: parsed || defaults.clusterLabelFontSize[level],
+          [level]: parsed || partialDefaults.clusterLabelFontSize[level],
         },
       }));
     },
     setClusterLabelMinZoom: (
-      level: keyof typeof defaults.clusterLabelMinZoom,
+      level: keyof typeof partialDefaults.clusterLabelMinZoom,
       value: number | string,
     ) => {
       const parsed = typeof value === "string" ? parseFloat(value) : value;
       set((state) => ({
         clusterLabelMinZoom: {
           ...state.clusterLabelMinZoom,
-          [level]: parsed || defaults.clusterLabelMinZoom[level],
+          [level]: parsed || partialDefaults.clusterLabelMinZoom[level],
         },
       }));
     },
