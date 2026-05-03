@@ -9,12 +9,8 @@ import {
   type SelectedCluster,
   useSelectionStore,
 } from "../../../map/selectionStore.ts";
+import { useMapView } from "../../../map/view/hooks.ts";
 import { Dropdown, Option } from "./Dropdown/Dropdown.tsx";
-import {
-  computeZoomToFit,
-  getBoundingBox,
-  getCenteredBoundingBox,
-} from "./viewport.ts";
 
 const MIN_QUERY_LENGTH = 3;
 const INPUT_DEBOUNCE_MS = 300;
@@ -22,8 +18,7 @@ const LOADING_DELAY_MS = 250;
 
 export const Search = () => {
   const trpc = useTRPC();
-  const setDesiredZoom = useMapStore((s) => s.setDesiredZoom);
-  const mapSize = useMapStore((s) => s.mapSize);
+  const view = useMapView();
   const searchMinScore = useMapStore((s) => s.searchMinScore);
   const maxResults = useMapStore((s) => s.maxDataPointsInViewport);
   const setSelectedClusters = useSelectionStore((s) => s.setSelectedClusters);
@@ -65,21 +60,13 @@ export const Search = () => {
 
   const focusCluster = (cluster: SelectedCluster) => {
     setSelectedClusters([cluster]);
-    setDesiredZoom(
-      computeZoomToFit(
-        getCenteredBoundingBox(cluster.position, mapSize),
-        mapSize,
-      ),
-    );
+    view.fitToPoints([cluster.position]);
   };
 
   const focusClusters = (clusters: SelectedCluster[]) => {
     if (clusters.length === 0) return;
     setSelectedClusters(clusters);
-    const positions = clusters.map((cluster) => cluster.position);
-    setDesiredZoom(
-      computeZoomToFit(getBoundingBox(positions, mapSize), mapSize),
-    );
+    view.fitToPoints(clusters.map((cluster) => cluster.position));
   };
 
   const onSelectionChange = (option: Option) => {
