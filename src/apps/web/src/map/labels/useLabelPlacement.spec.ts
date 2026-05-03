@@ -1,5 +1,4 @@
 import { renderHook } from "@testing-library/react";
-import { zoomIdentity } from "d3";
 import { describe, expect, it } from "vitest";
 import { useLabelPlacement } from "./useLabelPlacement.ts";
 
@@ -32,12 +31,14 @@ const minZoomByLevel = {
   6: 10,
 } as const;
 
+const transformAtScale = (scale: number) => ({ x: 0, y: 0, scale });
+
 describe("useLabelPlacement", () => {
   it("should return placed labels above each level's threshold for non-overlapping clusters", () => {
     const { result } = renderHook(() =>
       useLabelPlacement({
         clusters: [cluster("a", 0, 0), cluster("b", 500, 500)],
-        transform: zoomIdentity.scale(10),
+        transform: transformAtScale(10),
         layouter: stubLayouter,
         minZoomByLevel,
       }),
@@ -50,7 +51,7 @@ describe("useLabelPlacement", () => {
     const { result } = renderHook(() =>
       useLabelPlacement({
         clusters: [cluster("big", 0, 0, 1), cluster("small", 500, 500, 6)],
-        transform: zoomIdentity.scale(7),
+        transform: transformAtScale(7),
         layouter: stubLayouter,
         minZoomByLevel,
       }),
@@ -63,7 +64,7 @@ describe("useLabelPlacement", () => {
     const { result } = renderHook(() =>
       useLabelPlacement({
         clusters: [cluster("a", 0, 0, 1)],
-        transform: zoomIdentity.scale(2),
+        transform: transformAtScale(2),
         layouter: stubLayouter,
         minZoomByLevel,
       }),
@@ -76,7 +77,7 @@ describe("useLabelPlacement", () => {
     const { result } = renderHook(() =>
       useLabelPlacement({
         clusters: [cluster("high", 0, 0), cluster("low", 5, 0)],
-        transform: zoomIdentity.scale(10),
+        transform: transformAtScale(10),
         layouter: stubLayouter,
         minZoomByLevel,
       }),
@@ -87,7 +88,7 @@ describe("useLabelPlacement", () => {
 
   it("should reuse the result reference when inputs are stable", () => {
     const clusters = [cluster("a", 0, 0)];
-    const transform = zoomIdentity.scale(10);
+    const transform = transformAtScale(10);
     const { result, rerender } = renderHook(() =>
       useLabelPlacement({
         clusters,
@@ -113,11 +114,11 @@ describe("useLabelPlacement", () => {
           layouter: stubLayouter,
           minZoomByLevel,
         }),
-      { initialProps: { transform: zoomIdentity.scale(10) } },
+      { initialProps: { transform: transformAtScale(10) } },
     );
 
     const first = result.current;
-    rerender({ transform: zoomIdentity.scale(10).translate(100, 0) });
+    rerender({ transform: { x: 1000, y: 0, scale: 10 } });
 
     expect(result.current).not.toBe(first);
   });
@@ -130,7 +131,7 @@ describe("useLabelPlacement", () => {
           cluster("b", 500, 0),
           cluster("c", 1000, 0),
         ],
-        transform: zoomIdentity.scale(10),
+        transform: transformAtScale(10),
         layouter: stubLayouter,
         minZoomByLevel,
         maxLabels: 2,
@@ -144,7 +145,7 @@ describe("useLabelPlacement", () => {
     const { result } = renderHook(() =>
       useLabelPlacement({
         clusters: [{ ...cluster("a", 0, 0), labelOffsetPx: 20, fontSize: 13 }],
-        transform: zoomIdentity.scale(10),
+        transform: transformAtScale(10),
         layouter: stubLayouter,
         minZoomByLevel,
       }),

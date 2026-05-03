@@ -1,4 +1,3 @@
-import { zoomIdentity } from "d3";
 import { useMemo } from "react";
 import type { CSSProperties } from "react";
 import { describe, expect, it } from "vitest";
@@ -46,7 +45,7 @@ const LabelsHarness = ({
   );
   const labels = useLabelPlacement({
     clusters,
-    transform: zoomIdentity.scale(zoomScale),
+    transform: { x: 0, y: 0, scale: zoomScale },
     layouter,
     minZoomByLevel: MIN_ZOOM_BY_LEVEL,
   });

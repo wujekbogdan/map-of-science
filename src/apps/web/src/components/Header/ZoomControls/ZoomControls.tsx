@@ -1,33 +1,23 @@
 import styled from "styled-components";
-import { useShallow } from "zustand/react/shallow";
 import { useMapStore } from "../../../map/mapStore.ts";
+import { useMapView } from "../../../map/view/hooks.ts";
 
 export const ZoomControls = () => {
-  const [setDesiredZoom, currentZoom, zoomStepFactor] = useMapStore(
-    useShallow((s) => [s.setDesiredZoom, s.currentZoom, s.zoomStepFactor]),
-  );
-  const scale = currentZoom ? currentZoom.scale : 1;
-
-  const zoomToScale = (scale: number) => {
-    setDesiredZoom({
-      x: currentZoom?.x ?? 0,
-      y: currentZoom?.y ?? 0,
-      scale,
-    });
-  };
+  const view = useMapView();
+  const zoomStepFactor = useMapStore((s) => s.zoomStepFactor);
 
   return (
     <ZoomControlsStyled>
       <Button
         onClick={() => {
-          zoomToScale(scale * zoomStepFactor);
+          view.zoomBy(zoomStepFactor);
         }}
       >
         +
       </Button>
       <Button
         onClick={() => {
-          zoomToScale(scale / zoomStepFactor);
+          view.zoomBy(1 / zoomStepFactor);
         }}
       >
         &minus;
