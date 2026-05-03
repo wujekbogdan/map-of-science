@@ -42,7 +42,6 @@ export default function Map() {
   const foregroundRef = useRef<SVGGElement>(null);
   useBindZoomable(foregroundRef);
 
-  // Center world (0, 0) in the viewport on first ready.
   useEffect(() => {
     if (!isReady) return;
     view.panTo({ x: 0, y: 0 }, { animate: false });

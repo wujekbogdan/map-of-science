@@ -1,7 +1,7 @@
 import { cleanup, fireEvent, render } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import { useMapStore } from "../../../map/mapStore.ts";
-import { MapView } from "../../../map/view/mapView.tsx";
+import { MapView } from "../../../map/view/MapView.tsx";
 import { createFakeDebouncer } from "../../../map/view/test-utils/createFakeDebouncer.ts";
 import { createFakeDriver } from "../../../map/view/test-utils/createFakeDriver.ts";
 import { ZoomControls } from "./ZoomControls.tsx";

@@ -1,12 +1,12 @@
 import type { Driver, DriverCallbacks } from "./driver.ts";
+import type { Transform } from "./transform.ts";
 import type {
   BBox,
   CommandOptions,
   FitOptions,
   MapViewConfig,
   Point,
-} from "./mapView.tsx";
-import type { Transform } from "./transform.ts";
+} from "./types.ts";
 
 type Size = { width: number; height: number };
 

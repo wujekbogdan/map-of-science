@@ -1,6 +1,7 @@
 import { act, render, renderHook } from "@testing-library/react";
 import { useEffect, useRef } from "react";
 import { describe, expect, it } from "vitest";
+import { MapView } from "./MapView.tsx";
 import {
   useBindZoomable,
   useMapView,
@@ -9,10 +10,9 @@ import {
   useMapViewScale,
   useMapViewTransform,
 } from "./hooks.ts";
-import { MapView } from "./mapView.tsx";
-import type { BBox } from "./mapView.tsx";
 import { createFakeDebouncer } from "./test-utils/createFakeDebouncer.ts";
 import { createFakeDriver } from "./test-utils/createFakeDriver.ts";
+import type { BBox } from "./types.ts";
 
 const baseConfig = () => {
   const fake = createFakeDriver();

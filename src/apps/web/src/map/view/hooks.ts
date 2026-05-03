@@ -1,7 +1,7 @@
 import { useEffect, useRef, useSyncExternalStore, type RefObject } from "react";
-import { useContextOrThrow, type BBox } from "./context.ts";
-import type { MapView } from "./mapView.tsx";
+import { useContextOrThrow } from "./context.ts";
 import type { Transform } from "./transform.ts";
+import type { BBox, MapView } from "./types.ts";
 
 /**
  * Returns the command handle for dispatching pan, zoom, and fit operations. Identity is stable for the surrounding `<MapView>`'s lifetime, so the handle is safe to use in effect dependency arrays.

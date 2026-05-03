@@ -10,7 +10,7 @@ import { describe, expect, it } from "vitest";
 import type { Router, RouterOutputs } from "@map-of-science/api";
 import { TRPCProvider } from "../../../api-client/index.ts";
 import { useSelectionStore } from "../../../map/selectionStore.ts";
-import { MapView, type MapViewConfig } from "../../../map/view/mapView.tsx";
+import { MapView, type MapViewConfig } from "../../../map/view/MapView.tsx";
 import { createFakeDebouncer } from "../../../map/view/test-utils/createFakeDebouncer.ts";
 import {
   createFakeDriver,

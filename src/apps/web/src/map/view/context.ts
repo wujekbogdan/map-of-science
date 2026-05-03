@@ -1,6 +1,6 @@
 import { createContext, useContext } from "react";
 import type { createController } from "./controller.ts";
-import type { BBox, MapView } from "./mapView.tsx";
+import type { MapView } from "./types.ts";
 
 export type Controller = ReturnType<
   ReturnType<typeof createController<SVGSVGElement>>
@@ -21,6 +21,3 @@ export const useContextOrThrow = (caller: string): ContextValue => {
   }
   return ctx;
 };
-
-// Re-export for hook signatures.
-export type { BBox };
