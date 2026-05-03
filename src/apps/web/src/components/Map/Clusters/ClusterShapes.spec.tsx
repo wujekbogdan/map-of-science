@@ -84,7 +84,7 @@ describe("ClusterShapes", () => {
         growthRatingColors={growthRatingColors}
         onHoveredClusterChange={vi.fn()}
         onClusterClick={vi.fn()}
-        hoveredId="b"
+        popoverAnchorId="b"
         onHoveredElChange={onHoveredElChange}
       />,
     );
@@ -94,7 +94,7 @@ describe("ClusterShapes", () => {
     expect(onHoveredElChange).toHaveBeenCalledWith(target);
   });
 
-  it("should clear the previous element and capture the new one when hoveredId changes", () => {
+  it("should clear the previous element and capture the new one when popoverAnchorId changes", () => {
     const onHoveredElChange = vi.fn();
     const clusters = [
       makeCluster({ id: "a" }),
@@ -112,7 +112,7 @@ describe("ClusterShapes", () => {
     };
 
     const { container, rerender } = renderInSvg(
-      <ClusterShapes {...baseProps} hoveredId="a" />,
+      <ClusterShapes {...baseProps} popoverAnchorId="a" />,
     );
     const elA = container.querySelector('[data-test-cluster-id="a"]');
     onHoveredElChange.mockClear();
@@ -120,7 +120,7 @@ describe("ClusterShapes", () => {
     rerender(
       <svg>
         <g>
-          <ClusterShapes {...baseProps} hoveredId="b" />
+          <ClusterShapes {...baseProps} popoverAnchorId="b" />
         </g>
       </svg>,
     );

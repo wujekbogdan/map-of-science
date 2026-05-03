@@ -5,11 +5,15 @@ import { createLabelLayouter } from "../../../map/labels/createLabelLayouter.ts"
 import { createSvgMeasureText } from "../../../map/labels/createSvgMeasureText.ts";
 import { useLabelPlacement } from "../../../map/labels/useLabelPlacement.ts";
 import { useMapStore } from "../../../map/mapStore.ts";
+import { useMapViewIsSettled } from "../../../map/view/hooks.ts";
 import type { Transform } from "../../../map/view/transform.ts";
 import { ClusterHoverOverlay } from "./ClusterHoverOverlay.tsx";
 import { ClusterLabels } from "./ClusterLabels.tsx";
 import { ClusterShapes, type MapCluster } from "./ClusterShapes.tsx";
 import { toLabeledCluster } from "./clusterLevel.ts";
+import { useHoverIntent } from "./useHoverIntent.ts";
+
+const HOVER_DWELL_MS = 150;
 
 type Props = {
   clusters: MapCluster[];
@@ -37,11 +41,21 @@ export const Clusters = ({ clusters, transform, ripple, mode }: Props) => {
   const setRemoteArticleId = useArticleStore(
     (state) => state.setRemoteArticleId,
   );
-  const [hoveredClusterId, setHoveredClusterId] = useState<string | null>(null);
+  const [rawHoveredClusterId, setRawHoveredClusterId] = useState<string | null>(
+    null,
+  );
   const [dotEl, setDotEl] = useState<SVGGElement | null>(null);
   const [labelEl, setLabelEl] = useState<SVGGElement | null>(null);
-  const hoveredCluster = hoveredClusterId
-    ? (clusters.find((cluster) => cluster.id === hoveredClusterId) ?? null)
+  const isSettled = useMapViewIsSettled();
+  const intentHoveredClusterId = useHoverIntent(
+    rawHoveredClusterId,
+    HOVER_DWELL_MS,
+  );
+  const highlightedClusterId = isSettled ? rawHoveredClusterId : null;
+  const popoverAnchorClusterId = isSettled ? intentHoveredClusterId : null;
+  const popoverCluster = popoverAnchorClusterId
+    ? (clusters.find((cluster) => cluster.id === popoverAnchorClusterId) ??
+      null)
     : null;
 
   // Created once so the layout cache and the hidden measurement SVG survive
@@ -80,21 +94,23 @@ export const Clusters = ({ clusters, transform, ripple, mode }: Props) => {
         mode={mode}
         ripple={!!ripple}
         growthRatingColors={growthRatingColors}
-        onHoveredClusterChange={setHoveredClusterId}
+        onHoveredClusterChange={setRawHoveredClusterId}
         onClusterClick={setRemoteArticleId}
-        hoveredId={hoveredClusterId}
+        hoveredId={highlightedClusterId}
+        popoverAnchorId={popoverAnchorClusterId}
         onHoveredElChange={setDotEl}
       />
       <ClusterLabels
         labels={labels}
         zoomScale={zoomScale}
-        hoveredId={hoveredClusterId}
-        onHoveredClusterChange={setHoveredClusterId}
+        hoveredId={highlightedClusterId}
+        popoverAnchorId={popoverAnchorClusterId}
+        onHoveredClusterChange={setRawHoveredClusterId}
         onClusterClick={setRemoteArticleId}
         onHoveredElChange={setLabelEl}
       />
       <ClusterHoverOverlay
-        cluster={hoveredCluster}
+        cluster={popoverCluster}
         dotEl={dotEl}
         labelEl={labelEl}
       />

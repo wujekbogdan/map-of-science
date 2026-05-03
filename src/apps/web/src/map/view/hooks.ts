@@ -34,6 +34,14 @@ export const useMapViewIsReady = (): boolean => {
 };
 
 /**
+ * True while the view is at rest. Flips to false on the first transform change of a pan or zoom gesture and back to true once the transform has been quiet for the configured debounce window. True at mount before any gesture. Useful for gating interactions that should pause during gestures.
+ */
+export const useMapViewIsSettled = (): boolean => {
+  const { subscribe, getSnapshot } = useContextOrThrow("useMapViewIsSettled");
+  return useSyncExternalStore(subscribe, () => getSnapshot().isSettled);
+};
+
+/**
  * Subscribes to the current transform. The returned reference is the same across updates that leave `scale` unchanged. Use it as a memo dep to recompute only when the visible scale changes.
  */
 export const useMapViewTransform = (): Transform => {

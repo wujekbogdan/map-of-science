@@ -15,6 +15,7 @@ type Snapshot = {
   settledTransform: Transform | undefined;
   bbox: BBox | null;
   isReady: boolean;
+  isSettled: boolean;
 };
 
 const createCell = <T>(initial: T) => {
@@ -131,6 +132,7 @@ export const createController =
       settledTransform: undefined,
       bbox: null,
       isReady: false,
+      isSettled: true,
     });
     const size = createCell<Size>({ width: 0, height: 0 });
     const subscribers = new Set<() => void>();
@@ -145,12 +147,13 @@ export const createController =
       update({
         settledTransform: settled,
         bbox: computeBbox(settled, size.get()),
+        isSettled: true,
       });
     });
 
     const callbacks: DriverCallbacks = {
       onTransform: (next) => {
-        update({ transform: next });
+        update({ transform: next, isSettled: false });
         debouncer.schedule();
       },
       onReady: () => {

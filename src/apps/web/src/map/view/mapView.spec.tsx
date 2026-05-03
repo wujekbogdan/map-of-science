@@ -7,6 +7,7 @@ import {
   useMapView,
   useMapViewBbox,
   useMapViewIsReady,
+  useMapViewIsSettled,
   useMapViewScale,
   useMapViewTransform,
 } from "./hooks.ts";
@@ -284,6 +285,34 @@ describe("MapView", () => {
     });
     expect(lastTransform).not.toBe(initial);
     expect(lastTransform?.scale).toBe(2);
+  });
+
+  it("should expose isSettled via useMapViewIsSettled, defaulting true and tracking driver and debouncer events", () => {
+    const { fake, debouncer, config } = baseConfig();
+
+    let lastSettled: boolean | undefined;
+    const Harness = () => {
+      lastSettled = useMapViewIsSettled();
+      return null;
+    };
+
+    render(
+      <MapView config={config} size={{ width: 800, height: 600 }}>
+        <Harness />
+      </MapView>,
+    );
+
+    expect(lastSettled).toBe(true);
+
+    act(() => {
+      fake.fireTransform({ x: 100, y: 50, scale: 2 });
+    });
+    expect(lastSettled).toBe(false);
+
+    act(() => {
+      debouncer.fire();
+    });
+    expect(lastSettled).toBe(true);
   });
 
   it("should expose the current scale via useMapViewScale", () => {

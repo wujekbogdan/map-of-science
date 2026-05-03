@@ -9,6 +9,7 @@ type Props = {
   labels: PlacedLabel[];
   zoomScale: number;
   hoveredId?: string | null;
+  popoverAnchorId?: string | null;
   onHoveredClusterChange?: (id: string | null) => void;
   onClusterClick?: (id: string) => void;
   onHoveredElChange?: (el: SVGGElement | null) => void;
@@ -21,6 +22,7 @@ export const ClusterLabels = ({
   labels,
   zoomScale,
   hoveredId,
+  popoverAnchorId,
   onHoveredClusterChange,
   onClusterClick,
   onHoveredElChange,
@@ -35,7 +37,7 @@ export const ClusterLabels = ({
           key={id}
           className={css.label}
           data-test-cluster-id={id}
-          ref={id === hoveredId ? onHoveredElChange : undefined}
+          ref={id === popoverAnchorId ? onHoveredElChange : undefined}
           style={
             {
               "--label-offset-px": `${labelOffsetPx.toString()}px`,

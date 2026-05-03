@@ -16,6 +16,7 @@ type Props = {
   onHoveredClusterChange: (id: string | null) => void;
   onClusterClick: (id: string) => void;
   hoveredId?: string | null;
+  popoverAnchorId?: string | null;
   onHoveredElChange?: (el: SVGGElement | null) => void;
 };
 
@@ -31,6 +32,7 @@ export const ClusterShapes = memo(function ClusterShapes({
   onHoveredClusterChange,
   onClusterClick,
   hoveredId,
+  popoverAnchorId,
   onHoveredElChange,
 }: Props) {
   return (
@@ -40,7 +42,7 @@ export const ClusterShapes = memo(function ClusterShapes({
           key={cluster.id}
           className={css.fadeIn}
           data-test-cluster-id={cluster.id}
-          ref={cluster.id === hoveredId ? onHoveredElChange : undefined}
+          ref={cluster.id === popoverAnchorId ? onHoveredElChange : undefined}
           aria-label={cluster.displayName}
           onPointerEnter={() => {
             onHoveredClusterChange(cluster.id);
