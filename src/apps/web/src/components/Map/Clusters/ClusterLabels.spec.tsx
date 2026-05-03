@@ -117,7 +117,7 @@ describe("ClusterLabels", () => {
     expect(line?.getAttribute("stroke-width")).toBe((1 / 10).toString());
   });
 
-  it("should capture the matching label's element via onHoveredElChange when hoveredId changes", () => {
+  it("should capture the matching label's element via onHoveredElChange when popoverAnchorId changes", () => {
     const onHoveredElChange = vi.fn();
     const labels = [makeLabel({ id: "a" }), makeLabel({ id: "b" })];
 
@@ -125,7 +125,7 @@ describe("ClusterLabels", () => {
       <ClusterLabels
         zoomScale={1}
         labels={labels}
-        hoveredId="a"
+        popoverAnchorId="a"
         onHoveredElChange={onHoveredElChange}
       />,
     );
@@ -138,7 +138,7 @@ describe("ClusterLabels", () => {
           <ClusterLabels
             zoomScale={1}
             labels={labels}
-            hoveredId="b"
+            popoverAnchorId="b"
             onHoveredElChange={onHoveredElChange}
           />
         </g>

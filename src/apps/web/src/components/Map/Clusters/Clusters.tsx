@@ -11,6 +11,9 @@ import { ClusterHoverOverlay } from "./ClusterHoverOverlay.tsx";
 import { ClusterLabels } from "./ClusterLabels.tsx";
 import { ClusterShapes, type MapCluster } from "./ClusterShapes.tsx";
 import { toLabeledCluster } from "./clusterLevel.ts";
+import { useHoverIntent } from "./useHoverIntent.ts";
+
+const HOVER_DWELL_MS = 150;
 
 type Props = {
   clusters: MapCluster[];
@@ -44,9 +47,15 @@ export const Clusters = ({ clusters, transform, ripple, mode }: Props) => {
   const [dotEl, setDotEl] = useState<SVGGElement | null>(null);
   const [labelEl, setLabelEl] = useState<SVGGElement | null>(null);
   const isSettled = useMapViewIsSettled();
-  const hoveredClusterId = isSettled ? rawHoveredClusterId : null;
-  const hoveredCluster = hoveredClusterId
-    ? (clusters.find((cluster) => cluster.id === hoveredClusterId) ?? null)
+  const intentHoveredClusterId = useHoverIntent(
+    rawHoveredClusterId,
+    HOVER_DWELL_MS,
+  );
+  const highlightedClusterId = isSettled ? rawHoveredClusterId : null;
+  const popoverAnchorClusterId = isSettled ? intentHoveredClusterId : null;
+  const popoverCluster = popoverAnchorClusterId
+    ? (clusters.find((cluster) => cluster.id === popoverAnchorClusterId) ??
+      null)
     : null;
 
   // Created once so the layout cache and the hidden measurement SVG survive
@@ -87,19 +96,21 @@ export const Clusters = ({ clusters, transform, ripple, mode }: Props) => {
         growthRatingColors={growthRatingColors}
         onHoveredClusterChange={setRawHoveredClusterId}
         onClusterClick={setRemoteArticleId}
-        hoveredId={hoveredClusterId}
+        hoveredId={highlightedClusterId}
+        popoverAnchorId={popoverAnchorClusterId}
         onHoveredElChange={setDotEl}
       />
       <ClusterLabels
         labels={labels}
         zoomScale={zoomScale}
-        hoveredId={hoveredClusterId}
+        hoveredId={highlightedClusterId}
+        popoverAnchorId={popoverAnchorClusterId}
         onHoveredClusterChange={setRawHoveredClusterId}
         onClusterClick={setRemoteArticleId}
         onHoveredElChange={setLabelEl}
       />
       <ClusterHoverOverlay
-        cluster={hoveredCluster}
+        cluster={popoverCluster}
         dotEl={dotEl}
         labelEl={labelEl}
       />
