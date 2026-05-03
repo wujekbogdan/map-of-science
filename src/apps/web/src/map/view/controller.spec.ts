@@ -172,6 +172,7 @@ describe("controller", () => {
       expect(snapshot.settledTransform).toBeUndefined();
       expect(snapshot.bbox).toBeNull();
       expect(snapshot.isReady).toBe(false);
+      expect(snapshot.isSettled).toBe(true);
     }),
   );
 
@@ -206,6 +207,25 @@ describe("controller", () => {
       fake.fireTransform({ x: 100, y: 200, scale: 2 });
 
       expect(debouncer.schedule).toHaveBeenCalledTimes(1);
+    }),
+  );
+
+  it(
+    "should flip isSettled to false on a driver tick",
+    withController(({ fake, controller }) => {
+      fake.fireTransform({ x: 100, y: 200, scale: 2 });
+
+      expect(controller.getSnapshot().isSettled).toBe(false);
+    }),
+  );
+
+  it(
+    "should restore isSettled to true when the debouncer fires",
+    withController(({ fake, debouncer, controller }) => {
+      fake.fireTransform({ x: 100, y: 200, scale: 2 });
+      debouncer.fire();
+
+      expect(controller.getSnapshot().isSettled).toBe(true);
     }),
   );
 

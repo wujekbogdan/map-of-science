@@ -5,6 +5,7 @@ import { createLabelLayouter } from "../../../map/labels/createLabelLayouter.ts"
 import { createSvgMeasureText } from "../../../map/labels/createSvgMeasureText.ts";
 import { useLabelPlacement } from "../../../map/labels/useLabelPlacement.ts";
 import { useMapStore } from "../../../map/mapStore.ts";
+import { useMapViewIsSettled } from "../../../map/view/hooks.ts";
 import type { Transform } from "../../../map/view/transform.ts";
 import { ClusterHoverOverlay } from "./ClusterHoverOverlay.tsx";
 import { ClusterLabels } from "./ClusterLabels.tsx";
@@ -37,9 +38,13 @@ export const Clusters = ({ clusters, transform, ripple, mode }: Props) => {
   const setRemoteArticleId = useArticleStore(
     (state) => state.setRemoteArticleId,
   );
-  const [hoveredClusterId, setHoveredClusterId] = useState<string | null>(null);
+  const [rawHoveredClusterId, setRawHoveredClusterId] = useState<string | null>(
+    null,
+  );
   const [dotEl, setDotEl] = useState<SVGGElement | null>(null);
   const [labelEl, setLabelEl] = useState<SVGGElement | null>(null);
+  const isSettled = useMapViewIsSettled();
+  const hoveredClusterId = isSettled ? rawHoveredClusterId : null;
   const hoveredCluster = hoveredClusterId
     ? (clusters.find((cluster) => cluster.id === hoveredClusterId) ?? null)
     : null;
@@ -80,7 +85,7 @@ export const Clusters = ({ clusters, transform, ripple, mode }: Props) => {
         mode={mode}
         ripple={!!ripple}
         growthRatingColors={growthRatingColors}
-        onHoveredClusterChange={setHoveredClusterId}
+        onHoveredClusterChange={setRawHoveredClusterId}
         onClusterClick={setRemoteArticleId}
         hoveredId={hoveredClusterId}
         onHoveredElChange={setDotEl}
@@ -89,7 +94,7 @@ export const Clusters = ({ clusters, transform, ripple, mode }: Props) => {
         labels={labels}
         zoomScale={zoomScale}
         hoveredId={hoveredClusterId}
-        onHoveredClusterChange={setHoveredClusterId}
+        onHoveredClusterChange={setRawHoveredClusterId}
         onClusterClick={setRemoteArticleId}
         onHoveredElChange={setLabelEl}
       />
