@@ -1,4 +1,4 @@
-ARG NODE_VERSION=22.15.0
+ARG NODE_VERSION=22.22.2
 ARG PACKAGE_NAME=@map-of-science/api-server
 ARG APP_PATH=src/apps/api-server
 
