@@ -1,6 +1,6 @@
 {
   "name": "@map-of-science/node-app",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "TODO: set description",
   "type": "module",
   "private": true,

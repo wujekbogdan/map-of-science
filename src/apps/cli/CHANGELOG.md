@@ -1,5 +1,26 @@
 # @map-of-science/cli
 
+## 0.2.2
+
+### Patch Changes
+
+- 4c34142: - Bump `eslint` to `^9.39.4`.
+- 4c34142: - Bump `vitest` to `^4.1.5`.
+- Updated dependencies [4c34142]
+- Updated dependencies [4c34142]
+  - @map-of-science/parsers@0.2.2
+  - @map-of-science/atlas@0.3.1
+  - @map-of-science/atlas-store@0.3.1
+  - @map-of-science/cluster-embedder@0.2.1
+  - @map-of-science/cluster-namer@0.1.1
+  - @map-of-science/embeddings@0.1.2
+  - @map-of-science/eto-pdf-parser@0.1.1
+  - @map-of-science/logger@0.1.1
+  - @map-of-science/openalex@0.1.2
+  - @map-of-science/rate-limiter@0.1.1
+  - @map-of-science/text-generator@0.1.1
+  - @map-of-science/package@0.1.1
+
 ## 0.2.1
 
 ### Patch Changes

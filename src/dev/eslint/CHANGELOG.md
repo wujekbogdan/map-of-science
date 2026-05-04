@@ -1,5 +1,11 @@
 # @map-of-science/eslint
 
+## 0.4.1
+
+### Patch Changes
+
+- 4c34142: - Bump `eslint` to `^9.39.4`.
+
 ## 0.4.0
 
 ### Minor Changes

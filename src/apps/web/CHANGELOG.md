@@ -1,5 +1,37 @@
 # @map-of-science/web
 
+## 1.21.0
+
+### Minor Changes
+
+- 15dd851: - Raise map zoom cap from 50 to 100
+
+### Patch Changes
+
+- 4c34142: - Bump `eslint` to `^9.39.4`.
+- 4c34142: - Bump `vite-plugin-checker` to `^0.13.0`.
+  - Bump `vite-plugin-svgr` to `^5.2.0`.
+  - Use a caret range for `@trpc/server` to align with the rest of the workspace.
+- d12114c: - Send the active language to the API in the `x-lang` header so it can no longer be silently overridden by the browser.
+- e8ba303: - Stop touchpad pinch from zooming the whole page once the map reaches its scale cap.
+- dda69ff: - Fix duplicated cluster placeholder in the article modal for unnamed clusters.
+- adeda30: - Fix flickering popup when hovering a cluster label
+  - Highlight dot and label together when hovering either
+  - Cap popup width so long cluster names wrap instead of stretching
+- 4c34142: - Bump `vitest` to `^4.1.5`.
+- 98ad672: - Fix zoom buttons that drifted the map off-center after a pan.
+  - Refactor pan and zoom interactions into a new `MapView` module that exposes view state through declarative hooks and isolates d3 behind a renderer-agnostic driver interface.
+- 9db83ea: - Delay cluster popover until the cursor settles on a target, so sweeping past clusters no longer flashes their popovers.
+- 4c34142: - Bump `vite` to `^8.0.10`.
+  - Replace `@vitejs/plugin-react-swc` with `@vitejs/plugin-react`.
+- 4c34142: - Bump `@vitest/browser-playwright` to `4.1.5`.
+- f6fdb89: - Suppress cluster dot and label hover during pan and zoom.
+- Updated dependencies [9da1468]
+- Updated dependencies [dd6d4e7]
+- Updated dependencies [4c34142]
+- Updated dependencies [d12114c]
+  - @map-of-science/api@0.3.1
+
 ## 1.20.1
 
 ### Patch Changes

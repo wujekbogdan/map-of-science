@@ -1,5 +1,14 @@
 # @map-of-science/atlas-store
 
+## 0.3.1
+
+### Patch Changes
+
+- 4c34142: - Bump `vitest` to `^4.1.5`.
+- Updated dependencies [4c34142]
+  - @map-of-science/atlas@0.3.1
+  - @map-of-science/logger@0.1.1
+
 ## 0.3.0
 
 ### Minor Changes
