@@ -1,5 +1,11 @@
 # @map-of-science/atlas
 
+## 0.3.1
+
+### Patch Changes
+
+- 4c34142: - Bump `vitest` to `^4.1.5`.
+
 ## 0.3.0
 
 ### Minor Changes
