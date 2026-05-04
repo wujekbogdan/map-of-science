@@ -1,5 +1,11 @@
 # @map-of-science/test-utils
 
+## 0.2.2
+
+### Patch Changes
+
+- 4c34142: - Bump `vitest` to `^4.1.5`.
+
 ## 0.2.1
 
 ### Patch Changes

@@ -1,5 +1,12 @@
 # @map-of-science/root
 
+## 0.7.3
+
+### Patch Changes
+
+- 4c34142: - Bump `eslint` to `^9.39.4`.
+- dd6d4e7: - Run `typecheck` in CI
+
 ## 0.7.2
 
 ### Patch Changes

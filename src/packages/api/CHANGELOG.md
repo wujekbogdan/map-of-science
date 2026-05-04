@@ -1,5 +1,19 @@
 # @map-of-science/api
 
+## 0.3.1
+
+### Patch Changes
+
+- 9da1468: - Render unnamed clusters as `Cluster #N` (en_US) / `Klaster #N` (pl_PL) in `displayName` instead of joining `keyConcepts`.
+- dd6d4e7: - Widen `HttpRequest.headers` to `Record<string, string | string[] | undefined>` so it accepts Node's `IncomingHttpHeaders`
+  - Coerce array values in the `x-lang` request header read by `createContext` (first element wins)
+- 4c34142: - Bump `vitest` to `^4.1.5`.
+- d12114c: - Read request language from the `x-lang` header (`en_US` or `pl_PL`); fall back to `en_US` on missing or unsupported value instead of throwing.
+- Updated dependencies [4c34142]
+  - @map-of-science/atlas@0.3.1
+  - @map-of-science/atlas-store@0.3.1
+  - @map-of-science/embeddings@0.1.2
+
 ## 0.3.0
 
 ### Minor Changes
