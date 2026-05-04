@@ -2,6 +2,7 @@
   "extends": "@map-of-science/typescript/node",
   "compilerOptions": {
     "noEmit": false,
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "rootDir": "./src"
   }
 }

@@ -209,11 +209,13 @@ const Wrapper = styled.div`
   display: flex;
 `;
 
-const Combobox = styled(ComboboxHeadless)`
+const TypedCombobox = ComboboxHeadless<Option | null>;
+const Combobox = styled(TypedCombobox)`
   flex: 1;
 `;
 
-const ComboboxInput = styled(ComboboxInputHeadless).attrs<{
+const TypedComboboxInput = ComboboxInputHeadless<Option | null>;
+const ComboboxInput = styled(TypedComboboxInput).attrs<{
   placeholder?: string;
   autoComplete?: string;
 }>((props) => ({

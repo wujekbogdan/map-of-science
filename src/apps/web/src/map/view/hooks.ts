@@ -49,7 +49,7 @@ export const useMapViewTransform = (): Transform => {
   const cached = useRef<Transform | undefined>(undefined);
   return useSyncExternalStore(subscribe, () => {
     const next = getSnapshot().transform;
-    if (cached.current && cached.current.scale === next.scale) {
+    if (cached.current?.scale === next.scale) {
       return cached.current;
     }
     cached.current = next;

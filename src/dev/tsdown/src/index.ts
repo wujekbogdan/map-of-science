@@ -4,6 +4,9 @@ export const defineNodeConfig = (config?: UserConfig) =>
   defineConfig({
     entry: ["./src/index.ts"],
     platform: "node",
-    noExternal: [/.*/],
+    deps: {
+      alwaysBundle: [/.*/],
+      onlyBundle: false,
+    },
     ...config,
   });

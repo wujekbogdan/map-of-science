@@ -24,7 +24,7 @@ export const defineConfig = (...configs) =>
       },
       settings: {
         node: {
-          version: "22.15.0",
+          version: "22.22.2",
         },
       },
     },
