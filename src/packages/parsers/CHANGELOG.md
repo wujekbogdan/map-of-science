@@ -1,5 +1,12 @@
 # @map-of-science/parsers
 
+## 0.2.2
+
+### Patch Changes
+
+- 4c34142: - Bump `eslint` to `^9.39.4`.
+- 4c34142: - Bump `vitest` to `^4.1.5`.
+
 ## 0.2.1
 
 ### Patch Changes

@@ -1,5 +1,20 @@
 # @map-of-science/api
 
+## 0.2.2
+
+### Patch Changes
+
+- 4c34142: - Bump `eslint` to `^9.39.4`.
+- 4c34142: - Bump `vitest` to `^4.1.5`.
+- Updated dependencies [9da1468]
+- Updated dependencies [dd6d4e7]
+- Updated dependencies [4c34142]
+- Updated dependencies [d12114c]
+  - @map-of-science/api@0.3.1
+  - @map-of-science/atlas@0.3.1
+  - @map-of-science/atlas-store@0.3.1
+  - @map-of-science/embeddings@0.1.2
+
 ## 0.2.1
 
 ### Patch Changes

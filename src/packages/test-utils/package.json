@@ -1,6 +1,6 @@
 {
   "name": "@map-of-science/test-utils",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Shared testing utilities",
   "type": "module",
   "private": true,
@@ -15,9 +15,9 @@
     "@map-of-science/eslint": "workspace:*",
     "@map-of-science/typescript": "workspace:*",
     "@map-of-science/vitest": "workspace:*",
-    "@types/node": "^22.15.18",
+    "@types/node": "^22.19.17",
     "testcontainers": "^11.10.0",
-    "typescript": "~5.6.2",
+    "typescript": "~6.0.3",
     "vitest": "^4.1.5"
   },
   "dependencies": {
