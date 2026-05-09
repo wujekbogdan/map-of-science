@@ -23,12 +23,14 @@ export type Option =
       cluster: SelectedCluster;
     })
   | (OptionBase & {
-      type: "query";
+      type: "submit";
       clusters: SelectedCluster[];
     });
 
 type DropdownProps = {
+  value: string;
   options: Option[];
+  isQuerySubmittable: boolean;
   onSelect: (option: Option) => void;
   onReset: () => void;
   onInput: (query: string) => void;
@@ -55,7 +57,7 @@ type OptionRowProps = {
   focus: boolean;
   selected: boolean;
   tokens: Token[];
-  type: "query" | "cluster";
+  type: "submit" | "cluster";
 };
 
 const OptionRow = memo(
@@ -74,17 +76,16 @@ const OptionRow = memo(
 
 export const Dropdown = (props: DropdownProps) => {
   const { t } = useTranslation();
-  const { options: rawOptions } = props;
-  const [query, setQuery] = useState("");
+  const { options: rawOptions, value } = props;
   const [selection, setSelection] = useState<Option | null>(null);
 
   const options = useMemo(
     () =>
       rawOptions.map((option) => ({
         ...option,
-        tokens: tokenizeLabel(option.label, query),
+        tokens: tokenizeLabel(option.label, value),
       })),
-    [rawOptions, query],
+    [rawOptions, value],
   );
   const allClusters = useMemo(
     () =>
@@ -94,16 +95,8 @@ export const Dropdown = (props: DropdownProps) => {
     [rawOptions],
   );
 
-  const hasNoResultsText = query.length > 1 && options.length === 0;
-  const noResultsText = (() => {
-    if (query.length < 3) {
-      return t("search.dropdown.enterMin");
-    }
-    if (props.isLoading) {
-      return `${t("search.dropdown.loading")}…`;
-    }
-    return t("search.dropdown.noResults");
-  })();
+  const showHelpText = !props.isQuerySubmittable && value.length > 0;
+  const showLoadingText = props.isQuerySubmittable && props.isLoading;
 
   const placeholders = Array.from({ length: 10 }, (_, i) =>
     t(`search.dropdown.placeholder.${i + 1}`),
@@ -112,20 +105,17 @@ export const Dropdown = (props: DropdownProps) => {
     placeholders[Math.floor(Math.random() * placeholders.length)],
   );
 
-  const queryOption: Option = {
-    type: "query",
-    id: "dummy-id",
-    label: query,
-    keyword: query,
+  const submitOption: Option = {
+    type: "submit",
+    id: "submit-query",
+    label: value,
+    keyword: value,
     clusters: allClusters,
   };
-  const hasHighlightAllOption = query.length >= 3 && allClusters.length > 0;
 
   const onQueryChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const newQuery = event.target.value;
     setSelection(null);
-    setQuery(newQuery);
-    props.onInput(newQuery);
+    props.onInput(event.target.value);
   };
 
   const onSelectionChange = (selected: Option | null) => {
@@ -136,7 +126,6 @@ export const Dropdown = (props: DropdownProps) => {
 
   const onResetClick = () => {
     setSelection(null);
-    setQuery("");
     props.onReset();
   };
 
@@ -151,7 +140,7 @@ export const Dropdown = (props: DropdownProps) => {
               placeholder={t("search.dropdown.placeholder", {
                 placeholder: randomPlaceholder,
               })}
-              displayValue={(option: Option | null) => option?.keyword ?? query}
+              displayValue={(option: Option | null) => option?.keyword ?? value}
               onChange={onQueryChange}
             />
             <ComboboxOptions
@@ -160,22 +149,25 @@ export const Dropdown = (props: DropdownProps) => {
                 width: "var(--input-width)",
               }}
             >
-              {hasNoResultsText ? (
-                <NoResults>{noResultsText}</NoResults>
-              ) : (
+              {showHelpText && (
+                <NoResults>{t("search.dropdown.enterMin")}</NoResults>
+              )}
+              {showLoadingText && (
+                <NoResults>{t("search.dropdown.loading")}…</NoResults>
+              )}
+              {props.isQuerySubmittable && !showLoadingText && (
                 <>
-                  {hasHighlightAllOption && (
-                    <ComboboxOptionHeadless value={queryOption}>
-                      {({ focus, selected }) => (
-                        <ComboboxOption $focus={focus} $selected={selected}>
-                          <Label type="query">
-                            {t("search.dropdown.searchLabel")}:{" "}
-                            <strong>{query}</strong> [{allClusters.length}]
-                          </Label>
-                        </ComboboxOption>
-                      )}
-                    </ComboboxOptionHeadless>
-                  )}
+                  <ComboboxOptionHeadless value={submitOption}>
+                    {({ focus, selected }) => (
+                      <ComboboxOption $focus={focus} $selected={selected}>
+                        <Label type="submit">
+                          {t("search.dropdown.searchLabel")}:{" "}
+                          <strong>{value}</strong>
+                          {allClusters.length > 0 && ` [${allClusters.length}]`}
+                        </Label>
+                      </ComboboxOption>
+                    )}
+                  </ComboboxOptionHeadless>
                   {options.map((option) => (
                     <ComboboxOptionHeadless key={option.id} value={option}>
                       {({ focus, selected }) => (
