@@ -1,12 +1,3 @@
-onlyBuiltDependencies:
-  - '@parcel/watcher'
-  - '@swc/core'
-  - esbuild
-  - msw
-  - normalize-diacritics
-  - playwright
-  - playwright-core
-
 packages:
   # Deployable apps (e.g. Node.js, React)
   - 'src/apps/*'
@@ -21,3 +12,14 @@ packages:
 # instead of being auto-installed by pnpm, and that their versions are strictly enforced.
 strictPeerDependencies: true
 autoInstallPeers: false
+allowBuilds:
+  '@parcel/watcher': true
+  '@swc/core': true
+  cpu-features: false
+  esbuild: true
+  msw: true
+  normalize-diacritics: true
+  playwright: true
+  playwright-core: true
+  protobufjs: false
+  ssh2: false
