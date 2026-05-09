@@ -4,7 +4,7 @@ FROM base AS pnpm
 RUN apk update
 RUN apk add --no-cache libc6-compat
 ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
+ENV PATH="$PNPM_HOME/bin:$PNPM_HOME:$PATH"
 RUN corepack enable
 
 FROM pnpm AS pruner
