@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
+import { rootRouteId, useSearch } from "@tanstack/react-router";
 import { useDebounce } from "@uidotdev/usehooks";
-import debounce from "lodash/debounce";
-import { useMemo, useState } from "react";
+import { type FormEventHandler, useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import { useTRPC } from "../../../api-client";
 import { useMapStore } from "../../../map/mapStore.ts";
@@ -11,6 +11,7 @@ import {
 } from "../../../map/selectionStore.ts";
 import { useMapView } from "../../../map/view/hooks.ts";
 import { Dropdown, Option } from "./Dropdown/Dropdown.tsx";
+import { useSearchActions } from "./useSearchActions.ts";
 
 const MIN_QUERY_LENGTH = 3;
 const INPUT_DEBOUNCE_MS = 300;
@@ -19,17 +20,30 @@ const LOADING_DELAY_MS = 250;
 export const Search = () => {
   const trpc = useTRPC();
   const view = useMapView();
-  const searchMinScore = useMapStore((s) => s.searchMinScore);
   const maxResults = useMapStore((s) => s.maxDataPointsInViewport);
   const setSelectedClusters = useSelectionStore((s) => s.setSelectedClusters);
   const clearSelection = useSelectionStore((s) => s.clearSelection);
 
-  const [searchTerm, setSearchTerm] = useState("");
+  const { q = "", minScore } = useSearch({ from: rootRouteId });
+  const { commit, clear } = useSearchActions();
+  const [previousQ, setPreviousQ] = useState(q);
+  const [inputValue, setInputValue] = useState(q);
+  if (q !== previousQ) {
+    setPreviousQ(q);
+    setInputValue(q);
+  }
+
+  const debouncedInputValue = useDebounce(inputValue, INPUT_DEBOUNCE_MS);
+  const isQuerySubmittable = inputValue.length >= MIN_QUERY_LENGTH;
 
   const { data: results = [], isFetching } = useQuery(
     trpc.search.query.queryOptions(
-      { text: searchTerm, limit: maxResults, minScore: searchMinScore },
-      { enabled: searchTerm.length >= MIN_QUERY_LENGTH },
+      {
+        text: debouncedInputValue,
+        limit: maxResults,
+        minScore,
+      },
+      { enabled: debouncedInputValue.length >= MIN_QUERY_LENGTH },
     ),
   );
   const isLoading = useDebounce(isFetching, LOADING_DELAY_MS);
@@ -46,27 +60,25 @@ export const Search = () => {
     [results],
   );
 
-  const onInput = useMemo(
-    () =>
-      debounce((query: string) => {
-        if (query.length < MIN_QUERY_LENGTH) {
-          setSearchTerm("");
-          return;
-        }
-        setSearchTerm(query);
-      }, INPUT_DEBOUNCE_MS),
-    [],
-  );
+  const onInput = (query: string) => {
+    setInputValue(query);
+  };
+
+  // Focus follows the committed search: when results arrive for the URL's `q`,
+  // select them and fit the map. Decoupling from the click handler avoids the
+  // race where commit fires before results have loaded.
+  useEffect(() => {
+    if (q === "") return;
+    if (debouncedInputValue !== q) return;
+    if (isFetching) return;
+    if (results.length === 0) return;
+    setSelectedClusters(results);
+    view.fitToPoints(results.map((cluster) => cluster.position));
+  }, [q, debouncedInputValue, isFetching, results, setSelectedClusters, view]);
 
   const focusCluster = (cluster: SelectedCluster) => {
     setSelectedClusters([cluster]);
     view.fitToPoints([cluster.position]);
-  };
-
-  const focusClusters = (clusters: SelectedCluster[]) => {
-    if (clusters.length === 0) return;
-    setSelectedClusters(clusters);
-    view.fitToPoints(clusters.map((cluster) => cluster.position));
   };
 
   const onSelectionChange = (option: Option) => {
@@ -74,24 +86,27 @@ export const Search = () => {
       focusCluster(option.cluster);
       return;
     }
-    if (option.type === "query") {
-      focusClusters(option.clusters);
+    if (option.type === "submit") {
+      commit(option.label);
     }
   };
 
   const onReset = () => {
+    clear();
     clearSelection();
   };
 
+  const onFormSubmit: FormEventHandler<HTMLFormElement> = (event) => {
+    event.preventDefault();
+  };
+
   return (
-    <Form
-      onSubmit={(e) => {
-        e.preventDefault();
-      }}
-    >
+    <Form onSubmit={onFormSubmit}>
       <Dropdown
+        value={inputValue}
         isLoading={isLoading}
         options={dropdownOptions}
+        isQuerySubmittable={isQuerySubmittable}
         onInput={onInput}
         onSelect={onSelectionChange}
         onReset={onReset}

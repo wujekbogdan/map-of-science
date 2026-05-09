@@ -63,7 +63,6 @@ const partialDefaults = {
   },
   maxDataPointsInViewport: 500,
   maxLabelsInViewport: 300,
-  searchMinScore: 0.65,
   // const [xMin, xMax] = extent(clusters, (c) => c.position.x);
   // const xRange = xMax - xMin;
   // const scaleFactor = xRange / viewBox.width;
@@ -148,9 +147,6 @@ export const useMapStore = create(
           [level]: parsed || partialDefaults.clusterLabelMinZoom[level],
         },
       }));
-    },
-    setSearchMinScore: (searchMinScore: number) => {
-      set({ searchMinScore });
     },
     setGrowthRatingColors: (colors: Colors) => {
       set({ growthRatingColors: colors });

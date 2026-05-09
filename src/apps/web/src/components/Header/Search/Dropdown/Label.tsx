@@ -7,13 +7,13 @@ export type Token = { text: string; type: "regular" | "bold" };
 
 type Props = {
   tokens?: Token[];
-  type: "query" | "cluster";
+  type: "submit" | "cluster";
   children?: ReactNode;
 };
 
 const Label = ({ tokens, type, children }: Props) => {
   const icons = {
-    query: search,
+    submit: search,
     cluster: pin,
   };
 
