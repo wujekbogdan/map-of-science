@@ -4,6 +4,7 @@ import styled from "styled-components";
 import { useShallow } from "zustand/react/shallow";
 import { useMapStore, RGB } from "../map/mapStore.ts";
 import { useMapViewScale } from "../map/view/hooks.ts";
+import { MIN_SCORE_DEFAULT } from "./Header/Search/searchParams.ts";
 import { useSearchActions } from "./Header/Search/useSearchActions.ts";
 
 const i18n = (str: string) => str;
@@ -168,7 +169,7 @@ export const DevTool = () => {
                       step="0.01"
                       min="0"
                       max="1"
-                      value={searchMinScore}
+                      value={searchMinScore ?? MIN_SCORE_DEFAULT}
                       onChange={(e) => {
                         setMinScore(Number(e.target.value));
                       }}

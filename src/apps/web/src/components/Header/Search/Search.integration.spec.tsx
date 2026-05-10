@@ -363,7 +363,9 @@ describe("Search", () => {
 
       await submitSearchQuery(container, "something");
 
-      const highlightAllRow = await findByRole("option", { name: /\[2\]/ });
+      const highlightAllRow = await findByRole("option", {
+        name: /something/i,
+      });
       await userEvent.setup().click(highlightAllRow);
 
       await waitFor(() => {
@@ -388,20 +390,18 @@ describe("Search", () => {
         config,
         children: <Search />,
       });
-      const handler = vi
-        .fn()
-        .mockReturnValue([
-          makeCluster({
-            id: "c1",
-            name: "First",
-            position: { x: 100, y: 200 },
-          }),
-          makeCluster({
-            id: "c2",
-            name: "Second",
-            position: { x: 200, y: 100 },
-          }),
-        ]);
+      const handler = vi.fn().mockReturnValue([
+        makeCluster({
+          id: "c1",
+          name: "First",
+          position: { x: 100, y: 200 },
+        }),
+        makeCluster({
+          id: "c2",
+          name: "Second",
+          position: { x: 200, y: 100 },
+        }),
+      ]);
 
       const { container } = render(
         <TestProviders handler={handler} router={router} />,
@@ -456,6 +456,60 @@ describe("Search", () => {
 
       await waitFor(() => {
         expect(router.state.location.search.q).toBeUndefined();
+      });
+    }),
+  );
+
+  it(
+    "should refire search.query at the new minScore when the filter input is edited",
+    withStore(async () => {
+      const i18n = await setupI18n();
+      const { config } = baseConfig();
+      const handler = vi.fn().mockReturnValue([]);
+      const router = buildTestRouter({
+        i18n,
+        config,
+        children: <Search />,
+        initialUrl: '/?q="quantum"',
+      });
+
+      const { container } = render(
+        <TestProviders handler={handler} router={router} />,
+      );
+
+      await waitFor(() => {
+        expect(handler).toHaveBeenCalledWith("search.query", {
+          text: "quantum",
+          limit: 500,
+          minScore: 0.65,
+        });
+      });
+
+      // Filters render only when the dropdown is open.
+      const searchInput = await findSearchInput(container);
+      const user = userEvent.setup();
+      await user.click(searchInput);
+
+      const minScoreInput = await waitFor(() => {
+        const input = container.querySelector<HTMLInputElement>(
+          "input[type='number']",
+        );
+        if (!input) throw new Error("min-score input not found");
+        return input;
+      });
+
+      await user.clear(minScoreInput);
+      await user.type(minScoreInput, "0.9");
+
+      await waitFor(() => {
+        expect(router.state.location.search.minScore).toBe(0.9);
+      });
+      await waitFor(() => {
+        expect(handler).toHaveBeenCalledWith("search.query", {
+          text: "quantum",
+          limit: 500,
+          minScore: 0.9,
+        });
       });
     }),
   );

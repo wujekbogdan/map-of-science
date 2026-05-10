@@ -11,6 +11,8 @@ import {
 } from "../../../map/selectionStore.ts";
 import { useMapView } from "../../../map/view/hooks.ts";
 import { Dropdown, Option } from "./Dropdown/Dropdown.tsx";
+import { FiltersBar } from "./Dropdown/Filters/FiltersBar.tsx";
+import { MIN_SCORE_DEFAULT } from "./searchParams.ts";
 import { useSearchActions } from "./useSearchActions.ts";
 
 const MIN_QUERY_LENGTH = 3;
@@ -41,7 +43,7 @@ export const Search = () => {
       {
         text: debouncedInputValue,
         limit: maxResults,
-        minScore,
+        minScore: minScore ?? MIN_SCORE_DEFAULT,
       },
       { enabled: debouncedInputValue.length >= MIN_QUERY_LENGTH },
     ),
@@ -110,6 +112,7 @@ export const Search = () => {
         onInput={onInput}
         onSelect={onSelectionChange}
         onReset={onReset}
+        filters={<FiltersBar />}
       />
     </Form>
   );

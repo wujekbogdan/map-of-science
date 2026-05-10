@@ -4,12 +4,19 @@ import {
   ComboboxOptions as ComboboxOptionsHeadless,
   ComboboxOption as ComboboxOptionHeadless,
 } from "@headlessui/react";
-import { ChangeEvent, memo, useMemo, useRef, useState } from "react";
+import { ChangeEvent, ReactNode, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import type { SelectedCluster } from "../../../../map/selectionStore.ts";
-import Label, { Token } from "./Label.tsx";
+import { useClusterDotRadius } from "../../../Map/Clusters/clusterLevel.ts";
+import { ClusterResultRow } from "./ClusterResultRow.tsx";
+import { SubmitRow } from "./SubmitRow.tsx";
 import CloseIcon from "./close.svg";
+import {
+  ROW_GAP_PX,
+  SIZE_COLUMN_WIDTH_PX,
+  type Token,
+} from "./resultRowLayout.ts";
 
 type OptionBase = {
   label: string;
@@ -35,6 +42,7 @@ type DropdownProps = {
   onReset: () => void;
   onInput: (query: string) => void;
   isLoading: boolean;
+  filters?: ReactNode;
 };
 
 const tokenizeLabel = (label: string, query: string): Token[] => {
@@ -52,32 +60,11 @@ const tokenizeLabel = (label: string, query: string): Token[] => {
   ].filter(({ text }) => text);
 };
 
-type OptionRowProps = {
-  id: string;
-  focus: boolean;
-  selected: boolean;
-  tokens: Token[];
-  type: "submit" | "cluster";
-};
-
-const OptionRow = memo(
-  function OptionRow(props: OptionRowProps) {
-    return (
-      <ComboboxOption $focus={props.focus} $selected={props.selected}>
-        <Label tokens={props.tokens} type={props.type} />
-      </ComboboxOption>
-    );
-  },
-  (prev, next) =>
-    prev.id === next.id &&
-    prev.selected === next.selected &&
-    prev.focus === next.focus,
-);
-
 export const Dropdown = (props: DropdownProps) => {
   const { t } = useTranslation();
   const { options: rawOptions, value } = props;
   const [selection, setSelection] = useState<Option | null>(null);
+  const getDotRadius = useClusterDotRadius();
 
   const options = useMemo(
     () =>
@@ -149,40 +136,75 @@ export const Dropdown = (props: DropdownProps) => {
                 width: "var(--input-width)",
               }}
             >
-              {showHelpText && (
-                <NoResults>{t("search.dropdown.enterMin")}</NoResults>
+              {props.filters && (
+                <FiltersSlot
+                  onMouseDown={(event) => {
+                    event.stopPropagation();
+                  }}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                  }}
+                  onKeyDown={(event) => {
+                    event.stopPropagation();
+                  }}
+                >
+                  {props.filters}
+                </FiltersSlot>
               )}
-              {showLoadingText && (
-                <NoResults>{t("search.dropdown.loading")}…</NoResults>
-              )}
-              {props.isQuerySubmittable && !showLoadingText && (
-                <>
-                  <ComboboxOptionHeadless value={submitOption}>
-                    {({ focus, selected }) => (
-                      <ComboboxOption $focus={focus} $selected={selected}>
-                        <Label type="submit">
-                          {t("search.dropdown.searchLabel")}:{" "}
-                          <strong>{value}</strong>
-                          {allClusters.length > 0 && ` [${allClusters.length}]`}
-                        </Label>
-                      </ComboboxOption>
-                    )}
-                  </ComboboxOptionHeadless>
-                  {options.map((option) => (
-                    <ComboboxOptionHeadless key={option.id} value={option}>
+              <ResultsList>
+                {showHelpText && (
+                  <NoResults>{t("search.dropdown.enterMin")}</NoResults>
+                )}
+                {showLoadingText && (
+                  <NoResults>{t("search.dropdown.loading")}…</NoResults>
+                )}
+                {props.isQuerySubmittable && !showLoadingText && (
+                  <>
+                    <ComboboxOptionHeadless value={submitOption}>
                       {({ focus, selected }) => (
-                        <OptionRow
-                          type={option.type}
-                          id={option.id}
-                          focus={focus}
-                          selected={selected}
-                          tokens={option.tokens}
-                        />
+                        <ComboboxOption $focus={focus} $selected={selected}>
+                          <SubmitRow
+                            query={value}
+                            matchCount={allClusters.length || undefined}
+                          />
+                        </ComboboxOption>
                       )}
                     </ComboboxOptionHeadless>
-                  ))}
-                </>
-              )}
+                    {options.length > 0 && (
+                      <ColumnHeader>
+                        <HeaderSize>
+                          {t("search.dropdown.column.size")}
+                        </HeaderSize>
+                        <HeaderName>
+                          {t("search.dropdown.column.name")}
+                        </HeaderName>
+                        <HeaderScore>
+                          {t("search.dropdown.column.score")}
+                        </HeaderScore>
+                      </ColumnHeader>
+                    )}
+                    {options.map((option) => {
+                      if (option.type !== "cluster") return null;
+                      return (
+                        <ComboboxOptionHeadless key={option.id} value={option}>
+                          {({ focus, selected }) => (
+                            <ComboboxOption $focus={focus} $selected={selected}>
+                              <ClusterResultRow
+                                tokens={option.tokens}
+                                articlesCount={option.cluster.articlesCount}
+                                score={option.cluster.score}
+                                dotRadiusPx={getDotRadius(
+                                  option.cluster.articlesCount,
+                                )}
+                              />
+                            </ComboboxOption>
+                          )}
+                        </ComboboxOptionHeadless>
+                      );
+                    })}
+                  </>
+                )}
+              </ResultsList>
             </ComboboxOptions>
           </div>
         )}
@@ -241,11 +263,50 @@ const ComboboxOptions = styled(ComboboxOptionsHeadless)`
   border: 2px solid #9b5b9b;
   border-top-width: 0;
   margin-top: -2px;
+  display: flex;
+  flex-direction: column;
+  max-height: 50vh;
+`;
+
+const ResultsList = styled.div`
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
 `;
 
 const NoResults = styled.div`
   padding: 12px;
   color: #999;
+`;
+
+const FiltersSlot = styled.div`
+  padding: 8px 12px;
+  border-bottom: 1px solid #eee;
+`;
+
+const ColumnHeader = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${ROW_GAP_PX}px;
+  padding: 6px 12px;
+  border-bottom: 1px solid #eee;
+  color: #999;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+`;
+
+const HeaderSize = styled.span`
+  width: ${SIZE_COLUMN_WIDTH_PX}px;
+  flex-shrink: 0;
+`;
+
+const HeaderName = styled.span`
+  flex: 1;
+`;
+
+const HeaderScore = styled.span`
+  margin-left: auto;
 `;
 
 const ComboboxOption = styled.div<{
