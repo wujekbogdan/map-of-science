@@ -51,7 +51,7 @@ describe("search.query", () => {
     ]);
   });
 
-  it("should forward the text, limit, and minScore to search.query", async () => {
+  it("should forward the text, limit, minScore, and sort to search.query", async () => {
     const query = vi.fn().mockResolvedValue([]);
     const search = buildSearch(query);
 
@@ -59,12 +59,26 @@ describe("search.query", () => {
       text: "physics",
       limit: 5,
       minScore: 0.8,
+      sort: { kind: "articlesCount", direction: "desc" },
     });
 
     expect(query).toHaveBeenNthCalledWith(1, {
       text: "physics",
       limit: 5,
       minScore: 0.8,
+      sort: { kind: "articlesCount", direction: "desc" },
+    });
+  });
+
+  it("should default sort to relevance when not provided", async () => {
+    const query = vi.fn().mockResolvedValue([]);
+    const search = buildSearch(query);
+
+    await callerFor("en_US", search).search.query({ text: "physics" });
+
+    expect(query).toHaveBeenNthCalledWith(1, {
+      text: "physics",
+      sort: { kind: "relevance" },
     });
   });
 });
