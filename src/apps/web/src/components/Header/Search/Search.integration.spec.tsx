@@ -1,4 +1,10 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+  createMemoryHistory,
+  createRootRoute,
+  createRouter,
+  RouterProvider,
+} from "@tanstack/react-router";
 import { act, cleanup, render, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { createTRPCClient, type TRPCLink } from "@trpc/client";
@@ -6,7 +12,7 @@ import { observable } from "@trpc/server/observable";
 import i18next, { type i18n } from "i18next";
 import { ReactNode } from "react";
 import { I18nextProvider, initReactI18next } from "react-i18next";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import type { Router, RouterOutputs } from "@map-of-science/api";
 import { TRPCProvider } from "../../../api-client/index.ts";
 import { useSelectionStore } from "../../../map/selectionStore.ts";
@@ -17,6 +23,7 @@ import {
   type FakeDriver,
 } from "../../../map/view/test-utils/createFakeDriver.ts";
 import { Search } from "./Search.tsx";
+import { searchParamsSchema } from "./searchParams.ts";
 
 type Match = RouterOutputs["search"]["query"][number];
 
@@ -76,14 +83,43 @@ const baseConfig = (): {
   };
 };
 
-type ProvidersProps = {
+type TestRouterDeps = {
   i18n: i18n;
-  handler: (path: string, input: unknown) => unknown;
   config: MapViewConfig<SVGSVGElement>;
   children: ReactNode;
+  initialUrl?: string;
 };
 
-const TestProviders = ({ i18n, handler, config, children }: ProvidersProps) => {
+const buildTestRouter = ({
+  i18n,
+  config,
+  children,
+  initialUrl = "/",
+}: TestRouterDeps) => {
+  const testRoot = createRootRoute({
+    validateSearch: searchParamsSchema,
+    component: () => (
+      <I18nextProvider i18n={i18n}>
+        <MapView
+          config={config}
+          size={{ width: 800, height: 600 }}
+          chrome={children}
+        />
+      </I18nextProvider>
+    ),
+  });
+  return createRouter({
+    routeTree: testRoot,
+    history: createMemoryHistory({ initialEntries: [initialUrl] }),
+  });
+};
+
+type ProvidersProps = {
+  handler: (path: string, input: unknown) => unknown;
+  router: ReturnType<typeof buildTestRouter>;
+};
+
+const TestProviders = ({ handler, router }: ProvidersProps) => {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false } },
   });
@@ -93,27 +129,26 @@ const TestProviders = ({ i18n, handler, config, children }: ProvidersProps) => {
   return (
     <QueryClientProvider client={queryClient}>
       <TRPCProvider trpcClient={trpcClient} queryClient={queryClient}>
-        <I18nextProvider i18n={i18n}>
-          <MapView
-            config={config}
-            size={{ width: 800, height: 600 }}
-            chrome={children}
-          />
-        </I18nextProvider>
+        <RouterProvider router={router} />
       </TRPCProvider>
     </QueryClientProvider>
   );
 };
 
-const getSearchInput = (container: HTMLElement) => {
-  const input = container.querySelector<HTMLInputElement>(
-    "input[role='combobox']",
-  );
-  if (!input) throw new Error("search input not found");
-  return input;
-};
+const findSearchInput = (container: HTMLElement) =>
+  waitFor(() => {
+    const input = container.querySelector<HTMLInputElement>(
+      "input[role='combobox']",
+    );
+    if (!input) throw new Error("search input not found");
+    return input;
+  });
 
-const submitSearchQuery = async (input: HTMLInputElement, query: string) => {
+const submitSearchQuery = async (
+  container: HTMLElement,
+  query: string,
+): Promise<void> => {
+  const input = await findSearchInput(container);
   const user = userEvent.setup();
   await user.click(input);
   await user.type(input, query);
@@ -131,21 +166,70 @@ const withStore = (test: () => Promise<void>) => async () => {
 
 describe("Search", () => {
   it(
+    "should fire search.query with q and minScore from the URL on mount",
+    withStore(async () => {
+      const i18n = await setupI18n();
+      const { config } = baseConfig();
+      const handler = vi.fn().mockReturnValue([]);
+      const router = buildTestRouter({
+        i18n,
+        config,
+        children: <Search />,
+        initialUrl: '/?q="quantum"&minScore=0.8',
+      });
+
+      render(<TestProviders handler={handler} router={router} />);
+
+      await waitFor(() => {
+        expect(handler).toHaveBeenCalledWith("search.query", {
+          text: "quantum",
+          limit: 500,
+          minScore: 0.8,
+        });
+      });
+    }),
+  );
+
+  it(
+    "should populate the search input with q from the URL on mount",
+    withStore(async () => {
+      const i18n = await setupI18n();
+      const { config } = baseConfig();
+      const handler = vi.fn().mockReturnValue([]);
+      const router = buildTestRouter({
+        i18n,
+        config,
+        children: <Search />,
+        initialUrl: '/?q="quantum"',
+      });
+
+      const { container } = render(
+        <TestProviders handler={handler} router={router} />,
+      );
+
+      const input = await findSearchInput(container);
+      expect(input.value).toBe("quantum");
+    }),
+  );
+
+  it(
     "should fetch and show cluster results when the user types",
     withStore(async () => {
       const i18n = await setupI18n();
       const { config } = baseConfig();
+      const router = buildTestRouter({
+        i18n,
+        config,
+        children: <Search />,
+      });
       const { container, findByText } = render(
         <TestProviders
-          i18n={i18n}
           handler={() => [makeCluster({ id: "c1", name: "Black Holes" })]}
-          config={config}
-        >
-          <Search />
-        </TestProviders>,
+          router={router}
+        />,
       );
 
-      await submitSearchQuery(getSearchInput(container), "black holes");
+      await submitSearchQuery(container, "black holes");
 
       const result = await findByText("Black Holes");
       expect(result).toBeTruthy();
@@ -157,41 +241,71 @@ describe("Search", () => {
     withStore(async () => {
       const i18n = await setupI18n();
       const { config } = baseConfig();
-      const calls: { path: string; input: unknown }[] = [];
+      const handler = vi.fn().mockReturnValue([]);
+      const router = buildTestRouter({
+        i18n,
+        config,
+        children: <Search />,
+      });
 
       const { container } = render(
-        <TestProviders
-          i18n={i18n}
-          handler={(path, input) => {
-            calls.push({ path, input });
-            return [];
-          }}
-          config={config}
-        >
-          <Search />
-        </TestProviders>,
+        <TestProviders handler={handler} router={router} />,
       );
 
-      await submitSearchQuery(getSearchInput(container), "quantum");
+      await submitSearchQuery(container, "quantum");
 
       await waitFor(() => {
-        expect(calls).toContainEqual({
-          path: "search.query",
-          input: { text: "quantum", limit: 500, minScore: 0.65 },
+        expect(handler).toHaveBeenCalledWith("search.query", {
+          text: "quantum",
+          limit: 500,
+          minScore: 0.65,
         });
       });
     }),
   );
 
   it(
-    "should write the picked cluster into the selection store and fit the view to it",
+    "should push the typed query into the URL when the user presses Enter",
+    withStore(async () => {
+      const i18n = await setupI18n();
+      const { config } = baseConfig();
+      const handler = vi.fn().mockReturnValue([]);
+      const router = buildTestRouter({
+        i18n,
+        config,
+        children: <Search />,
+      });
+
+      const { container } = render(
+        <TestProviders handler={handler} router={router} />,
+      );
+
+      const input = await findSearchInput(container);
+      const user = userEvent.setup();
+      await user.click(input);
+      await user.type(input, "quantum");
+      await act(() => new Promise((resolve) => setTimeout(resolve, 350)));
+      await user.keyboard("{Enter}");
+
+      await waitFor(() => {
+        expect(router.state.location.search.q).toBe("quantum");
+      });
+    }),
+  );
+
+  it(
+    "should select and focus the picked cluster on the map and leave the URL unchanged",
     withStore(async () => {
       const i18n = await setupI18n();
       const { fake, config } = baseConfig();
+      const router = buildTestRouter({
+        i18n,
+        config,
+        children: <Search />,
+      });
 
       const { container, findByRole } = render(
         <TestProviders
-          i18n={i18n}
           handler={() => [
             makeCluster({
               id: "c1",
@@ -199,13 +313,11 @@ describe("Search", () => {
               position: { x: 100, y: 200 },
             }),
           ]}
-          config={config}
-        >
-          <Search />
-        </TestProviders>,
+          router={router}
+        />,
       );
 
-      await submitSearchQuery(getSearchInput(container), "black holes");
+      await submitSearchQuery(container, "black holes");
       const option = await findByRole("option", { name: /Black Holes/ });
       await userEvent.setup().click(option);
 
@@ -221,17 +333,22 @@ describe("Search", () => {
         { x: 300, y: 100, scale: 1 },
         { animate: true },
       );
+      expect(router.state.location.search.q).toBeUndefined();
     }),
   );
 
   it(
-    'should write all results into the selection store when "highlight all" is picked',
+    'should commit the search, select all matches, and zoom to them on "highlight all"',
     withStore(async () => {
       const i18n = await setupI18n();
-      const { config } = baseConfig();
+      const { fake, config } = baseConfig();
+      const router = buildTestRouter({
+        i18n,
+        config,
+        children: <Search />,
+      });
       const { container, findByRole } = render(
         <TestProviders
-          i18n={i18n}
           handler={() => [
             makeCluster({ id: "c1", name: "First" }),
             makeCluster({
@@ -240,19 +357,159 @@ describe("Search", () => {
               position: { x: 50, y: 50 },
             }),
           ]}
-          config={config}
-        >
-          <Search />
-        </TestProviders>,
+          router={router}
+        />,
       );
 
-      await submitSearchQuery(getSearchInput(container), "something");
+      await submitSearchQuery(container, "something");
 
-      const highlightAllRow = await findByRole("option", { name: /\[2\]/ });
+      const highlightAllRow = await findByRole("option", {
+        name: /something/i,
+      });
       await userEvent.setup().click(highlightAllRow);
 
       await waitFor(() => {
         expect(useSelectionStore.getState().selectedClusters.size).toBe(2);
+      });
+      await waitFor(() => {
+        expect(router.state.location.search.q).toBe("something");
+      });
+      await waitFor(() => {
+        expect(fake.applyTransform).toHaveBeenCalled();
+      });
+    }),
+  );
+
+  it(
+    "should commit and zoom to all matches when the user submits before results have loaded",
+    withStore(async () => {
+      const i18n = await setupI18n();
+      const { fake, config } = baseConfig();
+      const router = buildTestRouter({
+        i18n,
+        config,
+        children: <Search />,
+      });
+      const handler = vi.fn().mockReturnValue([
+        makeCluster({
+          id: "c1",
+          name: "First",
+          position: { x: 100, y: 200 },
+        }),
+        makeCluster({
+          id: "c2",
+          name: "Second",
+          position: { x: 200, y: 100 },
+        }),
+      ]);
+
+      const { container } = render(
+        <TestProviders handler={handler} router={router} />,
+      );
+
+      const input = await findSearchInput(container);
+      const user = userEvent.setup();
+      await user.click(input);
+      await user.type(input, "quantum");
+      await user.keyboard("{Enter}");
+
+      await waitFor(() => {
+        expect(router.state.location.search.q).toBe("quantum");
+      });
+      await waitFor(() => {
+        expect(fake.applyTransform).toHaveBeenCalled();
+      });
+    }),
+  );
+
+  it(
+    "should clear the URL query when the user clicks reset after submitting",
+    withStore(async () => {
+      const i18n = await setupI18n();
+      const { config } = baseConfig();
+      const router = buildTestRouter({
+        i18n,
+        config,
+        children: <Search />,
+      });
+      const handler = vi
+        .fn()
+        .mockReturnValue([makeCluster({ id: "c1", name: "First" })]);
+
+      const { container, findByRole } = render(
+        <TestProviders handler={handler} router={router} />,
+      );
+
+      await submitSearchQuery(container, "quantum");
+      const submitRow = await findByRole("option", { name: /quantum/ });
+      const user = userEvent.setup();
+      await user.click(submitRow);
+
+      await waitFor(() => {
+        expect(router.state.location.search.q).toBe("quantum");
+      });
+
+      const resetButton = await findByRole("button", {
+        name: "search.dropdown.reset",
+      });
+      await user.click(resetButton);
+
+      await waitFor(() => {
+        expect(router.state.location.search.q).toBeUndefined();
+      });
+    }),
+  );
+
+  it(
+    "should refire search.query at the new minScore when the filter input is edited",
+    withStore(async () => {
+      const i18n = await setupI18n();
+      const { config } = baseConfig();
+      const handler = vi.fn().mockReturnValue([]);
+      const router = buildTestRouter({
+        i18n,
+        config,
+        children: <Search />,
+        initialUrl: '/?q="quantum"',
+      });
+
+      const { container } = render(
+        <TestProviders handler={handler} router={router} />,
+      );
+
+      await waitFor(() => {
+        expect(handler).toHaveBeenCalledWith("search.query", {
+          text: "quantum",
+          limit: 500,
+          minScore: 0.65,
+        });
+      });
+
+      // Filters render only when the dropdown is open.
+      const searchInput = await findSearchInput(container);
+      const user = userEvent.setup();
+      await user.click(searchInput);
+
+      const minScoreInput = await waitFor(() => {
+        const input = document.querySelector<HTMLInputElement>(
+          "input[type='number']",
+        );
+        if (!input) throw new Error("min-score input not found");
+        return input;
+      });
+
+      await user.clear(minScoreInput);
+      await user.type(minScoreInput, "0.9");
+
+      await waitFor(() => {
+        expect(router.state.location.search.minScore).toBe(0.9);
+      });
+      await waitFor(() => {
+        expect(handler).toHaveBeenCalledWith("search.query", {
+          text: "quantum",
+          limit: 500,
+          minScore: 0.9,
+        });
       });
     }),
   );

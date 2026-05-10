@@ -52,6 +52,7 @@
     "@headlessui/react": "^2.2.0",
     "@map-of-science/api": "workspace:*",
     "@tanstack/react-query": "5.99.0",
+    "@tanstack/react-router": "1.169.2",
     "@trpc/client": "11.17.0",
     "@trpc/tanstack-react-query": "11.17.0",
     "@uidotdev/usehooks": "^2.4.1",

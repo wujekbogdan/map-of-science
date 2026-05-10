@@ -1,8 +1,11 @@
+import { rootRouteId, useSearch } from "@tanstack/react-router";
 import { Fragment, useState } from "react";
 import styled from "styled-components";
 import { useShallow } from "zustand/react/shallow";
 import { useMapStore, RGB } from "../map/mapStore.ts";
 import { useMapViewScale } from "../map/view/hooks.ts";
+import { MIN_SCORE_DEFAULT } from "./Header/Search/searchParams.ts";
+import { useSearchActions } from "./Header/Search/useSearchActions.ts";
 
 const i18n = (str: string) => str;
 
@@ -38,6 +41,8 @@ export const DevTool = () => {
   );
   const isExpanded = visibility === "expanded";
   const zoom = useMapViewScale().toFixed(2);
+  const { minScore: searchMinScore } = useSearch({ from: rootRouteId });
+  const { setMinScore } = useSearchActions();
   const [
     fontSize,
     setFontSize,
@@ -49,8 +54,6 @@ export const DevTool = () => {
     setMaxDataPointsInViewport,
     maxLabelsInViewport,
     setMaxLabelsInViewport,
-    searchMinScore,
-    setSearchMinScore,
     svgScaleFactor,
     svgOffset,
     setSvgOffset,
@@ -75,8 +78,6 @@ export const DevTool = () => {
       state.setMaxDataPointsInViewport,
       state.maxLabelsInViewport,
       state.setMaxLabelsInViewport,
-      state.searchMinScore,
-      state.setSearchMinScore,
       state.temp__svgScaleFactor,
       state.temp__svgOffset,
       state.temp__setSvgOffset,
@@ -168,9 +169,9 @@ export const DevTool = () => {
                       step="0.01"
                       min="0"
                       max="1"
-                      value={searchMinScore}
+                      value={searchMinScore ?? MIN_SCORE_DEFAULT}
                       onChange={(e) => {
-                        setSearchMinScore(Number(e.target.value));
+                        setMinScore(Number(e.target.value));
                       }}
                     />
                   </FormControl>
