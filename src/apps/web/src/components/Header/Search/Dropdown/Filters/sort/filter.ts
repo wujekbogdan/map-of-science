@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { defineFilter } from "../defineFilter.tsx";
+import { SortFilter } from "./SortFilter.tsx";
 import { decodeSort, encodeSort } from "./encoding.ts";
 import type { SortValue } from "./sortValue.ts";
 
@@ -23,5 +24,5 @@ export const sortFilter = defineFilter<SortValue>({
   routeSchema: sortRouteSchema,
   parse: parseSort,
   serialize: serializeSort,
-  Component: () => null,
+  Component: SortFilter,
 });

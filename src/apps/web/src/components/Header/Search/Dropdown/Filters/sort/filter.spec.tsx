@@ -1,5 +1,8 @@
-import { describe, expect, it } from "vitest";
-import { parseSort, serializeSort } from "./filter.ts";
+import { cleanup, render } from "@testing-library/react";
+import { afterEach, describe, expect, it } from "vitest";
+import { parseSort, serializeSort, sortFilter } from "./filter.ts";
+
+afterEach(cleanup);
 
 describe("sort filter", () => {
   it("should parse the sort URL value into a typed sort", () => {
@@ -26,5 +29,19 @@ describe("sort filter", () => {
     expect(serializeSort({ kind: "relevance" })).toEqual({
       sort: undefined,
     });
+  });
+
+  it("should render the sort UI driven by the URL params", () => {
+    const { container } = render(
+      <sortFilter.Component
+        params={{ sort: "articlesCount.desc" }}
+        onChange={() => {
+          /* empty */
+        }}
+      />,
+    );
+    const select = container.querySelector<HTMLSelectElement>("select");
+    if (!select) throw new Error("sort select not found");
+    expect(select.value).toBe("articlesCount");
   });
 });
