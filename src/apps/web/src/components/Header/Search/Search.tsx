@@ -12,7 +12,7 @@ import {
 import { useMapView } from "../../../map/view/hooks.ts";
 import { Dropdown, Option } from "./Dropdown/Dropdown.tsx";
 import { FiltersBar } from "./Dropdown/Filters/FiltersBar.tsx";
-import { MIN_SCORE_DEFAULT } from "./searchParams.ts";
+import { parseMinScore } from "./Dropdown/Filters/minScore/filter.ts";
 import { useSearchActions } from "./useSearchActions.ts";
 
 const MIN_QUERY_LENGTH = 3;
@@ -26,7 +26,9 @@ export const Search = () => {
   const setSelectedClusters = useSelectionStore((s) => s.setSelectedClusters);
   const clearSelection = useSelectionStore((s) => s.clearSelection);
 
-  const { q = "", minScore } = useSearch({ from: rootRouteId });
+  const params = useSearch({ from: rootRouteId });
+  const { q = "" } = params;
+  const minScore = parseMinScore(params);
   const { commit, clear } = useSearchActions();
   const [previousQ, setPreviousQ] = useState(q);
   const [inputValue, setInputValue] = useState(q);
@@ -43,7 +45,7 @@ export const Search = () => {
       {
         text: debouncedInputValue,
         limit: maxResults,
-        minScore: minScore ?? MIN_SCORE_DEFAULT,
+        minScore,
       },
       { enabled: debouncedInputValue.length >= MIN_QUERY_LENGTH },
     ),

@@ -1,36 +1,33 @@
 import { ChangeEventHandler, useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { MIN_SCORE_DEFAULT } from "../../searchParams.ts";
-import { formatScore } from "../formatScore.ts";
+import { formatScore } from "../../formatScore.ts";
+import { MIN_SCORE_DEFAULT } from "./filter.ts";
 
 type Props = {
-  value: number | undefined;
-  onChange: (next: number | undefined) => void;
+  value: number;
+  onChange: (next: number) => void;
 };
-
-const toDisplay = (value: number | undefined) =>
-  String(value ?? MIN_SCORE_DEFAULT);
 
 export const MinScoreFilter = ({ value, onChange }: Props) => {
   const { t } = useTranslation();
   // Display text is owned locally while the user types so an external value
   // change (e.g. URL re-resolving to default after a clear) does not overwrite
   // the in-progress input.
-  const [inputText, setInputText] = useState(() => toDisplay(value));
+  const [inputText, setInputText] = useState(() => String(value));
   const [focused, setFocused] = useState(false);
   const [previousValue, setPreviousValue] = useState(value);
 
   if (value !== previousValue) {
     setPreviousValue(value);
-    if (!focused) setInputText(toDisplay(value));
+    if (!focused) setInputText(String(value));
   }
 
   const onInputChange: ChangeEventHandler<HTMLInputElement> = (event) => {
     const raw = event.target.value;
     setInputText(raw);
     if (raw === "") {
-      onChange(undefined);
+      onChange(MIN_SCORE_DEFAULT);
       return;
     }
     const parsed = Number(raw);
@@ -38,9 +35,13 @@ export const MinScoreFilter = ({ value, onChange }: Props) => {
     onChange(parsed);
   };
 
+  const onFocus = () => {
+    setFocused(true);
+  };
+
   const onBlur = () => {
     setFocused(false);
-    setInputText(toDisplay(value));
+    setInputText(String(value));
   };
 
   return (
@@ -49,15 +50,13 @@ export const MinScoreFilter = ({ value, onChange }: Props) => {
       <Input
         id="min-score-filter"
         type="number"
-        step={0.01}
         min={0}
         max={1}
+        step={0.01}
         value={inputText}
         placeholder={formatScore(MIN_SCORE_DEFAULT)}
         onChange={onInputChange}
-        onFocus={() => {
-          setFocused(true);
-        }}
+        onFocus={onFocus}
         onBlur={onBlur}
       />
     </Field>
