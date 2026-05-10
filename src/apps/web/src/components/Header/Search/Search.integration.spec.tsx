@@ -185,6 +185,7 @@ describe("Search", () => {
           text: "quantum",
           limit: 500,
           minScore: 0.8,
+          sort: { kind: "relevance" },
         });
       });
     }),
@@ -259,6 +260,7 @@ describe("Search", () => {
           text: "quantum",
           limit: 500,
           minScore: 0.65,
+          sort: { kind: "relevance" },
         });
       });
     }),
@@ -482,6 +484,7 @@ describe("Search", () => {
           text: "quantum",
           limit: 500,
           minScore: 0.65,
+          sort: { kind: "relevance" },
         });
       });
 
@@ -509,6 +512,7 @@ describe("Search", () => {
           text: "quantum",
           limit: 500,
           minScore: 0.9,
+          sort: { kind: "relevance" },
         });
       });
     }),
