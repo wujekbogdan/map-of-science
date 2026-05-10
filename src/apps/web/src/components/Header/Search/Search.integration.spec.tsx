@@ -491,7 +491,7 @@ describe("Search", () => {
       await user.click(searchInput);
 
       const minScoreInput = await waitFor(() => {
-        const input = container.querySelector<HTMLInputElement>(
+        const input = document.querySelector<HTMLInputElement>(
           "input[type='number']",
         );
         if (!input) throw new Error("min-score input not found");
