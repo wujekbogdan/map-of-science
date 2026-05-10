@@ -1,4 +1,5 @@
 import { LABEL_DOT_GAP_PX } from "../../../map/labels/config.ts";
+import { useMapStore } from "../../../map/mapStore.ts";
 
 export type ClusterLevel = 1 | 2 | 3 | 4 | 5 | 6;
 
@@ -27,6 +28,20 @@ export const getClusterLevel = (
   if (articlesCount > thresholds[4]) return 4;
   if (articlesCount >= thresholds[5]) return 5;
   return 6;
+};
+
+export const getClusterDotRadiusPx = (
+  articlesCount: number,
+  thresholds: ArticleThresholds,
+): number => CLUSTER_DOT_RADII_PX[getClusterLevel(articlesCount, thresholds)];
+
+// Binds the radius lookup to the current store thresholds so consumers
+// outside the map (e.g. search dropdown rows) can ask for a radius from a
+// raw articlesCount without threading thresholds through props.
+export const useClusterDotRadius = () => {
+  const thresholds = useMapStore((state) => state.clusterLevelArticleThreshold);
+  return (articlesCount: number) =>
+    getClusterDotRadiusPx(articlesCount, thresholds);
 };
 
 // Augments a cluster with the metadata its label needs: level, font size in
