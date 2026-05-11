@@ -13,7 +13,6 @@ import { useSearchActions } from "./useSearchActions.ts";
 import { MIN_QUERY_LENGTH, useSearchQuery } from "./useSearchQuery.ts";
 
 const INPUT_DEBOUNCE_MS = 300;
-const LOADING_DELAY_MS = 250;
 
 export const Search = () => {
   const view = useMapView();
@@ -35,7 +34,6 @@ export const Search = () => {
 
   const { data: results = [], isFetching } =
     useSearchQuery(debouncedInputValue);
-  const isLoading = useDebounce(isFetching, LOADING_DELAY_MS);
 
   const dropdownOptions = useMemo<Option[]>(
     () =>
@@ -93,7 +91,7 @@ export const Search = () => {
     <Form onSubmit={onFormSubmit}>
       <Dropdown
         value={inputValue}
-        isLoading={isLoading}
+        isFetching={isFetching}
         options={dropdownOptions}
         isQuerySubmittable={isQuerySubmittable}
         onInput={onInput}

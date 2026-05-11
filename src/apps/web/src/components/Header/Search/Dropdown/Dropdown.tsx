@@ -10,6 +10,7 @@ import styled from "styled-components";
 import type { SelectedCluster } from "../../../../map/selectionStore.ts";
 import { useClusterDotRadius } from "../../../Map/Clusters/clusterLevel.ts";
 import { ClusterResultRow } from "./ClusterResultRow.tsx";
+import { Spinner } from "./Spinner.tsx";
 import { SubmitRow } from "./SubmitRow.tsx";
 import CloseIcon from "./close.svg";
 import {
@@ -41,7 +42,7 @@ type DropdownProps = {
   onSelect: (option: Option) => void;
   onReset: () => void;
   onInput: (query: string) => void;
-  isLoading: boolean;
+  isFetching: boolean;
   filters?: ReactNode;
 };
 
@@ -83,7 +84,6 @@ export const Dropdown = (props: DropdownProps) => {
   );
 
   const showHelpText = !props.isQuerySubmittable && value.length > 0;
-  const showLoadingText = props.isQuerySubmittable && props.isLoading;
 
   const placeholders = Array.from({ length: 10 }, (_, i) =>
     t(`search.dropdown.placeholder.${i + 1}`),
@@ -155,10 +155,7 @@ export const Dropdown = (props: DropdownProps) => {
                 {showHelpText && (
                   <NoResults>{t("search.dropdown.enterMin")}</NoResults>
                 )}
-                {showLoadingText && (
-                  <NoResults>{t("search.dropdown.loading")}…</NoResults>
-                )}
-                {props.isQuerySubmittable && !showLoadingText && (
+                {props.isQuerySubmittable && (
                   <>
                     <ComboboxOptionHeadless value={submitOption}>
                       {({ focus, selected }) => (
@@ -209,10 +206,16 @@ export const Dropdown = (props: DropdownProps) => {
           </div>
         )}
       </Combobox>
-      {selection && (
-        <ResetButton role="button" onClick={onResetClick}>
-          <SrOnly>{t("search.dropdown.reset")}</SrOnly>
-        </ResetButton>
+      {props.isFetching ? (
+        <InputSlot>
+          <Spinner />
+        </InputSlot>
+      ) : (
+        selection && (
+          <ResetButton role="button" onClick={onResetClick}>
+            <SrOnly>{t("search.dropdown.reset")}</SrOnly>
+          </ResetButton>
+        )
       )}
     </Wrapper>
   );
@@ -343,4 +346,14 @@ const ResetButton = styled.span`
   &:hover {
     opacity: 0.8;
   }
+`;
+
+const InputSlot = styled.span`
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  pointer-events: none;
 `;

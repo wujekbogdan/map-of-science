@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { rootRouteId, useSearch } from "@tanstack/react-router";
 import { useTRPC } from "../../../api-client";
 import { useMapStore } from "../../../map/mapStore.ts";
@@ -18,7 +18,10 @@ export const useSearchQuery = (text: string) => {
   return useQuery(
     trpc.search.query.queryOptions(
       toSearchInput({ text, limit, minScore, sort }),
-      { enabled: text.length >= MIN_QUERY_LENGTH },
+      {
+        enabled: text.length >= MIN_QUERY_LENGTH,
+        placeholderData: keepPreviousData,
+      },
     ),
   );
 };
