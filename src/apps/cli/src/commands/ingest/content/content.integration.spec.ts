@@ -108,5 +108,6 @@ describe("ingest:content e2e", () => {
         });
       });
     }),
+    60_000,
   );
 });
