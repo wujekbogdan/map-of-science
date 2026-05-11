@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const sortValueSchema = z.discriminatedUnion("kind", [
+export const sortSelectionSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("relevance") }),
   z.strictObject({
     kind: z.literal("articlesCount"),
@@ -8,4 +8,4 @@ export const sortValueSchema = z.discriminatedUnion("kind", [
   }),
 ]);
 
-export type SortValue = z.infer<typeof sortValueSchema>;
+export type SortSelection = z.infer<typeof sortSelectionSchema>;

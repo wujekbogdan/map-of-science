@@ -1,14 +1,14 @@
 import { z } from "zod";
-import { type SortValue, sortValueSchema } from "./sortValue.ts";
+import { type SortSelection, sortSelectionSchema } from "./sortSelection.ts";
 
 const sortStringSchema = z.preprocess((raw) => {
   if (typeof raw !== "string") return null;
   const [kind, ...rest] = raw.split(".");
   return rest.length ? { kind, direction: rest.join(".") } : { kind };
-}, sortValueSchema);
+}, sortSelectionSchema);
 
-export const encodeSort = (value: SortValue): string =>
+export const encodeSort = (value: SortSelection): string =>
   "direction" in value ? `${value.kind}.${value.direction}` : value.kind;
 
-export const decodeSort = (raw: unknown): SortValue | undefined =>
+export const decodeSort = (raw: unknown): SortSelection | undefined =>
   sortStringSchema.safeParse(raw).data;

@@ -1,8 +1,11 @@
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import type { SortValue } from "../../sortValue.ts";
+import type { SortSelection } from "../../sortSelection.ts";
 
-type Props = { value: SortValue; onChange: (next: SortValue) => void };
+type Props = {
+  value: SortSelection;
+  onChange: (next: SortSelection) => void;
+};
 
 export const DirectionToggle = ({ value, onChange }: Props) => {
   const { t } = useTranslation();

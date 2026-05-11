@@ -2,11 +2,11 @@ import { cleanup, render } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { SortFilter } from "./SortFilter.tsx";
-import type { SortValue } from "./sortValue.ts";
+import type { SortSelection } from "./sortSelection.ts";
 
 afterEach(cleanup);
 
-const renderSortFilter = (value: SortValue) => {
+const renderSortFilter = (value: SortSelection) => {
   const onChange = vi.fn();
   const { container } = render(
     <SortFilter value={value} onChange={onChange} />,

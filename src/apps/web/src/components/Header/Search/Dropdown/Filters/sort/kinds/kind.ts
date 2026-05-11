@@ -1,8 +1,11 @@
 import type { FC } from "react";
-import type { SortValue } from "../sortValue.ts";
+import type { SortSelection } from "../sortSelection.ts";
 
 export type SortKind = {
-  id: SortValue["kind"];
-  default: SortValue;
-  Component?: FC<{ value: SortValue; onChange: (next: SortValue) => void }>;
+  id: SortSelection["kind"];
+  default: SortSelection;
+  Component?: FC<{
+    value: SortSelection;
+    onChange: (next: SortSelection) => void;
+  }>;
 };
