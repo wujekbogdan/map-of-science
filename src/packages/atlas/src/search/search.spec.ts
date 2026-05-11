@@ -2,14 +2,14 @@ import { describe, expect, it, vi } from "vitest";
 import type { Cluster } from "../clusters/clusters.js";
 import { createSearch } from "./search.js";
 
-const buildMatch = (id: string, score: number) =>
+const buildMatch = (id: string, score: number, articlesCount = 0) =>
   ({
     id,
     externalId: 0,
     position: { x: 0, y: 0 },
     name: null,
     nameSource: null,
-    articlesCount: 0,
+    articlesCount,
     growthRating: 0,
     embedding: { model: "gemini-embedding-001", source: "article-titles" },
     keyConcepts: [],
@@ -75,4 +75,31 @@ describe("createSearch", () => {
       minScore: 0.9,
     });
   });
+
+  it.each([
+    ["desc", ["c-2", "c-3", "c-1"]],
+    ["asc", ["c-1", "c-3", "c-2"]],
+  ] as const)(
+    "should re-rank by articlesCount %s when sort kind is articlesCount",
+    async (direction, expectedIds) => {
+      const findByVector = vi
+        .fn()
+        .mockResolvedValueOnce([
+          buildMatch("c-1", 0.95, 100),
+          buildMatch("c-2", 0.9, 500),
+          buildMatch("c-3", 0.85, 300),
+        ]);
+      const search = createSearch({
+        clusters: { findByVector },
+        embedQuery: vi.fn().mockResolvedValueOnce([0]),
+      });
+
+      const results = await search.query({
+        text: "anything",
+        sort: { kind: "articlesCount", direction },
+      });
+
+      expect(results.map((match) => match.id)).toEqual(expectedIds);
+    },
+  );
 });

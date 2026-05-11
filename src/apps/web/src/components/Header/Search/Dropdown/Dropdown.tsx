@@ -4,12 +4,20 @@ import {
   ComboboxOptions as ComboboxOptionsHeadless,
   ComboboxOption as ComboboxOptionHeadless,
 } from "@headlessui/react";
-import { ChangeEvent, ReactNode, useMemo, useRef, useState } from "react";
+import {
+  ChangeEvent,
+  ReactNode,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import type { SelectedCluster } from "../../../../map/selectionStore.ts";
 import { useClusterDotRadius } from "../../../Map/Clusters/clusterLevel.ts";
 import { ClusterResultRow } from "./ClusterResultRow.tsx";
+import { Spinner } from "./Spinner.tsx";
 import { SubmitRow } from "./SubmitRow.tsx";
 import CloseIcon from "./close.svg";
 import {
@@ -36,13 +44,41 @@ export type Option =
 
 type DropdownProps = {
   value: string;
+  query: string;
   options: Option[];
   isQuerySubmittable: boolean;
   onSelect: (option: Option) => void;
   onReset: () => void;
   onInput: (query: string) => void;
-  isLoading: boolean;
+  onItemHover: (clusterId: string | null) => void;
+  isFetching: boolean;
   filters?: ReactNode;
+};
+
+// HeadlessUI Combobox keeps DOM focus on the input and tracks the active
+// option via aria-activedescendant, so neither row mouse events nor onFocus
+// give us a signal that covers arrow-key navigation. The render-prop
+// activeOption is the only unified source for "currently focused option"
+// across mouse and keyboard, and bridging it into the store is a sync to an
+// external system - the textbook effect case.
+const HoverReporter = ({
+  activeOption,
+  onItemHover,
+}: {
+  activeOption: Option | null;
+  onItemHover: (clusterId: string | null) => void;
+}) => {
+  useEffect(() => {
+    const id =
+      activeOption?.type === "cluster" ? activeOption.cluster.id : null;
+    onItemHover(id);
+    // Pair every set with a cleanup-clear so transitions, remounts, and
+    // unmounts all converge on null - nothing can leave a stale id behind.
+    return () => {
+      onItemHover(null);
+    };
+  }, [activeOption, onItemHover]);
+  return null;
 };
 
 const tokenizeLabel = (label: string, query: string): Token[] => {
@@ -62,7 +98,7 @@ const tokenizeLabel = (label: string, query: string): Token[] => {
 
 export const Dropdown = (props: DropdownProps) => {
   const { t } = useTranslation();
-  const { options: rawOptions, value } = props;
+  const { options: rawOptions, value, query } = props;
   const [selection, setSelection] = useState<Option | null>(null);
   const getDotRadius = useClusterDotRadius();
 
@@ -70,9 +106,9 @@ export const Dropdown = (props: DropdownProps) => {
     () =>
       rawOptions.map((option) => ({
         ...option,
-        tokens: tokenizeLabel(option.label, value),
+        tokens: tokenizeLabel(option.label, query),
       })),
-    [rawOptions, value],
+    [rawOptions, query],
   );
   const allClusters = useMemo(
     () =>
@@ -83,7 +119,6 @@ export const Dropdown = (props: DropdownProps) => {
   );
 
   const showHelpText = !props.isQuerySubmittable && value.length > 0;
-  const showLoadingText = props.isQuerySubmittable && props.isLoading;
 
   const placeholders = Array.from({ length: 10 }, (_, i) =>
     t(`search.dropdown.placeholder.${i + 1}`),
@@ -119,8 +154,12 @@ export const Dropdown = (props: DropdownProps) => {
   return (
     <Wrapper>
       <Combobox value={selection} immediate onChange={onSelectionChange}>
-        {({ open }) => (
+        {({ open, activeOption }) => (
           <div>
+            <HoverReporter
+              activeOption={activeOption}
+              onItemHover={props.onItemHover}
+            />
             <ComboboxInput
               autoComplete="off"
               $open={open}
@@ -155,10 +194,7 @@ export const Dropdown = (props: DropdownProps) => {
                 {showHelpText && (
                   <NoResults>{t("search.dropdown.enterMin")}</NoResults>
                 )}
-                {showLoadingText && (
-                  <NoResults>{t("search.dropdown.loading")}…</NoResults>
-                )}
-                {props.isQuerySubmittable && !showLoadingText && (
+                {props.isQuerySubmittable && (
                   <>
                     <ComboboxOptionHeadless value={submitOption}>
                       {({ focus, selected }) => (
@@ -209,10 +245,16 @@ export const Dropdown = (props: DropdownProps) => {
           </div>
         )}
       </Combobox>
-      {selection && (
-        <ResetButton role="button" onClick={onResetClick}>
-          <SrOnly>{t("search.dropdown.reset")}</SrOnly>
-        </ResetButton>
+      {props.isFetching ? (
+        <InputSlot>
+          <Spinner />
+        </InputSlot>
+      ) : (
+        selection && (
+          <ResetButton role="button" onClick={onResetClick}>
+            <SrOnly>{t("search.dropdown.reset")}</SrOnly>
+          </ResetButton>
+        )
       )}
     </Wrapper>
   );
@@ -315,6 +357,7 @@ const ComboboxOption = styled.div<{
 }>`
   color: #333;
   padding: 12px;
+  cursor: pointer;
   background-color: ${({ $focus }) => ($focus ? "#eee" : "transparent")};
 `;
 
@@ -343,4 +386,14 @@ const ResetButton = styled.span`
   &:hover {
     opacity: 0.8;
   }
+`;
+
+const InputSlot = styled.span`
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  pointer-events: none;
 `;
