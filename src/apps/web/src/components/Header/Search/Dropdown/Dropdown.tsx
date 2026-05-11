@@ -4,7 +4,14 @@ import {
   ComboboxOptions as ComboboxOptionsHeadless,
   ComboboxOption as ComboboxOptionHeadless,
 } from "@headlessui/react";
-import { ChangeEvent, ReactNode, useMemo, useRef, useState } from "react";
+import {
+  ChangeEvent,
+  ReactNode,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import type { SelectedCluster } from "../../../../map/selectionStore.ts";
@@ -43,8 +50,35 @@ type DropdownProps = {
   onSelect: (option: Option) => void;
   onReset: () => void;
   onInput: (query: string) => void;
+  onItemHover: (clusterId: string | null) => void;
   isFetching: boolean;
   filters?: ReactNode;
+};
+
+// HeadlessUI Combobox keeps DOM focus on the input and tracks the active
+// option via aria-activedescendant, so neither row mouse events nor onFocus
+// give us a signal that covers arrow-key navigation. The render-prop
+// activeOption is the only unified source for "currently focused option"
+// across mouse and keyboard, and bridging it into the store is a sync to an
+// external system - the textbook effect case.
+const HoverReporter = ({
+  activeOption,
+  onItemHover,
+}: {
+  activeOption: Option | null;
+  onItemHover: (clusterId: string | null) => void;
+}) => {
+  useEffect(() => {
+    const id =
+      activeOption?.type === "cluster" ? activeOption.cluster.id : null;
+    onItemHover(id);
+    // Pair every set with a cleanup-clear so transitions, remounts, and
+    // unmounts all converge on null - nothing can leave a stale id behind.
+    return () => {
+      onItemHover(null);
+    };
+  }, [activeOption, onItemHover]);
+  return null;
 };
 
 const tokenizeLabel = (label: string, query: string): Token[] => {
@@ -120,8 +154,12 @@ export const Dropdown = (props: DropdownProps) => {
   return (
     <Wrapper>
       <Combobox value={selection} immediate onChange={onSelectionChange}>
-        {({ open }) => (
+        {({ open, activeOption }) => (
           <div>
+            <HoverReporter
+              activeOption={activeOption}
+              onItemHover={props.onItemHover}
+            />
             <ComboboxInput
               autoComplete="off"
               $open={open}

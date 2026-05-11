@@ -46,7 +46,11 @@ const clusterOption: Option = {
 
 const renderDropdown = (
   instance: i18n,
-  props: { value: string; query: string },
+  props: {
+    value: string;
+    query: string;
+    onItemHover?: (id: string | null) => void;
+  },
 ) =>
   render(
     <I18nextProvider i18n={instance}>
@@ -59,6 +63,7 @@ const renderDropdown = (
         onSelect={vi.fn()}
         onReset={vi.fn()}
         onInput={vi.fn()}
+        onItemHover={props.onItemHover ?? vi.fn()}
       />
     </I18nextProvider>,
   );
@@ -82,6 +87,50 @@ describe("Dropdown", () => {
         .map((node) => node.textContent)
         .join("");
       expect(boldText).toBe("Black");
+    }),
+  );
+
+  it(
+    "should report null when unmounted while a cluster is focused",
+    withDropdown(async (instance) => {
+      const onItemHover = vi.fn();
+      const { container, unmount } = renderDropdown(instance, {
+        value: "Black",
+        query: "Black",
+        onItemHover,
+      });
+
+      const input = container.querySelector("input");
+      if (!input) throw new Error("input not found");
+      const user = userEvent.setup();
+      await user.click(input);
+      await user.keyboard("{ArrowDown}{ArrowDown}");
+
+      onItemHover.mockClear();
+      unmount();
+
+      expect(onItemHover).toHaveBeenLastCalledWith(null);
+    }),
+  );
+
+  it(
+    "should report the cluster id of the focused option",
+    withDropdown(async (instance) => {
+      const onItemHover = vi.fn();
+      const { container } = renderDropdown(instance, {
+        value: "Black",
+        query: "Black",
+        onItemHover,
+      });
+
+      const input = container.querySelector("input");
+      if (!input) throw new Error("input not found");
+      const user = userEvent.setup();
+      await user.click(input);
+      // Skip the leading submit option and land on the cluster row.
+      await user.keyboard("{ArrowDown}{ArrowDown}");
+
+      expect(onItemHover).toHaveBeenCalledWith(cluster.id);
     }),
   );
 });

@@ -18,6 +18,9 @@ export const Search = () => {
   const view = useMapView();
   const setSelectedClusters = useSelectionStore((s) => s.setSelectedClusters);
   const clearSelection = useSelectionStore((s) => s.clearSelection);
+  const setSearchHoveredCluster = useSelectionStore(
+    (s) => s.setSearchHoveredCluster,
+  );
 
   const params = useSearch({ from: rootRouteId });
   const { q = "" } = params;
@@ -98,6 +101,7 @@ export const Search = () => {
         onInput={onInput}
         onSelect={onSelectionChange}
         onReset={onReset}
+        onItemHover={setSearchHoveredCluster}
         filters={<FiltersBar />}
       />
     </Form>
