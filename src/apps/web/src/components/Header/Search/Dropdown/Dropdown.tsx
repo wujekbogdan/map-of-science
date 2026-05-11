@@ -318,6 +318,7 @@ const ComboboxOption = styled.div<{
 }>`
   color: #333;
   padding: 12px;
+  cursor: pointer;
   background-color: ${({ $focus }) => ($focus ? "#eee" : "transparent")};
 `;
 
