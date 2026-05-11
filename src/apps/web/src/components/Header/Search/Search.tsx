@@ -91,6 +91,7 @@ export const Search = () => {
     <Form onSubmit={onFormSubmit}>
       <Dropdown
         value={inputValue}
+        query={debouncedInputValue}
         isFetching={isFetching}
         options={dropdownOptions}
         isQuerySubmittable={isQuerySubmittable}

@@ -37,6 +37,7 @@ export type Option =
 
 type DropdownProps = {
   value: string;
+  query: string;
   options: Option[];
   isQuerySubmittable: boolean;
   onSelect: (option: Option) => void;
@@ -63,7 +64,7 @@ const tokenizeLabel = (label: string, query: string): Token[] => {
 
 export const Dropdown = (props: DropdownProps) => {
   const { t } = useTranslation();
-  const { options: rawOptions, value } = props;
+  const { options: rawOptions, value, query } = props;
   const [selection, setSelection] = useState<Option | null>(null);
   const getDotRadius = useClusterDotRadius();
 
@@ -71,9 +72,9 @@ export const Dropdown = (props: DropdownProps) => {
     () =>
       rawOptions.map((option) => ({
         ...option,
-        tokens: tokenizeLabel(option.label, value),
+        tokens: tokenizeLabel(option.label, query),
       })),
-    [rawOptions, value],
+    [rawOptions, query],
   );
   const allClusters = useMemo(
     () =>

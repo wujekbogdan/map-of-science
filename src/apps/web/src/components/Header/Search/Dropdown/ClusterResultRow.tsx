@@ -34,7 +34,7 @@ export const ClusterResultRow = ({
     </MetaGroup>
     <Name>
       {tokens.map((token, index) => (
-        <NameToken key={index} $type={token.type}>
+        <NameToken key={index} $type={token.type} data-test-token={token.type}>
           {token.text}
         </NameToken>
       ))}
