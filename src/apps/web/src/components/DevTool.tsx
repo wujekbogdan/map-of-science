@@ -4,6 +4,7 @@ import styled from "styled-components";
 import { useShallow } from "zustand/react/shallow";
 import { useMapStore, RGB } from "../map/mapStore.ts";
 import { useMapViewScale } from "../map/view/hooks.ts";
+import { parseMinScore } from "./Header/Search/Dropdown/Filters/minScore/filter.ts";
 import { useSearchActions } from "./Header/Search/useSearchActions.ts";
 
 const i18n = (str: string) => str;
@@ -40,7 +41,8 @@ export const DevTool = () => {
   );
   const isExpanded = visibility === "expanded";
   const zoom = useMapViewScale().toFixed(2);
-  const { minScore: searchMinScore } = useSearch({ from: rootRouteId });
+  const params = useSearch({ from: rootRouteId });
+  const searchMinScore = parseMinScore(params);
   const { setMinScore } = useSearchActions();
   const [
     fontSize,

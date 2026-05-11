@@ -29,3 +29,5 @@ export type {
 
 export { createSearch } from "./search/search.js";
 export type { EmbedQuery, Search } from "./search/search.js";
+export { DEFAULT_SORT, sortValueSchema } from "./search/sort.js";
+export type { SortValue } from "./search/sort.js";

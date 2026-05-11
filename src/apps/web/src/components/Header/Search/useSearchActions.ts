@@ -16,7 +16,7 @@ export const useSearchActions = () => {
     });
   };
 
-  const setMinScore = (value: number) => {
+  const setMinScore = (value: number | undefined) => {
     void navigate({
       search: (prev) => ({ ...prev, minScore: value }),
       replace: true,

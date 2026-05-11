@@ -48,9 +48,13 @@ const mockLink =
   ({ op }) =>
     observable((observer) => {
       try {
-        const result = handler(op.path, op.input);
-        observer.next({ result: { data: result } });
-        observer.complete();
+        Promise.resolve(handler(op.path, op.input)).then(
+          (data) => {
+            observer.next({ result: { data } });
+            observer.complete();
+          },
+          (err) => observer.error(err as never),
+        );
       } catch (err) {
         observer.error(err as never);
       }
@@ -185,6 +189,7 @@ describe("Search", () => {
           text: "quantum",
           limit: 500,
           minScore: 0.8,
+          sort: { kind: "relevance" },
         });
       });
     }),
@@ -259,6 +264,7 @@ describe("Search", () => {
           text: "quantum",
           limit: 500,
           minScore: 0.65,
+          sort: { kind: "relevance" },
         });
       });
     }),
@@ -363,7 +369,9 @@ describe("Search", () => {
 
       await submitSearchQuery(container, "something");
 
-      const highlightAllRow = await findByRole("option", { name: /\[2\]/ });
+      const highlightAllRow = await findByRole("option", {
+        name: /something/i,
+      });
       await userEvent.setup().click(highlightAllRow);
 
       await waitFor(() => {
@@ -388,20 +396,18 @@ describe("Search", () => {
         config,
         children: <Search />,
       });
-      const handler = vi
-        .fn()
-        .mockReturnValue([
-          makeCluster({
-            id: "c1",
-            name: "First",
-            position: { x: 100, y: 200 },
-          }),
-          makeCluster({
-            id: "c2",
-            name: "Second",
-            position: { x: 200, y: 100 },
-          }),
-        ]);
+      const handler = vi.fn().mockReturnValue([
+        makeCluster({
+          id: "c1",
+          name: "First",
+          position: { x: 100, y: 200 },
+        }),
+        makeCluster({
+          id: "c2",
+          name: "Second",
+          position: { x: 200, y: 100 },
+        }),
+      ]);
 
       const { container } = render(
         <TestProviders handler={handler} router={router} />,
@@ -456,6 +462,120 @@ describe("Search", () => {
 
       await waitFor(() => {
         expect(router.state.location.search.q).toBeUndefined();
+      });
+    }),
+  );
+
+  it(
+    "should keep previous results visible and show a spinner while the next query is in flight",
+    withStore(async () => {
+      const i18n = await setupI18n();
+      const { config } = baseConfig();
+      const router = buildTestRouter({
+        i18n,
+        config,
+        children: <Search />,
+      });
+
+      let resolveSecond!: (value: Match[]) => void;
+      const secondCall = new Promise<Match[]>((resolve) => {
+        resolveSecond = resolve;
+      });
+      const handler = vi
+        .fn()
+        .mockReturnValueOnce([
+          makeCluster({
+            id: "c1",
+            name: "Black Holes",
+            displayName: "Black Holes",
+          }),
+          makeCluster({ id: "c2", name: "Quasars", displayName: "Quasars" }),
+        ])
+        .mockReturnValueOnce(secondCall);
+
+      const { container, findAllByText, queryAllByText } = render(
+        <TestProviders handler={handler} router={router} />,
+      );
+      const querySpinner = () =>
+        document.querySelector('[aria-label="search.dropdown.loading"]');
+
+      await submitSearchQuery(container, "black holes");
+      await findAllByText("Black Holes");
+
+      const input = await findSearchInput(container);
+      const user = userEvent.setup();
+      await user.type(input, " more");
+      await act(() => new Promise((resolve) => setTimeout(resolve, 350)));
+
+      expect(queryAllByText("Black Holes").length).toBeGreaterThan(0);
+      expect(queryAllByText("Quasars").length).toBeGreaterThan(0);
+      expect(querySpinner()).toBeTruthy();
+
+      act(() => {
+        resolveSecond([
+          makeCluster({ id: "c3", name: "Pulsars", displayName: "Pulsars" }),
+        ]);
+      });
+
+      await findAllByText("Pulsars");
+      await waitFor(() => {
+        expect(querySpinner()).toBeFalsy();
+      });
+    }),
+  );
+
+  it(
+    "should refire search.query at the new minScore when the filter input is edited",
+    withStore(async () => {
+      const i18n = await setupI18n();
+      const { config } = baseConfig();
+      const handler = vi.fn().mockReturnValue([]);
+      const router = buildTestRouter({
+        i18n,
+        config,
+        children: <Search />,
+        initialUrl: '/?q="quantum"',
+      });
+
+      const { container } = render(
+        <TestProviders handler={handler} router={router} />,
+      );
+
+      await waitFor(() => {
+        expect(handler).toHaveBeenCalledWith("search.query", {
+          text: "quantum",
+          limit: 500,
+          minScore: 0.65,
+          sort: { kind: "relevance" },
+        });
+      });
+
+      // Filters render only when the dropdown is open.
+      const searchInput = await findSearchInput(container);
+      const user = userEvent.setup();
+      await user.click(searchInput);
+
+      const minScoreInput = await waitFor(() => {
+        const input = document.querySelector<HTMLInputElement>(
+          "input[type='number']",
+        );
+        if (!input) throw new Error("min-score input not found");
+        return input;
+      });
+
+      await user.clear(minScoreInput);
+      await user.type(minScoreInput, "0.9");
+
+      await waitFor(() => {
+        expect(router.state.location.search.minScore).toBe(0.9);
+      });
+      await waitFor(() => {
+        expect(handler).toHaveBeenCalledWith("search.query", {
+          text: "quantum",
+          limit: 500,
+          minScore: 0.9,
+          sort: { kind: "relevance" },
+        });
       });
     }),
   );

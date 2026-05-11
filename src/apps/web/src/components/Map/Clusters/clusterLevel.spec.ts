@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { LABEL_DOT_GAP_PX } from "../../../map/labels/config.ts";
-import { toLabeledCluster } from "./clusterLevel.ts";
+import { getClusterDotRadiusPx, toLabeledCluster } from "./clusterLevel.ts";
 
 const articleThresholds = {
   1: 2000,
@@ -56,4 +56,23 @@ describe("toLabeledCluster", () => {
     expect(labeled.fontSize).toBe(6);
     expect(labeled.labelOffsetPx).toBe(3 + LABEL_DOT_GAP_PX);
   });
+});
+
+describe("getClusterDotRadiusPx", () => {
+  it.each([
+    { articlesCount: 5000, radius: 8 },
+    { articlesCount: 1500, radius: 7 },
+    { articlesCount: 800, radius: 6 },
+    { articlesCount: 300, radius: 5 },
+    { articlesCount: 100, radius: 4 },
+    { articlesCount: 10, radius: 3 },
+    { articlesCount: 0, radius: 3 },
+  ])(
+    "should map $articlesCount articles to a $radius px dot",
+    ({ articlesCount, radius }) => {
+      expect(getClusterDotRadiusPx(articlesCount, articleThresholds)).toBe(
+        radius,
+      );
+    },
+  );
 });
