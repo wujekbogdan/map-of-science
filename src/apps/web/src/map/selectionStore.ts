@@ -8,6 +8,7 @@ export const useSelectionStore = create(
   combine(
     {
       selectedClusters: new Map<string, SelectedCluster>(),
+      searchHoveredClusterId: null as string | null,
     },
     (set) => ({
       setSelectedClusters: (clusters: SelectedCluster[]) => {
@@ -19,6 +20,9 @@ export const useSelectionStore = create(
       },
       clearSelection: () => {
         set({ selectedClusters: new Map() });
+      },
+      setSearchHoveredCluster: (id: string | null) => {
+        set({ searchHoveredClusterId: id });
       },
     }),
   ),

@@ -1,15 +1,25 @@
-import { rootRouteId, useSearch } from "@tanstack/react-router";
+import { rootRouteId, useNavigate, useSearch } from "@tanstack/react-router";
 import styled from "styled-components";
-import { useSearchActions } from "../../useSearchActions.ts";
-import { MinScoreFilter } from "./MinScoreFilter.tsx";
+import { filters } from "./registry.ts";
 
 export const FiltersBar = () => {
-  const { minScore } = useSearch({ from: rootRouteId });
-  const { setMinScore } = useSearchActions();
+  const params = useSearch({ from: rootRouteId });
+  const navigate = useNavigate({ from: "/" });
 
   return (
     <Bar>
-      <MinScoreFilter value={minScore} onChange={setMinScore} />
+      {filters.map((filter) => (
+        <filter.Component
+          key={filter.id}
+          params={params}
+          onChange={(next) =>
+            void navigate({
+              search: (prev) => ({ ...prev, ...next }),
+              replace: true,
+            })
+          }
+        />
+      ))}
     </Bar>
   );
 };
