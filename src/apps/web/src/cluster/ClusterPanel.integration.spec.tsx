@@ -17,6 +17,22 @@ vi.mock("../components/Article/IframeArticle.tsx", () => ({
   ),
 }));
 
+vi.mock("../map/view/hooks.ts", () => ({
+  useMapView: () => ({ centerOn: vi.fn() }),
+}));
+
+vi.mock("./useActiveCluster.ts", () => ({
+  useActiveCluster: () => null,
+}));
+
+vi.mock("../map/mapStore.ts", () => ({
+  useMapStore: (selector: (state: unknown) => unknown) =>
+    selector({
+      clusterLevelArticleThreshold: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+      clusterFocusZoom: { 1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1 },
+    }),
+}));
+
 describe("ClusterPanel", () => {
   it("should render IframeArticle with the cluster id from the URL", async () => {
     const testRoot = createRootRoute({ component: () => <Outlet /> });
