@@ -96,6 +96,18 @@ const createCommands = <Surface>(args: {
         { animate: animateFlag(options) },
       );
     },
+    centerOn: (point: Point, options?: CommandOptions & { scale?: number }) => {
+      const scale = options?.scale ?? getLiveTransform().scale;
+      const { width, height } = getSize();
+      driver.applyTransform(
+        {
+          x: -point.x * scale + width / 2,
+          y: -point.y * scale + height / 2,
+          scale,
+        },
+        { animate: animateFlag(options) },
+      );
+    },
     fitToBox: (box: BBox, options?: FitOptions) => {
       driver.applyTransform(computeFit(box, getSize(), paddingFor(options)), {
         animate: animateFlag(options),

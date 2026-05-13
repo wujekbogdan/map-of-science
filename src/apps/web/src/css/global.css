@@ -1,3 +1,15 @@
+:root {
+  --sidebar-width: 460px;
+  --chrome-offset: 6px;
+  --search-height: 48px;
+}
+
+@media (min-width: 992px) {
+  :root {
+    --chrome-offset: 12px;
+  }
+}
+
 *,
 *:before,
 *:after {

@@ -67,6 +67,8 @@ export const DevTool = () => {
     setClusterLabelMinZoom,
     clusterLabelFontSize,
     setClusterLabelFontSize,
+    clusterFocusZoom,
+    setClusterFocusZoom,
   ] = useMapStore(
     useShallow((state) => [
       state.fontSize,
@@ -91,6 +93,8 @@ export const DevTool = () => {
       state.setClusterLabelMinZoom,
       state.clusterLabelFontSize,
       state.setClusterLabelFontSize,
+      state.clusterFocusZoom,
+      state.setClusterFocusZoom,
     ]),
   );
   const areaLayers = [
@@ -303,6 +307,7 @@ export const DevTool = () => {
                     <GridHead>{i18n("Min articles")}</GridHead>
                     <GridHead>{i18n("Min zoom")}</GridHead>
                     <GridHead>{i18n("Font size")}</GridHead>
+                    <GridHead>{i18n("Focus zoom")}</GridHead>
                     {clusterLevels.map((level) => (
                       <Fragment key={level}>
                         <GridCell>{level}</GridCell>
@@ -339,6 +344,16 @@ export const DevTool = () => {
                             value={clusterLabelFontSize[level]}
                             onChange={(e) => {
                               setClusterLabelFontSize(level, e.target.value);
+                            }}
+                          />
+                        </GridCell>
+                        <GridCell>
+                          <CompactInput
+                            type="number"
+                            step="0.5"
+                            value={clusterFocusZoom[level]}
+                            onChange={(e) => {
+                              setClusterFocusZoom(level, e.target.value);
                             }}
                           />
                         </GridCell>
@@ -516,7 +531,7 @@ const ColorInput = styled.input.attrs({ type: "color" })`
 
 const Grid = styled.div`
   display: grid;
-  grid-template-columns: auto 1fr 1fr 1fr;
+  grid-template-columns: auto 1fr 1fr 1fr 1fr;
   gap: 4px 8px;
   align-items: center;
 `;

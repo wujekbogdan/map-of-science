@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import { Suspense } from "react";
 import styled from "styled-components";
 import { useShallow } from "zustand/react/shallow";
 import { config } from "../config.ts";
@@ -11,9 +10,9 @@ import { useWindowSize } from "../useWindowSize.ts";
 import { Article } from "./Article/Article.tsx";
 import { DevTool } from "./DevTool.tsx";
 import { Header } from "./Header/Header.tsx";
-import Info from "./Info/Info.tsx";
 import Logo from "./Logo/Logo.tsx";
 import Map from "./Map/Map.tsx";
+import { SidebarOutlet } from "./Sidebar/SidebarOutlet.tsx";
 
 const VIEW_CONFIG: MapViewConfig<SVGSVGElement> = {
   scaleExtent: { min: 0.5, max: 100 },
@@ -36,11 +35,6 @@ const fetchMapSvg = async () => {
   });
 };
 
-const AppLoader = () => {
-  // TODO: Implement global loading state
-  return "";
-};
-
 function App() {
   const [svgScaleFactor, svgOffset] = useMapStore(
     useShallow((s) => [s.temp__svgScaleFactor, s.temp__svgOffset]),
@@ -54,36 +48,32 @@ function App() {
 
   return (
     <Container>
-      <Suspense fallback={<AppLoader />}>
-        <MapView
-          config={VIEW_CONFIG}
-          size={size}
-          background={{
-            imageUrl: mapSvgUrl,
-            scaleFactor: svgScaleFactor,
-            offset: svgOffset,
-          }}
-          chrome={
-            <>
-              <Header />
-              <Article />
-              <InfoWrapper>
-                <Info />
-              </InfoWrapper>
-              <LogoWrapper>
-                <Logo />
-              </LogoWrapper>
-              {config.devTool && (
-                <DevToolsWrapper>
-                  <DevTool />
-                </DevToolsWrapper>
-              )}
-            </>
-          }
-        >
-          <Map />
-        </MapView>
-      </Suspense>
+      <MapView
+        config={VIEW_CONFIG}
+        size={size}
+        background={{
+          imageUrl: mapSvgUrl,
+          scaleFactor: svgScaleFactor,
+          offset: svgOffset,
+        }}
+        chrome={
+          <>
+            <Header />
+            <Article />
+            <SidebarOutlet />
+            <LogoWrapper>
+              <Logo />
+            </LogoWrapper>
+            {config.devTool && (
+              <DevToolsWrapper>
+                <DevTool />
+              </DevToolsWrapper>
+            )}
+          </>
+        }
+      >
+        <Map />
+      </MapView>
     </Container>
   );
 }
@@ -95,12 +85,6 @@ const Container = styled.div`
     rgba(173, 216, 230, 0.7) 0,
     rgba(173, 216, 230, 1) 100%
   );
-`;
-
-const InfoWrapper = styled.div`
-  position: fixed;
-  bottom: 0;
-  right: 0;
 `;
 
 const LogoWrapper = styled.div`

@@ -12,10 +12,17 @@ export const useSelectionStore = create(
     },
     (set) => ({
       setSelectedClusters: (clusters: SelectedCluster[]) => {
-        set({
-          selectedClusters: new Map(
-            clusters.map((cluster) => [cluster.id, cluster]),
-          ),
+        set((state) => {
+          const current = state.selectedClusters;
+          const sameSet =
+            current.size === clusters.length &&
+            clusters.every((cluster) => current.has(cluster.id));
+          if (sameSet) return state;
+          return {
+            selectedClusters: new Map(
+              clusters.map((cluster) => [cluster.id, cluster]),
+            ),
+          };
         });
       },
       clearSelection: () => {
