@@ -106,6 +106,7 @@ export const MapView = ({
         zoomBy: (factor, options) => controller.zoomBy(factor, options),
         zoomTo: (target, options) => controller.zoomTo(target, options),
         panTo: (point, options) => controller.panTo(point, options),
+        centerOn: (point, options) => controller.centerOn(point, options),
         fitToBox: (box, options) => controller.fitToBox(box, options),
         fitToPoints: (points, options) =>
           controller.fitToPoints(points, options),

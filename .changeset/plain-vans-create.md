@@ -7,3 +7,5 @@
 - Route search dropdown single-result picks to `/cluster/$id` instead of selecting it on the map.
 - Redesign the header control group: include the "About the map" button and rename `Toggles` to `Controls`.
 - Disable suspense in react-i18next.
+- Add a purple halo ring around the active cluster.
+- Adjust zoom to cluster size when centering on a cluster via URL or search.

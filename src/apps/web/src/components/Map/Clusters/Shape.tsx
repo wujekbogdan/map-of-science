@@ -39,6 +39,7 @@ type ShapeOptions = {
     y: number;
   };
   ripple: boolean;
+  halo: boolean;
   mode: Mode;
   level: 1 | 2 | 3 | 4 | 5 | 6;
   growthRatingColors: {
@@ -50,7 +51,8 @@ type ShapeOptions = {
 };
 
 export const Shape = (options: ShapeOptions) => {
-  const { point, mode, growthRatingColors, ripple, level, progress } = options;
+  const { point, mode, growthRatingColors, ripple, halo, level, progress } =
+    options;
   const { x, y } = point;
   const colorClasses =
     mode === "regular" ? [css.outline, css.fill] : [css.outline];
@@ -83,6 +85,9 @@ export const Shape = (options: ShapeOptions) => {
 
   return (
     <>
+      {halo && (
+        <circle className={classes([css.halo, sizeClass])} cx={x} cy={y} />
+      )}
       {ripple && <circle className={css.ripple} cx={x} cy={y} style={style} />}
       <circle className={classes(classList)} cx={x} cy={y} style={style} />
     </>

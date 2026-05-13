@@ -20,10 +20,17 @@ type Props = {
   clusters: MapCluster[];
   transform: Transform | undefined;
   ripplingIds: Set<string>;
+  highlightedIds: Set<string>;
   mode: "regular" | "growth";
 };
 
-export const Clusters = ({ clusters, transform, ripplingIds, mode }: Props) => {
+export const Clusters = ({
+  clusters,
+  transform,
+  ripplingIds,
+  highlightedIds,
+  mode,
+}: Props) => {
   const [
     growthRatingColors,
     fontSizeByLevel,
@@ -100,6 +107,7 @@ export const Clusters = ({ clusters, transform, ripplingIds, mode }: Props) => {
         articleThresholds={articleThresholds}
         mode={mode}
         ripplingIds={ripplingIds}
+        highlightedIds={highlightedIds}
         growthRatingColors={growthRatingColors}
         onHoveredClusterChange={setRawHoveredClusterId}
         onClusterClick={onClusterClick}

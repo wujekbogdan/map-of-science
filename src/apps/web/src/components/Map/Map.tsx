@@ -1,4 +1,5 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { useLocation } from "@tanstack/react-router";
 import { CSSProperties, useEffect, useMemo, useRef } from "react";
 import { useShallow } from "zustand/react/shallow";
 import { useTRPC } from "../../api-client/index.ts";
@@ -21,6 +22,8 @@ import {
 import { useLanguage } from "../../useLanguage.ts";
 import { Clusters } from "./Clusters/Clusters.tsx";
 import Label from "./Label/Label.tsx";
+
+const EMPTY_IDS = new Set<string>();
 
 export default function Map() {
   const [scaleFactor, fontSize, maxDataPointsInViewport, mapMode] = useMapStore(
@@ -137,14 +140,18 @@ export default function Map() {
     scaledFontSize.layer3,
   ]);
 
-  const flash = useFlashState(highlightedClusters);
-  const ripplingIds = useMemo(
-    () =>
-      flash
-        ? new Set(highlightedClusters.map((cluster) => cluster.id))
-        : new Set<string>(),
-    [flash, highlightedClusters],
+  const highlightedIds = useMemo(
+    () => new Set(highlightedClusters.map((cluster) => cluster.id)),
+    [highlightedClusters],
   );
+  const isMapNav = useLocation({
+    select: (location) => location.state.source === "map",
+  });
+  const flash = useFlashState({
+    trigger: highlightedClusters,
+    shouldFlash: !isMapNav,
+  });
+  const ripplingIds = flash ? highlightedIds : EMPTY_IDS;
 
   return (
     <g ref={foregroundRef} style={{ "--zoom-scale": scale } as CSSProperties}>
@@ -153,6 +160,7 @@ export default function Map() {
         transform={liveTransform}
         mode={mapMode}
         ripplingIds={ripplingIds}
+        highlightedIds={highlightedIds}
       />
       {labelsScaled.map((label) => (
         <Label

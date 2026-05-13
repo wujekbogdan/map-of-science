@@ -12,6 +12,7 @@ type Props = {
   articleThresholds: ArticleThresholds;
   mode: "regular" | "growth";
   ripplingIds: Set<string>;
+  highlightedIds: Set<string>;
   growthRatingColors: { start: RGB; middle: RGB; end: RGB };
   onHoveredClusterChange: (id: string | null) => void;
   onClusterClick: (id: string) => void;
@@ -28,6 +29,7 @@ export const ClusterShapes = memo(function ClusterShapes({
   articleThresholds,
   mode,
   ripplingIds,
+  highlightedIds,
   growthRatingColors,
   onHoveredClusterChange,
   onClusterClick,
@@ -63,6 +65,7 @@ export const ClusterShapes = memo(function ClusterShapes({
               y: cluster.position.y,
             }}
             ripple={ripplingIds.has(cluster.id)}
+            halo={highlightedIds.has(cluster.id)}
             mode={mode}
             forcedHover={cluster.id === hoveredId}
             growthRatingColors={growthRatingColors}
