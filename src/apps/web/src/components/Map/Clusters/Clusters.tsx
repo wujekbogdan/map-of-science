@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useShallow } from "zustand/react/shallow";
-import { useArticleStore } from "../../../article/articleStore.ts";
+import { useNavigateToCluster } from "../../../cluster/useNavigateToCluster.ts";
 import { createLabelLayouter } from "../../../map/labels/createLabelLayouter.ts";
 import { createSvgMeasureText } from "../../../map/labels/createSvgMeasureText.ts";
 import { useLabelPlacement } from "../../../map/labels/useLabelPlacement.ts";
@@ -19,11 +19,11 @@ const HOVER_DWELL_MS = 150;
 type Props = {
   clusters: MapCluster[];
   transform: Transform | undefined;
-  ripple?: boolean;
+  ripplingIds: Set<string>;
   mode: "regular" | "growth";
 };
 
-export const Clusters = ({ clusters, transform, ripple, mode }: Props) => {
+export const Clusters = ({ clusters, transform, ripplingIds, mode }: Props) => {
   const [
     growthRatingColors,
     fontSizeByLevel,
@@ -39,9 +39,10 @@ export const Clusters = ({ clusters, transform, ripple, mode }: Props) => {
       state.maxLabelsInViewport,
     ]),
   );
-  const setRemoteArticleId = useArticleStore(
-    (state) => state.setRemoteArticleId,
-  );
+  const navigateToCluster = useNavigateToCluster();
+  const onClusterClick = (id: string) => {
+    void navigateToCluster(id, { fromMap: true });
+  };
   const searchHoveredClusterId = useSelectionStore(
     (state) => state.searchHoveredClusterId,
   );
@@ -98,10 +99,10 @@ export const Clusters = ({ clusters, transform, ripple, mode }: Props) => {
         clusters={clusters}
         articleThresholds={articleThresholds}
         mode={mode}
-        ripple={!!ripple}
+        ripplingIds={ripplingIds}
         growthRatingColors={growthRatingColors}
         onHoveredClusterChange={setRawHoveredClusterId}
-        onClusterClick={setRemoteArticleId}
+        onClusterClick={onClusterClick}
         hoveredId={highlightedClusterId}
         popoverAnchorId={popoverAnchorClusterId}
         onHoveredElChange={setDotEl}
@@ -112,7 +113,7 @@ export const Clusters = ({ clusters, transform, ripple, mode }: Props) => {
         hoveredId={highlightedClusterId}
         popoverAnchorId={popoverAnchorClusterId}
         onHoveredClusterChange={setRawHoveredClusterId}
-        onClusterClick={setRemoteArticleId}
+        onClusterClick={onClusterClick}
         onHoveredElChange={setLabelEl}
       />
       <ClusterHoverOverlay

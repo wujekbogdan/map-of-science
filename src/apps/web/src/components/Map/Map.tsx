@@ -3,7 +3,9 @@ import { CSSProperties, useEffect, useMemo, useRef } from "react";
 import { useShallow } from "zustand/react/shallow";
 import { useTRPC } from "../../api-client/index.ts";
 import { useArticleStore } from "../../article/articleStore.ts";
+import { useActiveCluster } from "../../cluster/useActiveCluster.ts";
 import { useMapStore } from "../../map/mapStore.ts";
+import { mergeHighlightedClusters } from "../../map/mergeHighlightedClusters.ts";
 import { pickClustersToRender } from "../../map/pickClustersToRender.ts";
 import { useSelectionStore } from "../../map/selectionStore.ts";
 import { useFlashState } from "../../map/useFlashState.ts";
@@ -78,10 +80,16 @@ export default function Map() {
     ),
   );
 
+  const activeCluster = useActiveCluster();
+
+  const highlightedClusters = useMemo(
+    () => mergeHighlightedClusters(selectedClusters, activeCluster),
+    [selectedClusters, activeCluster],
+  );
+
   const clustersToRender = useMemo(
-    () =>
-      pickClustersToRender(viewportClusters, [...selectedClusters.values()]),
-    [viewportClusters, selectedClusters],
+    () => pickClustersToRender(viewportClusters, highlightedClusters),
+    [viewportClusters, highlightedClusters],
   );
 
   const { data: areas = [] } = useQuery(
@@ -129,8 +137,14 @@ export default function Map() {
     scaledFontSize.layer3,
   ]);
 
-  const hasSelection = selectedClusters.size > 0;
-  const ripple = useFlashState(selectedClusters);
+  const flash = useFlashState(highlightedClusters);
+  const ripplingIds = useMemo(
+    () =>
+      flash
+        ? new Set(highlightedClusters.map((cluster) => cluster.id))
+        : new Set<string>(),
+    [flash, highlightedClusters],
+  );
 
   return (
     <g ref={foregroundRef} style={{ "--zoom-scale": scale } as CSSProperties}>
@@ -138,7 +152,7 @@ export default function Map() {
         clusters={clustersToRender}
         transform={liveTransform}
         mode={mapMode}
-        ripple={hasSelection && ripple}
+        ripplingIds={ripplingIds}
       />
       {labelsScaled.map((label) => (
         <Label

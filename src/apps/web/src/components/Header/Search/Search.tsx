@@ -1,11 +1,10 @@
-import { rootRouteId, useSearch } from "@tanstack/react-router";
+import { rootRouteId, useNavigate, useSearch } from "@tanstack/react-router";
 import { useDebounce } from "@uidotdev/usehooks";
 import { type FormEventHandler, useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
-import {
-  type SelectedCluster,
-  useSelectionStore,
-} from "../../../map/selectionStore.ts";
+import { useActiveCluster } from "../../../cluster/useActiveCluster.ts";
+import { useNavigateToCluster } from "../../../cluster/useNavigateToCluster.ts";
+import { useSelectionStore } from "../../../map/selectionStore.ts";
 import { useMapView } from "../../../map/view/hooks.ts";
 import { Dropdown, Option } from "./Dropdown/Dropdown.tsx";
 import { FiltersBar } from "./Dropdown/Filters/FiltersBar.tsx";
@@ -24,12 +23,15 @@ export const Search = () => {
 
   const params = useSearch({ from: rootRouteId });
   const { q = "" } = params;
-  const { commit, clear } = useSearchActions();
-  const [previousQ, setPreviousQ] = useState(q);
-  const [inputValue, setInputValue] = useState(q);
-  if (q !== previousQ) {
-    setPreviousQ(q);
-    setInputValue(q);
+  const { commit } = useSearchActions();
+  const navigate = useNavigate();
+  const activeCluster = useActiveCluster();
+  const expectedValue = activeCluster?.displayName ?? q;
+  const [previousExpected, setPreviousExpected] = useState(expectedValue);
+  const [inputValue, setInputValue] = useState(expectedValue);
+  if (expectedValue !== previousExpected) {
+    setPreviousExpected(expectedValue);
+    setInputValue(expectedValue);
   }
 
   const debouncedInputValue = useDebounce(inputValue, INPUT_DEBOUNCE_MS);
@@ -66,14 +68,11 @@ export const Search = () => {
     view.fitToPoints(results.map((cluster) => cluster.position));
   }, [q, debouncedInputValue, isFetching, results, setSelectedClusters, view]);
 
-  const focusCluster = (cluster: SelectedCluster) => {
-    setSelectedClusters([cluster]);
-    view.fitToPoints([cluster.position]);
-  };
+  const navigateToCluster = useNavigateToCluster();
 
   const onSelectionChange = (option: Option) => {
     if (option.type === "cluster") {
-      focusCluster(option.cluster);
+      void navigateToCluster(option.cluster.id);
       return;
     }
     if (option.type === "submit") {
@@ -82,8 +81,8 @@ export const Search = () => {
   };
 
   const onReset = () => {
-    clear();
     clearSelection();
+    void navigate({ to: "/", search: { q: undefined }, replace: true });
   };
 
   const onFormSubmit: FormEventHandler<HTMLFormElement> = (event) => {

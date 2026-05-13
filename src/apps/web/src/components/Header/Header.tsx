@@ -1,8 +1,8 @@
 import { useState } from "react";
 import styled from "styled-components";
 import { useBreakpointMin, breakpoints } from "../../useBreakpoint.ts";
+import Controls from "./Controls/Controls.tsx";
 import { Search } from "./Search/Search.tsx";
-import Toggles from "./Toggles/Toggles.tsx";
 import { ZoomControls } from "./ZoomControls/ZoomControls.tsx";
 import closeIcon from "./close.svg";
 import hamburgerIcon from "./hamburger.svg";
@@ -27,9 +27,9 @@ export const Header = () => {
           $isOpen={isMenuOpen}
         />
         {(isAtLeastLg || isMenuOpen) && (
-          <TogglesWrap>
-            <Toggles />
-          </TogglesWrap>
+          <ControlsWrap>
+            <Controls />
+          </ControlsWrap>
         )}
       </TopBar>
       {isAtLeastLg && (
@@ -41,38 +41,21 @@ export const Header = () => {
   );
 };
 
-const offset = {
-  sm: "6px",
-  lg: "12px",
-};
-
 const TopBar = styled.div`
   position: fixed;
-  padding: ${offset.sm};
+  padding: var(--chrome-offset);
   width: 100%;
   display: flex;
   align-items: center;
   z-index: 1;
-
-  @media (min-width: ${breakpoints.lg}) {
-    padding: ${offset.lg};
-    background: rgba(255, 255, 255, 0.8);
-  }
 `;
 
 const SearchWrap = styled.div`
-  width: 100%;
-
-  @media (min-width: ${breakpoints.lg}) {
-    width: 400px;
-  }
-
-  @media (min-width: ${breakpoints.xl}) {
-    width: 450px;
-  }
+  width: calc(var(--sidebar-width) - 2 * var(--chrome-offset));
+  max-width: 100%;
 `;
 
-const TogglesWrap = styled.div`
+const ControlsWrap = styled.div`
   position: fixed;
   right: 6px;
   top: 64px;
@@ -84,6 +67,7 @@ const TogglesWrap = styled.div`
     padding: 0;
     position: static;
     margin-left: auto;
+    margin-right: 6px;
   }
 `;
 
@@ -92,7 +76,7 @@ const MenuButton = styled.div<{ $isOpen: boolean }>`
   height: 24px;
   margin-left: 12px;
   cursor: pointer;
-  margin-right: ${offset.sm};
+  margin-right: var(--chrome-offset);
   background-size: 24px 24px;
   background-repeat: no-repeat;
   background-image: ${(props) =>
@@ -105,6 +89,6 @@ const MenuButton = styled.div<{ $isOpen: boolean }>`
 
 const ZoomControlsWrap = styled.div`
   position: fixed;
-  right: ${offset.lg};
-  top: 84px;
+  right: var(--chrome-offset);
+  bottom: var(--chrome-offset);
 `;

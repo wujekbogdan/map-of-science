@@ -34,6 +34,30 @@ afterEach(() => {
 });
 
 describe("ClusterShapes", () => {
+  it("should render an extra ripple circle only for clusters in ripplingIds", () => {
+    const clusters = [
+      makeCluster({ id: "a" }),
+      makeCluster({ id: "b", position: { x: 30, y: 40 } }),
+    ];
+
+    const { container } = renderInSvg(
+      <ClusterShapes
+        clusters={clusters}
+        articleThresholds={{ 1: 2000, 2: 1000, 3: 500, 4: 200, 5: 50 }}
+        mode="regular"
+        ripplingIds={new Set(["b"])}
+        growthRatingColors={growthRatingColors}
+        onHoveredClusterChange={vi.fn()}
+        onClusterClick={vi.fn()}
+      />,
+    );
+
+    const groupA = container.querySelector('[data-test-cluster-id="a"]');
+    const groupB = container.querySelector('[data-test-cluster-id="b"]');
+    expect(groupA?.querySelectorAll("circle")).toHaveLength(1);
+    expect(groupB?.querySelectorAll("circle")).toHaveLength(2);
+  });
+
   it("should fire hover and click callbacks with the targeted cluster id", () => {
     const onHoveredClusterChange = vi.fn();
     const onClusterClick = vi.fn();
@@ -47,7 +71,7 @@ describe("ClusterShapes", () => {
         clusters={clusters}
         articleThresholds={{ 1: 2000, 2: 1000, 3: 500, 4: 200, 5: 50 }}
         mode="regular"
-        ripple={false}
+        ripplingIds={new Set()}
         growthRatingColors={growthRatingColors}
         onHoveredClusterChange={onHoveredClusterChange}
         onClusterClick={onClusterClick}
@@ -80,7 +104,7 @@ describe("ClusterShapes", () => {
         clusters={clusters}
         articleThresholds={{ 1: 2000, 2: 1000, 3: 500, 4: 200, 5: 50 }}
         mode="regular"
-        ripple={false}
+        ripplingIds={new Set()}
         growthRatingColors={growthRatingColors}
         onHoveredClusterChange={vi.fn()}
         onClusterClick={vi.fn()}
@@ -104,7 +128,7 @@ describe("ClusterShapes", () => {
       clusters,
       articleThresholds: { 1: 2000, 2: 1000, 3: 500, 4: 200, 5: 50 } as const,
       mode: "regular" as const,
-      ripple: false,
+      ripplingIds: new Set<string>(),
       growthRatingColors,
       onHoveredClusterChange: vi.fn(),
       onClusterClick: vi.fn(),

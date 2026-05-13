@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   createMemoryHistory,
   createRootRoute,
+  createRoute,
   createRouter,
   RouterProvider,
 } from "@tanstack/react-router";
@@ -15,6 +16,7 @@ import { I18nextProvider, initReactI18next } from "react-i18next";
 import { describe, expect, it, vi } from "vitest";
 import type { Router, RouterOutputs } from "@map-of-science/api";
 import { TRPCProvider } from "../../../api-client/index.ts";
+import { CLUSTER_ROUTE_PATH } from "../../../cluster/routePath.ts";
 import { useSelectionStore } from "../../../map/selectionStore.ts";
 import { MapView, type MapViewConfig } from "../../../map/view/MapView.tsx";
 import { createFakeDebouncer } from "../../../map/view/test-utils/createFakeDebouncer.ts";
@@ -112,8 +114,18 @@ const buildTestRouter = ({
       </I18nextProvider>
     ),
   });
+  const indexRoute = createRoute({
+    getParentRoute: () => testRoot,
+    path: "/",
+    component: () => null,
+  });
+  const clusterRoute = createRoute({
+    getParentRoute: () => testRoot,
+    path: CLUSTER_ROUTE_PATH,
+    component: () => null,
+  });
   return createRouter({
-    routeTree: testRoot,
+    routeTree: testRoot.addChildren([indexRoute, clusterRoute]),
     history: createMemoryHistory({ initialEntries: [initialUrl] }),
   });
 };
@@ -300,7 +312,7 @@ describe("Search", () => {
   );
 
   it(
-    "should select and focus the picked cluster on the map and leave the URL unchanged",
+    "should navigate to the cluster route when the user picks a single dropdown result",
     withStore(async () => {
       const i18n = await setupI18n();
       const { fake, config } = baseConfig();
@@ -328,18 +340,10 @@ describe("Search", () => {
       await userEvent.setup().click(option);
 
       await waitFor(() => {
-        expect(useSelectionStore.getState().selectedClusters.size).toBe(1);
+        expect(router.state.location.pathname).toBe("/cluster/c1");
       });
-      expect(
-        useSelectionStore.getState().selectedClusters.get("c1")?.position,
-      ).toEqual({ x: 100, y: 200 });
-      // fitToPoints([{x:100,y:200}]) at size 800x600 → centered at scale 1:
-      // x = -100 + 400 = 300; y = -200 + 300 = 100
-      expect(fake.applyTransform).toHaveBeenCalledWith(
-        { x: 300, y: 100, scale: 1 },
-        { animate: true },
-      );
-      expect(router.state.location.search.q).toBeUndefined();
+      expect(useSelectionStore.getState().selectedClusters.size).toBe(0);
+      expect(fake.applyTransform).not.toHaveBeenCalled();
     }),
   );
 
