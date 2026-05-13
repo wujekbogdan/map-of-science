@@ -16,13 +16,13 @@ export const IframeArticle = ({ id }: { id: string }) => {
   return (
     <Wrapper>
       {cluster && externalId !== undefined && (
-        <p>
+        <Heading>
           <Trans
             i18nKey={cluster.name ? "article.info" : "article.infoUnnamed"}
             values={{ id: externalId, name: cluster.name }}
             components={{ bold: <strong /> }}
           />
-        </p>
+        </Heading>
       )}
       {url && <Iframe src={url} />}
       {url && (
@@ -40,6 +40,13 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   height: 100%;
+`;
+
+const Heading = styled.h2`
+  margin-top: 0;
+  font-size: 1em;
+  font-weight: normal;
+  line-height: 1.5;
 `;
 
 const Iframe = styled.iframe`

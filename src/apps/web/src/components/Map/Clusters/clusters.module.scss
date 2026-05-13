@@ -66,11 +66,23 @@ $duration: 0.3s;
 // Mirrors `CLUSTER_DOT_RADII_PX` in `./clusterLevel.ts` - keep the two lists
 // in sync.
 $sizes: 8px, 7px, 6px, 5px, 4px, 3px;
+$halo-offset: 10px;
 
 @for $i from 1 through list.length($sizes) {
   .level-#{$i} {
     r: calc(list.nth($sizes, $i) / var(--zoom-scale));
   }
+  .halo.level-#{$i} {
+    r: calc((nth($sizes, $i) + $halo-offset) / var(--zoom-scale));
+  }
+}
+
+.halo {
+  fill: none;
+  stroke: $purple;
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
 }
 
 .group {

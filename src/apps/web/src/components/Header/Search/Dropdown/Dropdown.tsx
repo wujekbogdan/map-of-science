@@ -250,7 +250,7 @@ export const Dropdown = (props: DropdownProps) => {
           <Spinner />
         </InputSlot>
       ) : (
-        selection && (
+        value.length > 0 && (
           <ResetButton role="button" onClick={onResetClick}>
             <SrOnly>{t("search.dropdown.reset")}</SrOnly>
           </ResetButton>
@@ -290,6 +290,7 @@ const ComboboxInput = styled(TypedComboboxInput).attrs<{
     props.$open ? "#9B5B9B #9B5B9B #fff #9B5B9B" : "#9B5B9B"};
   border-radius: ${({ $open }) => ($open ? "4px 4px 0 0" : "4px")};
   color: #333;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
   transition: box-shadow 0.2s ease-in-out;
 
   &:focus {

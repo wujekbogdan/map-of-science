@@ -1,8 +1,11 @@
 import {
   createRootRoute,
+  createRoute,
   createRouter,
   createMemoryHistory,
 } from "@tanstack/react-router";
+import { ClusterPanel } from "./cluster/ClusterPanel.tsx";
+import { CLUSTER_ROUTE_PATH } from "./cluster/routePath.ts";
 import App from "./components/App.tsx";
 import { searchParamsSchema } from "./components/Header/Search/searchParams.ts";
 
@@ -11,7 +14,19 @@ export const rootRoute = createRootRoute({
   component: App,
 });
 
-const routeTree = rootRoute;
+const searchRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/",
+  component: () => null,
+});
+
+const clusterRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: CLUSTER_ROUTE_PATH,
+  component: ClusterPanel,
+});
+
+const routeTree = rootRoute.addChildren([searchRoute, clusterRoute]);
 
 export const createAppRouter = (initialEntries?: string[]) =>
   createRouter({

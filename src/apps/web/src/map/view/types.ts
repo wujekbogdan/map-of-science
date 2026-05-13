@@ -44,6 +44,14 @@ export type MapView = {
   panTo: (point: Point, options?: CommandOptions) => void;
 
   /**
+   * Center the view on `point` at the requested scale; falls back to the current scale when omitted.
+   */
+  centerOn: (
+    point: Point,
+    options?: CommandOptions & { scale?: number },
+  ) => void;
+
+  /**
    * Fit `box` to the viewport.
    */
   fitToBox: (box: BBox, options?: FitOptions) => void;

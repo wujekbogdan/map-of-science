@@ -57,7 +57,7 @@ export const translations = {
     "map.clusterDetails.articleCount": "Number of articles: {{count}}",
     "map.clusterDetails.growthRating": "Growth rate: {{rating}}",
     "map.clusterDetails.keywordsLabel": "Keywords",
-    "info.about": "About the Map of Science",
+    "info.about": "About the Map",
     "general.error": "An error occurred.",
   },
   pl: {
@@ -117,7 +117,7 @@ export const translations = {
     "map.clusterDetails.articleCount": "Liczba artykułów: {{count}}",
     "map.clusterDetails.growthRating": "Tempo rozwoju: {{rating}}",
     "map.clusterDetails.keywordsLabel": "Słowa kluczowe",
-    "info.about": "O Mapie Nauki",
+    "info.about": "O Mapie",
     "general.error": "Wystąpił błąd.",
   },
 } as const;

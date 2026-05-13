@@ -164,6 +164,38 @@ describe("controller", () => {
   );
 
   it(
+    "should center on the supplied point at the requested scale",
+    withController(({ fake, controller }) => {
+      controller.setSize({ width: 800, height: 600 });
+
+      controller.centerOn({ x: 100, y: 200 }, { scale: 4 });
+
+      // scale = 4; x = -100*4 + 400 = 0; y = -200*4 + 300 = -500
+      expect(fake.applyTransform).toHaveBeenCalledTimes(1);
+      expect(fake.applyTransform).toHaveBeenCalledWith(
+        { x: 0, y: -500, scale: 4 },
+        { animate: true },
+      );
+    }),
+  );
+
+  it(
+    "should center on the supplied point at the current scale when scale is omitted",
+    withController(({ fake, controller }) => {
+      controller.setSize({ width: 800, height: 600 });
+      fake.fireTransform({ x: 0, y: 0, scale: 2 });
+
+      controller.centerOn({ x: 100, y: 200 });
+
+      // scale = 2; x = -100*2 + 400 = 200; y = -200*2 + 300 = -100
+      expect(fake.applyTransform).toHaveBeenCalledWith(
+        { x: 200, y: -100, scale: 2 },
+        { animate: true },
+      );
+    }),
+  );
+
+  it(
     "should expose the initial transform via getSnapshot before any driver activity",
     withController(({ controller }) => {
       const snapshot = controller.getSnapshot();

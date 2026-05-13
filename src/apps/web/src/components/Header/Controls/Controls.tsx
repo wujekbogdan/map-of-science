@@ -16,6 +16,7 @@ import { useShallow } from "zustand/react/shallow";
 import { useMapStore } from "../../../map/mapStore.ts";
 import { breakpoints, useBreakpointMin } from "../../../useBreakpoint.ts";
 import { LangCode } from "../../../useLanguage.ts";
+import Info from "../../Info/Info.tsx";
 import LanguageSelector from "./LanguageSelector.tsx";
 
 const useTooltip = () => {
@@ -43,7 +44,7 @@ const useTooltip = () => {
   };
 };
 
-const Toggles = () => {
+const Controls = () => {
   const { t } = useTranslation();
   const [
     mapMode,
@@ -114,8 +115,8 @@ const Toggles = () => {
 
   return (
     <Wrap>
-      <TogglesList>
-        <TogglesListItem>
+      <ControlsList>
+        <ControlsListItem>
           <Label
             ref={modeTooltip.refs.setReference}
             {...modeTooltip.getReferenceProps()}
@@ -133,9 +134,9 @@ const Toggles = () => {
               </Toggle>
             )}
           </Switch>
-        </TogglesListItem>
+        </ControlsListItem>
 
-        <TogglesListItem>
+        <ControlsListItem>
           <Label
             htmlFor="cluster-count"
             ref={clusterCountTooltip.refs.setReference}
@@ -154,12 +155,16 @@ const Toggles = () => {
             onChange={onClusterInputChange}
             onBlur={onClusterInputBlur}
           />
-        </TogglesListItem>
+        </ControlsListItem>
 
-        <TogglesListItem>
+        <ControlsListItem>
           <LanguageSelector onSelect={onLanguageSelect} />
-        </TogglesListItem>
-      </TogglesList>
+        </ControlsListItem>
+
+        <ControlsListItem>
+          <Info />
+        </ControlsListItem>
+      </ControlsList>
 
       <Tooltip
         ref={modeTooltip.refs.setFloating}
@@ -193,11 +198,10 @@ const Toggles = () => {
   );
 };
 
-export default Toggles;
+export default Controls;
 
 const Wrap = styled.div`
   display: flex;
-  color: #333;
 `;
 
 const Label = styled.label`
@@ -210,9 +214,10 @@ const Label = styled.label`
 
 const Input = styled.input<{ $invalid?: boolean }>`
   width: 100%;
-  padding: 12px;
-  border: 1px solid ${({ $invalid }) => ($invalid ? "crimson" : "#ededed")};
+  padding: 4px;
+  border: 2px solid ${({ $invalid }) => ($invalid ? "crimson" : "#9B5B9B")};
   background-color: ${({ $invalid }) => ($invalid ? "#fff6f6" : "white")};
+  border-radius: 4px;
 
   @media (min-width: ${breakpoints.lg}) {
     width: auto;
@@ -275,7 +280,7 @@ const ListItem = styled.li`
   }
 `;
 
-const TogglesList = styled.ul`
+const ControlsList = styled.ul`
   margin: 0;
   padding: 0;
   list-style: none;
@@ -287,18 +292,21 @@ const TogglesList = styled.ul`
   }
 `;
 
-const TogglesListItem = styled.li`
+const ControlsListItem = styled.li`
   display: flex;
-  margin: 0 0 12px 0;
+  margin: 0 0 6px 0;
   flex-direction: column;
   align-items: flex-start;
+  padding: 6px 16px;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 26px;
 
   &:last-child {
     margin-bottom: 0;
   }
 
   @media (min-width: ${breakpoints.lg}) {
-    margin: 0 24px 0 0;
+    margin: 0 16px 0 0;
     flex-direction: row;
     align-items: center;
 

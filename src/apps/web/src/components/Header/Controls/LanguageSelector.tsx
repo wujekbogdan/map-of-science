@@ -26,23 +26,23 @@ export const LanguageSelector = (props: Props) => {
   return (
     <Menu>
       <MenuButton as={Fragment}>
-        <Item>
+        <Trigger>
           <Text>{t("toggles.languages.language")}</Text>
           <Icon>
             <Flag lang={language} />
           </Icon>
-        </Item>
+        </Trigger>
       </MenuButton>
-      <Items anchor="bottom end">
+      <Items anchor={{ to: "bottom end", offset: 14 }}>
         {supportedLanguages.map((language) => (
           <MenuItem key={language} as={Fragment}>
             {() => (
-              <Item onClick={() => props.onSelect?.(language)}>
+              <Option onClick={() => props.onSelect?.(language)}>
                 <Text>{t(`toggles.languages.${language}`)}</Text>
                 <Icon>
                   <Flag lang={language} />
                 </Icon>
-              </Item>
+              </Option>
             )}
           </MenuItem>
         ))}
@@ -53,13 +53,22 @@ export const LanguageSelector = (props: Props) => {
 
 export default LanguageSelector;
 
-const Item = styled.div`
+const Trigger = styled.div`
   cursor: pointer;
   display: flex;
   justify-content: flex-end;
   align-items: center;
   column-gap: 8px;
-  padding: 12px 8px;
+`;
+
+const Option = styled(Trigger)`
+  border-radius: 26px;
+  margin-bottom: 6px;
+  padding: 6px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
 
   &:hover {
     background: rgba(0, 0, 0, 0.05);
@@ -67,9 +76,11 @@ const Item = styled.div`
 `;
 
 const Items = styled(MenuItems)`
-  margin-top: 12px;
+  margin-top: 18px;
+  padding: 12px 6px;
   z-index: 100;
-  background: #fff;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 16px;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
 
   &:focus {

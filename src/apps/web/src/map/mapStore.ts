@@ -56,6 +56,17 @@ const partialDefaults = {
     5: 15,
     6: 18,
   },
+
+  // Target zoom (k) used when centering on a single cluster.
+  // Bigger clusters = lower zoom;
+  clusterFocusZoom: {
+    1: 1,
+    2: 1.5,
+    3: 2,
+    4: 3,
+    5: 6,
+    6: 13,
+  },
   scaleFactor: {
     min: 0.5,
     max: 16,
@@ -145,6 +156,18 @@ export const useMapStore = create(
         clusterLabelMinZoom: {
           ...state.clusterLabelMinZoom,
           [level]: parsed || partialDefaults.clusterLabelMinZoom[level],
+        },
+      }));
+    },
+    setClusterFocusZoom: (
+      level: keyof typeof partialDefaults.clusterFocusZoom,
+      value: number | string,
+    ) => {
+      const parsed = typeof value === "string" ? parseFloat(value) : value;
+      set((state) => ({
+        clusterFocusZoom: {
+          ...state.clusterFocusZoom,
+          [level]: parsed || partialDefaults.clusterFocusZoom[level],
         },
       }));
     },
