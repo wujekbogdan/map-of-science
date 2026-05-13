@@ -10,12 +10,10 @@ type ArticleState =
       type: "local-with-videos";
       article: string | null;
       areaId: string;
-    }
-  | { id: string; type: "iframe"; article: null; areaId: null };
+    };
 
 type ArticleActions = {
   reset: () => void;
-  setRemoteArticleId: (id: string) => void;
   fetchAreaArticle: (
     areaId: string,
     label: string,
@@ -31,9 +29,6 @@ export const useArticleStore = create<ArticleState & ArticleActions>((set) => ({
   areaId: null,
   reset: () => {
     set({ id: null, type: null, article: null, areaId: null });
-  },
-  setRemoteArticleId: (id: string) => {
-    set({ id, type: "iframe", article: null, areaId: null });
   },
   fetchAreaArticle: async (areaId: string, label: string, lang: LangCode) => {
     const articleHTML = await fetchArticle(label, lang);

@@ -25,6 +25,9 @@ i18next
       caches: ["localStorage"],
       order: ["localStorage", "navigator"],
     },
+    react: {
+      useSuspense: false,
+    },
   })
   .catch((err) => {
     console.error("Failed to initialize i18next:", err);
