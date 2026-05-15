@@ -21,8 +21,8 @@ vi.mock("../map/view/hooks.ts", () => ({
   useMapView: () => ({ centerOn: vi.fn() }),
 }));
 
-vi.mock("./useActiveCluster.ts", () => ({
-  useActiveCluster: () => null,
+vi.mock("./useViewedCluster.ts", () => ({
+  useViewedCluster: () => null,
 }));
 
 vi.mock("../map/mapStore.ts", () => ({

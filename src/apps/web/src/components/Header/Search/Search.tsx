@@ -2,8 +2,8 @@ import { rootRouteId, useNavigate, useSearch } from "@tanstack/react-router";
 import { useDebounce } from "@uidotdev/usehooks";
 import { type FormEventHandler, useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
-import { useActiveCluster } from "../../../cluster/useActiveCluster.ts";
 import { useNavigateToCluster } from "../../../cluster/useNavigateToCluster.ts";
+import { useViewedCluster } from "../../../cluster/useViewedCluster.ts";
 import { useSelectionStore } from "../../../map/selectionStore.ts";
 import { useMapView } from "../../../map/view/hooks.ts";
 import { Dropdown, Option } from "./Dropdown/Dropdown.tsx";
@@ -25,8 +25,8 @@ export const Search = () => {
   const { q = "" } = params;
   const { commit } = useSearchActions();
   const navigate = useNavigate();
-  const activeCluster = useActiveCluster();
-  const expectedValue = activeCluster?.displayName ?? q;
+  const viewedCluster = useViewedCluster();
+  const expectedValue = viewedCluster?.displayName ?? q;
   const [previousExpected, setPreviousExpected] = useState(expectedValue);
   const [inputValue, setInputValue] = useState(expectedValue);
   if (expectedValue !== previousExpected) {
