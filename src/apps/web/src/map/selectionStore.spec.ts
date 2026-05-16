@@ -23,6 +23,7 @@ describe("selectionStore", () => {
     useSelectionStore.setState({
       selectedClusters: new Map(),
       searchHoveredClusterId: null,
+      isSearchOpen: false,
     });
   });
 
@@ -35,6 +36,16 @@ describe("selectionStore", () => {
     useSelectionStore.getState().setSearchHoveredCluster("c-42");
     useSelectionStore.getState().setSearchHoveredCluster(null);
     expect(useSelectionStore.getState().searchHoveredClusterId).toBeNull();
+  });
+
+  it("should toggle isSearchOpen", () => {
+    expect(useSelectionStore.getState().isSearchOpen).toBe(false);
+
+    useSelectionStore.getState().setSearchOpen(true);
+    expect(useSelectionStore.getState().isSearchOpen).toBe(true);
+
+    useSelectionStore.getState().setSearchOpen(false);
+    expect(useSelectionStore.getState().isSearchOpen).toBe(false);
   });
 
   it("should swap selectedClusters when ids differ and keep the same reference when they don't", () => {

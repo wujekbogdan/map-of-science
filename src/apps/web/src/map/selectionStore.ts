@@ -9,6 +9,7 @@ export const useSelectionStore = create(
     {
       selectedClusters: new Map<string, SelectedCluster>(),
       searchHoveredClusterId: null as string | null,
+      isSearchOpen: false,
     },
     (set) => ({
       setSelectedClusters: (clusters: SelectedCluster[]) => {
@@ -30,6 +31,9 @@ export const useSelectionStore = create(
       },
       setSearchHoveredCluster: (id: string | null) => {
         set({ searchHoveredClusterId: id });
+      },
+      setSearchOpen: (open: boolean) => {
+        set({ isSearchOpen: open });
       },
     }),
   ),

@@ -19,6 +19,7 @@ export const Search = () => {
   const setSearchHoveredCluster = useSelectionStore(
     (s) => s.setSearchHoveredCluster,
   );
+  const setSearchOpen = useSelectionStore((s) => s.setSearchOpen);
 
   const params = useSearch({ from: rootRouteId });
   const { q = "" } = params;
@@ -38,8 +39,23 @@ export const Search = () => {
   const debouncedInputValue = useDebounce(inputValue, INPUT_DEBOUNCE_MS);
   const isQuerySubmittable = inputValue.length >= MIN_QUERY_LENGTH;
 
-  const { data: results = [], isFetching } =
-    useSearchQuery(debouncedInputValue);
+  // A search is active once the typed query is long enough to run. The cluster
+  // panel renders in a different part of the tree and can't read this local
+  // value, so it goes through the shared store; clear it on unmount so it
+  // can't stay stuck on.
+  // TODO: routing this local search state through the global store is a
+  // shortcut. Revisit how search state is owned once the surrounding work
+  // settles.
+  useEffect(() => {
+    setSearchOpen(isQuerySubmittable);
+    return () => {
+      setSearchOpen(false);
+    };
+  }, [isQuerySubmittable, setSearchOpen]);
+
+  const { data, isFetching } = useSearchQuery(debouncedInputValue);
+  const results = data ?? [];
+  const matchCount = data?.length;
 
   const dropdownOptions = useMemo<Option[]>(
     () =>
@@ -98,6 +114,7 @@ export const Search = () => {
         query={debouncedInputValue}
         isFetching={isFetching}
         options={dropdownOptions}
+        matchCount={matchCount}
         isQuerySubmittable={isQuerySubmittable}
         onInput={onInput}
         onSelect={onSelectionChange}

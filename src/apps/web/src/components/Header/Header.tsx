@@ -67,7 +67,6 @@ const ControlsWrap = styled.div`
     padding: 0;
     position: static;
     margin-left: auto;
-    margin-right: 6px;
   }
 `;
 

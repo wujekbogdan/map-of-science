@@ -4,7 +4,7 @@ import { RowLine, TrailingIcon } from "./resultRowLayout.ts";
 
 type Props = {
   query: string;
-  matchCount: number;
+  matchCount: number | undefined;
 };
 
 export const SubmitRow = ({ query, matchCount }: Props) => {
@@ -14,7 +14,8 @@ export const SubmitRow = ({ query, matchCount }: Props) => {
     <RowLine>
       <span>
         <strong>{query}</strong>
-        {` [${t("search.dropdown.submitRow.matchCount", { count: matchCount })}]`}
+        {matchCount !== undefined &&
+          ` [${t("search.dropdown.submitRow.matchCount", { count: matchCount })}]`}
       </span>
       <TrailingIcon src={searchIcon} alt="" />
     </RowLine>

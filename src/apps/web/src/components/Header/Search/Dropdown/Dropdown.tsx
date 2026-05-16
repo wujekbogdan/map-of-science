@@ -46,6 +46,7 @@ type DropdownProps = {
   value: string;
   query: string;
   options: Option[];
+  matchCount: number | undefined;
   isQuerySubmittable: boolean;
   onSelect: (option: Option) => void;
   onReset: () => void;
@@ -208,7 +209,7 @@ export const Dropdown = (props: DropdownProps) => {
                           <ComboboxOption $focus={focus}>
                             <SubmitRow
                               query={value}
-                              matchCount={allClusters.length}
+                              matchCount={props.matchCount}
                             />
                           </ComboboxOption>
                         )}
@@ -306,6 +307,7 @@ const ComboboxInput = styled(TypedComboboxInput).attrs<{
 `;
 
 const ComboboxOptions = styled(ComboboxOptionsHeadless)`
+  --anchor-padding: var(--chrome-offset);
   z-index: 40;
   background-color: #fff;
   box-sizing: border-box;
@@ -315,7 +317,6 @@ const ComboboxOptions = styled(ComboboxOptionsHeadless)`
   margin-top: -2px;
   display: flex;
   flex-direction: column;
-  max-height: 50vh;
 `;
 
 const ResultsList = styled.div`

@@ -24,6 +24,7 @@ import {
   createFakeDriver,
   type FakeDriver,
 } from "../../../map/view/test-utils/createFakeDriver.ts";
+import { ContextPanelOutlet } from "../../ContextPanel/ContextPanelOutlet.tsx";
 import { Search } from "./Search.tsx";
 import { searchParamsSchema } from "./searchParams.ts";
 
@@ -498,6 +499,45 @@ describe("Search", () => {
   );
 
   it(
+    "should omit the match count on the submit row until results have arrived",
+    withStore(async () => {
+      const i18n = await setupI18n();
+      const { config } = baseConfig();
+      const router = buildTestRouter({
+        i18n,
+        config,
+        children: <Search />,
+      });
+
+      let resolveResults!: (value: Match[]) => void;
+      const pending = new Promise<Match[]>((resolve) => {
+        resolveResults = resolve;
+      });
+      const handler = vi.fn().mockReturnValueOnce(pending);
+
+      const { container, findByRole } = render(
+        <TestProviders handler={handler} router={router} />,
+      );
+
+      await submitSearchQuery(container, "quantum");
+
+      // Results are still in flight: the submit row shows the query but no
+      // count bracket (unknown count is not "zero results").
+      const submitRow = await findByRole("option", { name: /quantum/i });
+      expect(submitRow.textContent).toContain("quantum");
+      expect(submitRow.textContent).not.toContain("[");
+
+      act(() => {
+        resolveResults([makeCluster({ id: "c1" }), makeCluster({ id: "c2" })]);
+      });
+
+      await waitFor(() => {
+        expect(submitRow.textContent?.includes("[")).toBe(true);
+      });
+    }),
+  );
+
+  it(
     "should keep previous results visible and show a spinner while the next query is in flight",
     withStore(async () => {
       const i18n = await setupI18n();
@@ -552,6 +592,62 @@ describe("Search", () => {
       await waitFor(() => {
         expect(querySpinner()).toBeFalsy();
       });
+    }),
+  );
+
+  it(
+    "should shift the cluster panel only while the query is submittable",
+    withStore(async () => {
+      const i18n = await setupI18n();
+      const { config } = baseConfig();
+      const cluster = makeCluster({
+        id: "c1",
+        name: "Black Holes",
+        displayName: "Black Holes",
+      });
+      const handler = (path: string) =>
+        path === "cluster.byId" ? cluster : [cluster];
+      const router = buildTestRouter({
+        i18n,
+        config,
+        children: (
+          <>
+            <Search />
+            <ContextPanelOutlet />
+          </>
+        ),
+        initialUrl: "/cluster/c1",
+      });
+
+      const { container, findByTestId } = render(
+        <TestProviders handler={handler} router={router} />,
+      );
+
+      const input = await findSearchInput(container);
+      const panel = await findByTestId("context-panel");
+      expect(panel.getAttribute("data-test-open")).toBe("true");
+      expect(panel.getAttribute("data-test-shifted")).toBe("false");
+
+      const user = userEvent.setup();
+      await user.click(input);
+
+      // Sub-threshold: the hint state does not shift the panel.
+      await user.type(input, "bl");
+      expect(panel.getAttribute("data-test-shifted")).toBe("false");
+
+      // Submittable: the panel shifts right, beside the results.
+      await user.type(input, "ack");
+      await waitFor(() => {
+        expect(panel.getAttribute("data-test-shifted")).toBe("true");
+      });
+      expect(panel.getAttribute("data-test-open")).toBe("true");
+
+      // Clearing the query returns the panel to its docked position.
+      await user.clear(input);
+      await waitFor(() => {
+        expect(panel.getAttribute("data-test-shifted")).toBe("false");
+      });
+      expect(panel.getAttribute("data-test-open")).toBe("true");
     }),
   );
 

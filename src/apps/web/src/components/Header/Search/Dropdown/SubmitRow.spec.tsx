@@ -19,7 +19,7 @@ const setupI18n = async (lng: "en" | "pl"): Promise<i18n> => {
   return instance;
 };
 
-const renderRow = (instance: i18n, query: string, matchCount: number) =>
+const renderRow = (instance: i18n, query: string, matchCount?: number) =>
   render(
     <I18nextProvider i18n={instance}>
       <SubmitRow query={query} matchCount={matchCount} />
@@ -33,6 +33,16 @@ describe("SubmitRow", () => {
     const { container } = renderRow(instance, "quantum", 42);
 
     expect(container.querySelector("strong")?.textContent).toBe("quantum");
+  });
+
+  it("should omit the bracket entirely when the match count is unknown", async () => {
+    const instance = await setupI18n("en");
+
+    const { container } = renderRow(instance, "quantum", undefined);
+
+    expect(container.querySelector("strong")?.textContent).toBe("quantum");
+    expect(container.textContent).not.toContain("[");
+    expect(container.textContent).not.toContain("cluster");
   });
 
   it.each([

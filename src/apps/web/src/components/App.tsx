@@ -8,11 +8,11 @@ import { createD3ZoomDriver } from "../map/view/createD3ZoomDriver.ts";
 import { createDebouncer } from "../map/view/debouncer.ts";
 import { useWindowSize } from "../useWindowSize.ts";
 import { Article } from "./Article/Article.tsx";
+import { ContextPanelOutlet } from "./ContextPanel/ContextPanelOutlet.tsx";
 import { DevTool } from "./DevTool.tsx";
 import { Header } from "./Header/Header.tsx";
 import Logo from "./Logo/Logo.tsx";
 import Map from "./Map/Map.tsx";
-import { SidebarOutlet } from "./Sidebar/SidebarOutlet.tsx";
 
 const VIEW_CONFIG: MapViewConfig<SVGSVGElement> = {
   scaleExtent: { min: 0.5, max: 100 },
@@ -60,7 +60,7 @@ function App() {
           <>
             <Header />
             <Article />
-            <SidebarOutlet />
+            <ContextPanelOutlet />
             <LogoWrapper>
               <Logo />
             </LogoWrapper>

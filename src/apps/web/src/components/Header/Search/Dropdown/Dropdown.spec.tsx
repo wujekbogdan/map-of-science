@@ -58,6 +58,7 @@ const renderDropdown = (
         value={props.value}
         query={props.query}
         options={[clusterOption]}
+        matchCount={1}
         isQuerySubmittable
         isFetching={false}
         onSelect={vi.fn()}
