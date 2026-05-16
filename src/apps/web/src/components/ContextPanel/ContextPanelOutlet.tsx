@@ -2,14 +2,17 @@ import { Outlet, useMatchRoute } from "@tanstack/react-router";
 import styled from "styled-components";
 import { CLUSTER_ROUTE_PATH } from "../../cluster/routePath.ts";
 import { useClearViewedCluster } from "../../cluster/useClearViewedCluster.ts";
-import { useSelectionStore } from "../../map/selectionStore.ts";
 import { useMapBackgroundTap } from "../../map/view/hooks.ts";
+import {
+  selectIsSearchActive,
+  useSearchStore,
+} from "../Header/Search/searchStore.ts";
 import { ContextPanel } from "./ContextPanel.tsx";
 
 export const ContextPanelOutlet = () => {
   const matchRoute = useMatchRoute();
   const isClusterRoute = !!matchRoute({ to: CLUSTER_ROUTE_PATH });
-  const isSearchOpen = useSelectionStore((state) => state.isSearchOpen);
+  const isSearchActive = useSearchStore(selectIsSearchActive);
   const clearViewedCluster = useClearViewedCluster();
 
   const onContextPanelClose = () => {
@@ -23,10 +26,10 @@ export const ContextPanelOutlet = () => {
   return (
     <Placement
       $open={isClusterRoute}
-      $shifted={isSearchOpen}
+      $shifted={isSearchActive}
       data-testid="context-panel"
       data-test-open={isClusterRoute}
-      data-test-shifted={isSearchOpen}
+      data-test-shifted={isSearchActive}
     >
       <ContextPanel onClose={onContextPanelClose}>
         <Outlet />

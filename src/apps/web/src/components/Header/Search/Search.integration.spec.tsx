@@ -27,6 +27,7 @@ import {
 import { ContextPanelOutlet } from "../../ContextPanel/ContextPanelOutlet.tsx";
 import { Search } from "./Search.tsx";
 import { searchParamsSchema } from "./searchParams.ts";
+import { useSearchStore } from "./searchStore.ts";
 
 type Match = RouterOutputs["search"]["query"][number];
 
@@ -175,6 +176,7 @@ const submitSearchQuery = async (
 
 const withStore = (test: () => Promise<void>) => async () => {
   useSelectionStore.getState().clearSelection();
+  useSearchStore.setState({ draftQuery: "", previewedClusterId: null });
   return Promise.resolve(test()).finally(() => {
     cleanup();
     expect.hasAssertions();
@@ -440,7 +442,7 @@ describe("Search", () => {
   );
 
   it(
-    "should clear the search and close the results on reset and on Escape, without leaving the viewed cluster",
+    "should clear the search and refocus the input on reset and on Escape - after typing and after a commit - keeping the viewed cluster open",
     withStore(async () => {
       const i18n = await setupI18n();
       const { config } = baseConfig();
@@ -463,10 +465,14 @@ describe("Search", () => {
       );
 
       const input = await findSearchInput(container);
+      const user = userEvent.setup();
+
+      // The deep-linked query shows in the input and opens the results.
       expect(input.value).toBe("quantum");
       await findByRole("option", { name: /Black Holes/ });
 
-      const user = userEvent.setup();
+      // (a) The X button clears the query and closes the results while the
+      // viewed cluster stays open (results close because the query is empty).
       const resetButton = await findByRole("button", {
         name: "search.dropdown.reset",
       });
@@ -475,14 +481,14 @@ describe("Search", () => {
       await waitFor(() => {
         expect(router.state.location.search.q).toBeUndefined();
       });
-      // Clearing the search keeps the viewed cluster open and closes the
-      // results because the query is now empty.
       expect(router.state.location.pathname).toBe("/cluster/c1");
       expect(input.value).toBe("");
+      expect(document.activeElement).toBe(input);
       await waitFor(() => {
         expect(queryByRole("option", { name: /Black Holes/ })).toBeNull();
       });
 
+      // (b) Escape after typing without committing clears the same way.
       await user.click(input);
       await user.type(input, "neutron");
       await act(() => new Promise((resolve) => setTimeout(resolve, 350)));
@@ -492,9 +498,72 @@ describe("Search", () => {
 
       expect(router.state.location.pathname).toBe("/cluster/c1");
       expect(input.value).toBe("");
+      expect(document.activeElement).toBe(input);
       await waitFor(() => {
         expect(queryByRole("option", { name: /Black Holes/ })).toBeNull();
       });
+
+      // (c) Escape after a commit drops ?q=, empties the input, and closes
+      // the results together - the URL and the visible input must not
+      // disagree - and still leaves the viewed cluster open. The commit moves
+      // focus off the input, so Escape must not depend on input focus.
+      await user.click(input);
+      await user.type(input, "black");
+      await act(() => new Promise((resolve) => setTimeout(resolve, 350)));
+      await findByRole("option", { name: /Black Holes/ });
+      await user.keyboard("{Enter}");
+      await waitFor(() => {
+        expect(router.state.location.search.q).toBe("black");
+      });
+
+      await user.keyboard("{Escape}");
+
+      await waitFor(() => {
+        expect(router.state.location.search.q).toBeUndefined();
+      });
+      expect(input.value).toBe("");
+      expect(router.state.location.pathname).toBe("/cluster/c1");
+      expect(document.activeElement).toBe(input);
+      await waitFor(() => {
+        expect(queryByRole("option", { name: /Black Holes/ })).toBeNull();
+      });
+    }),
+  );
+
+  it(
+    "should keep the viewed cluster open and the query intact when a filter changes",
+    withStore(async () => {
+      const i18n = await setupI18n();
+      const { config } = baseConfig();
+      const router = buildTestRouter({
+        i18n,
+        config,
+        children: <Search />,
+        initialUrl: '/cluster/c1?q="quantum"',
+      });
+      const cluster = makeCluster({
+        id: "c1",
+        name: "Black Holes",
+        displayName: "Black Holes",
+      });
+      const handler = (path: string) =>
+        path === "cluster.byId" ? cluster : [cluster];
+
+      const { container, findByLabelText } = render(
+        <TestProviders handler={handler} router={router} />,
+      );
+
+      const input = await findSearchInput(container);
+      expect(input.value).toBe("quantum");
+
+      const sortSelect = await findByLabelText("search.filters.sort");
+      await userEvent.setup().selectOptions(sortSelect, "articlesCount");
+
+      await waitFor(() => {
+        expect(router.state.location.search.sort).toBeDefined();
+      });
+      expect(router.state.location.pathname).toBe("/cluster/c1");
+      expect(router.state.location.search.q).toBe("quantum");
     }),
   );
 

@@ -127,53 +127,96 @@ export const Dropdown = (props: DropdownProps) => {
     placeholders[Math.floor(Math.random() * placeholders.length)],
   );
 
-  const submitOption: Option = {
-    type: "submit",
-    id: "submit-query",
-    label: value,
-    keyword: value,
-    clusters: allClusters,
-  };
+  const submitOption = useMemo<Option>(
+    () => ({
+      type: "submit",
+      id: "submit-query",
+      label: value,
+      keyword: value,
+      clusters: allClusters,
+    }),
+    [value, allClusters],
+  );
+
+  const optionById = useMemo(
+    () =>
+      new Map<string, Option>(
+        [submitOption, ...rawOptions].map((option) => [option.id, option]),
+      ),
+    [rawOptions, submitOption],
+  );
 
   const onQueryChange = (event: ChangeEvent<HTMLInputElement>) => {
     props.onInput(event.target.value);
   };
 
-  const onSelectionChange = (selected: Option | null) => {
+  const onSelectionChange = (selectedId: string | null) => {
+    const selected = selectedId === null ? null : optionById.get(selectedId);
     if (!selected) return;
     props.onSelect(selected);
   };
 
-  const onResetClick = () => {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Escape resets the search regardless of which element inside the widget
+  // holds focus. After a commit focus can leave the input, so a handler bound
+  // only to the input would miss it.
+  //
+  // Headless UI gates its controlled value sync on an internal "typing" flag
+  // it sets on every keydown and only clears on selection or when its
+  // open/close machine closes. Rendering the options with `static` keeps that
+  // machine from running, so after an Escape keydown the flag stays set and a
+  // cleared controlled value never reaches the DOM input. Writing the empty
+  // value through the native input setter and dispatching the `input` event
+  // is the one channel Headless UI reconciles in that state. The store stays
+  // the single source of truth; this only reconciles the DOM to it. Tracked
+  // for retirement by the dropdown implementation research.
+  const resetSearch = () => {
     props.onReset();
+    const element = inputRef.current;
+    if (!element) return;
+    Object.getOwnPropertyDescriptor(
+      window.HTMLInputElement.prototype,
+      "value",
+    )?.set?.call(element, "");
+    element.dispatchEvent(new Event("input", { bubbles: true }));
+    element.focus();
   };
 
-  const onInputKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+  const onResetClick = () => {
+    resetSearch();
+  };
+
+  const onWrapperKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.key === "Escape") {
-      props.onReset();
+      resetSearch();
     }
   };
 
   const isOpen = value.length > 0;
 
   return (
-    <Wrapper>
-      <Combobox value={null} immediate onChange={onSelectionChange}>
+    <Wrapper onKeyDown={onWrapperKeyDown}>
+      <Combobox value={value} immediate onChange={onSelectionChange}>
         {({ activeOption }) => (
           <div>
             <HoverReporter
-              activeOption={activeOption}
+              activeOption={
+                activeOption === null
+                  ? null
+                  : (optionById.get(activeOption) ?? null)
+              }
               onItemHover={props.onItemHover}
             />
             <ComboboxInput
+              ref={inputRef}
               autoComplete="off"
               $open={isOpen}
               placeholder={t("search.dropdown.placeholder", {
                 placeholder: randomPlaceholder,
               })}
-              displayValue={() => value}
+              displayValue={(draft) => draft ?? ""}
               onChange={onQueryChange}
-              onKeyDown={onInputKeyDown}
             />
             {isOpen && (
               <ComboboxOptions
@@ -204,7 +247,7 @@ export const Dropdown = (props: DropdownProps) => {
                   )}
                   {props.isQuerySubmittable && (
                     <>
-                      <ComboboxOptionHeadless value={submitOption}>
+                      <ComboboxOptionHeadless value={submitOption.id}>
                         {({ focus }) => (
                           <ComboboxOption $focus={focus}>
                             <SubmitRow
@@ -229,7 +272,7 @@ export const Dropdown = (props: DropdownProps) => {
                         return (
                           <ComboboxOptionHeadless
                             key={option.id}
-                            value={option}
+                            value={option.id}
                           >
                             {({ focus }) => (
                               <ComboboxOption $focus={focus}>
@@ -273,13 +316,13 @@ const Wrapper = styled.div`
   display: flex;
 `;
 
-const TypedCombobox = ComboboxHeadless<Option | null>;
-const Combobox = styled(TypedCombobox)`
+const QueryCombobox = ComboboxHeadless<string>;
+const Combobox = styled(QueryCombobox)`
   flex: 1;
 `;
 
-const TypedComboboxInput = ComboboxInputHeadless<Option | null>;
-const ComboboxInput = styled(TypedComboboxInput).attrs<{
+const QueryComboboxInput = ComboboxInputHeadless<string>;
+const ComboboxInput = styled(QueryComboboxInput).attrs<{
   placeholder?: string;
   autoComplete?: string;
 }>((props) => ({
