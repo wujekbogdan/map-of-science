@@ -1,4 +1,4 @@
-import type { Driver, DriverCallbacks } from "./driver.ts";
+import type { Driver, DriverCallbacks, MapViewSignal } from "./driver.ts";
 import type { Transform } from "./transform.ts";
 import type {
   BBox,
@@ -148,6 +148,7 @@ export const createController =
     });
     const size = createCell<Size>({ width: 0, height: 0 });
     const subscribers = new Set<() => void>();
+    const tapListeners = new Set<MapViewSignal>();
 
     const update = (next: Partial<Snapshot>) => {
       snapshot.set({ ...snapshot.get(), ...next });
@@ -170,6 +171,9 @@ export const createController =
       },
       onReady: () => {
         update({ isReady: true });
+      },
+      onBackgroundTap: () => {
+        for (const listener of [...tapListeners]) listener();
       },
     };
 
@@ -199,11 +203,18 @@ export const createController =
       detach: () => {
         debouncer.cancel();
         driver.detach();
+        tapListeners.clear();
       },
       subscribe: (listener: () => void) => {
         subscribers.add(listener);
         return () => {
           subscribers.delete(listener);
+        };
+      },
+      onBackgroundTap: (listener: MapViewSignal) => {
+        tapListeners.add(listener);
+        return () => {
+          tapListeners.delete(listener);
         };
       },
       getSnapshot: () => snapshot.get(),

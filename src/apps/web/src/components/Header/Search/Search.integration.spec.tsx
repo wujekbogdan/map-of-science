@@ -652,6 +652,56 @@ describe("Search", () => {
   );
 
   it(
+    "should close the cluster panel on a map background tap while preserving the query",
+    withStore(async () => {
+      const i18n = await setupI18n();
+      const { fake, config } = baseConfig();
+      const cluster = makeCluster({
+        id: "c1",
+        name: "Black Holes",
+        displayName: "Black Holes",
+      });
+      const handler = (path: string) =>
+        path === "cluster.byId" ? cluster : [cluster];
+      const router = buildTestRouter({
+        i18n,
+        config,
+        children: (
+          <>
+            <Search />
+            <ContextPanelOutlet />
+          </>
+        ),
+        initialUrl: '/cluster/c1?q="black"',
+      });
+
+      const { findByTestId } = render(
+        <TestProviders handler={handler} router={router} />,
+      );
+
+      const panel = await findByTestId("context-panel");
+      expect(panel.getAttribute("data-test-open")).toBe("true");
+
+      act(() => {
+        fake.emitBackgroundTap();
+      });
+
+      await waitFor(() => {
+        expect(router.state.location.pathname).toBe("/");
+      });
+      expect(router.state.location.search.q).toBe("black");
+      expect(panel.getAttribute("data-test-open")).toBe("false");
+
+      // A tap once the panel is already closed is a harmless no-op.
+      act(() => {
+        fake.emitBackgroundTap();
+      });
+      expect(router.state.location.pathname).toBe("/");
+      expect(router.state.location.search.q).toBe("black");
+    }),
+  );
+
+  it(
     "should refire search.query at the new minScore when the filter input is edited",
     withStore(async () => {
       const i18n = await setupI18n();

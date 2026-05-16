@@ -22,10 +22,18 @@ export const createD3ZoomDriver: CreateDriver<SVGSVGElement> = ({
   // which lets touchpad pinch (wheel + ctrlKey) leak to browser page zoom at the
   // cap. The d3-zoom docs recommend a sibling wheel listener that always calls
   // preventDefault: https://d3js.org/d3-zoom#zoom_scaleExtent
-  const preventBrowserWheel = (event: WheelEvent) => {
+  const onSurfaceWheel = (event: WheelEvent) => {
     event.preventDefault();
   };
-  surface.addEventListener("wheel", preventBrowserWheel, { passive: false });
+  surface.addEventListener("wheel", onSurfaceWheel, { passive: false });
+
+  // d3-zoom suppresses the native click after a pan or zoom gesture, so a click
+  // that survives is a tap. Restricting to the surface as its own target keeps
+  // taps on rendered content (which sit in descendant nodes) from counting.
+  const onSurfaceClick = (event: MouseEvent) => {
+    if (event.target === surface) callbacks.onBackgroundTap();
+  };
+  surface.addEventListener("click", onSurfaceClick);
 
   const selection = select<SVGSVGElement, unknown>(surface);
   selection.call(behavior);
@@ -66,7 +74,8 @@ export const createD3ZoomDriver: CreateDriver<SVGSVGElement> = ({
     },
     detach: () => {
       behavior.on("zoom", null);
-      surface.removeEventListener("wheel", preventBrowserWheel);
+      surface.removeEventListener("wheel", onSurfaceWheel);
+      surface.removeEventListener("click", onSurfaceClick);
     },
   };
 };

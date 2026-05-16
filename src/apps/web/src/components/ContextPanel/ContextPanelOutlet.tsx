@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { CLUSTER_ROUTE_PATH } from "../../cluster/routePath.ts";
 import { useClearViewedCluster } from "../../cluster/useClearViewedCluster.ts";
 import { useSelectionStore } from "../../map/selectionStore.ts";
+import { useMapBackgroundTap } from "../../map/view/hooks.ts";
 import { ContextPanel } from "./ContextPanel.tsx";
 
 export const ContextPanelOutlet = () => {
@@ -14,6 +15,10 @@ export const ContextPanelOutlet = () => {
   const onContextPanelClose = () => {
     void clearViewedCluster();
   };
+
+  useMapBackgroundTap(() => {
+    if (isClusterRoute) void clearViewedCluster();
+  });
 
   return (
     <Placement

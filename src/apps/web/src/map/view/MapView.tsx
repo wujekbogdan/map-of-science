@@ -113,6 +113,7 @@ export const MapView = ({
       },
       subscribe: controller.subscribe,
       getSnapshot: controller.getSnapshot,
+      onBackgroundTap: controller.onBackgroundTap,
     };
   }, [controller]);
 

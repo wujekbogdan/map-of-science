@@ -328,4 +328,59 @@ describe("controller", () => {
       expect(controller.getSnapshot().isReady).toBe(true);
     }),
   );
+
+  it(
+    "should notify background-tap listeners when the driver reports a tap",
+    withController(({ fake, controller }) => {
+      const listener = vi.fn();
+      controller.onBackgroundTap(listener);
+
+      fake.emitBackgroundTap();
+
+      expect(listener).toHaveBeenCalledTimes(1);
+    }),
+  );
+
+  it(
+    "should stop notifying a background-tap listener once it unsubscribes",
+    withController(({ fake, controller }) => {
+      const listener = vi.fn();
+      const unsubscribe = controller.onBackgroundTap(listener);
+
+      unsubscribe();
+      fake.emitBackgroundTap();
+
+      expect(listener).not.toHaveBeenCalled();
+    }),
+  );
+
+  it(
+    "should drop background-tap listeners on detach",
+    withController(({ fake, controller }) => {
+      const listener = vi.fn();
+      controller.onBackgroundTap(listener);
+
+      controller.detach();
+      fake.emitBackgroundTap();
+
+      expect(listener).not.toHaveBeenCalled();
+    }),
+  );
+
+  it(
+    "should keep notifying remaining listeners when one unsubscribes mid-emit",
+    withController(({ fake, controller }) => {
+      const second = vi.fn();
+      const first = vi.fn(() => {
+        unsubscribeSecond();
+      });
+      controller.onBackgroundTap(first);
+      const unsubscribeSecond = controller.onBackgroundTap(second);
+
+      fake.emitBackgroundTap();
+
+      expect(first).toHaveBeenCalledTimes(1);
+      expect(second).toHaveBeenCalledTimes(1);
+    }),
+  );
 });
