@@ -208,7 +208,7 @@ export const Dropdown = (props: DropdownProps) => {
                           <ComboboxOption $focus={focus}>
                             <SubmitRow
                               query={value}
-                              matchCount={allClusters.length || undefined}
+                              matchCount={allClusters.length}
                             />
                           </ComboboxOption>
                         )}
@@ -221,9 +221,6 @@ export const Dropdown = (props: DropdownProps) => {
                           <HeaderName>
                             {t("search.dropdown.column.name")}
                           </HeaderName>
-                          <HeaderScore>
-                            {t("search.dropdown.column.score")}
-                          </HeaderScore>
                         </ColumnHeader>
                       )}
                       {options.map((option) => {
@@ -238,7 +235,6 @@ export const Dropdown = (props: DropdownProps) => {
                                 <ClusterResultRow
                                   tokens={option.tokens}
                                   articlesCount={option.cluster.articlesCount}
-                                  score={option.cluster.score}
                                   dotRadiusPx={getDotRadius(
                                     option.cluster.articlesCount,
                                   )}
@@ -357,10 +353,6 @@ const HeaderSize = styled.span`
 
 const HeaderName = styled.span`
   flex: 1;
-`;
-
-const HeaderScore = styled.span`
-  margin-left: auto;
 `;
 
 const ComboboxOption = styled.div<{

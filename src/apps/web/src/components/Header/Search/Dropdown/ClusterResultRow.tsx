@@ -1,10 +1,8 @@
 import styled from "styled-components";
-import { formatScore } from "./formatScore.ts";
 import {
   CountLabel,
   MetaGroup,
   RowLine,
-  ScoreLabel,
   type Token,
 } from "./resultRowLayout.ts";
 
@@ -15,14 +13,12 @@ const DOT_VIEW_BOX = `-${DOT_BOX_HALF_PX} -${DOT_BOX_HALF_PX} ${DOT_BOX_PX} ${DO
 type Props = {
   tokens: Token[];
   articlesCount: number;
-  score: number;
   dotRadiusPx: number;
 };
 
 export const ClusterResultRow = ({
   tokens,
   articlesCount,
-  score,
   dotRadiusPx,
 }: Props) => (
   <RowLine>
@@ -39,7 +35,6 @@ export const ClusterResultRow = ({
         </NameToken>
       ))}
     </Name>
-    <ScoreLabel>{formatScore(score)}</ScoreLabel>
   </RowLine>
 );
 
