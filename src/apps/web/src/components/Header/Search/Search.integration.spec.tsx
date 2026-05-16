@@ -312,7 +312,7 @@ describe("Search", () => {
   );
 
   it(
-    "should navigate to the cluster route when the user picks a single dropdown result",
+    "should open the cluster while keeping the typed query and matches so the user can keep browsing",
     withStore(async () => {
       const i18n = await setupI18n();
       const { fake, config } = baseConfig();
@@ -321,18 +321,17 @@ describe("Search", () => {
         config,
         children: <Search />,
       });
+      const cluster = makeCluster({
+        id: "c1",
+        name: "Black Holes",
+        displayName: "Black Holes",
+        position: { x: 100, y: 200 },
+      });
+      const handler = (path: string) =>
+        path === "cluster.byId" ? cluster : [cluster];
 
       const { container, findByRole } = render(
-        <TestProviders
-          handler={() => [
-            makeCluster({
-              id: "c1",
-              name: "Black Holes",
-              position: { x: 100, y: 200 },
-            }),
-          ]}
-          router={router}
-        />,
+        <TestProviders handler={handler} router={router} />,
       );
 
       await submitSearchQuery(container, "black holes");
@@ -342,6 +341,13 @@ describe("Search", () => {
       await waitFor(() => {
         expect(router.state.location.pathname).toBe("/cluster/c1");
       });
+
+      // The input keeps the typed query (it is no longer overwritten by
+      // the viewed cluster), and the matches stay browsable.
+      const input = await findSearchInput(container);
+      expect(input.value).toBe("black holes");
+      expect(await findByRole("option", { name: /Black Holes/ })).toBeTruthy();
+      // Opening one cluster is not a commit: nothing is selected or zoomed.
       expect(useSelectionStore.getState().selectedClusters.size).toBe(0);
       expect(fake.applyTransform).not.toHaveBeenCalled();
     }),
@@ -433,7 +439,7 @@ describe("Search", () => {
   );
 
   it(
-    "should clear the URL query when the user clicks reset after submitting",
+    "should clear the search and close the results on reset and on Escape, without leaving the viewed cluster",
     withStore(async () => {
       const i18n = await setupI18n();
       const { config } = baseConfig();
@@ -441,24 +447,25 @@ describe("Search", () => {
         i18n,
         config,
         children: <Search />,
+        initialUrl: '/cluster/c1?q="quantum"',
       });
-      const handler = vi
-        .fn()
-        .mockReturnValue([makeCluster({ id: "c1", name: "First" })]);
+      const cluster = makeCluster({
+        id: "c1",
+        name: "Black Holes",
+        displayName: "Black Holes",
+      });
+      const handler = (path: string) =>
+        path === "cluster.byId" ? cluster : [cluster];
 
-      const { container, findByRole } = render(
+      const { container, findByRole, queryByRole } = render(
         <TestProviders handler={handler} router={router} />,
       );
 
-      await submitSearchQuery(container, "quantum");
-      const submitRow = await findByRole("option", { name: /quantum/ });
+      const input = await findSearchInput(container);
+      expect(input.value).toBe("quantum");
+      await findByRole("option", { name: /Black Holes/ });
+
       const user = userEvent.setup();
-      await user.click(submitRow);
-
-      await waitFor(() => {
-        expect(router.state.location.search.q).toBe("quantum");
-      });
-
       const resetButton = await findByRole("button", {
         name: "search.dropdown.reset",
       });
@@ -466,6 +473,26 @@ describe("Search", () => {
 
       await waitFor(() => {
         expect(router.state.location.search.q).toBeUndefined();
+      });
+      // Clearing the search keeps the viewed cluster open and closes the
+      // results because the query is now empty.
+      expect(router.state.location.pathname).toBe("/cluster/c1");
+      expect(input.value).toBe("");
+      await waitFor(() => {
+        expect(queryByRole("option", { name: /Black Holes/ })).toBeNull();
+      });
+
+      await user.click(input);
+      await user.type(input, "neutron");
+      await act(() => new Promise((resolve) => setTimeout(resolve, 350)));
+      await findByRole("option", { name: /Black Holes/ });
+
+      await user.keyboard("{Escape}");
+
+      expect(router.state.location.pathname).toBe("/cluster/c1");
+      expect(input.value).toBe("");
+      await waitFor(() => {
+        expect(queryByRole("option", { name: /Black Holes/ })).toBeNull();
       });
     }),
   );

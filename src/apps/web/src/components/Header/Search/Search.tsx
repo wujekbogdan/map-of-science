@@ -3,7 +3,6 @@ import { useDebounce } from "@uidotdev/usehooks";
 import { type FormEventHandler, useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import { useNavigateToCluster } from "../../../cluster/useNavigateToCluster.ts";
-import { useViewedCluster } from "../../../cluster/useViewedCluster.ts";
 import { useSelectionStore } from "../../../map/selectionStore.ts";
 import { useMapView } from "../../../map/view/hooks.ts";
 import { Dropdown, Option } from "./Dropdown/Dropdown.tsx";
@@ -25,13 +24,15 @@ export const Search = () => {
   const { q = "" } = params;
   const { commit } = useSearchActions();
   const navigate = useNavigate();
-  const viewedCluster = useViewedCluster();
-  const expectedValue = viewedCluster?.displayName ?? q;
-  const [previousExpected, setPreviousExpected] = useState(expectedValue);
-  const [inputValue, setInputValue] = useState(expectedValue);
-  if (expectedValue !== previousExpected) {
-    setPreviousExpected(expectedValue);
-    setInputValue(expectedValue);
+  // `q` is the committed query and the source of truth; `inputValue` is the
+  // editable draft. `previousQ` distinguishes an external `q` change (commit,
+  // reset, history navigation) from ordinary re-renders, so the draft re-syncs
+  // to the URL only on those changes and is not overwritten while typing.
+  const [previousQ, setPreviousQ] = useState(q);
+  const [inputValue, setInputValue] = useState(q);
+  if (q !== previousQ) {
+    setPreviousQ(q);
+    setInputValue(q);
   }
 
   const debouncedInputValue = useDebounce(inputValue, INPUT_DEBOUNCE_MS);
@@ -81,8 +82,9 @@ export const Search = () => {
   };
 
   const onReset = () => {
+    setInputValue("");
     clearSelection();
-    void navigate({ to: "/", search: { q: undefined }, replace: true });
+    void navigate({ to: ".", search: {}, replace: true });
   };
 
   const onFormSubmit: FormEventHandler<HTMLFormElement> = (event) => {

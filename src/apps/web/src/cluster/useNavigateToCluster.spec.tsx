@@ -7,6 +7,8 @@ vi.mock("@tanstack/react-router", () => ({
   useNavigate: () => mockNavigate,
 }));
 
+const anyFunction: unknown = expect.any(Function);
+
 type Deps = {
   navigate: ReturnType<typeof useNavigateToCluster>;
 };
@@ -31,6 +33,7 @@ describe("useNavigateToCluster", () => {
         to: "/cluster/$id",
         params: { id: "abc-123" },
         state: { source: undefined },
+        search: anyFunction,
       });
     }),
   );
@@ -44,7 +47,19 @@ describe("useNavigateToCluster", () => {
         to: "/cluster/$id",
         params: { id: "abc-123" },
         state: { source: "map" },
+        search: anyFunction,
       });
+    }),
+  );
+
+  it(
+    "should preserve the existing search params so an active query survives navigation",
+    withUseNavigateToCluster(({ navigate }) => {
+      void navigate("abc-123");
+      const { search } = mockNavigate.mock.calls[0][0] as {
+        search: (prev: Record<string, unknown>) => Record<string, unknown>;
+      };
+      expect(search({ q: "quantum" })).toEqual({ q: "quantum" });
     }),
   );
 });
