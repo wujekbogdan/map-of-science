@@ -46,6 +46,7 @@ type DropdownProps = {
   value: string;
   query: string;
   options: Option[];
+  selectedOptionId: string | null;
   matchCount: number | undefined;
   isQuerySubmittable: boolean;
   onSelect: (option: Option) => void;
@@ -146,12 +147,26 @@ export const Dropdown = (props: DropdownProps) => {
     [rawOptions, submitOption],
   );
 
+  // Headless UI keeps the option list open after a selection only in
+  // `multiple` mode; single mode hardcodes a close that drops the active
+  // option, so keyboard navigation would restart at the top. The list is
+  // driven by a single anchor id (`[anchor]` or `[]`); the array/toggle
+  // semantics are reduced back to one selected option in `onSelectionChange`.
+  const selectedComboboxValue = useMemo(
+    () => (props.selectedOptionId ? [props.selectedOptionId] : []),
+    [props.selectedOptionId],
+  );
+
   const onQueryChange = (event: ChangeEvent<HTMLInputElement>) => {
     props.onInput(event.target.value);
   };
 
-  const onSelectionChange = (selectedId: string | null) => {
-    const selected = selectedId === null ? null : optionById.get(selectedId);
+  const onSelectionChange = (next: string[]) => {
+    const toggledId =
+      next.find((id) => !selectedComboboxValue.includes(id)) ??
+      selectedComboboxValue.find((id) => !next.includes(id));
+    const selected =
+      toggledId === undefined ? null : optionById.get(toggledId);
     if (!selected) return;
     props.onSelect(selected);
   };
@@ -197,7 +212,12 @@ export const Dropdown = (props: DropdownProps) => {
 
   return (
     <Wrapper onKeyDown={onWrapperKeyDown}>
-      <Combobox value={value} immediate onChange={onSelectionChange}>
+      <Combobox
+        multiple
+        value={selectedComboboxValue}
+        immediate
+        onChange={onSelectionChange}
+      >
         {({ activeOption }) => (
           <div>
             <HoverReporter
@@ -215,7 +235,7 @@ export const Dropdown = (props: DropdownProps) => {
               placeholder={t("search.dropdown.placeholder", {
                 placeholder: randomPlaceholder,
               })}
-              displayValue={(draft) => draft ?? ""}
+              displayValue={() => value}
               onChange={onQueryChange}
             />
             {isOpen && (
@@ -248,8 +268,8 @@ export const Dropdown = (props: DropdownProps) => {
                   {props.isQuerySubmittable && (
                     <>
                       <ComboboxOptionHeadless value={submitOption.id}>
-                        {({ focus }) => (
-                          <ComboboxOption $focus={focus}>
+                        {({ focus, selected }) => (
+                          <ComboboxOption $focus={focus} $selected={selected}>
                             <SubmitRow
                               query={value}
                               matchCount={props.matchCount}
@@ -274,8 +294,11 @@ export const Dropdown = (props: DropdownProps) => {
                             key={option.id}
                             value={option.id}
                           >
-                            {({ focus }) => (
-                              <ComboboxOption $focus={focus}>
+                            {({ focus, selected }) => (
+                              <ComboboxOption
+                                $focus={focus}
+                                $selected={selected}
+                              >
                                 <ClusterResultRow
                                   tokens={option.tokens}
                                   articlesCount={option.cluster.articlesCount}
@@ -316,7 +339,7 @@ const Wrapper = styled.div`
   display: flex;
 `;
 
-const QueryCombobox = ComboboxHeadless<string>;
+const QueryCombobox = ComboboxHeadless<string, true>;
 const Combobox = styled(QueryCombobox)`
   flex: 1;
 `;
@@ -401,11 +424,15 @@ const HeaderName = styled.span`
 
 const ComboboxOption = styled.div<{
   $focus: boolean;
+  $selected: boolean;
 }>`
   color: #333;
   padding: 12px;
   cursor: pointer;
-  background-color: ${({ $focus }) => ($focus ? "#eee" : "transparent")};
+  background-color: ${({ $focus, $selected }) =>
+    $focus ? "#eee" : $selected ? "#f3e8f3" : "transparent"};
+  box-shadow: ${({ $selected }) =>
+    $selected ? "inset 3px 0 0 #9b5b9b" : "none"};
 `;
 
 const SrOnly = styled.span`

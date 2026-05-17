@@ -442,6 +442,61 @@ describe("Search", () => {
   );
 
   it(
+    "should resume keyboard navigation from the active result after selecting one",
+    withStore(async () => {
+      const i18n = await setupI18n();
+      const { config } = baseConfig();
+      const router = buildTestRouter({
+        i18n,
+        config,
+        children: <Search />,
+      });
+      const clusters = [
+        makeCluster({ id: "c1", name: "First", displayName: "First" }),
+        makeCluster({
+          id: "c2",
+          name: "Second",
+          displayName: "Second",
+          position: { x: 50, y: 50 },
+        }),
+      ];
+      const handler = (path: string) =>
+        path === "cluster.byId" ? clusters[0] : clusters;
+
+      const { container, findByRole } = render(
+        <TestProviders handler={handler} router={router} />,
+      );
+
+      await submitSearchQuery(container, "something");
+      const input = await findSearchInput(container);
+      const firstOption = await findByRole("option", { name: /First/ });
+      const secondOption = await findByRole("option", { name: /Second/ });
+
+      const user = userEvent.setup();
+      // First arrow press lands on the "First" result.
+      await user.keyboard("{ArrowDown}");
+      expect(input.getAttribute("aria-activedescendant")).toBe(firstOption.id);
+
+      // Selecting the active result opens it but keeps the results browsable.
+      await user.keyboard("{Enter}");
+      await waitFor(() => {
+        expect(router.state.location.pathname).toBe("/cluster/c1");
+      });
+
+      // The selected row stays active with no extra keypress, ...
+      expect(input.getAttribute("aria-activedescendant")).toBe(firstOption.id);
+
+      // ... and a single arrow press advances from it to the next row.
+      await user.keyboard("{ArrowDown}");
+      await waitFor(() => {
+        expect(input.getAttribute("aria-activedescendant")).toBe(
+          secondOption.id,
+        );
+      });
+    }),
+  );
+
+  it(
     "should clear the search and refocus the input on reset and on Escape - after typing and after a commit - keeping the viewed cluster open",
     withStore(async () => {
       const i18n = await setupI18n();

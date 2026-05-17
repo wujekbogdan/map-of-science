@@ -1,6 +1,6 @@
 import { rootRouteId, useSearch } from "@tanstack/react-router";
 import { useDebounce } from "@uidotdev/usehooks";
-import { type ReactNode, useEffect, useMemo } from "react";
+import { type ReactNode, useEffect, useMemo, useState } from "react";
 import { useNavigateToCluster } from "../../../cluster/useNavigateToCluster.ts";
 import { useSelectionStore } from "../../../map/selectionStore.ts";
 import { useMapView } from "../../../map/view/hooks.ts";
@@ -71,11 +71,20 @@ export const SearchDropdown = ({ filters }: { filters?: ReactNode }) => {
     view.fitToPoints(results.map((cluster) => cluster.position));
   }, [q, debouncedDraftQuery, isFetching, results, setSelectedClusters, view]);
 
+  // The active option survives a selection only when the Combobox is driven
+  // by an explicit anchor (see Dropdown). The anchor follows the last
+  // selection and is dropped whenever the result set changes under it.
+  const [selectedOptionId, setSelectedOptionId] = useState<string | null>(
+    null,
+  );
+
   const onInput = (text: string) => {
     setDraftQuery(text);
+    setSelectedOptionId(null);
   };
 
   const onSelect = (option: Option) => {
+    setSelectedOptionId(option.id);
     if (option.type === "cluster") {
       void navigateToCluster(option.cluster.id);
       return;
@@ -89,6 +98,7 @@ export const SearchDropdown = ({ filters }: { filters?: ReactNode }) => {
     reset();
     clearSelection();
     clear();
+    setSelectedOptionId(null);
   };
 
   return (
@@ -97,6 +107,7 @@ export const SearchDropdown = ({ filters }: { filters?: ReactNode }) => {
       query={debouncedDraftQuery}
       isFetching={isFetching}
       options={dropdownOptions}
+      selectedOptionId={selectedOptionId}
       matchCount={matchCount}
       isQuerySubmittable={isQuerySubmittable}
       onInput={onInput}
