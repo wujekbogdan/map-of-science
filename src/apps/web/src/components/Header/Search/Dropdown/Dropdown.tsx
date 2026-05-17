@@ -247,6 +247,7 @@ export const Dropdown = (props: DropdownProps) => {
               <ComboboxOptions
                 ref={optionsRef}
                 static
+                modal={false}
                 anchor="bottom start"
                 style={{
                   width: "var(--input-width)",
@@ -366,10 +367,8 @@ const ComboboxInput = styled(QueryComboboxInput).attrs<{
   padding: 12px;
   border-width: 2px;
   border-style: solid;
-  border-color: #9b5b9b;
-  // When open, the options panel underlaps the input and supplies the bottom
-  // edge, so the input drops its own bottom border to avoid a double seam.
-  border-bottom-width: ${({ $open }) => ($open ? "0" : "2px")};
+  border-color: ${(props) =>
+    props.$open ? "#9B5B9B #9B5B9B #fff #9B5B9B" : "#9B5B9B"};
   border-radius: ${({ $open }) => ($open ? "4px 4px 0 0" : "4px")};
   color: #333;
   box-shadow: ${({ $open }) =>
