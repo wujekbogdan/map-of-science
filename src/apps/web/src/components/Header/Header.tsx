@@ -47,7 +47,10 @@ const TopBar = styled.div`
   width: 100%;
   display: flex;
   align-items: center;
-  z-index: 1;
+  // Sits above the search options panel: Headless UI portals that panel to
+  // the document body, so only an ancestor stacking context outranking its
+  // z-index keeps the input and its reset control clickable.
+  z-index: 50;
 `;
 
 const SearchWrap = styled.div`

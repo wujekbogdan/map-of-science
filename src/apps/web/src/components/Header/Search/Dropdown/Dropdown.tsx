@@ -165,8 +165,7 @@ export const Dropdown = (props: DropdownProps) => {
     const toggledId =
       next.find((id) => !selectedComboboxValue.includes(id)) ??
       selectedComboboxValue.find((id) => !next.includes(id));
-    const selected =
-      toggledId === undefined ? null : optionById.get(toggledId);
+    const selected = toggledId === undefined ? null : optionById.get(toggledId);
     if (!selected) return;
     props.onSelect(selected);
   };
@@ -360,11 +359,14 @@ const ComboboxInput = styled(QueryComboboxInput).attrs<{
   padding: 12px;
   border-width: 2px;
   border-style: solid;
-  border-color: ${(props) =>
-    props.$open ? "#9B5B9B #9B5B9B #fff #9B5B9B" : "#9B5B9B"};
+  border-color: #9b5b9b;
+  // When open, the options panel underlaps the input and supplies the bottom
+  // edge, so the input drops its own bottom border to avoid a double seam.
+  border-bottom-width: ${({ $open }) => ($open ? "0" : "2px")};
   border-radius: ${({ $open }) => ($open ? "4px 4px 0 0" : "4px")};
   color: #333;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  box-shadow: ${({ $open }) =>
+    $open ? "none" : "0 2px 6px rgba(0, 0, 0, 0.08)"};
   transition: box-shadow 0.2s ease-in-out;
 
   &:focus {
@@ -431,8 +433,6 @@ const ComboboxOption = styled.div<{
   cursor: pointer;
   background-color: ${({ $focus, $selected }) =>
     $focus ? "#eee" : $selected ? "#f3e8f3" : "transparent"};
-  box-shadow: ${({ $selected }) =>
-    $selected ? "inset 3px 0 0 #9b5b9b" : "none"};
 `;
 
 const SrOnly = styled.span`
