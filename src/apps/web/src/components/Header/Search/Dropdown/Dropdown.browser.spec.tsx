@@ -1,8 +1,8 @@
 import i18next, { type i18n } from "i18next";
 import { I18nextProvider, initReactI18next } from "react-i18next";
 import { describe, expect, it, vi } from "vitest";
-import { page, userEvent } from "vitest/browser";
 import { render } from "vitest-browser-react";
+import { page, userEvent } from "vitest/browser";
 import type { SelectedCluster } from "../../../../map/selectionStore.ts";
 import { Dropdown, type Option } from "./Dropdown.tsx";
 
@@ -62,6 +62,43 @@ describe("Dropdown", () => {
     await userEvent.click(
       page.getByRole("button", { name: "search.dropdown.reset" }),
     );
+
+    expect(onReset).toHaveBeenCalledTimes(1);
+  });
+
+  it("should keep the clear button clickable after the input is blurred and refocused", async () => {
+    const instance = await setupI18n();
+    const onReset = vi.fn();
+
+    await render(
+      <I18nextProvider i18n={instance}>
+        <button data-testid="outside">outside</button>
+        <Dropdown
+          value="black"
+          query="black"
+          options={[clusterOption]}
+          selectedOptionId={null}
+          matchCount={1}
+          isQuerySubmittable
+          isFetching={false}
+          onSelect={vi.fn()}
+          onReset={onReset}
+          onInput={vi.fn()}
+          onItemHover={vi.fn()}
+        />
+      </I18nextProvider>,
+    );
+
+    const input = page.getByRole("combobox");
+    const outside = page.getByTestId("outside");
+    const resetButton = page.getByRole("button", {
+      name: "search.dropdown.reset",
+    });
+
+    await userEvent.click(input);
+    await userEvent.click(outside);
+    await userEvent.click(input);
+    await userEvent.click(resetButton);
 
     expect(onReset).toHaveBeenCalledTimes(1);
   });
