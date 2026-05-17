@@ -53,8 +53,8 @@ const renderPanel = (props: React.ComponentProps<typeof ArticleWithVideos>) =>
   );
 
 describe("ArticleWithVideos", () => {
-  it("should render the related header and a thumbnail link per item", () => {
-    const { getByText, getAllByRole } = renderPanel({
+  it("should render a thumbnail link per item", () => {
+    const { getAllByRole } = renderPanel({
       html: null,
       items: [
         buildItem({
@@ -76,7 +76,6 @@ describe("ArticleWithVideos", () => {
       ],
     });
 
-    expect(getByText("Related videos")).toBeTruthy();
     const thumbs = getAllByRole("img");
     expect(thumbs).toHaveLength(2);
     expect(thumbs[0].getAttribute("src")).toContain("vid-a");

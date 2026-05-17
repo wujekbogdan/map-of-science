@@ -10,6 +10,7 @@ const Error = () => {
 };
 
 export const Article = () => {
+  const { t } = useTranslation();
   const { type, article, areaId, reset } = useArticleStore();
 
   if (!type) {
@@ -25,8 +26,12 @@ export const Article = () => {
     }
   };
 
+  const header =
+    type === "local-with-videos" ? t("article.youtubeRelated") : undefined;
+
   return (
     <ArticleModal
+      header={header}
       onClose={() => {
         reset();
       }}

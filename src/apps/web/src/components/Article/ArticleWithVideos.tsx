@@ -22,46 +22,33 @@ export const ArticleWithVideos = ({ html, items }: Props) => {
   return (
     <>
       {html && <HtmlArticle html={html} />}
-      <Videos>
-        {items.length > 0 ? (
-          <>
-            <ListHeader>{t("article.youtubeRelated")}</ListHeader>
-            <List>
-              {items.map((item) => (
-                <ListItem key={item.id}>
-                  <Link
-                    href={item.metadata.segmentUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <VideoHeader>{item.metadata.segmentName} </VideoHeader>
-                    <VideoDate>{formatDate(item.metadata.date)}</VideoDate>
-                    <Thumbnail
-                      src={youtubeIdToImage(item.metadata.videoId)}
-                      alt={item.metadata.segmentName}
-                    />
-                  </Link>
-                </ListItem>
-              ))}
-            </List>
-          </>
-        ) : (
-          <ListHeader>{t("article.youtubeNone")}</ListHeader>
-        )}
-      </Videos>
+      {items.length > 0 ? (
+        <List>
+          {items.map((item) => (
+            <ListItem key={item.id}>
+              <Link
+                href={item.metadata.segmentUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <VideoHeader>{item.metadata.segmentName} </VideoHeader>
+                <VideoDate>{formatDate(item.metadata.date)}</VideoDate>
+                <Thumbnail
+                  src={youtubeIdToImage(item.metadata.videoId)}
+                  alt={item.metadata.segmentName}
+                />
+              </Link>
+            </ListItem>
+          ))}
+        </List>
+      ) : (
+        <EmptyMessage>{t("article.youtubeNone")}</EmptyMessage>
+      )}
     </>
   );
 };
 
-const Videos = styled.div`
-  margin: 48px 0 0 0;
-
-  &:first-child {
-    margin: 0;
-  }
-`;
-
-const ListHeader = styled.h2``;
+const EmptyMessage = styled.p``;
 
 const List = styled.ul`
   list-style: none;

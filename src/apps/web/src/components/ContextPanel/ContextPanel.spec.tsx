@@ -31,4 +31,46 @@ describe("ContextPanel", () => {
     await userEvent.setup().click(getByRole("button"));
     expect(onClose).toHaveBeenCalledTimes(1);
   });
+
+  it("should render the header inside an h2", async () => {
+    const instance = await setupI18n();
+
+    const { getByRole } = render(
+      <I18nextProvider i18n={instance}>
+        <ContextPanel onClose={vi.fn()} header="Panel title">
+          body
+        </ContextPanel>
+      </I18nextProvider>,
+    );
+
+    expect(getByRole("heading", { level: 2 }).textContent).toBe("Panel title");
+  });
+
+  it("should render no heading when header is omitted", async () => {
+    const instance = await setupI18n();
+
+    const { queryByRole } = render(
+      <I18nextProvider i18n={instance}>
+        <ContextPanel onClose={vi.fn()}>body</ContextPanel>
+      </I18nextProvider>,
+    );
+
+    expect(queryByRole("heading")).toBeNull();
+  });
+
+  it("should still emit onClose when a header is present", async () => {
+    const instance = await setupI18n();
+    const onClose = vi.fn();
+
+    const { getByRole } = render(
+      <I18nextProvider i18n={instance}>
+        <ContextPanel onClose={onClose} header="Panel title">
+          body
+        </ContextPanel>
+      </I18nextProvider>,
+    );
+
+    await userEvent.setup().click(getByRole("button"));
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
 });
