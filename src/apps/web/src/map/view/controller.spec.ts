@@ -76,6 +76,24 @@ describe("controller", () => {
   );
 
   it(
+    "should pan to a translate that centers the point within the safe area when an inset is set",
+    withController(({ fake, controller }) => {
+      controller.setSize({ width: 800, height: 600 });
+      controller.setInset({ top: 60, right: 0, bottom: 0, left: 200 });
+
+      controller.panTo({ x: 100, y: 200 });
+
+      // safe area center (500, 330); scale 1
+      // x = -100*1 + 500 = 400; y = -200*1 + 330 = 130
+      expect(fake.applyTransform).toHaveBeenCalledTimes(1);
+      expect(fake.applyTransform).toHaveBeenCalledWith(
+        { x: 400, y: 130, scale: 1 },
+        { animate: true },
+      );
+    }),
+  );
+
+  it(
     "should pan using the latest scale reported by the driver",
     withController(({ fake, controller }) => {
       controller.setSize({ width: 800, height: 600 });
@@ -107,6 +125,29 @@ describe("controller", () => {
       expect(fake.applyTransform).toHaveBeenCalledTimes(1);
       expect(fake.applyTransform).toHaveBeenCalledWith(
         { x: 150, y: 50, scale: 5 },
+        { animate: true },
+      );
+    }),
+  );
+
+  it(
+    "should fit the bounding box within the safe area when an inset is set",
+    withController(({ fake, controller }) => {
+      controller.setSize({ width: 800, height: 600 });
+      controller.setInset({ top: 60, right: 0, bottom: 0, left: 200 });
+
+      controller.fitToBox({
+        x: { min: 0, max: 100 },
+        y: { min: 0, max: 100 },
+      });
+
+      // safe area 600x540, screen center (500, 330)
+      // box 100x100, padding 0.1 → effective 120x120
+      // scale = min(600/120, 540/120) = 4.5
+      // x = -50*4.5 + 500 = 275; y = -50*4.5 + 330 = 105
+      expect(fake.applyTransform).toHaveBeenCalledTimes(1);
+      expect(fake.applyTransform).toHaveBeenCalledWith(
+        { x: 275, y: 105, scale: 4.5 },
         { animate: true },
       );
     }),
@@ -164,6 +205,24 @@ describe("controller", () => {
   );
 
   it(
+    "should center a single point within the safe area when an inset is set",
+    withController(({ fake, controller }) => {
+      controller.setSize({ width: 800, height: 600 });
+      controller.setInset({ top: 60, right: 0, bottom: 0, left: 200 });
+
+      controller.fitToPoints([{ x: 100, y: 200 }]);
+
+      // safe area center (500, 330); scale 1
+      // x = -100 + 500 = 400; y = -200 + 330 = 130
+      expect(fake.applyTransform).toHaveBeenCalledTimes(1);
+      expect(fake.applyTransform).toHaveBeenCalledWith(
+        { x: 400, y: 130, scale: 1 },
+        { animate: true },
+      );
+    }),
+  );
+
+  it(
     "should center on the supplied point at the requested scale",
     withController(({ fake, controller }) => {
       controller.setSize({ width: 800, height: 600 });
@@ -180,6 +239,24 @@ describe("controller", () => {
   );
 
   it(
+    "should center on the supplied point within the safe area when an inset is set",
+    withController(({ fake, controller }) => {
+      controller.setSize({ width: 800, height: 600 });
+      controller.setInset({ top: 60, right: 0, bottom: 0, left: 200 });
+
+      controller.centerOn({ x: 100, y: 200 }, { scale: 4 });
+
+      // safe area center (500, 330); scale 4
+      // x = -100*4 + 500 = 100; y = -200*4 + 330 = -470
+      expect(fake.applyTransform).toHaveBeenCalledTimes(1);
+      expect(fake.applyTransform).toHaveBeenCalledWith(
+        { x: 100, y: -470, scale: 4 },
+        { animate: true },
+      );
+    }),
+  );
+
+  it(
     "should center on the supplied point at the current scale when scale is omitted",
     withController(({ fake, controller }) => {
       controller.setSize({ width: 800, height: 600 });
@@ -190,6 +267,26 @@ describe("controller", () => {
       // scale = 2; x = -100*2 + 400 = 200; y = -200*2 + 300 = -100
       expect(fake.applyTransform).toHaveBeenCalledWith(
         { x: 200, y: -100, scale: 2 },
+        { animate: true },
+      );
+    }),
+  );
+
+  it(
+    "should fall back to the full viewport on an axis when the inset would leave no usable space",
+    withController(({ fake, controller }) => {
+      controller.setSize({ width: 800, height: 600 });
+      // left inset exceeds the width: that axis has no usable space and must
+      // fall back to the full width; the height axis stays inset-aware.
+      controller.setInset({ top: 60, right: 0, bottom: 0, left: 900 });
+
+      controller.panTo({ x: 100, y: 200 });
+
+      // width falls back: centerX = 400; height safe: centerY = 330
+      // x = -100*1 + 400 = 300; y = -200*1 + 330 = 130
+      expect(fake.applyTransform).toHaveBeenCalledTimes(1);
+      expect(fake.applyTransform).toHaveBeenCalledWith(
+        { x: 300, y: 130, scale: 1 },
         { animate: true },
       );
     }),

@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { CLUSTER_ROUTE_PATH } from "../../cluster/routePath.ts";
 import { useClearViewedCluster } from "../../cluster/useClearViewedCluster.ts";
 import { useMapBackgroundTap } from "../../map/view/hooks.ts";
+import { useCoveredArea } from "../../map/view/useCoveredArea.ts";
 import {
   selectIsSearchActive,
   useSearchStore,
@@ -14,6 +15,11 @@ export const ContextPanelOutlet = () => {
   const isClusterRoute = !!matchRoute({ to: CLUSTER_ROUTE_PATH });
   const isSearchActive = useSearchStore(selectIsSearchActive);
   const clearViewedCluster = useClearViewedCluster();
+  const placementRef = useCoveredArea<HTMLDivElement>({
+    id: "cluster-panel",
+    edge: "left",
+    active: isClusterRoute,
+  });
 
   const onContextPanelClose = () => {
     void clearViewedCluster();
@@ -25,6 +31,7 @@ export const ContextPanelOutlet = () => {
 
   return (
     <Placement
+      ref={placementRef}
       $open={isClusterRoute}
       $shifted={isSearchActive}
       data-testid="context-panel"

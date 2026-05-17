@@ -4,11 +4,30 @@ import type {
   BBox,
   CommandOptions,
   FitOptions,
+  Inset,
   MapViewConfig,
   Point,
 } from "./types.ts";
 
 type Size = { width: number; height: number };
+
+const noInset: Inset = { top: 0, right: 0, bottom: 0, left: 0 };
+
+// The viewport region left uncovered by docked panels. An axis whose inset
+// would leave no usable space falls back to the full size, so centering never
+// targets a zero or negative area.
+const safeAreaOf = (size: Size, inset: Inset) => {
+  const insetWidth = size.width - inset.left - inset.right;
+  const insetHeight = size.height - inset.top - inset.bottom;
+  const hasWidth = insetWidth > 0;
+  const hasHeight = insetHeight > 0;
+  return {
+    width: hasWidth ? insetWidth : size.width,
+    height: hasHeight ? insetHeight : size.height,
+    centerX: hasWidth ? inset.left + insetWidth / 2 : size.width / 2,
+    centerY: hasHeight ? inset.top + insetHeight / 2 : size.height / 2,
+  };
+};
 
 type Snapshot = {
   transform: Transform;
@@ -28,19 +47,25 @@ const createCell = <T>(initial: T) => {
   };
 };
 
-const computeFit = (box: BBox, size: Size, padding: number): Transform => {
+const computeFit = (
+  box: BBox,
+  size: Size,
+  padding: number,
+  inset: Inset,
+): Transform => {
+  const safe = safeAreaOf(size, inset);
   const boxWidth = box.x.max - box.x.min;
   const boxHeight = box.y.max - box.y.min;
   const padded = 1 + 2 * padding;
   const scale = Math.min(
-    size.width / (boxWidth * padded),
-    size.height / (boxHeight * padded),
+    safe.width / (boxWidth * padded),
+    safe.height / (boxHeight * padded),
   );
   const cx = (box.x.min + box.x.max) / 2;
   const cy = (box.y.min + box.y.max) / 2;
   return {
-    x: -cx * scale + size.width / 2,
-    y: -cy * scale + size.height / 2,
+    x: -cx * scale + safe.centerX,
+    y: -cy * scale + safe.centerY,
     scale,
   };
 };
@@ -70,8 +95,9 @@ const createCommands = <Surface>(args: {
   config: MapViewConfig<Surface>;
   getLiveTransform: () => Transform;
   getSize: () => Size;
+  getInset: () => Inset;
 }) => {
-  const { driver, config, getLiveTransform, getSize } = args;
+  const { driver, config, getLiveTransform, getSize, getInset } = args;
   const animateFlag = (options?: CommandOptions) =>
     options?.animate ?? config.defaults.animate;
   const paddingFor = (options?: FitOptions) =>
@@ -86,11 +112,11 @@ const createCommands = <Surface>(args: {
     },
     panTo: (point: Point, options?: CommandOptions) => {
       const { scale } = getLiveTransform();
-      const { width, height } = getSize();
+      const safe = safeAreaOf(getSize(), getInset());
       driver.applyTransform(
         {
-          x: -point.x * scale + width / 2,
-          y: -point.y * scale + height / 2,
+          x: -point.x * scale + safe.centerX,
+          y: -point.y * scale + safe.centerY,
           scale,
         },
         { animate: animateFlag(options) },
@@ -98,30 +124,31 @@ const createCommands = <Surface>(args: {
     },
     centerOn: (point: Point, options?: CommandOptions & { scale?: number }) => {
       const scale = options?.scale ?? getLiveTransform().scale;
-      const { width, height } = getSize();
+      const safe = safeAreaOf(getSize(), getInset());
       driver.applyTransform(
         {
-          x: -point.x * scale + width / 2,
-          y: -point.y * scale + height / 2,
+          x: -point.x * scale + safe.centerX,
+          y: -point.y * scale + safe.centerY,
           scale,
         },
         { animate: animateFlag(options) },
       );
     },
     fitToBox: (box: BBox, options?: FitOptions) => {
-      driver.applyTransform(computeFit(box, getSize(), paddingFor(options)), {
-        animate: animateFlag(options),
-      });
+      driver.applyTransform(
+        computeFit(box, getSize(), paddingFor(options), getInset()),
+        { animate: animateFlag(options) },
+      );
     },
     fitToPoints: (points: Point[], options?: FitOptions) => {
       if (points.length === 0) return;
       if (points.length === 1) {
         const [point] = points;
-        const { width, height } = getSize();
+        const safe = safeAreaOf(getSize(), getInset());
         driver.applyTransform(
           {
-            x: -point.x + width / 2,
-            y: -point.y + height / 2,
+            x: -point.x + safe.centerX,
+            y: -point.y + safe.centerY,
             scale: 1,
           },
           { animate: animateFlag(options) },
@@ -129,7 +156,12 @@ const createCommands = <Surface>(args: {
         return;
       }
       driver.applyTransform(
-        computeFit(boundsOf(points), getSize(), paddingFor(options)),
+        computeFit(
+          boundsOf(points),
+          getSize(),
+          paddingFor(options),
+          getInset(),
+        ),
         { animate: animateFlag(options) },
       );
     },
@@ -147,6 +179,7 @@ export const createController =
       isSettled: true,
     });
     const size = createCell<Size>({ width: 0, height: 0 });
+    const inset = createCell<Inset>(noInset);
     const subscribers = new Set<() => void>();
     const tapListeners = new Set<MapViewSignal>();
 
@@ -189,10 +222,14 @@ export const createController =
       config,
       getLiveTransform: () => snapshot.get().transform,
       getSize: size.get,
+      getInset: inset.get,
     });
 
     return {
       ...commands,
+      setInset: (next: Inset) => {
+        inset.set(next);
+      },
       setSize: (next: Size) => {
         size.set(next);
         const { settledTransform } = snapshot.get();

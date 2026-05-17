@@ -15,6 +15,7 @@ import {
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import type { SelectedCluster } from "../../../../map/selectionStore.ts";
+import { useCoveredArea } from "../../../../map/view/useCoveredArea.ts";
 import { useClusterDotRadius } from "../../../Map/Clusters/clusterLevel.ts";
 import { ClusterResultRow } from "./ClusterResultRow.tsx";
 import { Spinner } from "./Spinner.tsx";
@@ -208,6 +209,11 @@ export const Dropdown = (props: DropdownProps) => {
   };
 
   const isOpen = value.length > 0;
+  const optionsRef = useCoveredArea<HTMLDivElement>({
+    id: "search-dropdown",
+    edge: "left",
+    active: isOpen,
+  });
 
   return (
     <Wrapper onKeyDown={onWrapperKeyDown}>
@@ -239,6 +245,7 @@ export const Dropdown = (props: DropdownProps) => {
             />
             {isOpen && (
               <ComboboxOptions
+                ref={optionsRef}
                 static
                 anchor="bottom start"
                 style={{
