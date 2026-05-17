@@ -357,7 +357,7 @@ describe("Search", () => {
   );
 
   it(
-    'should commit the search, select all matches, and zoom to them on "highlight all"',
+    'should commit the search, select all matches, zoom to them on "highlight all", and re-fit on a repeat submit',
     withStore(async () => {
       const i18n = await setupI18n();
       const { fake, config } = baseConfig();
@@ -382,10 +382,11 @@ describe("Search", () => {
 
       await submitSearchQuery(container, "something");
 
+      const user = userEvent.setup();
       const highlightAllRow = await findByRole("option", {
         name: /something/i,
       });
-      await userEvent.setup().click(highlightAllRow);
+      await user.click(highlightAllRow);
 
       await waitFor(() => {
         expect(useSelectionStore.getState().selectedClusters.size).toBe(2);
@@ -393,6 +394,16 @@ describe("Search", () => {
       await waitFor(() => {
         expect(router.state.location.search.q).toBe("something");
       });
+      await waitFor(() => {
+        expect(fake.applyTransform).toHaveBeenCalled();
+      });
+
+      // Re-submitting the same query has to re-fit the map even though the
+      // URL `?q=` has not changed.
+      vi.mocked(fake.applyTransform).mockClear();
+      const repeatSubmit = await findByRole("option", { name: /something/i });
+      await user.click(repeatSubmit);
+
       await waitFor(() => {
         expect(fake.applyTransform).toHaveBeenCalled();
       });

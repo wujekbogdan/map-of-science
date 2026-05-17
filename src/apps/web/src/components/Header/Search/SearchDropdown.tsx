@@ -31,6 +31,9 @@ export const SearchDropdown = ({ filters }: { filters?: ReactNode }) => {
   const { commit, clear } = useSearchActions();
   const view = useMapView();
   const navigateToCluster = useNavigateToCluster();
+  // Bumps on every explicit submit so an identical-query re-submit still
+  // re-fires the fit effect; q alone would not change.
+  const [submitVersion, setSubmitVersion] = useState(0);
 
   // The committed query (URL `?q=`) stays the source of truth. Mirror it into
   // the draft on every external change - deep link, history navigation,
@@ -69,14 +72,20 @@ export const SearchDropdown = ({ filters }: { filters?: ReactNode }) => {
     if (results.length === 0) return;
     setSelectedClusters(results);
     view.fitToPoints(results.map((cluster) => cluster.position));
-  }, [q, debouncedDraftQuery, isFetching, results, setSelectedClusters, view]);
+  }, [
+    q,
+    debouncedDraftQuery,
+    isFetching,
+    results,
+    submitVersion,
+    setSelectedClusters,
+    view,
+  ]);
 
   // The active option survives a selection only when the Combobox is driven
   // by an explicit anchor (see Dropdown). The anchor follows the last
   // selection and is dropped whenever the result set changes under it.
-  const [selectedOptionId, setSelectedOptionId] = useState<string | null>(
-    null,
-  );
+  const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
 
   const onInput = (text: string) => {
     setDraftQuery(text);
@@ -91,6 +100,7 @@ export const SearchDropdown = ({ filters }: { filters?: ReactNode }) => {
     }
     if (option.type === "submit") {
       commit(option.label);
+      setSubmitVersion((version) => version + 1);
     }
   };
 
