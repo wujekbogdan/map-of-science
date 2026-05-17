@@ -2,6 +2,9 @@ import { useQuery } from "@tanstack/react-query";
 import { Trans, useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { useTRPC } from "../../api-client/index.ts";
+import { CLOSE_BUTTON_SIZE_PX } from "../ContextPanel/ContextPanel.tsx";
+
+const HEADING_CLOSE_GAP_PX = 8;
 
 // TODO: render a loading state while the cluster is being fetched. The modal
 // opens blank for a beat because rendering waits on a tRPC round-trip.
@@ -44,6 +47,11 @@ const Wrapper = styled.div`
 
 const Heading = styled.h2`
   margin-top: 0;
+  /* Clear the context panel's close control (its --chrome-offset inset plus
+     the button itself) and add a gap so the title doesn't crowd it. */
+  padding-right: calc(
+    var(--chrome-offset) + ${CLOSE_BUTTON_SIZE_PX}px + ${HEADING_CLOSE_GAP_PX}px
+  );
   font-size: 1em;
   font-weight: normal;
   line-height: 1.5;

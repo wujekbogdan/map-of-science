@@ -4,15 +4,19 @@ import { useShallow } from "zustand/react/shallow";
 import { config } from "../config.ts";
 import { useMapStore } from "../map/mapStore.ts";
 import { MapView, type MapViewConfig } from "../map/view/MapView.tsx";
+import {
+  selectInset,
+  useCoveredAreaStore,
+} from "../map/view/coveredAreaStore.ts";
 import { createD3ZoomDriver } from "../map/view/createD3ZoomDriver.ts";
 import { createDebouncer } from "../map/view/debouncer.ts";
 import { useWindowSize } from "../useWindowSize.ts";
 import { Article } from "./Article/Article.tsx";
+import { ContextPanelOutlet } from "./ContextPanel/ContextPanelOutlet.tsx";
 import { DevTool } from "./DevTool.tsx";
 import { Header } from "./Header/Header.tsx";
 import Logo from "./Logo/Logo.tsx";
 import Map from "./Map/Map.tsx";
-import { SidebarOutlet } from "./Sidebar/SidebarOutlet.tsx";
 
 const VIEW_CONFIG: MapViewConfig<SVGSVGElement> = {
   scaleExtent: { min: 0.5, max: 100 },
@@ -40,6 +44,7 @@ function App() {
     useShallow((s) => [s.temp__svgScaleFactor, s.temp__svgOffset]),
   );
   const size = useWindowSize();
+  const inset = useCoveredAreaStore(useShallow(selectInset));
   const { data: mapSvgUrl } = useQuery({
     queryKey: ["map-svg"],
     queryFn: fetchMapSvg,
@@ -51,6 +56,7 @@ function App() {
       <MapView
         config={VIEW_CONFIG}
         size={size}
+        inset={inset}
         background={{
           imageUrl: mapSvgUrl,
           scaleFactor: svgScaleFactor,
@@ -60,7 +66,7 @@ function App() {
           <>
             <Header />
             <Article />
-            <SidebarOutlet />
+            <ContextPanelOutlet />
             <LogoWrapper>
               <Logo />
             </LogoWrapper>

@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import searchIcon from "../icons/search.svg";
 import { RowLine, TrailingIcon } from "./resultRowLayout.ts";
 
@@ -6,12 +7,17 @@ type Props = {
   matchCount: number | undefined;
 };
 
-export const SubmitRow = ({ query, matchCount }: Props) => (
-  <RowLine>
-    <span>
-      <strong>{query}</strong>
-      {matchCount !== undefined && ` [${matchCount}]`}
-    </span>
-    <TrailingIcon src={searchIcon} alt="" />
-  </RowLine>
-);
+export const SubmitRow = ({ query, matchCount }: Props) => {
+  const { t } = useTranslation();
+
+  return (
+    <RowLine>
+      <span>
+        <strong>{query}</strong>
+        {matchCount !== undefined &&
+          ` [${t("search.dropdown.submitRow.matchCount", { count: matchCount })}]`}
+      </span>
+      <TrailingIcon src={searchIcon} alt="" />
+    </RowLine>
+  );
+};

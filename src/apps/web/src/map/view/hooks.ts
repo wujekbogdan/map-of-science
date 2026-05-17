@@ -1,5 +1,6 @@
 import { useEffect, useRef, useSyncExternalStore, type RefObject } from "react";
 import { useContextOrThrow } from "./context.ts";
+import type { MapViewSignal } from "./driver.ts";
 import type { Transform } from "./transform.ts";
 import type { BBox, MapView } from "./types.ts";
 
@@ -55,6 +56,19 @@ export const useMapViewTransform = (): Transform => {
     cached.current = next;
     return next;
   });
+};
+
+/**
+ * Runs `handler` whenever the user taps the bare map surface. The latest `handler` is always used without re-subscribing, so passing a fresh closure each render is fine and never misses or duplicates a tap.
+ */
+export const useMapBackgroundTap = (handler: MapViewSignal) => {
+  const { onBackgroundTap } = useContextOrThrow("useMapBackgroundTap");
+  const handlerRef = useRef(handler);
+  handlerRef.current = handler;
+  useEffect(
+    () => onBackgroundTap(() => handlerRef.current()),
+    [onBackgroundTap],
+  );
 };
 
 /**

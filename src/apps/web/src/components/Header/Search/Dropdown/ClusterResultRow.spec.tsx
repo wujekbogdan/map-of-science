@@ -5,7 +5,7 @@ import { ClusterResultRow } from "./ClusterResultRow.tsx";
 afterEach(cleanup);
 
 describe("ClusterResultRow", () => {
-  it("should render the cluster name, articles count, formatted score, and a sized dot", () => {
+  it("should render the cluster name, articles count, and a sized dot without a score", () => {
     const { container } = render(
       <ClusterResultRow
         tokens={[
@@ -13,14 +13,13 @@ describe("ClusterResultRow", () => {
           { text: "Holes", type: "bold" },
         ]}
         articlesCount={1234}
-        score={0.823}
         dotRadiusPx={6}
       />,
     );
 
     expect(container.textContent).toContain("Black Holes");
     expect(container.textContent).toContain("1234");
-    expect(container.textContent).toContain("0.82");
+    expect(container.textContent).not.toMatch(/\d+\.\d{2}/);
 
     const circle = container.querySelector("circle");
     expect(circle?.getAttribute("r")).toBe("6");

@@ -3,7 +3,7 @@ import { useMatchRoute } from "@tanstack/react-router";
 import { useTRPC } from "../api-client/index.ts";
 import { CLUSTER_ROUTE_PATH } from "./routePath.ts";
 
-export const useActiveCluster = () => {
+export const useViewedCluster = () => {
   const matchRoute = useMatchRoute();
   const match = matchRoute({ to: CLUSTER_ROUTE_PATH });
   const id = match ? match.id : null;

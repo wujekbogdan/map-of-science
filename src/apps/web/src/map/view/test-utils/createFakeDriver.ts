@@ -7,6 +7,8 @@ export type FakeDriver = Driver & {
   fireTransform: (transform: Transform) => void;
   /** Invoke the bound `onReady` callback. */
   fireReady: () => void;
+  /** Invoke the bound `onBackgroundTap` callback. */
+  emitBackgroundTap: () => void;
   /** Plug into `MapViewConfig.createDriver`. */
   create: CreateDriver;
 };
@@ -32,6 +34,9 @@ export const createFakeDriver = (): FakeDriver => {
     },
     fireReady: () => {
       callbacks?.onReady();
+    },
+    emitBackgroundTap: () => {
+      callbacks?.onBackgroundTap();
     },
     create,
   };

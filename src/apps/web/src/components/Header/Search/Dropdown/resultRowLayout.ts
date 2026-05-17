@@ -31,12 +31,6 @@ export const CountLabel = styled.span`
   line-height: inherit;
 `;
 
-export const ScoreLabel = styled.span`
-  color: #555;
-  font-family: monospace;
-  margin-left: auto;
-`;
-
 export const TrailingIcon = styled.img`
   margin-left: auto;
 `;

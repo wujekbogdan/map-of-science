@@ -6,7 +6,7 @@ import { getClusterLevel } from "../components/Map/Clusters/clusterLevel.ts";
 import { useMapStore } from "../map/mapStore.ts";
 import { useMapView } from "../map/view/hooks.ts";
 import { CLUSTER_ROUTE_PATH } from "./routePath.ts";
-import { useActiveCluster } from "./useActiveCluster.ts";
+import { useViewedCluster } from "./useViewedCluster.ts";
 
 const route = getRouteApi(CLUSTER_ROUTE_PATH);
 
@@ -14,7 +14,7 @@ export const ClusterPanel = () => {
   const { id } = route.useParams();
   const source = useLocation({ select: (location) => location.state.source });
   const view = useMapView();
-  const cluster = useActiveCluster();
+  const cluster = useViewedCluster();
   const [thresholds, focusZoom] = useMapStore(
     useShallow((state) => [
       state.clusterLevelArticleThreshold,

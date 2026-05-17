@@ -4,7 +4,7 @@ import { CSSProperties, useEffect, useMemo, useRef } from "react";
 import { useShallow } from "zustand/react/shallow";
 import { useTRPC } from "../../api-client/index.ts";
 import { useArticleStore } from "../../article/articleStore.ts";
-import { useActiveCluster } from "../../cluster/useActiveCluster.ts";
+import { useViewedCluster } from "../../cluster/useViewedCluster.ts";
 import { useMapStore } from "../../map/mapStore.ts";
 import { mergeHighlightedClusters } from "../../map/mergeHighlightedClusters.ts";
 import { pickClustersToRender } from "../../map/pickClustersToRender.ts";
@@ -83,11 +83,11 @@ export default function Map() {
     ),
   );
 
-  const activeCluster = useActiveCluster();
+  const viewedCluster = useViewedCluster();
 
   const highlightedClusters = useMemo(
-    () => mergeHighlightedClusters(selectedClusters, activeCluster),
-    [selectedClusters, activeCluster],
+    () => mergeHighlightedClusters(selectedClusters, viewedCluster),
+    [selectedClusters, viewedCluster],
   );
 
   const clustersToRender = useMemo(
@@ -160,7 +160,7 @@ export default function Map() {
         transform={liveTransform}
         mode={mapMode}
         ripplingIds={ripplingIds}
-        highlightedIds={highlightedIds}
+        viewedClusterId={viewedCluster?.id ?? null}
       />
       {labelsScaled.map((label) => (
         <Label

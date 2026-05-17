@@ -1,12 +1,22 @@
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
 import { Context, type ContextValue, type Controller } from "./context.ts";
 import { createController } from "./controller.ts";
+import { MapRectContext } from "./mapRectContext.ts";
 import type { Transform } from "./transform.ts";
-import type { MapViewConfig } from "./types.ts";
+import type { Inset, MapViewConfig } from "./types.ts";
+import { useViewportRect } from "./useViewportRect.ts";
 
 export type { MapViewConfig } from "./types.ts";
 
 type Size = { width: number; height: number };
+
+const noInset: Inset = { top: 0, right: 0, bottom: 0, left: 0 };
 
 type BackgroundConfig = {
   imageUrl: string | undefined;
@@ -39,12 +49,15 @@ const backgroundStyle = (
 export const MapView = ({
   config,
   size,
+  inset,
   background,
   chrome,
   children,
 }: {
   config: MapViewConfig<SVGSVGElement>;
   size: Size;
+  /** Pixels of the surface covered by docked chrome. Programmatic camera moves center within the uncovered area. */
+  inset?: Inset;
   background?: BackgroundConfig;
   /** HTML siblings of the `<svg>`. Render here for headers, overlays, controls. */
   chrome?: ReactNode;
@@ -53,6 +66,15 @@ export const MapView = ({
 }) => {
   const [svg, setSvg] = useState<SVGSVGElement | null>(null);
   const [controller, setController] = useState<Controller | null>(null);
+  const [measureRef, mapRect] = useViewportRect<SVGSVGElement>();
+
+  const setSvgRef = useCallback(
+    (node: SVGSVGElement | null) => {
+      measureRef(node);
+      setSvg(node);
+    },
+    [measureRef],
+  );
 
   useEffect(() => {
     if (!svg) return;
@@ -67,6 +89,7 @@ export const MapView = ({
   // Sync size during render so commands fired by child effects observe the
   // latest value. setSize is idempotent.
   controller?.setSize(size);
+  controller?.setInset(inset ?? noInset);
 
   useEffect(() => {
     if (!svg || !background?.imageUrl) return;
@@ -113,20 +136,23 @@ export const MapView = ({
       },
       subscribe: controller.subscribe,
       getSnapshot: controller.getSnapshot,
+      onBackgroundTap: controller.onBackgroundTap,
     };
   }, [controller]);
 
   return (
-    <Context.Provider value={value}>
-      {controller && chrome}
-      <svg
-        ref={setSvg}
-        width={size.width}
-        height={size.height}
-        style={{ display: "block" }}
-      >
-        {controller && children}
-      </svg>
-    </Context.Provider>
+    <Context value={value}>
+      <MapRectContext value={mapRect}>
+        {controller && chrome}
+        <svg
+          ref={setSvgRef}
+          width={size.width}
+          height={size.height}
+          style={{ display: "block" }}
+        >
+          {controller && children}
+        </svg>
+      </MapRectContext>
+    </Context>
   );
 };
