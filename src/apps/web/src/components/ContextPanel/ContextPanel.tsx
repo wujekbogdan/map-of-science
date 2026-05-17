@@ -3,32 +3,35 @@ import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import closeIcon from "../Header/close.svg";
 
-export const CLOSE_BUTTON_SIZE_PX = 28;
+const CLOSE_BUTTON_SIZE_PX = 28;
 
 type Props = {
   onClose: () => void;
+  header?: ReactNode;
   children: ReactNode;
 };
 
-export const ContextPanel = ({ onClose, children }: Props) => {
+export const ContextPanel = ({ onClose, header, children }: Props) => {
   const { t } = useTranslation();
 
   return (
     <Card>
-      <CloseButton
-        type="button"
-        aria-label={t("article.close")}
-        onClick={onClose}
-      >
-        <img src={closeIcon} alt="" />
-      </CloseButton>
+      <TopRow>
+        {header !== undefined && <Heading>{header}</Heading>}
+        <CloseButton
+          type="button"
+          aria-label={t("article.close")}
+          onClick={onClose}
+        >
+          <img src={closeIcon} alt="" />
+        </CloseButton>
+      </TopRow>
       {children}
     </Card>
   );
 };
 
 const Card = styled.div`
-  position: relative;
   box-sizing: border-box;
   width: 100%;
   height: 100%;
@@ -37,14 +40,26 @@ const Card = styled.div`
   background: white;
   border-radius: 26px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
-  overflow-y: auto;
   padding: var(--chrome-offset);
 `;
 
+const TopRow = styled.div`
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+`;
+
+const Heading = styled.h2`
+  flex: 1;
+  margin: 0;
+  font-size: 1em;
+  font-weight: normal;
+  line-height: 1.5;
+`;
+
 const CloseButton = styled.button`
-  position: absolute;
-  top: var(--chrome-offset);
-  right: var(--chrome-offset);
+  flex: 0 0 auto;
+  margin-left: auto;
   display: flex;
   align-items: center;
   justify-content: center;
