@@ -8,7 +8,6 @@ import {
   selectIsSearchActive,
   useSearchStore,
 } from "../Header/Search/searchStore.ts";
-import { ContextPanel } from "./ContextPanel.tsx";
 
 export const ContextPanelOutlet = () => {
   const matchRoute = useMatchRoute();
@@ -20,10 +19,6 @@ export const ContextPanelOutlet = () => {
     edge: "left",
     active: isClusterRoute,
   });
-
-  const onContextPanelClose = () => {
-    void clearViewedCluster();
-  };
 
   useMapBackgroundTap(() => {
     if (isClusterRoute) void clearViewedCluster();
@@ -38,9 +33,7 @@ export const ContextPanelOutlet = () => {
       data-test-open={isClusterRoute}
       data-test-shifted={isSearchActive}
     >
-      <ContextPanel onClose={onContextPanelClose}>
-        <Outlet />
-      </ContextPanel>
+      <Outlet />
     </Placement>
   );
 };

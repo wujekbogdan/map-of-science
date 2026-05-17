@@ -1,16 +1,16 @@
-import { ReactElement, useRef } from "react";
-import { useTranslation } from "react-i18next";
+import { ReactElement, ReactNode, useRef } from "react";
 import { useClickAway, useKey } from "react-use";
 import styled from "styled-components";
 import { breakpoints } from "../../useBreakpoint.ts";
+import { ContextPanel } from "../ContextPanel/ContextPanel.tsx";
 
 type Props = {
   children: ReactElement;
   onClose?: () => void;
+  header?: ReactNode;
 };
 
-export const ArticleModal = ({ children, onClose }: Props) => {
-  const { t } = useTranslation();
+export const ArticleModal = ({ children, onClose, header }: Props) => {
   const ref = useRef(null);
 
   useClickAway(ref, () => {
@@ -23,18 +23,16 @@ export const ArticleModal = ({ children, onClose }: Props) => {
 
   return (
     <Overlay>
-      <ArticleWrapper ref={ref}>
-        <Header>
-          <CloseButton
-            onClick={() => {
-              onClose?.();
-            }}
-          >
-            {t("article.close")} ✕
-          </CloseButton>
-        </Header>
-        <Content>{children}</Content>
-      </ArticleWrapper>
+      <PositionWrapper ref={ref}>
+        <ContextPanel
+          header={header}
+          onClose={() => {
+            onClose?.();
+          }}
+        >
+          <Body>{children}</Body>
+        </ContextPanel>
+      </PositionWrapper>
     </Overlay>
   );
 };
@@ -45,7 +43,7 @@ export const ArticleModal = ({ children, onClose }: Props) => {
 // would create unnecessary complexity and coupling, so I went with a
 // transparent overlay instead that will catch the click.
 const Overlay = styled.div`
-  z-index: 30;
+  z-index: 100;
   position: fixed;
   top: 0;
   right: 0;
@@ -53,19 +51,18 @@ const Overlay = styled.div`
   left: 0;
 `;
 
-const ArticleWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
+const Body = styled.div`
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+`;
+
+const PositionWrapper = styled.div`
   position: fixed;
   top: 12px;
   right: 12px;
   bottom: 12px;
   left: 12px;
-  padding: 20px;
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 4px;
-  box-shadow: 0 0 16px rgba(0, 0, 0, 0.2);
-  overflow-y: auto;
 
   @media (min-width: ${breakpoints.lg}) {
     top: 36px;
@@ -74,32 +71,5 @@ const ArticleWrapper = styled.div`
     left: 50%;
     width: 50%;
     transform: translateX(-50%);
-    padding: 12px;
   }
 `;
-
-const Header = styled.header`
-  display: flex;
-`;
-
-const Content = styled.section`
-  flex-grow: 1;
-`;
-
-const Button = styled.button`
-  border-radius: 4px;
-  border: 1px solid #ddd;
-  padding: 8px 12px;
-  cursor: pointer;
-
-  &:hover {
-    border-color: #ccc;
-  }
-
-  &:focus {
-    border-color: #999;
-    outline: none;
-  }
-`;
-
-const CloseButton = styled(Button)``;
