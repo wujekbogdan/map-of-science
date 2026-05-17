@@ -6,15 +6,16 @@ import {
 } from "@headlessui/react";
 import {
   ChangeEvent,
+  KeyboardEvent,
   ReactNode,
   useEffect,
   useMemo,
   useRef,
-  useState,
 } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import type { SelectedCluster } from "../../../../map/selectionStore.ts";
+import { useCoveredArea } from "../../../../map/view/useCoveredArea.ts";
 import { useClusterDotRadius } from "../../../Map/Clusters/clusterLevel.ts";
 import { ClusterResultRow } from "./ClusterResultRow.tsx";
 import { Spinner } from "./Spinner.tsx";
@@ -46,6 +47,8 @@ type DropdownProps = {
   value: string;
   query: string;
   options: Option[];
+  selectedOptionId: string | null;
+  matchCount: number | undefined;
   isQuerySubmittable: boolean;
   onSelect: (option: Option) => void;
   onReset: () => void;
@@ -99,7 +102,6 @@ const tokenizeLabel = (label: string, query: string): Token[] => {
 export const Dropdown = (props: DropdownProps) => {
   const { t } = useTranslation();
   const { options: rawOptions, value, query } = props;
-  const [selection, setSelection] = useState<Option | null>(null);
   const getDotRadius = useClusterDotRadius();
 
   const options = useMemo(
@@ -127,121 +129,199 @@ export const Dropdown = (props: DropdownProps) => {
     placeholders[Math.floor(Math.random() * placeholders.length)],
   );
 
-  const submitOption: Option = {
-    type: "submit",
-    id: "submit-query",
-    label: value,
-    keyword: value,
-    clusters: allClusters,
-  };
+  const submitOption = useMemo<Option>(
+    () => ({
+      type: "submit",
+      id: "submit-query",
+      label: value,
+      keyword: value,
+      clusters: allClusters,
+    }),
+    [value, allClusters],
+  );
+
+  const optionById = useMemo(
+    () =>
+      new Map<string, Option>(
+        [submitOption, ...rawOptions].map((option) => [option.id, option]),
+      ),
+    [rawOptions, submitOption],
+  );
+
+  // Headless UI keeps the option list open after a selection only in
+  // `multiple` mode; single mode hardcodes a close that drops the active
+  // option, so keyboard navigation would restart at the top. The list is
+  // driven by a single anchor id (`[anchor]` or `[]`); the array/toggle
+  // semantics are reduced back to one selected option in `onSelectionChange`.
+  const selectedComboboxValue = useMemo(
+    () => (props.selectedOptionId ? [props.selectedOptionId] : []),
+    [props.selectedOptionId],
+  );
 
   const onQueryChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setSelection(null);
     props.onInput(event.target.value);
   };
 
-  const onSelectionChange = (selected: Option | null) => {
+  const onSelectionChange = (next: string[]) => {
+    const toggledId =
+      next.find((id) => !selectedComboboxValue.includes(id)) ??
+      selectedComboboxValue.find((id) => !next.includes(id));
+    const selected = toggledId === undefined ? null : optionById.get(toggledId);
     if (!selected) return;
-    setSelection(selected);
     props.onSelect(selected);
   };
 
-  const onResetClick = () => {
-    setSelection(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Escape resets the search regardless of which element inside the widget
+  // holds focus. After a commit focus can leave the input, so a handler bound
+  // only to the input would miss it.
+  //
+  // Headless UI gates its controlled value sync on an internal "typing" flag
+  // it sets on every keydown and only clears on selection or when its
+  // open/close machine closes. Rendering the options with `static` keeps that
+  // machine from running, so after an Escape keydown the flag stays set and a
+  // cleared controlled value never reaches the DOM input. Writing the empty
+  // value through the native input setter and dispatching the `input` event
+  // is the one channel Headless UI reconciles in that state. The store stays
+  // the single source of truth; this only reconciles the DOM to it. Tracked
+  // for retirement by the dropdown implementation research.
+  const resetSearch = () => {
     props.onReset();
+    const element = inputRef.current;
+    if (!element) return;
+    Object.getOwnPropertyDescriptor(
+      window.HTMLInputElement.prototype,
+      "value",
+    )?.set?.call(element, "");
+    element.dispatchEvent(new Event("input", { bubbles: true }));
+    element.focus();
   };
 
+  const onResetClick = () => {
+    resetSearch();
+  };
+
+  const onWrapperKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === "Escape") {
+      resetSearch();
+    }
+  };
+
+  const isOpen = value.length > 0;
+  const optionsRef = useCoveredArea<HTMLDivElement>({
+    id: "search-dropdown",
+    edge: "left",
+    active: isOpen,
+  });
+
   return (
-    <Wrapper>
-      <Combobox value={selection} immediate onChange={onSelectionChange}>
-        {({ open, activeOption }) => (
+    <Wrapper onKeyDown={onWrapperKeyDown}>
+      <Combobox
+        multiple
+        value={selectedComboboxValue}
+        immediate
+        onChange={onSelectionChange}
+      >
+        {({ activeOption }) => (
           <div>
             <HoverReporter
-              activeOption={activeOption}
+              activeOption={
+                activeOption === null
+                  ? null
+                  : (optionById.get(activeOption) ?? null)
+              }
               onItemHover={props.onItemHover}
             />
             <ComboboxInput
+              ref={inputRef}
               autoComplete="off"
-              $open={open}
+              $open={isOpen}
               placeholder={t("search.dropdown.placeholder", {
                 placeholder: randomPlaceholder,
               })}
-              displayValue={(option: Option | null) => option?.keyword ?? value}
+              displayValue={() => value}
               onChange={onQueryChange}
             />
-            <ComboboxOptions
-              anchor="bottom start"
-              style={{
-                width: "var(--input-width)",
-              }}
-            >
-              {props.filters && (
-                <FiltersSlot
-                  onMouseDown={(event) => {
-                    event.stopPropagation();
-                  }}
-                  onClick={(event) => {
-                    event.stopPropagation();
-                  }}
-                  onKeyDown={(event) => {
-                    event.stopPropagation();
-                  }}
-                >
-                  {props.filters}
-                </FiltersSlot>
-              )}
-              <ResultsList>
-                {showHelpText && (
-                  <NoResults>{t("search.dropdown.enterMin")}</NoResults>
+            {isOpen && (
+              <ComboboxOptions
+                ref={optionsRef}
+                static
+                anchor="bottom start"
+                style={{
+                  width: "var(--input-width)",
+                }}
+              >
+                {props.filters && (
+                  <FiltersSlot
+                    onMouseDown={(event) => {
+                      event.stopPropagation();
+                    }}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                    }}
+                    onKeyDown={(event) => {
+                      event.stopPropagation();
+                    }}
+                  >
+                    {props.filters}
+                  </FiltersSlot>
                 )}
-                {props.isQuerySubmittable && (
-                  <>
-                    <ComboboxOptionHeadless value={submitOption}>
-                      {({ focus, selected }) => (
-                        <ComboboxOption $focus={focus} $selected={selected}>
-                          <SubmitRow
-                            query={value}
-                            matchCount={allClusters.length || undefined}
-                          />
-                        </ComboboxOption>
+                <ResultsList>
+                  {showHelpText && (
+                    <NoResults>{t("search.dropdown.enterMin")}</NoResults>
+                  )}
+                  {props.isQuerySubmittable && (
+                    <>
+                      <ComboboxOptionHeadless value={submitOption.id}>
+                        {({ focus, selected }) => (
+                          <ComboboxOption $focus={focus} $selected={selected}>
+                            <SubmitRow
+                              query={value}
+                              matchCount={props.matchCount}
+                            />
+                          </ComboboxOption>
+                        )}
+                      </ComboboxOptionHeadless>
+                      {options.length > 0 && (
+                        <ColumnHeader>
+                          <HeaderSize>
+                            {t("search.dropdown.column.size")}
+                          </HeaderSize>
+                          <HeaderName>
+                            {t("search.dropdown.column.name")}
+                          </HeaderName>
+                        </ColumnHeader>
                       )}
-                    </ComboboxOptionHeadless>
-                    {options.length > 0 && (
-                      <ColumnHeader>
-                        <HeaderSize>
-                          {t("search.dropdown.column.size")}
-                        </HeaderSize>
-                        <HeaderName>
-                          {t("search.dropdown.column.name")}
-                        </HeaderName>
-                        <HeaderScore>
-                          {t("search.dropdown.column.score")}
-                        </HeaderScore>
-                      </ColumnHeader>
-                    )}
-                    {options.map((option) => {
-                      if (option.type !== "cluster") return null;
-                      return (
-                        <ComboboxOptionHeadless key={option.id} value={option}>
-                          {({ focus, selected }) => (
-                            <ComboboxOption $focus={focus} $selected={selected}>
-                              <ClusterResultRow
-                                tokens={option.tokens}
-                                articlesCount={option.cluster.articlesCount}
-                                score={option.cluster.score}
-                                dotRadiusPx={getDotRadius(
-                                  option.cluster.articlesCount,
-                                )}
-                              />
-                            </ComboboxOption>
-                          )}
-                        </ComboboxOptionHeadless>
-                      );
-                    })}
-                  </>
-                )}
-              </ResultsList>
-            </ComboboxOptions>
+                      {options.map((option) => {
+                        if (option.type !== "cluster") return null;
+                        return (
+                          <ComboboxOptionHeadless
+                            key={option.id}
+                            value={option.id}
+                          >
+                            {({ focus, selected }) => (
+                              <ComboboxOption
+                                $focus={focus}
+                                $selected={selected}
+                              >
+                                <ClusterResultRow
+                                  tokens={option.tokens}
+                                  articlesCount={option.cluster.articlesCount}
+                                  dotRadiusPx={getDotRadius(
+                                    option.cluster.articlesCount,
+                                  )}
+                                />
+                              </ComboboxOption>
+                            )}
+                          </ComboboxOptionHeadless>
+                        );
+                      })}
+                    </>
+                  )}
+                </ResultsList>
+              </ComboboxOptions>
+            )}
           </div>
         )}
       </Combobox>
@@ -265,13 +345,13 @@ const Wrapper = styled.div`
   display: flex;
 `;
 
-const TypedCombobox = ComboboxHeadless<Option | null>;
-const Combobox = styled(TypedCombobox)`
+const QueryCombobox = ComboboxHeadless<string, true>;
+const Combobox = styled(QueryCombobox)`
   flex: 1;
 `;
 
-const TypedComboboxInput = ComboboxInputHeadless<Option | null>;
-const ComboboxInput = styled(TypedComboboxInput).attrs<{
+const QueryComboboxInput = ComboboxInputHeadless<string>;
+const ComboboxInput = styled(QueryComboboxInput).attrs<{
   placeholder?: string;
   autoComplete?: string;
 }>((props) => ({
@@ -286,11 +366,14 @@ const ComboboxInput = styled(TypedComboboxInput).attrs<{
   padding: 12px;
   border-width: 2px;
   border-style: solid;
-  border-color: ${(props) =>
-    props.$open ? "#9B5B9B #9B5B9B #fff #9B5B9B" : "#9B5B9B"};
+  border-color: #9b5b9b;
+  // When open, the options panel underlaps the input and supplies the bottom
+  // edge, so the input drops its own bottom border to avoid a double seam.
+  border-bottom-width: ${({ $open }) => ($open ? "0" : "2px")};
   border-radius: ${({ $open }) => ($open ? "4px 4px 0 0" : "4px")};
   color: #333;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  box-shadow: ${({ $open }) =>
+    $open ? "none" : "0 2px 6px rgba(0, 0, 0, 0.08)"};
   transition: box-shadow 0.2s ease-in-out;
 
   &:focus {
@@ -299,6 +382,7 @@ const ComboboxInput = styled(TypedComboboxInput).attrs<{
 `;
 
 const ComboboxOptions = styled(ComboboxOptionsHeadless)`
+  --anchor-padding: var(--chrome-offset);
   z-index: 40;
   background-color: #fff;
   box-sizing: border-box;
@@ -308,7 +392,6 @@ const ComboboxOptions = styled(ComboboxOptionsHeadless)`
   margin-top: -2px;
   display: flex;
   flex-direction: column;
-  max-height: 50vh;
 `;
 
 const ResultsList = styled.div`
@@ -348,10 +431,6 @@ const HeaderName = styled.span`
   flex: 1;
 `;
 
-const HeaderScore = styled.span`
-  margin-left: auto;
-`;
-
 const ComboboxOption = styled.div<{
   $focus: boolean;
   $selected: boolean;
@@ -359,7 +438,8 @@ const ComboboxOption = styled.div<{
   color: #333;
   padding: 12px;
   cursor: pointer;
-  background-color: ${({ $focus }) => ($focus ? "#eee" : "transparent")};
+  background-color: ${({ $focus, $selected }) =>
+    $focus ? "#eee" : $selected ? "#f3e8f3" : "transparent"};
 `;
 
 const SrOnly = styled.span`

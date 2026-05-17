@@ -4,9 +4,10 @@ import { useTRPC } from "../../../api-client";
 import { useMapStore } from "../../../map/mapStore.ts";
 import { parseMinScore } from "./Dropdown/Filters/minScore/filter.ts";
 import { parseSort } from "./Dropdown/Filters/sort/filter.ts";
+import { MIN_QUERY_LENGTH } from "./searchStore.ts";
 import { toSearchInput } from "./toSearchInput.ts";
 
-export const MIN_QUERY_LENGTH = 3;
+export { MIN_QUERY_LENGTH };
 
 export const useSearchQuery = (text: string) => {
   const trpc = useTRPC();

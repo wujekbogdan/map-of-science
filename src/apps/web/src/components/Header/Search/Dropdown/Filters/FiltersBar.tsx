@@ -4,7 +4,7 @@ import { filters } from "./registry.ts";
 
 export const FiltersBar = () => {
   const params = useSearch({ from: rootRouteId });
-  const navigate = useNavigate({ from: "/" });
+  const navigate = useNavigate();
 
   return (
     <Bar>
@@ -14,6 +14,7 @@ export const FiltersBar = () => {
           params={params}
           onChange={(next) =>
             void navigate({
+              to: ".",
               search: (prev) => ({ ...prev, ...next }),
               replace: true,
             })

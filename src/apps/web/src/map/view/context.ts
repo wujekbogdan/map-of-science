@@ -10,6 +10,7 @@ export type ContextValue = {
   command: MapView;
   subscribe: Controller["subscribe"];
   getSnapshot: Controller["getSnapshot"];
+  onBackgroundTap: Controller["onBackgroundTap"];
 };
 
 export const Context = createContext<ContextValue | null>(null);

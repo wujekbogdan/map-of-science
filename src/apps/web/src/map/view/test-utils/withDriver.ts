@@ -8,20 +8,22 @@ type Deps = {
   driver: Driver;
   onTransform: ReturnType<typeof vi.fn>;
   onReady: ReturnType<typeof vi.fn>;
+  onBackgroundTap: ReturnType<typeof vi.fn>;
 };
 
 export const withDriver = (test: (deps: Deps) => void | Promise<void>) =>
   withSvg(async (svg) => {
     const onTransform = vi.fn();
     const onReady = vi.fn();
+    const onBackgroundTap = vi.fn();
     const driver = createD3ZoomDriver({
       surface: svg,
-      callbacks: { onTransform, onReady },
+      callbacks: { onTransform, onReady, onBackgroundTap },
       initial: { x: 0, y: 0, scale: 1 },
       scaleExtent: { min: 0.5, max: 100 },
     });
     try {
-      await test({ svg, driver, onTransform, onReady });
+      await test({ svg, driver, onTransform, onReady, onBackgroundTap });
     } finally {
       driver.detach();
       expect.hasAssertions();

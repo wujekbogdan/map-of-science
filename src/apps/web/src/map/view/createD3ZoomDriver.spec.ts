@@ -68,6 +68,41 @@ describe("createD3ZoomDriver", () => {
   );
 
   it(
+    "should fire onBackgroundTap when the surface itself is clicked",
+    withDriver(({ svg, onBackgroundTap }) => {
+      svg.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+
+      expect(onBackgroundTap).toHaveBeenCalledTimes(1);
+    }),
+  );
+
+  it(
+    "should not fire onBackgroundTap when rendered content is clicked",
+    withDriver(({ svg, onBackgroundTap }) => {
+      const child = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "g",
+      );
+      svg.appendChild(child);
+
+      child.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+
+      expect(onBackgroundTap).not.toHaveBeenCalled();
+    }),
+  );
+
+  it(
+    "should stop firing onBackgroundTap after detach",
+    withDriver(({ svg, driver, onBackgroundTap }) => {
+      driver.detach();
+
+      svg.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+
+      expect(onBackgroundTap).not.toHaveBeenCalled();
+    }),
+  );
+
+  it(
     "should preventDefault on a pinch wheel event at the scale cap",
     withDriver(({ svg }) => {
       // Pin d3-zoom's stored transform to the cap so its wheel handler returns

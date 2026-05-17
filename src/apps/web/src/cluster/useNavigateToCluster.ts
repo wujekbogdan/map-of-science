@@ -14,5 +14,6 @@ export const useNavigateToCluster = () => {
       to: CLUSTER_ROUTE_PATH,
       params: { id },
       state: { source: options?.fromMap ? "map" : undefined },
+      search: (prev) => prev,
     });
 };

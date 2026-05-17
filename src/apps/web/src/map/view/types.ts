@@ -15,6 +15,18 @@ export type BBox = {
   y: { min: number; max: number };
 };
 
+/**
+ * Pixels of the viewport covered by docked panels on each edge. Programmatic
+ * camera moves center within the area left uncovered; manual interaction is
+ * unaffected.
+ */
+export type Inset = {
+  top: number;
+  right: number;
+  bottom: number;
+  left: number;
+};
+
 export type CommandOptions = {
   animate?: boolean;
 };

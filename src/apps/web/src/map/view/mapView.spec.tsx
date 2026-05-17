@@ -1,9 +1,10 @@
 import { act, render, renderHook } from "@testing-library/react";
 import { useEffect, useRef } from "react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { MapView } from "./MapView.tsx";
 import {
   useBindZoomable,
+  useMapBackgroundTap,
   useMapView,
   useMapViewBbox,
   useMapViewIsReady,
@@ -336,5 +337,44 @@ describe("MapView", () => {
     });
 
     expect(getByTestId("scale").textContent).toBe("2");
+  });
+
+  it("should invoke the current useMapBackgroundTap handler on each tap until unmount", () => {
+    const { fake, config } = baseConfig();
+
+    const first = vi.fn();
+    const second = vi.fn();
+    const Harness = ({ handler }: { handler: () => void }) => {
+      useMapBackgroundTap(handler);
+      return null;
+    };
+
+    const { rerender, unmount } = render(
+      <MapView config={config} size={{ width: 800, height: 600 }}>
+        <Harness handler={first} />
+      </MapView>,
+    );
+
+    act(() => {
+      fake.emitBackgroundTap();
+    });
+    expect(first).toHaveBeenCalledTimes(1);
+
+    rerender(
+      <MapView config={config} size={{ width: 800, height: 600 }}>
+        <Harness handler={second} />
+      </MapView>,
+    );
+    act(() => {
+      fake.emitBackgroundTap();
+    });
+    expect(first).toHaveBeenCalledTimes(1);
+    expect(second).toHaveBeenCalledTimes(1);
+
+    unmount();
+    act(() => {
+      fake.emitBackgroundTap();
+    });
+    expect(second).toHaveBeenCalledTimes(1);
   });
 });
