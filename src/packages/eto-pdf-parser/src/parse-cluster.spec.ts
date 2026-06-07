@@ -205,6 +205,21 @@ describe("parseClusterPdf", () => {
     expect(result.topInstitutions.length).toBeGreaterThan(0);
   });
 
+  // An absent industry-organizations table carries no "Yearly citations
+  // (average)" header, so the header search must stay inside the section.
+  // Running past it matches the "Top funders" header below and pulls the
+  // funders table, and the rest of the document, in as company names.
+  // cluster_62180 has data in every section after the empty industry table,
+  // so nothing downstream halts the overrun, which makes it the reliable
+  // reproducer; cluster_18121 escapes only because a later "No data
+  // available." happens to stop the scan.
+  it("should keep topCompanies empty when the industry section is absent and later sections have data", async () => {
+    const data = await loadTestPdf("cluster_62180.pdf");
+    const result = await parseClusterPdf(data);
+
+    expect(result.topCompanies).toEqual([]);
+  });
+
   it("should drop link-label artifacts from org names but keep junk-but-real names", async () => {
     const data = await loadTestPdf("cluster_77592.pdf");
     const result = await parseClusterPdf(data);

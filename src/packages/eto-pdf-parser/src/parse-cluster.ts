@@ -428,18 +428,23 @@ const extractOrgNames = ({
   if (sectionStart === -1) {
     return [];
   }
-  const scoped = text.slice(sectionStart + sectionMarker.length);
-  // An empty table prints "No data available." with no column header, so a missing header means empty.
-  const headerStart = scoped.indexOf(ORG_AVG_HEADER);
+  const afterMarker = sectionStart + sectionMarker.length;
+  const sectionEnd = text.indexOf(endMarker, afterMarker);
+  const section = text.slice(
+    afterMarker,
+    sectionEnd === -1 ? text.length : sectionEnd,
+  );
+  // An empty table prints "No data available." instead of a header and rows. The
+  // header search stays within the section so it cannot fall through to the next
+  // table's header and pull that table in.
+  if (section.includes(NO_DATA_TEXT)) {
+    return [];
+  }
+  const headerStart = section.indexOf(ORG_AVG_HEADER);
   if (headerStart === -1) {
     return [];
   }
-  const contentStart = headerStart + ORG_AVG_HEADER.length;
-  const end = scoped.indexOf(endMarker, contentStart);
-  const region = scoped.slice(contentStart, end === -1 ? scoped.length : end);
-  if (region.includes(NO_DATA_TEXT)) {
-    return [];
-  }
+  const region = section.slice(headerStart + ORG_AVG_HEADER.length);
   return withoutArtifacts(parseOrgNames({ region, totalArticles }));
 };
 
