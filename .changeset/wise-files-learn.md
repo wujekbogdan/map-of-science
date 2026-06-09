@@ -5,7 +5,7 @@
 "@map-of-science/cluster-embedder": patch
 "@map-of-science/cluster-namer": patch
 "@map-of-science/embeddings": patch
-"@map-of-science/eto-pdf-parser": patch
+"@map-of-science/eto-cluster-parser": patch
 "@map-of-science/llm-price": patch
 "@map-of-science/logger": patch
 "@map-of-science/openalex": patch
