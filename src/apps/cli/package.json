@@ -23,7 +23,7 @@
     "@map-of-science/cluster-embedder": "workspace:*",
     "@map-of-science/cluster-namer": "workspace:*",
     "@map-of-science/embeddings": "workspace:*",
-    "@map-of-science/eto-pdf-parser": "workspace:*",
+    "@map-of-science/eto-cluster-parser": "workspace:*",
     "@map-of-science/logger": "workspace:*",
     "@map-of-science/openalex": "workspace:*",
     "@map-of-science/package": "workspace:*",

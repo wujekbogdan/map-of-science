@@ -1,1 +1,1 @@
-export { createScrapeEtoCommand, scrapeEto } from "./scrape-eto.js";
+export { createScrapeEtoCommand } from "./scrape-eto.js";
