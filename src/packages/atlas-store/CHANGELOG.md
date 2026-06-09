@@ -1,5 +1,16 @@
 # @map-of-science/atlas-store
 
+## 0.3.2
+
+### Patch Changes
+
+- 5b8bea3: - Bump `typescript` to `~6.0.3`.
+  - Bump `@types/node` to `^22.19.17`.
+- Updated dependencies [f98de5b]
+- Updated dependencies [5b8bea3]
+  - @map-of-science/atlas@0.4.0
+  - @map-of-science/logger@0.1.2
+
 ## 0.3.1
 
 ### Patch Changes

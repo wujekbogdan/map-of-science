@@ -1,5 +1,14 @@
 # @map-of-science/typescript
 
+## 0.6.0
+
+### Minor Changes
+
+- 5b8bea3: - Bump `typescript` peer and dev to `~6.0.3`.
+  - Raise `target` and `lib` to `ES2025`.
+  - Add `types: ["node"]` to the node config.
+  - Drop `strict` and `module` (now defaults in 6.0).
+
 ## 0.5.0
 
 ### Minor Changes

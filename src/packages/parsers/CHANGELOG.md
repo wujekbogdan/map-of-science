@@ -1,5 +1,12 @@
 # @map-of-science/parsers
 
+## 0.2.3
+
+### Patch Changes
+
+- 5b8bea3: - Bump `typescript` to `~6.0.3`.
+  - Bump `@types/node` to `^22.19.17`.
+
 ## 0.2.2
 
 ### Patch Changes

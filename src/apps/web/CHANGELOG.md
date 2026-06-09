@@ -1,5 +1,50 @@
 # @map-of-science/web
 
+## 1.22.0
+
+### Minor Changes
+
+- 16893c0: - Show a relevance score and cluster size indicator on every search result row.
+  - Add a min-score filter input to the search dropdown so users can adjust the relevance threshold from the UI.
+- 823e545: Unify article modal and cluster side panel chrome.
+- 4a3ab1f: - Account for open side panels when zooming or panning the map to a target, so the focused content lands in the visible area.
+  - Float the cluster detail as a docked panel that shifts to make room for the search results.
+  - Close the cluster panel by tapping the map background.
+- 02f7953: - Open the cluster detail in a left side panel at `/cluster/$id`, replacing the click-to-open iframe modal.
+  - Route map cluster clicks to `/cluster/$id`.
+  - Route search dropdown single-result picks to `/cluster/$id` instead of selecting it on the map.
+  - Redesign the header control group: include the "About the map" button and rename `Toggles` to `Controls`.
+  - Disable suspense in react-i18next.
+  - Add a purple halo ring around the active cluster.
+  - Adjust zoom to cluster size when centering on a cluster via URL or search.
+- 67956e6: - Move search state into URL search params and trigger backend search on route change rather than on internal state change.
+- f98de5b: - Add a sort filter to the search dropdown so results can be ordered by relevance or articles count
+  - Make the filters bar configurable so new filters slot in without touching shared wiring
+  - Keep results visible during refetch and show a spinner next to the input
+  - Highlight the matching cluster on the map while hovering or arrow-keying a search result
+
+### Patch Changes
+
+- 05e241e: - Keep the search clear button clickable after the input is refocused while the results panel stays open.
+  - Stop the header row from shifting 1-2px when the results panel opens.
+- 25e0764: - Update Dockerfile `PATH` to include `$PNPM_HOME/bin`, where pnpm v11 writes its global binaries.
+- 4a3ab1f: - Keep the search clear button clickable after the input loses focus.
+  - Resume keyboard navigation from the selected result after a selection, and mark the selected row.
+  - Always activate the search input on click.
+  - Keep the search results open after picking a cluster from them, instead of closing and clearing the search.
+  - Clear the search on Escape regardless of where focus currently sits.
+  - Mark only the viewed cluster with a halo, not every search match.
+- ecef6c4: Re-fit the map when the same search query is submitted again.
+- 818b44c: - Migrate cluster styles to the `sass:list` module to drop Dart Sass 3.0 deprecation warnings for `length()` and `nth()`
+- 5b8bea3: - Bump `typescript` to `~6.0.3` and add `@types/node` `^22.19.17`.
+  - Bump `react-i18next` to `^16.6.6` and `i18next` to `^25.10.10`.
+  - Align `@trpc/client` and `@trpc/tanstack-react-query` to `11.17.0`.
+  - Adjust source for TypeScript 6.0 compatibility.
+  - Bump Docker base to `node:22.22.2-alpine3.22`.
+- Updated dependencies [f98de5b]
+- Updated dependencies [5b8bea3]
+  - @map-of-science/api@0.4.0
+
 ## 1.21.0
 
 ### Minor Changes

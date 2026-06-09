@@ -1,5 +1,14 @@
 # @map-of-science/text-generator
 
+## 0.1.2
+
+### Patch Changes
+
+- 5b8bea3: - Bump `typescript` to `~6.0.3`.
+  - Bump `@types/node` to `^22.19.17`.
+- Updated dependencies [5b8bea3]
+  - @map-of-science/llm-price@0.1.2
+
 ## 0.1.1
 
 ### Patch Changes

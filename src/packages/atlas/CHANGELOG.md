@@ -1,5 +1,17 @@
 # @map-of-science/atlas
 
+## 0.4.0
+
+### Minor Changes
+
+- f98de5b: - Export `SortValue`, `sortValueSchema`, and `DEFAULT_SORT`
+  - Accept an optional `sort` on `Search.query` and re-rank vector results in memory to apply the requested order
+
+### Patch Changes
+
+- 5b8bea3: - Bump `typescript` to `~6.0.3`.
+  - Bump `@types/node` to `^22.19.17`.
+
 ## 0.3.1
 
 ### Patch Changes
