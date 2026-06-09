@@ -1,6 +1,6 @@
 {
   "name": "@map-of-science/embeddings",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Text embedding generation with provider abstraction",
   "type": "module",
   "private": true,

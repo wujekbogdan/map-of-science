@@ -1,5 +1,21 @@
 # @map-of-science/api
 
+## 0.4.0
+
+### Minor Changes
+
+- f98de5b: - Accept an optional `sort` on `search.query` input as a `relevance | articlesCount.{asc,desc}` discriminated union, defaulting to `relevance`
+
+### Patch Changes
+
+- 5b8bea3: - Bump `typescript` to `~6.0.3`.
+  - Bump `@types/node` to `^22.19.17`.
+- Updated dependencies [f98de5b]
+- Updated dependencies [5b8bea3]
+  - @map-of-science/atlas@0.4.0
+  - @map-of-science/atlas-store@0.3.2
+  - @map-of-science/embeddings@0.1.3
+
 ## 0.3.1
 
 ### Patch Changes

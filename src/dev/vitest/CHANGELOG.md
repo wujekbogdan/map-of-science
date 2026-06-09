@@ -1,5 +1,13 @@
 # @map-of-science/vitest
 
+## 0.4.2
+
+### Patch Changes
+
+- 5b8bea3: - Bump `typescript` to `~6.0.3`.
+  - Add `@types/node` `^22.19.17`.
+  - Set `rootDir` explicitly.
+
 ## 0.4.1
 
 ### Patch Changes

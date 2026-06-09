@@ -1,5 +1,14 @@
 # @map-of-science/root
 
+## 0.7.4
+
+### Patch Changes
+
+- 25e0764: - Bump pnpm from 10.11.0 to 11.0.9.
+  - Migrate workspace build-script settings to the v11 `allowBuilds` map.
+- 02f7953: Add a GitHub workflow that applies changesets and makes a release on push to `main`.
+- 5b8bea3: - Pin Node engine to `^22.22.2`.
+
 ## 0.7.3
 
 ### Patch Changes
