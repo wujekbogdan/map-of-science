@@ -1,5 +1,12 @@
 # @map-of-science/eslint
 
+## 0.4.2
+
+### Patch Changes
+
+- 5b8bea3: - Bump `typescript-eslint` to `^8.59.1`.
+  - Set Node baseline to `22.22.2` for `n/no-unsupported-features`.
+
 ## 0.4.1
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "@map-of-science/rate-limiter",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Rate limiting wrapper for async functions",
   "type": "module",
   "private": true,

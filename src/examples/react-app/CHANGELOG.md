@@ -1,5 +1,12 @@
 # @map-of-science/react-app
 
+## 0.1.3
+
+### Patch Changes
+
+- 5b8bea3: - Bump `typescript` to `~6.0.3`.
+  - Add `@types/node` `^22.19.17`.
+
 ## 0.1.2
 
 ### Patch Changes

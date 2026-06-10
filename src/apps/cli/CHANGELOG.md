@@ -1,5 +1,33 @@
 # @map-of-science/cli
 
+## 1.0.0
+
+### Major Changes
+
+- d9cc921: Disable the `scrape-eto` command. It consumed the PDF parser, which has been replaced by a JSONL-based cluster parser that is not yet wired into the command.
+
+### Patch Changes
+
+- 5b8bea3: - Bump `typescript` to `~6.0.3`.
+  - Bump `@types/node` to `^22.19.17`.
+  - Bump `tsdown` to `^0.21.10`.
+- 818b44c: - Silence rolldown EVAL warnings from `bottleneck`'s optional redis backends during build
+- Updated dependencies [f98de5b]
+- Updated dependencies [5b8bea3]
+- Updated dependencies [d9cc921]
+  - @map-of-science/atlas@0.4.0
+  - @map-of-science/atlas-store@0.3.2
+  - @map-of-science/cluster-embedder@0.2.2
+  - @map-of-science/cluster-namer@0.1.2
+  - @map-of-science/embeddings@0.1.3
+  - @map-of-science/eto-cluster-parser@1.0.0
+  - @map-of-science/logger@0.1.2
+  - @map-of-science/openalex@0.1.3
+  - @map-of-science/parsers@0.2.3
+  - @map-of-science/rate-limiter@0.1.2
+  - @map-of-science/text-generator@0.1.2
+  - @map-of-science/package@0.1.2
+
 ## 0.2.2
 
 ### Patch Changes
