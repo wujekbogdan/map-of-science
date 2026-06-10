@@ -28,7 +28,7 @@ Commands:
   embed [options]           Embed clusters from NDJSON file into vector store
   search [options] <query>  Search clusters using vector similarity
   name [options]            Generate names for clusters using LLM
-  scrape-eto [options]      Scrape article titles from ETO cluster PDFs to NDJSON
+  scrape-eto [options]      Parse the ETO cluster JSONL dataset to NDJSON
   ingest:areas [options]    Ingest areas (tiers 1-3) from TSV files into Qdrant
   ingest:content [options]  Ingest YouTube segments as ContentItems into Qdrant
   ingest:clusters [options] Ingest clusters (embeddings + positions + names) into Qdrant
@@ -146,12 +146,10 @@ Options:
 ```
 Usage: cli scrape-eto [options]
 
-Scrape article titles from ETO cluster PDFs to NDJSON
+Parse the ETO cluster JSONL dataset to NDJSON
 
 Options:
-  -i, --input <path>    Directory containing cluster_*.pdf files
-  -o, --output <path>   Output NDJSON file path
-  -s, --start <number>  Starting cluster ID
-  -l, --limit <number>  Number of clusters to process
-  -h, --help            display help for command
+  -i, --input <path>   ETO cluster_details JSONL file, or a directory of them
+  -o, --output <path>  Output NDJSON file path
+  -h, --help           display help for command
 ```
