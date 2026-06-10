@@ -89,15 +89,14 @@ Web at [http://localhost:8080/](http://localhost:8080/), api at [http://localhos
 
 ## Data pipeline
 
-The API reads all its data from Qdrant. This pipeline loads Qdrant from scratch using ETO cluster PDFs and the curated TSVs in `src/apps/web/asset/`. Requires Qdrant running and a `GOOGLE_API_KEY`.
+The API reads all its data from Qdrant. This pipeline loads Qdrant from scratch using the ETO cluster JSONL dataset and the curated TSVs in `src/apps/web/asset/`. Requires Qdrant running and a `GOOGLE_API_KEY`.
 
-Download the ETO PDFs from [Zenodo](https://doi.org/10.5281/zenodo.12628195) and extract them so each file is named `cluster_<id>.pdf`. Then, from the repo root:
+Provide the ETO `cluster_details` JSONL dataset, one cluster record per line. Point `scrape-eto` at a single `.jsonl` file or at a directory of them. <!-- TODO: link to the hosted dataset once it is published. --> Then, from the repo root:
 
 ```bash
-# 1. Pull article titles out of each PDF into NDJSON.
+# 1. Parse the ETO cluster JSONL dataset into NDJSON.
 pnpm --filter @map-of-science/cli start scrape-eto \
-  --input <pdfs-dir> --output eto.ndjson \
-  --start <from-id> --limit <count>
+  --input <jsonl-file-or-dir> --output eto.ndjson
 
 # 2. Generate en-US and pl-PL names for each cluster via Gemini.
 pnpm --filter @map-of-science/cli start name \

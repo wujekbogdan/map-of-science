@@ -7,6 +7,7 @@ import { createClusterEmbedder } from "@map-of-science/cluster-embedder";
 import { createEmbedder } from "@map-of-science/embeddings";
 import { parseCsv, streamNdjsonFile } from "@map-of-science/parsers/node";
 import { createRateLimitedFunction } from "@map-of-science/rate-limiter";
+import { etoRecordSchema } from "../../../eto/record.js";
 import { createBuildCluster } from "./buildCluster.js";
 import {
   buildClusterLookups,
@@ -40,32 +41,15 @@ const cliSchema = z.object({
 
 type Options = z.infer<typeof cliSchema>;
 
-const etoRecordSchema = z
-  .object({
-    id: z.number(),
-    articles: z.object({
-      core: z.array(z.string()),
-      review: z.array(z.string()),
-      highlyCited: z.array(z.string()),
-    }),
-  })
-  .transform((data) => ({
-    id: String(data.id),
-    titles: [
-      ...new Set([
-        ...data.articles.core,
-        ...data.articles.review,
-        ...data.articles.highlyCited,
-      ]),
-    ],
-  }));
-
 async function* streamEtoNdjson(path: string) {
   for await (const record of streamNdjsonFile(path)) {
     const parsed = etoRecordSchema.safeParse(record);
     if (!parsed.success) continue;
-    if (parsed.data.titles.length === 0) continue;
-    yield parsed.data;
+
+    const titles = [...new Set(parsed.data.titles)];
+    if (titles.length === 0) continue;
+
+    yield { id: String(parsed.data.id), titles };
   }
 }
 

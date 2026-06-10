@@ -29,9 +29,12 @@ const etoNdjson =
     id: 1,
     totalArticles: 1000,
     articles: {
-      core: ["Quantum entanglement measurements", "Superconducting qubits"],
-      review: ["Review of quantum computing hardware"],
-      highlyCited: ["Quantum supremacy demonstration"],
+      core: [
+        { title: "Quantum entanglement measurements" },
+        { title: "Superconducting qubits" },
+      ],
+      review: [{ title: "Review of quantum computing hardware" }],
+      highlyCited: [{ title: "Quantum supremacy demonstration" }],
     },
   }) +
   "\n" +
@@ -39,9 +42,9 @@ const etoNdjson =
     id: 2,
     totalArticles: 500,
     articles: {
-      core: ["Transformer architectures for language models"],
-      review: ["Survey of deep learning techniques"],
-      highlyCited: ["Attention is all you need"],
+      core: [{ title: "Transformer architectures for language models" }],
+      review: [{ title: "Survey of deep learning techniques" }],
+      highlyCited: [{ title: "Attention is all you need" }],
     },
   }) +
   "\n";

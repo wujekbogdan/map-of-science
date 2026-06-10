@@ -127,6 +127,8 @@ const buildSection = ({
     // rather than emitting a titleless entry.
     .filter((entry) => entry.title.length > 0);
 
+export type ParsedCluster = ReturnType<typeof parseCluster>;
+
 export const parseCluster = (record: unknown) => {
   const data = clusterSchema.parse(record);
   const papers = parsePapers(data.paper_stats);
