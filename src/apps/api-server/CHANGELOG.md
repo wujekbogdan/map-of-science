@@ -1,5 +1,11 @@
 # @map-of-science/api
 
+## 0.2.4
+
+### Patch Changes
+
+- ad32a8b: - Publish a multi-arch Docker image to GHCR on release.
+
 ## 0.2.3
 
 ### Patch Changes

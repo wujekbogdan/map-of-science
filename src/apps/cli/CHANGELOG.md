@@ -1,5 +1,17 @@
 # @map-of-science/cli
 
+## 1.1.0
+
+### Minor Changes
+
+- e43d891: - Re-enable the `scrape-eto` command. It parses the ETO `cluster_details` JSONL dataset into NDJSON.
+  - Update the `name` and `ingest:clusters` commands to read the ETO NDJSON's object-shaped article entries.
+
+### Patch Changes
+
+- Updated dependencies [e43d891]
+  - @map-of-science/eto-cluster-parser@1.1.0
+
 ## 1.0.0
 
 ### Major Changes
