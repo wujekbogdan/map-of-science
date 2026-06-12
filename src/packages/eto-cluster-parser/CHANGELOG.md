@@ -1,5 +1,11 @@
 # @map-of-science/eto-pdf-parser
 
+## 1.1.0
+
+### Minor Changes
+
+- e43d891: Export the `ParsedCluster` type.
+
 ## 1.0.0
 
 ### Major Changes

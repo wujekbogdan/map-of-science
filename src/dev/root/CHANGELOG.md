@@ -1,5 +1,16 @@
 # @map-of-science/root
 
+## 0.8.0
+
+### Minor Changes
+
+- ad32a8b: - Tag app releases with `changeset tag` and publish their Docker images from the pushed tags.
+  - Remove the GitHub Pages deployment.
+
+### Patch Changes
+
+- e43d891: Document the JSONL `scrape-eto` step in the data pipeline guide.
+
 ## 0.7.4
 
 ### Patch Changes

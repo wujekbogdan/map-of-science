@@ -1,6 +1,6 @@
 {
   "name": "@map-of-science/eto-cluster-parser",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Parser for ETO Map of Science cluster records",
   "type": "module",
   "private": true,
