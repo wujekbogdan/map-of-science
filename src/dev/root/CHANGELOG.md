@@ -1,5 +1,11 @@
 # @map-of-science/root
 
+## 0.8.1
+
+### Patch Changes
+
+- 7ed7e50: - Run the release workflow on push to `main` instead of manual dispatch.
+
 ## 0.8.0
 
 ### Minor Changes
