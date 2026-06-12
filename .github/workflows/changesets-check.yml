@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-24.04
     if: github.actor != 'github-actions[bot]'
     steps:
-      - uses: dorny/paths-filter@v3
+      - uses: dorny/paths-filter@v4
         id: changeset
         with:
           filters: |
