@@ -13,9 +13,13 @@ jobs:
     name: Release
     runs-on: ubuntu-24.04
     steps:
+      # Persist the PAT so pushed tags trigger docker-publish.
+      # https://github.com/changesets/action#with-publishing
       - name: Checkout Repo
         uses: actions/checkout@v4
-        
+        with:
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+
       - name: Enable Corepack
         run: corepack enable
         
@@ -36,5 +40,6 @@ jobs:
         with:
           commit: "chore(release): apply changesets"
           title: "Release: ${{ env.RELEASE_DATE }}"
+          publish: pnpm changeset tag
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
