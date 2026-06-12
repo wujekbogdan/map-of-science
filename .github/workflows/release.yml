@@ -1,5 +1,7 @@
 name: Release
-on: workflow_dispatch
+on:
+  push:
+    branches: ["main"]
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 # The changesets action, after processing the changesets, commits the changes to the repository.
