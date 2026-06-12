@@ -21,6 +21,12 @@ COPY --from=pruner /app/out/full/ .
 RUN pnpm turbo build
 
 FROM nginx:1.27.2-alpine AS runner
-WORKDIR /usr/share/nginx/html
-COPY --from=builder /app/src/apps/web/dist .
-ENTRYPOINT sh -c "./vite-envs.sh && nginx -g 'daemon off;'"
+COPY --from=builder /app/src/apps/web/dist /usr/share/nginx/html
+# The stock entrypoint renders /etc/nginx/templates/*.template with envsubst
+# at startup; the rendered config.js replaces the build-time stub.
+COPY src/apps/web/config.js.template /etc/nginx/templates/config.js.template
+ENV NGINX_ENVSUBST_OUTPUT_DIR=/usr/share/nginx/html
+# envsubst leaves undefined vars as literal `${...}`, so default them to empty.
+ENV VITE_API_URL=""
+ENV VITE_DEV_TOOL_ENABLED=""
+CMD ["nginx", "-g", "daemon off;"]

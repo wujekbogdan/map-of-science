@@ -365,9 +365,6 @@ importers:
       vite:
         specifier: ^8.0.10
         version: 8.0.10(@types/node@22.19.17)(esbuild@0.27.7)(jiti@2.4.2)(less@4.3.0)(sass-embedded@1.99.0)(sass@1.99.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.8.4)
-      vite-envs:
-        specifier: 4.7.1
-        version: 4.7.1
       vite-plugin-checker:
         specifier: ^0.13.0
         version: 0.13.0(eslint@9.39.4(jiti@2.4.2))(optionator@0.9.4)(typescript@6.0.3)(vite@8.0.10(@types/node@22.19.17)(esbuild@0.27.7)(jiti@2.4.2)(less@4.3.0)(sass-embedded@1.99.0)(sass@1.99.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.8.4))
@@ -5946,10 +5943,6 @@ packages:
   vary@1.1.2:
     resolution: {integrity: sha512-BNGbWLfd0eUPabhkXUVm0j8uuvREyTh5ovRa/dyow/BqAbZJyC+5fU+IzQOzmAKzYqYRAISoRhdQr3eIZ/PXqg==}
     engines: {node: '>= 0.8'}
-
-  vite-envs@4.7.1:
-    resolution: {integrity: sha512-JksP1ToqW5WSCcbfIwb7KHIQv9UHO8nreGpqsCJaXnTAd00LAAOa7ta7KoonNZNpDecODqF19rZbg1miIS2ILg==}
-    hasBin: true
 
   vite-plugin-checker@0.13.0:
     resolution: {integrity: sha512-14EkOZmfinVZNxRmg2uCNDwtqGc/33lU/UEJansHgu27+ad+r6mMBf1Xtnq57jGZWiO/xzwtiEKPYsganw7ZFQ==}
@@ -11551,8 +11544,6 @@ snapshots:
   varint@6.0.0: {}
 
   vary@1.1.2: {}
-
-  vite-envs@4.7.1: {}
 
   vite-plugin-checker@0.13.0(eslint@9.39.4(jiti@2.4.2))(optionator@0.9.4)(typescript@6.0.3)(vite@8.0.10(@types/node@22.19.17)(esbuild@0.27.7)(jiti@2.4.2)(less@4.3.0)(sass-embedded@1.99.0)(sass@1.99.0)(stylus@0.62.0)(tsx@4.21.0)(yaml@2.8.4)):
     dependencies:
