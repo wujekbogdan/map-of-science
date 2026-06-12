@@ -5,6 +5,8 @@ services:
       context: .
       dockerfile: ./src/apps/web/Dockerfile
     restart: always
+    environment:
+      VITE_API_URL: http://localhost:4000
     ports:
       - "8080:80"
   api:

@@ -1,7 +1,6 @@
 {
   "name": "@map-of-science/web",
   "version": "1.22.0",
-  "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -42,6 +41,7 @@
     "typescript": "~6.0.3",
     "typescript-plugin-css-modules": "^5.1.0",
     "vite": "^8.0.10",
+    "vite-envs": "4.7.1",
     "vite-plugin-checker": "^0.13.0",
     "vite-plugin-svgr": "^5.2.0",
     "vitest": "^4.1.5",

@@ -21,5 +21,6 @@ COPY --from=pruner /app/out/full/ .
 RUN pnpm turbo build
 
 FROM nginx:1.27.2-alpine AS runner
-COPY --from=builder /app/src/apps/web/dist /usr/share/nginx/html
-CMD ["nginx", "-g", "daemon off;"]
+WORKDIR /usr/share/nginx/html
+COPY --from=builder /app/src/apps/web/dist .
+ENTRYPOINT sh -c "./vite-envs.sh && nginx -g 'daemon off;'"
