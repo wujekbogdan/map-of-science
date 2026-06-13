@@ -5,6 +5,12 @@ on:
     tags:
       - "@map-of-science/web@*"
       - "@map-of-science/api-server@*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing package tag to re-release, e.g. @map-of-science/web@1.23.0"
+        required: true
+        type: string
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -21,7 +27,7 @@ jobs:
       - name: Parse the package tag
         id: tag
         env:
-          REF_NAME: ${{ github.ref_name }}
+          REF_NAME: ${{ inputs.tag || github.ref_name }}
         run: |
           package="${REF_NAME%@*}"
           echo "app=${package##*/}" >> "$GITHUB_OUTPUT"
@@ -34,4 +40,5 @@ jobs:
     with:
       app: ${{ needs.tag.outputs.app }}
       version: ${{ needs.tag.outputs.version }}
+      ref: ${{ inputs.tag || github.ref_name }}
       push: true
