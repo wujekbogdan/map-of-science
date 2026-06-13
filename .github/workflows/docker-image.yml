@@ -64,7 +64,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           outputs: ${{ inputs.push && format('type=image,name=ghcr.io/{0}/map-of-science-{1},push-by-digest=true,name-canonical=true,push=true', github.repository_owner, inputs.app) || '' }}
           cache-from: type=gha,scope=${{ inputs.app }}-${{ matrix.arch }}
-          cache-to: type=gha,scope=${{ inputs.app }}-${{ matrix.arch }},mode=max
+          cache-to: type=gha,scope=${{ inputs.app }}-${{ matrix.arch }},mode=max,ignore-error=true
 
       - name: Export digest
         if: inputs.push
