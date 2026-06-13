@@ -18,7 +18,7 @@ jobs:
       # Persist the PAT so pushed tags trigger docker-publish.
       # https://github.com/changesets/action#with-publishing
       - name: Checkout Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
@@ -26,7 +26,7 @@ jobs:
         run: corepack enable
         
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version-file: .nvmrc
           cache: 'pnpm'

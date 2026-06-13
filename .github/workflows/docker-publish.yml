@@ -5,56 +5,40 @@ on:
     tags:
       - "@map-of-science/web@*"
       - "@map-of-science/api-server@*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing package tag to re-release, e.g. @map-of-science/web@1.23.0"
+        required: true
+        type: string
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  publish:
-    name: Publish image
+  tag:
+    name: Resolve app and version from the tag
     runs-on: ubuntu-24.04
-    permissions:
-      contents: read
-      packages: write
+    outputs:
+      app: ${{ steps.tag.outputs.app }}
+      version: ${{ steps.tag.outputs.version }}
     steps:
-      - name: Resolve app and version from tag
+      - name: Parse the package tag
         id: tag
+        env:
+          REF_NAME: ${{ inputs.tag || github.ref_name }}
         run: |
-          ref="${{ github.ref_name }}"
-          name="${ref%@*}"
-          echo "app=${name##*/}" >> "$GITHUB_OUTPUT"
-          echo "version=${ref##*@}" >> "$GITHUB_OUTPUT"
+          package="${REF_NAME%@*}"
+          echo "app=${package##*/}" >> "$GITHUB_OUTPUT"
+          echo "version=${REF_NAME##*@}" >> "$GITHUB_OUTPUT"
 
-      - name: Checkout Repo
-        uses: actions/checkout@v4
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
-      - name: Set up Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Collect tags and labels
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ghcr.io/${{ github.repository_owner }}/map-of-science-${{ steps.tag.outputs.app }}
-          tags: |
-            type=raw,value=${{ steps.tag.outputs.version }}
-            type=raw,value=latest
-
-      - name: Build and push
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: ./src/apps/${{ steps.tag.outputs.app }}/Dockerfile
-          platforms: linux/amd64,linux/arm64
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha,scope=${{ steps.tag.outputs.app }}
-          cache-to: type=gha,scope=${{ steps.tag.outputs.app }},mode=max
+  publish:
+    name: Publish
+    needs: tag
+    uses: ./.github/workflows/docker-image.yml
+    with:
+      app: ${{ needs.tag.outputs.app }}
+      version: ${{ needs.tag.outputs.version }}
+      ref: ${{ inputs.tag || github.ref_name }}
+      push: true
