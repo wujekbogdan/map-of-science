@@ -13,3 +13,5 @@ export const useViewedCluster = () => {
   );
   return cluster;
 };
+
+export type ViewedCluster = NonNullable<ReturnType<typeof useViewedCluster>>;

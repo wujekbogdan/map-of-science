@@ -1,20 +1,20 @@
-import { getRouteApi, useLocation } from "@tanstack/react-router";
+import { useLocation } from "@tanstack/react-router";
 import { useEffect, useRef } from "react";
-import { Trans } from "react-i18next";
+import styled from "styled-components";
 import { useShallow } from "zustand/react/shallow";
-import { IframeArticle } from "../components/Article/IframeArticle.tsx";
-import { ContextPanel } from "../components/ContextPanel/ContextPanel.tsx";
-import { getClusterLevel } from "../components/Map/Clusters/clusterLevel.ts";
-import { useMapStore } from "../map/mapStore.ts";
-import { useMapView } from "../map/view/hooks.ts";
-import { CLUSTER_ROUTE_PATH } from "./routePath.ts";
-import { useClearViewedCluster } from "./useClearViewedCluster.ts";
-import { useViewedCluster } from "./useViewedCluster.ts";
-
-const route = getRouteApi(CLUSTER_ROUTE_PATH);
+import { ContextPanel } from "../../components/ContextPanel/ContextPanel.tsx";
+import { getClusterLevel } from "../../components/Map/Clusters/clusterLevel.ts";
+import { useMapStore } from "../../map/mapStore.ts";
+import { useMapView } from "../../map/view/hooks.ts";
+import { useClearViewedCluster } from "../useClearViewedCluster.ts";
+import { useViewedCluster } from "../useViewedCluster.ts";
+import { ClusterArticles } from "./ClusterArticles.tsx";
+import { ClusterFacts } from "./ClusterFacts.tsx";
+import { ClusterTopSources } from "./ClusterTopSources.tsx";
+import { RatingLegend } from "./RatingLegend.tsx";
+import { RelatedClusters } from "./RelatedClusters.tsx";
 
 export const ClusterPanel = () => {
-  const { id } = route.useParams();
   const source = useLocation({ select: (location) => location.state.source });
   const view = useMapView();
   const cluster = useViewedCluster();
@@ -41,15 +41,12 @@ export const ClusterPanel = () => {
     view.centerOn(position, { scale: focusZoom[level] });
   }, [position, articlesCount, source, view, thresholds, focusZoom]);
 
-  const externalId = cluster?.externalId;
-  const header =
-    externalId !== undefined ? (
-      <Trans
-        i18nKey={cluster?.name ? "article.info" : "article.infoUnnamed"}
-        values={{ id: externalId, name: cluster?.name }}
-        components={{ bold: <strong /> }}
-      />
-    ) : undefined;
+  // An unnamed cluster already reads "Cluster #11174", so only a named one needs the id spelled out.
+  const header = cluster
+    ? cluster.name
+      ? `${cluster.displayName} (#${cluster.externalId.toString()})`
+      : cluster.displayName
+    : undefined;
 
   return (
     <ContextPanel
@@ -58,7 +55,21 @@ export const ClusterPanel = () => {
         void clearViewedCluster();
       }}
     >
-      <IframeArticle id={id} />
+      {cluster && (
+        <Body>
+          <ClusterFacts cluster={cluster} />
+          <ClusterArticles cluster={cluster} />
+          <ClusterTopSources cluster={cluster} />
+          <RelatedClusters cluster={cluster} />
+          <RatingLegend />
+        </Body>
+      )}
     </ContextPanel>
   );
 };
+
+const Body = styled.div`
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+`;
