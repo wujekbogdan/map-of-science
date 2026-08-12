@@ -1,6 +1,10 @@
 import { z } from "zod";
-import { bboxSchema, type Cluster } from "@map-of-science/atlas";
-import type { Lang } from "../context.js";
+import {
+  bboxSchema,
+  type Cluster,
+  rankRelatedClusters,
+} from "@map-of-science/atlas";
+import type { Context, Lang } from "../context.js";
 import { publicProcedure, router } from "../trpc.js";
 
 const PLACEHOLDER_PREFIX: Record<Lang, string> = {
@@ -34,6 +38,40 @@ export const present = (cluster: Cluster, lang: Lang) => {
   };
 };
 
+/*
+ * Ranks a cluster's citation links, the strongest first, and gives each one a name.
+ *
+ * `id` is null when the cluster is not stored.
+ */
+const presentRelatedClusters = async (
+  cluster: Cluster,
+  { atlas, lang }: Pick<Context, "atlas" | "lang">,
+) => {
+  const ranked = rankRelatedClusters(cluster.relatedClusters);
+  if (ranked.length === 0) return [];
+
+  const found = await atlas.clusters.findByExternalIds(
+    ranked.map(({ externalId }) => externalId),
+  );
+  const byExternalId = new Map(
+    found.map((related) => [related.externalId, related]),
+  );
+
+  return ranked.map(({ externalId, significantCitations }) => {
+    const related = byExternalId.get(externalId);
+    return {
+      externalId,
+      significantCitations,
+      id: related?.id ?? null,
+      displayName: resolveDisplayName(
+        related?.name?.[lang] ?? null,
+        externalId,
+        lang,
+      ),
+    };
+  });
+};
+
 const DEFAULT_VIEWPORT_LIMIT = 500;
 
 export const clusterRouter = router({
@@ -41,7 +79,12 @@ export const clusterRouter = router({
     .input(z.object({ id: z.string() }))
     .query(async ({ input, ctx }) => {
       const cluster = await ctx.atlas.clusters.findById(input.id);
-      return cluster ? present(cluster, ctx.lang) : null;
+      if (!cluster) return null;
+      return {
+        // The ranked links are a second field, so that `relatedClusters` holds the same shape in every procedure.
+        ...present(cluster, ctx.lang),
+        rankedRelatedClusters: await presentRelatedClusters(cluster, ctx),
+      };
     }),
 
   byIds: publicProcedure

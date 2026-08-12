@@ -14,12 +14,38 @@ const buildCluster = () => ({
   growthRating: 75.5,
   embedding: { model: "gemini-embedding-001", source: "article-titles" },
   keyConcepts: ["machine learning", "neural networks"],
+  averageArticleAgeYears: 5.8,
+  citationRating: 75.47,
+  patentRating: 99.78,
+  topJournals: ["Nature"],
+  topInstitutions: ["Kyushu University"],
+  topCompanies: [],
+  articles: { core: [], review: [], highlyCited: [] },
+  relatedClusters: {
+    topCiting: [
+      { externalId: 7, significantCitations: 30 },
+      { externalId: 8, significantCitations: 12 },
+    ],
+    topCited: [
+      { externalId: 8, significantCitations: 20 },
+      { externalId: 9, significantCitations: 25 },
+    ],
+  },
+});
+
+const buildRelated = (externalId: number, name: string | null) => ({
+  ...buildCluster(),
+  id: `c-${externalId.toString()}`,
+  externalId,
+  name: name === null ? null : { en_US: name, pl_PL: name },
+  nameSource: name === null ? null : ("llm" as const),
 });
 
 const buildAtlas = (overrides?: Partial<AtlasStore["clusters"]>): AtlasStore =>
   ({
     clusters: {
       findById: vi.fn().mockResolvedValue(buildCluster()),
+      findByExternalIds: vi.fn().mockResolvedValue([]),
       ...overrides,
     },
   }) as unknown as AtlasStore;
@@ -89,6 +115,53 @@ describe("cluster.byId", () => {
   it("should negate position.y to convert to screen-space", async () => {
     const result = await callerFor("en_US").cluster.byId({ id: "c-1" });
     expect(result?.position).toEqual({ x: 10, y: 5 });
+  });
+
+  it("should rank related clusters and name each one, with no id for a cluster we do not hold", async () => {
+    const atlas = buildAtlas({
+      findByExternalIds: vi
+        .fn()
+        .mockResolvedValue([buildRelated(7, "Optics"), buildRelated(8, null)]),
+    });
+
+    const result = await callerFor("en_US", atlas).cluster.byId({ id: "c-1" });
+
+    expect(result?.rankedRelatedClusters).toEqual([
+      {
+        externalId: 8,
+        significantCitations: 32,
+        id: "c-8",
+        displayName: "Cluster #8",
+      },
+      {
+        externalId: 7,
+        significantCitations: 30,
+        id: "c-7",
+        displayName: "Optics",
+      },
+      {
+        externalId: 9,
+        significantCitations: 25,
+        id: null,
+        displayName: "Cluster #9",
+      },
+    ]);
+  });
+
+  it("should look nothing up when the cluster has no citation links", async () => {
+    const findByExternalIds = vi.fn().mockResolvedValue([]);
+    const atlas = buildAtlas({
+      findById: vi.fn().mockResolvedValue({
+        ...buildCluster(),
+        relatedClusters: { topCiting: [], topCited: [] },
+      }),
+      findByExternalIds,
+    });
+
+    const result = await callerFor("en_US", atlas).cluster.byId({ id: "c-1" });
+
+    expect(result?.rankedRelatedClusters).toEqual([]);
+    expect(findByExternalIds).not.toHaveBeenCalled();
   });
 });
 

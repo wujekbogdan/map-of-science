@@ -90,4 +90,33 @@ describe("createClustersRepository", () => {
       expect(mocks.retrieve).not.toHaveBeenCalled();
     });
   });
+
+  describe("findByExternalIds", () => {
+    it("should retrieve the points that the external ids resolve to", async () => {
+      const mocks = buildQdrantMocks();
+      const repository = createClustersRepository({ qdrant: asClient(mocks) });
+
+      await repository.findByExternalIds([42, 0]);
+
+      expect(mocks.retrieve).toHaveBeenCalledTimes(1);
+      expect(mocks.retrieve).toHaveBeenNthCalledWith(1, "clusters", {
+        ids: [
+          "7c411b5e-9d3f-50b5-9c28-62096e41c4ed",
+          "6af613b6-569c-5c22-9c37-2ed93f31d3af",
+        ],
+        with_payload: true,
+        with_vector: false,
+      });
+    });
+
+    it("should return an empty array without calling qdrant when external ids is empty", async () => {
+      const mocks = buildQdrantMocks();
+      const repository = createClustersRepository({ qdrant: asClient(mocks) });
+
+      const result = await repository.findByExternalIds([]);
+
+      expect(result).toEqual([]);
+      expect(mocks.retrieve).not.toHaveBeenCalled();
+    });
+  });
 });
