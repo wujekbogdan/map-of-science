@@ -33,6 +33,14 @@ const cluster: SelectedCluster = {
   growthRating: 50,
   embedding: { model: "test", source: "titles" },
   keyConcepts: [],
+  averageArticleAgeYears: 0,
+  citationRating: 0,
+  patentRating: 0,
+  topJournals: [],
+  topInstitutions: [],
+  topCompanies: [],
+  articles: { core: [], review: [], highlyCited: [] },
+  relatedClusters: { topCiting: [], topCited: [] },
   score: 0.9,
 };
 

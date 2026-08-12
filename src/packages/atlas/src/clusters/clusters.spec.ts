@@ -11,6 +11,30 @@ const validCluster = {
   growthRating: 75.5,
   embedding: { model: "gemini-embedding-001", source: "article-titles" },
   keyConcepts: ["machine learning", "neural networks", "deep learning"],
+  averageArticleAgeYears: 5.8,
+  citationRating: 75.47,
+  patentRating: 99.78,
+  topJournals: ["Nature", "Science advances"],
+  topInstitutions: ["Centre National de la Recherche Scientifique"],
+  topCompanies: [],
+  articles: {
+    core: [
+      {
+        title: "Attention is all you need",
+        metadata: "2017: Advances in neural information processing systems",
+        citations: 120000,
+        doi: "10.48550/arXiv.1706.03762",
+      },
+    ],
+    review: [],
+    highlyCited: [
+      { title: "Deep learning", metadata: "2015", citations: 90000, doi: null },
+    ],
+  },
+  relatedClusters: {
+    topCiting: [{ externalId: 0, significantCitations: 35 }],
+    topCited: [],
+  },
 };
 
 describe("clusterSchema", () => {
@@ -54,6 +78,22 @@ describe("clusterSchema", () => {
       keyConcepts: ["a", "b"],
     });
     expect(parsed.keyConcepts).toEqual(["a", "b"]);
+  });
+
+  it.each([
+    "averageArticleAgeYears",
+    "citationRating",
+    "patentRating",
+    "topJournals",
+    "topInstitutions",
+    "topCompanies",
+    "articles",
+    "relatedClusters",
+  ])("should reject a cluster with no %s", (field) => {
+    const withoutField = Object.fromEntries(
+      Object.entries(validCluster).filter(([key]) => key !== field),
+    );
+    expect(() => clusterSchema.parse(withoutField)).toThrow();
   });
 
   it("should default keyConcepts to empty array when omitted", () => {

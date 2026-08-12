@@ -49,7 +49,7 @@ async function* streamEtoNdjson(path: string) {
     const titles = [...new Set(parsed.data.titles)];
     if (titles.length === 0) continue;
 
-    yield { id: String(parsed.data.id), titles };
+    yield { ...parsed.data, titles };
   }
 }
 

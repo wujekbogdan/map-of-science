@@ -2,7 +2,7 @@ import { Command } from "commander";
 import { createClusterNamer } from "@map-of-science/cluster-namer";
 import { streamNdjsonFile } from "@map-of-science/parsers/node";
 import { createGenerator } from "@map-of-science/text-generator";
-import { etoRecordSchema } from "../../eto/record.js";
+import { etoTitlesSchema } from "../../eto/record.js";
 import { forEachEntry } from "../../utils/stream.js";
 import { createNameConfig } from "./config.js";
 import { formatTsvHeader, formatTsvRow } from "./output.js";
@@ -44,7 +44,7 @@ export const name = async (options: NameOptions) => {
     generator,
     { start: config.start, limit: config.limit },
     async (entry, position) => {
-      const result = etoRecordSchema.safeParse(entry);
+      const result = etoTitlesSchema.safeParse(entry);
 
       if (!result.success) {
         console.error(`Skipping invalid cluster`);

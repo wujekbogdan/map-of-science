@@ -2,6 +2,7 @@ import { writeFile } from "node:fs/promises";
 import { dir as tmpDir } from "tmp-promise";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { withQdrantContainer } from "@map-of-science/test-utils";
+import { toEtoNdjson } from "../../__test__/etoNdjson.js";
 import { toTsv } from "../../__test__/tsv.js";
 import { runIngestClusters } from "../ingest/clusters/command.js";
 import { search } from "./search.js";
@@ -24,30 +25,20 @@ const namesTsv = toTsv([["cluster_id", "en-US", "pl-PL"]]);
 const placesTsv = toTsv([["id", "cluster_id"]]);
 const entitiesTsv = toTsv([["id", "en-US", "pl-PL"]]);
 
-const etoNdjson =
-  JSON.stringify({
+const etoNdjson = toEtoNdjson([
+  {
     id: 1,
-    totalArticles: 1000,
-    articles: {
-      core: [
-        { title: "Quantum entanglement measurements" },
-        { title: "Superconducting qubits" },
-      ],
-      review: [{ title: "Review of quantum computing hardware" }],
-      highlyCited: [{ title: "Quantum supremacy demonstration" }],
-    },
-  }) +
-  "\n" +
-  JSON.stringify({
+    core: ["Quantum entanglement measurements", "Superconducting qubits"],
+    review: ["Review of quantum computing hardware"],
+    highlyCited: ["Quantum supremacy demonstration"],
+  },
+  {
     id: 2,
-    totalArticles: 500,
-    articles: {
-      core: [{ title: "Transformer architectures for language models" }],
-      review: [{ title: "Survey of deep learning techniques" }],
-      highlyCited: [{ title: "Attention is all you need" }],
-    },
-  }) +
-  "\n";
+    core: ["Transformer architectures for language models"],
+    review: ["Survey of deep learning techniques"],
+    highlyCited: ["Attention is all you need"],
+  },
+]);
 
 type Fixtures = {
   etoInput: string;

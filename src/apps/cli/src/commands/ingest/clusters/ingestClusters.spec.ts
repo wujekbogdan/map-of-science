@@ -1,10 +1,26 @@
 import { describe, expect, it, vi } from "vitest";
 import type { AtlasStore } from "@map-of-science/atlas-store";
+import type { EtoRecord } from "../../../eto/record.js";
 import { ingestClusters } from "./ingestClusters.js";
 
 const vector = Array.from({ length: 768 }, () => 0);
 
-const record = (id: string) => ({ id, totalArticles: 1, titles: ["t"] });
+const noEtoDetail = {
+  averageArticleAgeYears: 0,
+  citationRatingPercentile: 0,
+  patentRatingPercentile: 0,
+  topJournals: [],
+  topInstitutions: [],
+  topCompanies: [],
+  articles: { core: [], review: [], highlyCited: [] },
+  relatedClusters: { topCiting: [], topCited: [] },
+};
+
+const record = (id: number): EtoRecord => ({
+  id,
+  ...noEtoDetail,
+  titles: ["t"],
+});
 
 const stream = <T>(items: T[]): AsyncIterable<T> => ({
   async *[Symbol.asyncIterator]() {
@@ -35,9 +51,8 @@ const buildDeps = (
   };
 };
 
-const buildFake = (externalId: string) => ({
-  id: `id-${externalId}`,
-  externalId: Number(externalId),
+const buildFake = (externalId: number) => ({
+  externalId,
   position: { x: 0, y: 0 },
   name: null,
   nameSource: null,
@@ -45,6 +60,14 @@ const buildFake = (externalId: string) => ({
   growthRating: 0,
   embedding: { model: "m", source: "s" },
   keyConcepts: [],
+  averageArticleAgeYears: 0,
+  citationRating: 0,
+  patentRating: 0,
+  topJournals: [],
+  topInstitutions: [],
+  topCompanies: [],
+  articles: { core: [], review: [], highlyCited: [] },
+  relatedClusters: { topCiting: [], topCited: [] },
   vector,
 });
 
@@ -66,8 +89,8 @@ describe("ingestClusters", () => {
     const deps = buildDeps();
     const result = await ingestClusters({
       ...deps,
-      buildCluster: ({ externalId }) => buildFake(externalId),
-      streamEto: stream([record("1"), record("2"), record("3")]),
+      buildCluster: ({ record }) => buildFake(record.id),
+      streamEto: stream([record(1), record(2), record(3)]),
       batchSize: 2,
     });
 
@@ -83,9 +106,9 @@ describe("ingestClusters", () => {
     const deps = buildDeps();
     const result = await ingestClusters({
       ...deps,
-      buildCluster: ({ externalId }) =>
-        externalId === "2" ? null : buildFake(externalId),
-      streamEto: stream([record("1"), record("2"), record("3")]),
+      buildCluster: ({ record }) =>
+        record.id === 2 ? null : buildFake(record.id),
+      streamEto: stream([record(1), record(2), record(3)]),
       batchSize: 10,
     });
 

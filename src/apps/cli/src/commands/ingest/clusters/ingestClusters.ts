@@ -1,7 +1,6 @@
 import type { ClusterInput } from "@map-of-science/atlas";
 import type { AtlasStore } from "@map-of-science/atlas-store";
-
-type EtoRecord = { id: string; titles: string[] };
+import type { EtoRecord } from "../../../eto/record.js";
 
 export const ingestClusters = async ({
   clustersRepo,
@@ -12,7 +11,7 @@ export const ingestClusters = async ({
 }: {
   clustersRepo: AtlasStore["clusters"];
   buildCluster: (args: {
-    externalId: string;
+    record: EtoRecord;
     vector: number[];
   }) => ClusterInput | null;
   embedCluster: (cluster: {
@@ -35,7 +34,7 @@ export const ingestClusters = async ({
 
   for await (const record of streamEto) {
     const { vector } = await embedCluster({ titles: record.titles });
-    const cluster = buildCluster({ externalId: record.id, vector });
+    const cluster = buildCluster({ record, vector });
     if (!cluster) continue;
     batch.push(cluster);
     if (batch.length >= batchSize) await flush();

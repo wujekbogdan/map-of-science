@@ -1,4 +1,5 @@
 import type { QdrantClient } from "@qdrant/js-client-rest";
+import { v5 as uuidv5 } from "uuid";
 import { z } from "zod";
 import {
   type BBox,
@@ -12,6 +13,11 @@ import { createCollectionSchema } from "../collection/create-collection-schema.j
 
 const TITLES_VECTOR = "titles";
 const TITLES_VECTOR_SIZE = 768;
+
+const POINT_ID_NAMESPACE = "6ba7b810-9dad-11d1-80b4-00c04fd430c8";
+
+const pointId = (externalId: number) =>
+  uuidv5(String(externalId), POINT_ID_NAMESPACE);
 
 const schemaSpec = {
   name: COLLECTION,
@@ -35,6 +41,14 @@ const rawScoredPointSchema = rawPointSchema.extend({
   score: z.number(),
 });
 
+const toRelatedPayload = (
+  related: ClusterInput["relatedClusters"]["topCiting"],
+) =>
+  related.map((entry) => ({
+    id: entry.externalId,
+    significantCitations: entry.significantCitations,
+  }));
+
 const toPayload = (cluster: ClusterInput) => ({
   externalId: cluster.externalId,
   x: cluster.position.x,
@@ -45,6 +59,31 @@ const toPayload = (cluster: ClusterInput) => ({
   growthRating: cluster.growthRating,
   embedding: cluster.embedding,
   keyConcepts: cluster.keyConcepts,
+  averageArticleAgeYears: cluster.averageArticleAgeYears,
+  citationRatingPercentile: cluster.citationRating,
+  patentRatingPercentile: cluster.patentRating,
+  topJournals: cluster.topJournals,
+  topInstitutions: cluster.topInstitutions,
+  topCompanies: cluster.topCompanies,
+  articles: cluster.articles,
+  relatedClusters: {
+    topCiting: toRelatedPayload(cluster.relatedClusters.topCiting),
+    topCited: toRelatedPayload(cluster.relatedClusters.topCited),
+  },
+});
+
+const storedRelatedSchema = z
+  .array(z.object({ id: z.number(), significantCitations: z.number() }))
+  .transform((entries) =>
+    entries.map(({ id, significantCitations }) => ({
+      externalId: id,
+      significantCitations,
+    })),
+  );
+
+const storedRelatedClustersSchema = z.object({
+  topCiting: storedRelatedSchema,
+  topCited: storedRelatedSchema,
 });
 
 const payloadToCluster = (
@@ -61,6 +100,14 @@ const payloadToCluster = (
     growthRating: payload.growthRating,
     embedding: payload.embedding,
     keyConcepts: payload.keyConcepts ?? [],
+    averageArticleAgeYears: payload.averageArticleAgeYears,
+    citationRating: payload.citationRatingPercentile,
+    patentRating: payload.patentRatingPercentile,
+    topJournals: payload.topJournals,
+    topInstitutions: payload.topInstitutions,
+    topCompanies: payload.topCompanies,
+    articles: payload.articles,
+    relatedClusters: storedRelatedClustersSchema.parse(payload.relatedClusters),
   });
 
 const parsePoint = (raw: unknown): Cluster => {
@@ -87,7 +134,7 @@ export const createClustersRepository = ({
     await qdrant.upsert(COLLECTION, {
       wait: true,
       points: items.map((item) => ({
-        id: item.id,
+        id: pointId(item.externalId),
         vector: { [TITLES_VECTOR]: item.vector },
         payload: toPayload(item),
       })),
