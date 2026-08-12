@@ -5,6 +5,7 @@ export {
   clusterInputSchema,
   clusterSchema,
 } from "./clusters/clusters.js";
+export { rankRelatedClusters } from "./clusters/rankRelatedClusters.js";
 export type {
   BBox,
   Cluster,

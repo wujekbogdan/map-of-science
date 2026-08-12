@@ -177,6 +177,8 @@ export type ClusterRepository = {
   findById(id: string): Promise<Cluster | null>;
   /* Get multiple clusters by id. */
   findByIds(ids: string[]): Promise<Cluster[]>;
+  /* Get multiple clusters by their ETO id. An id with no cluster is left out. */
+  findByExternalIds(externalIds: number[]): Promise<Cluster[]>;
   /* Get clusters whose position falls inside the bounding box. */
   findInViewport(args: { bbox: BBox; limit: number }): Promise<Cluster[]>;
   /* Find clusters most similar to the given embedding. */

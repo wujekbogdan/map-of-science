@@ -161,6 +161,16 @@ export const createClustersRepository = ({
     return result.map(parsePoint);
   },
 
+  async findByExternalIds(externalIds: number[]): Promise<Cluster[]> {
+    if (externalIds.length === 0) return [];
+    const result = await qdrant.retrieve(COLLECTION, {
+      ids: externalIds.map(pointId),
+      with_payload: true,
+      with_vector: false,
+    });
+    return result.map(parsePoint);
+  },
+
   async findInViewport({
     bbox,
     limit,
