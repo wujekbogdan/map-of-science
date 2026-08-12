@@ -25,6 +25,8 @@ services:
   qdrant:
     container_name: qdrant
     image: qdrant/qdrant:v1.17.1
+    environment:
+      QDRANT__STORAGE__SNAPSHOTS_PATH: /qdrant/storage/snapshots
     ports:
       - "6333:6333"
       - "6334:6334"
