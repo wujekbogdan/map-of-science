@@ -1,5 +1,5 @@
-import { v5 as uuidv5 } from "uuid";
 import { clusterInputSchema } from "@map-of-science/atlas";
+import type { EtoRecord } from "../../../eto/record.js";
 
 export type LocalizedName = { en_US: string; pl_PL: string };
 
@@ -16,7 +16,6 @@ export type ClusterLookups = {
   curatedNames: Map<string, LocalizedName>;
 };
 
-const CLUSTER_NAMESPACE = "6ba7b810-9dad-11d1-80b4-00c04fd430c8";
 const EMBEDDING_MODEL = "gemini-embedding-001";
 const EMBEDDING_SOURCE = "article-titles";
 
@@ -28,23 +27,42 @@ const resolveName = (lookups: ClusterLookups, externalId: string) => {
   return { name: null, nameSource: null };
 };
 
+const toRelatedClusters = (
+  entries: EtoRecord["relatedClusters"]["topCiting"],
+) =>
+  entries.map(({ id, significantCitations }) => ({
+    externalId: id,
+    significantCitations,
+  }));
+
 export const createBuildCluster =
   (lookups: ClusterLookups) =>
-  ({ externalId, vector }: { externalId: string; vector: number[] }) => {
+  ({ record, vector }: { record: EtoRecord; vector: number[] }) => {
+    const externalId = String(record.id);
     const position = lookups.positions.get(externalId);
     if (!position) return null;
 
     const { name, nameSource } = resolveName(lookups, externalId);
 
     return clusterInputSchema.parse({
-      id: uuidv5(externalId, CLUSTER_NAMESPACE),
-      externalId: Number(externalId),
+      externalId: record.id,
       position: { x: position.x, y: position.y },
       name,
       nameSource,
       articlesCount: position.articlesCount,
       growthRating: position.growthRating,
       embedding: { model: EMBEDDING_MODEL, source: EMBEDDING_SOURCE },
+      averageArticleAgeYears: record.averageArticleAgeYears,
+      citationRating: record.citationRatingPercentile,
+      patentRating: record.patentRatingPercentile,
+      topJournals: record.topJournals,
+      topInstitutions: record.topInstitutions,
+      topCompanies: record.topCompanies,
+      articles: record.articles,
+      relatedClusters: {
+        topCiting: toRelatedClusters(record.relatedClusters.topCiting),
+        topCited: toRelatedClusters(record.relatedClusters.topCited),
+      },
       vector,
     });
   };

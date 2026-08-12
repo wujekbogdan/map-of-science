@@ -1,8 +1,33 @@
 import { z } from "zod";
 
-export const clusterSchema = z
+const articleSchema = z
   .object({
-    id: z.string().describe("Unique cluster identifier."),
+    title: z.string(),
+    metadata: z
+      .string()
+      .describe(
+        'Year and journal, as "<year>: <journal>". Holds the year alone when ETO gives no journal.',
+      ),
+    citations: z.number(),
+    doi: z.string().nullable(),
+  })
+  .describe("An article that ETO selects for a cluster.");
+
+const relatedClusterSchema = z
+  .object({
+    externalId: z
+      .number()
+      .describe(
+        "ETO id of the other cluster. Some of these clusters are not stored.",
+      ),
+    significantCitations: z
+      .number()
+      .describe("Citations between the two clusters, as ETO counts them."),
+  })
+  .describe("A citation link to another cluster.");
+
+const clusterAttributesSchema = z
+  .object({
     externalId: z.number().describe("Cluster ID from ETO."),
     position: z.object({
       x: z.number().describe("Horizontal coordinate, increases rightward."),
@@ -26,6 +51,8 @@ export const clusterSchema = z
       .describe("Number of articles the cluster was built from."),
     growthRating: z
       .number()
+      .min(0)
+      .max(100)
       .describe(
         "Percentile 0-100 showing how fast the cluster grew over the last 3 years vs other clusters, per ETO.",
       ),
@@ -41,12 +68,77 @@ export const clusterSchema = z
       .array(z.string())
       .default([])
       .describe("Keywords tagging the cluster's key concepts, per ETO."),
+    averageArticleAgeYears: z
+      .number()
+      .describe("Mean age of the cluster's articles, per ETO."),
+    citationRating: z
+      .number()
+      .min(0)
+      .max(100)
+      .describe(
+        "Percentile 0-100 showing how often other work cites the cluster vs other clusters, per ETO.",
+      ),
+    patentRating: z
+      .number()
+      .min(0)
+      .max(100)
+      .describe(
+        "Percentile 0-100 showing how often patents cite the cluster vs other clusters, per ETO.",
+      ),
+    topJournals: z
+      .array(z.string())
+      .describe(
+        "Journals that publish the cluster's articles. The most frequent journal is first.",
+      ),
+    topInstitutions: z
+      .array(z.string())
+      .describe(
+        "Institutions that wrote the cluster's articles. The most frequent institution is first.",
+      ),
+    topCompanies: z
+      .array(z.string())
+      .describe(
+        "Companies that wrote the cluster's articles. The most frequent company is first. Each entry ends with its country in brackets.",
+      ),
+    articles: z
+      .object({
+        core: z
+          .array(articleSchema)
+          .describe(
+            "Articles with the strongest links to the other articles in the cluster.",
+          ),
+        review: z
+          .array(articleSchema)
+          .describe(
+            "Articles that describe and systematize the work of others.",
+          ),
+        highlyCited: z
+          .array(articleSchema)
+          .describe("Articles with the most citations."),
+      })
+      .describe("Articles that ETO selects for the cluster."),
+    relatedClusters: z
+      .object({
+        topCiting: z
+          .array(relatedClusterSchema)
+          .describe("Clusters that cite the cluster."),
+        topCited: z
+          .array(relatedClusterSchema)
+          .describe("Clusters that the cluster cites."),
+      })
+      .describe("Citation links to other clusters."),
+  })
+  .describe("Everything that describes a cluster, without its identity.");
+
+export const clusterSchema = clusterAttributesSchema
+  .extend({
+    id: z.string().describe("Unique cluster identifier."),
   })
   .describe(
     "A group of scientific articles that share a topic. Clusters are the foundation - every other entity is positioned relative to them.",
   );
 
-export const clusterInputSchema = clusterSchema
+export const clusterInputSchema = clusterAttributesSchema
   .extend({
     vector: z.array(z.number()).describe("Embedding vector for the cluster."),
   })

@@ -33,10 +33,18 @@ const withReadyClusterRepository = (test: (deps: Deps) => Promise<void>) =>
     await test(deps);
   });
 
+const storedPointIds = async (client: QdrantClient) => {
+  const { points } = await client.scroll("clusters", {
+    limit: 100,
+    with_payload: false,
+    with_vector: false,
+  });
+  return points.map((point) => String(point.id));
+};
+
 const buildClusterInput = (
   overrides: Partial<ClusterInput> = {},
 ): ClusterInput => ({
-  id: "550e8400-e29b-41d4-a716-446655440001",
   externalId: 1,
   position: { x: 12.5, y: -8.25 },
   name: { en_US: "Machine Learning", pl_PL: "Uczenie Maszynowe" },
@@ -45,6 +53,30 @@ const buildClusterInput = (
   growthRating: 73.4,
   embedding: { model: "gemini-embedding-001", source: "article-titles" },
   keyConcepts: [],
+  averageArticleAgeYears: 5.8,
+  citationRating: 75.47,
+  patentRating: 99.78,
+  topJournals: ["Nature", "Science advances"],
+  topInstitutions: ["Centre National de la Recherche Scientifique"],
+  topCompanies: [],
+  articles: {
+    core: [
+      {
+        title: "Attention is all you need",
+        metadata: "2017: Advances in neural information processing systems",
+        citations: 120000,
+        doi: "10.48550/arXiv.1706.03762",
+      },
+    ],
+    review: [],
+    highlyCited: [
+      { title: "Deep learning", metadata: "2015", citations: 90000, doi: null },
+    ],
+  },
+  relatedClusters: {
+    topCiting: [{ externalId: 0, significantCitations: 35 }],
+    topCited: [],
+  },
   vector: Array.from({ length: 768 }, (_, index) => (index === 0 ? 1 : 0)),
   ...overrides,
 });
@@ -80,27 +112,32 @@ describe("clusters repository", () => {
 
   it(
     "should save a cluster and read it back by id",
-    withReadyClusterRepository(async ({ repository }) => {
+    withReadyClusterRepository(async ({ repository, client }) => {
       const input = buildClusterInput();
       await repository.upsert([input]);
 
-      const { vector, ...expected } = input;
+      const [id] = await storedPointIds(client);
+      const found = await repository.findById(id);
+
+      const { vector, ...attributes } = input;
       expect(vector).toHaveLength(768);
-      const found = await repository.findById(input.id);
-      expect(found).toEqual(expected);
+      expect(found).toEqual({ ...attributes, id });
     }),
     60_000,
   );
 
   it(
     "should save and load keyConcepts",
-    withReadyClusterRepository(async ({ repository }) => {
-      const input = buildClusterInput({
-        keyConcepts: ["edible coatings", "shelf life", "Chitosan"],
-      });
-      await repository.upsert([input]);
+    withReadyClusterRepository(async ({ repository, client }) => {
+      await repository.upsert([
+        buildClusterInput({
+          keyConcepts: ["edible coatings", "shelf life", "Chitosan"],
+        }),
+      ]);
 
-      const found = await repository.findById(input.id);
+      const [id] = await storedPointIds(client);
+      const found = await repository.findById(id);
+
       expect(found?.keyConcepts).toEqual([
         "edible coatings",
         "shelf life",
@@ -136,6 +173,14 @@ describe("clusters repository", () => {
                 model: "gemini-embedding-001",
                 source: "article-titles",
               },
+              averageArticleAgeYears: 0,
+              citationRatingPercentile: 0,
+              patentRatingPercentile: 0,
+              topJournals: [],
+              topInstitutions: [],
+              topCompanies: [],
+              articles: { core: [], review: [], highlyCited: [] },
+              relatedClusters: { topCiting: [], topCited: [] },
             },
           },
         ],
@@ -160,18 +205,13 @@ describe("clusters repository", () => {
 
   it(
     "should fetch many clusters in one call with findByIds",
-    withReadyClusterRepository(async ({ repository }) => {
-      const first = buildClusterInput({
-        id: "550e8400-e29b-41d4-a716-446655440010",
-        externalId: 10,
-      });
-      const second = buildClusterInput({
-        id: "550e8400-e29b-41d4-a716-446655440011",
-        externalId: 11,
-      });
-      await repository.upsert([first, second]);
+    withReadyClusterRepository(async ({ repository, client }) => {
+      await repository.upsert([
+        buildClusterInput({ externalId: 10 }),
+        buildClusterInput({ externalId: 11 }),
+      ]);
 
-      const found = await repository.findByIds([first.id, second.id]);
+      const found = await repository.findByIds(await storedPointIds(client));
 
       expect(found).toHaveLength(2);
       expect(found.map((cluster) => cluster.externalId).sort()).toEqual([
@@ -185,17 +225,14 @@ describe("clusters repository", () => {
     "should return only clusters whose position falls inside the bbox",
     withReadyClusterRepository(async ({ repository }) => {
       const inside = buildClusterInput({
-        id: "550e8400-e29b-41d4-a716-446655440020",
         externalId: 20,
         position: { x: 5, y: 5 },
       });
       const outsideX = buildClusterInput({
-        id: "550e8400-e29b-41d4-a716-446655440021",
         externalId: 21,
         position: { x: 50, y: 5 },
       });
       const outsideY = buildClusterInput({
-        id: "550e8400-e29b-41d4-a716-446655440022",
         externalId: 22,
         position: { x: 5, y: 50 },
       });
@@ -216,19 +253,16 @@ describe("clusters repository", () => {
     "should order clusters inside the viewport by articlesCount desc",
     withReadyClusterRepository(async ({ repository }) => {
       const small = buildClusterInput({
-        id: "550e8400-e29b-41d4-a716-446655440030",
         externalId: 30,
         position: { x: 1, y: 1 },
         articlesCount: 100,
       });
       const huge = buildClusterInput({
-        id: "550e8400-e29b-41d4-a716-446655440031",
         externalId: 31,
         position: { x: 2, y: 2 },
         articlesCount: 5000,
       });
       const medium = buildClusterInput({
-        id: "550e8400-e29b-41d4-a716-446655440032",
         externalId: 32,
         position: { x: 3, y: 3 },
         articlesCount: 800,
@@ -250,7 +284,6 @@ describe("clusters repository", () => {
     withReadyClusterRepository(async ({ repository }) => {
       const inputs = [100, 200, 300, 400].map((articlesCount, index) =>
         buildClusterInput({
-          id: `550e8400-e29b-41d4-a716-44665544004${index}`,
           externalId: 40 + index,
           position: { x: index, y: index },
           articlesCount,
@@ -280,12 +313,10 @@ describe("clusters repository", () => {
       );
 
       const matching = buildClusterInput({
-        id: "550e8400-e29b-41d4-a716-446655440050",
         externalId: 50,
         vector: queryVector,
       });
       const unrelated = buildClusterInput({
-        id: "550e8400-e29b-41d4-a716-446655440051",
         externalId: 51,
         vector: otherVector,
       });

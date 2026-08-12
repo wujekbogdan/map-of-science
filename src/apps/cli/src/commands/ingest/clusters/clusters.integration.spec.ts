@@ -3,6 +3,7 @@ import { writeFile } from "node:fs/promises";
 import { dir as tmpDir } from "tmp-promise";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { withQdrantContainer } from "@map-of-science/test-utils";
+import { toEtoNdjson } from "../../../__test__/etoNdjson.js";
 import { toTsv } from "../../../__test__/tsv.js";
 import { runIngestClusters } from "./command.js";
 
@@ -28,30 +29,20 @@ const namesTsv = toTsv([
 const placesTsv = toTsv([["id", "cluster_id"]]);
 const entitiesTsv = toTsv([["id", "en-US", "pl-PL"]]);
 
-const etoNdjson =
-  JSON.stringify({
+const etoNdjson = toEtoNdjson([
+  {
     id: 1,
-    totalArticles: 1000,
-    articles: {
-      core: [
-        { title: "Quantum entanglement measurements" },
-        { title: "Superconducting qubits" },
-      ],
-      review: [{ title: "Review of quantum computing hardware" }],
-      highlyCited: [{ title: "Quantum supremacy demonstration" }],
-    },
-  }) +
-  "\n" +
-  JSON.stringify({
+    core: ["Quantum entanglement measurements", "Superconducting qubits"],
+    review: ["Review of quantum computing hardware"],
+    highlyCited: ["Quantum supremacy demonstration"],
+  },
+  {
     id: 2,
-    totalArticles: 500,
-    articles: {
-      core: [{ title: "Transformer architectures for language models" }],
-      review: [{ title: "Survey of deep learning techniques" }],
-      highlyCited: [{ title: "Attention is all you need" }],
-    },
-  }) +
-  "\n";
+    core: ["Transformer architectures for language models"],
+    review: ["Survey of deep learning techniques"],
+    highlyCited: ["Attention is all you need"],
+  },
+]);
 
 type Fixtures = {
   etoInput: string;
@@ -131,7 +122,21 @@ describe("ingest:clusters e2e", () => {
           nameSource: "llm",
           articlesCount: 1000,
           growthRating: 42.5,
+          averageArticleAgeYears: 5.8,
+          citationRatingPercentile: 75.47,
+          patentRatingPercentile: 99.78,
+          topJournals: ["Journal of Tests"],
+          topInstitutions: ["Test University"],
+          topCompanies: [],
+          relatedClusters: {
+            topCiting: [{ id: 0, significantCitations: 3 }],
+            topCited: [],
+          },
         });
+        expect(
+          (cluster1?.payload as { articles: { core: unknown[] } }).articles
+            .core,
+        ).toHaveLength(2);
         const vector = (cluster1?.vector as Record<string, number[]>).titles;
         expect(vector).toHaveLength(768);
       });
