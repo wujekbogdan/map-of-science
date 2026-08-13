@@ -43,7 +43,6 @@ export const ArticleList = ({ label, articles }: Props) => {
   );
 };
 
-// The app defines no link colour, so a link reads as underlined body text.
 const Title = styled.a`
   color: inherit;
   text-decoration: underline;
