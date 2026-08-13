@@ -1,11 +1,5 @@
 /*
- * The app's baseline grid and type scale.
- *
- * Sizes step by 1.125 from the body size, which gives 14, 16 and 18.
- * That is the smallest of the usual ratios, and it suits an interface that carries data rather than display type.
- * A larger ratio, such as the golden ratio, passes a readable heading size within two steps.
- *
- * Every line height and every spacing step is a whole number of baselines, so a line of text stays on the grid however long a value wraps.
+ * The app's baseline grid and type scale, so that text keeps one rhythm in every panel.
  *
  * Sizes and spacing only. Weight, colour and borders are the choice of each component.
  */
