@@ -1,43 +1,54 @@
 import { useTranslation } from "react-i18next";
+import styled from "styled-components";
 import type { ViewedCluster } from "../useViewedCluster.ts";
+import { LabelledList } from "./LabelledList.tsx";
 
 type Props = {
-  title: string;
+  label: string;
   articles: ViewedCluster["articles"]["core"];
 };
 
 // Some ETO titles carry their own closing punctuation, so a second period would read "Title..".
 const carriesOwnPunctuation = (title: string) => /[.?!:]$/.test(title);
 
-export const ArticleList = ({ title, articles }: Props) => {
+export const ArticleList = ({ label, articles }: Props) => {
   const { t } = useTranslation();
 
-  if (articles.length === 0) return null;
-
   return (
-    <section>
-      <h4>{title}</h4>
-      <ul>
-        {articles.map((article) => (
-          <li key={article.title}>
+    <LabelledList
+      label={label}
+      items={articles.map((article) => ({
+        key: article.title,
+        content: (
+          <>
             {article.doi === null ? (
               article.title
             ) : (
-              <a
+              <Title
                 href={`https://doi.org/${article.doi}`}
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 {article.title}
-              </a>
+              </Title>
             )}
             {`${carriesOwnPunctuation(article.title) ? "" : "."} ${article.metadata}. ${t(
               "map.clusterDetails.articleCitations",
               { count: article.citations },
             )}.`}
-          </li>
-        ))}
-      </ul>
-    </section>
+          </>
+        ),
+      }))}
+    />
   );
 };
+
+// The app defines no link colour, so a link reads as underlined body text.
+const Title = styled.a`
+  color: inherit;
+  text-decoration: underline;
+
+  &:hover {
+    text-decoration: none;
+  }
+`;

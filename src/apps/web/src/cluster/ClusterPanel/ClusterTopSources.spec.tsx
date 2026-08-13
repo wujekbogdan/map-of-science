@@ -2,32 +2,35 @@ import { cleanup } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import { ClusterTopSources } from "./ClusterTopSources.tsx";
 import { createViewedCluster } from "./test-utils/createViewedCluster.ts";
-import { definitionFor } from "./test-utils/definitionFor.ts";
 import { renderTranslated } from "./test-utils/renderTranslated.tsx";
 
 afterEach(cleanup);
 
 describe("ClusterTopSources", () => {
-  it.each([
-    ["Key journals", "Chemical Engineering Journal, Small"],
-    ["Key institutions", "Chinese Academy of Sciences – China"],
-    ["Key companies", "Samsung (South Korea)"],
-  ])("should show %s as %s", async (label, value) => {
-    const { container } = await renderTranslated(
+  it("should render each kind of source as its own labelled list", async () => {
+    const { getByRole, getAllByRole } = await renderTranslated(
       <ClusterTopSources cluster={createViewedCluster()} />,
     );
 
-    expect(definitionFor(container, label)).toBe(value);
+    expect(
+      getByRole("heading", { name: "Key journals", level: 4 }),
+    ).toBeTruthy();
+    expect(getAllByRole("listitem").map((item) => item.textContent)).toEqual([
+      "Chemical Engineering Journal",
+      "Small",
+      "Chinese Academy of Sciences – China",
+      "Samsung (South Korea)",
+    ]);
   });
 
-  it("should drop the companies line when the cluster has no companies", async () => {
-    const { container } = await renderTranslated(
+  it("should drop the companies list when the cluster has no companies", async () => {
+    const { queryByRole, getByRole } = await renderTranslated(
       <ClusterTopSources cluster={createViewedCluster({ topCompanies: [] })} />,
     );
 
-    expect(container.textContent).not.toContain("Key companies");
-    expect(definitionFor(container, "Key journals")).toBe(
-      "Chemical Engineering Journal, Small",
-    );
+    expect(queryByRole("heading", { name: "Key companies" })).toBeNull();
+    expect(
+      getByRole("heading", { name: "Key institutions", level: 4 }),
+    ).toBeTruthy();
   });
 });

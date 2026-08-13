@@ -1,34 +1,36 @@
-import { Fragment } from "react";
 import { useTranslation } from "react-i18next";
 import type { ViewedCluster } from "../useViewedCluster.ts";
+import { LabelledList } from "./LabelledList.tsx";
+import { PanelSection } from "./PanelSection.tsx";
 
 export const ClusterTopSources = ({ cluster }: { cluster: ViewedCluster }) => {
   const { t } = useTranslation();
-  const rows = [
+  const groups = [
     {
-      labelKey: "map.clusterDetails.keyJournalsLabel",
+      label: t("map.clusterDetails.keyJournalsLabel"),
       entries: cluster.topJournals,
     },
     {
-      labelKey: "map.clusterDetails.keyInstitutionsLabel",
+      label: t("map.clusterDetails.keyInstitutionsLabel"),
       entries: cluster.topInstitutions,
     },
     {
-      labelKey: "map.clusterDetails.keyCompaniesLabel",
+      label: t("map.clusterDetails.keyCompaniesLabel"),
       entries: cluster.topCompanies,
     },
   ];
 
+  if (groups.every(({ entries }) => entries.length === 0)) return null;
+
   return (
-    <dl>
-      {rows
-        .filter(({ entries }) => entries.length > 0)
-        .map(({ labelKey, entries }) => (
-          <Fragment key={labelKey}>
-            <dt>{t(labelKey)}</dt>
-            <dd>{entries.join(", ")}</dd>
-          </Fragment>
-        ))}
-    </dl>
+    <PanelSection>
+      {groups.map(({ label, entries }) => (
+        <LabelledList
+          key={label}
+          label={label}
+          items={entries.map((entry) => ({ key: entry, content: entry }))}
+        />
+      ))}
+    </PanelSection>
   );
 };

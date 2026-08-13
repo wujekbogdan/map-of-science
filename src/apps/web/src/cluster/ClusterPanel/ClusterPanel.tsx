@@ -6,6 +6,7 @@ import { ContextPanel } from "../../components/ContextPanel/ContextPanel.tsx";
 import { getClusterLevel } from "../../components/Map/Clusters/clusterLevel.ts";
 import { useMapStore } from "../../map/mapStore.ts";
 import { useMapView } from "../../map/view/hooks.ts";
+import { rhythm } from "../../typography.ts";
 import { useClearViewedCluster } from "../useClearViewedCluster.ts";
 import { useViewedCluster } from "../useViewedCluster.ts";
 import { ClusterArticles } from "./ClusterArticles.tsx";
@@ -41,7 +42,7 @@ export const ClusterPanel = () => {
     view.centerOn(position, { scale: focusZoom[level] });
   }, [position, articlesCount, source, view, thresholds, focusZoom]);
 
-  // An unnamed cluster already reads "Cluster #11174", so only a named one needs the id spelled out.
+  // The placeholder name already carries the id, so only a named cluster needs it added.
   const header = cluster
     ? cluster.name
       ? `${cluster.displayName} (#${cluster.externalId.toString()})`
@@ -71,5 +72,7 @@ export const ClusterPanel = () => {
 const Body = styled.div`
   flex: 1;
   min-height: 0;
+  /* Outside the scroll box, so the gap under the header survives scrolling. */
+  margin-top: ${rhythm.space.aboveBody};
   overflow-y: auto;
 `;

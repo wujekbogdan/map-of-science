@@ -1,5 +1,6 @@
-import { Fragment } from "react";
 import { useTranslation } from "react-i18next";
+import { FactList } from "./FactList.tsx";
+import { PanelSection } from "./PanelSection.tsx";
 
 const RATING_BANDS = [
   { labelKey: "map.clusterDetails.rating.veryLow", range: "0-20" },
@@ -14,16 +15,13 @@ export const RatingLegend = () => {
   const { t } = useTranslation();
 
   return (
-    <section>
-      <h3>{t("map.clusterDetails.ratingScale")}</h3>
-      <dl>
-        {RATING_BANDS.map(({ labelKey, range }) => (
-          <Fragment key={labelKey}>
-            <dt>{t(labelKey)}</dt>
-            <dd>{range}</dd>
-          </Fragment>
-        ))}
-      </dl>
-    </section>
+    <PanelSection title={t("map.clusterDetails.ratingScale")}>
+      <FactList
+        rows={RATING_BANDS.map(({ labelKey, range }) => ({
+          label: t(labelKey),
+          value: range,
+        }))}
+      />
+    </PanelSection>
   );
 };

@@ -15,7 +15,7 @@ const article = {
 describe("ArticleList", () => {
   it("should link the title to its DOI", async () => {
     const { getByRole } = await renderTranslated(
-      <ArticleList title="Core articles" articles={[article]} />,
+      <ArticleList label="Core articles" articles={[article]} />,
     );
 
     expect(
@@ -26,7 +26,7 @@ describe("ArticleList", () => {
   it("should render the title as plain text when the article has no DOI", async () => {
     const { queryByRole, getByText } = await renderTranslated(
       <ArticleList
-        title="Core articles"
+        label="Core articles"
         articles={[{ ...article, doi: null }]}
       />,
     );
@@ -58,7 +58,7 @@ describe("ArticleList", () => {
     ],
   ])("should read correctly for %s", async (_case, given, expected) => {
     const { getByRole } = await renderTranslated(
-      <ArticleList title="Core articles" articles={[given]} />,
+      <ArticleList label="Core articles" articles={[given]} />,
     );
 
     expect(getByRole("listitem").textContent).toBe(expected);
@@ -66,7 +66,7 @@ describe("ArticleList", () => {
 
   it("should render nothing when the cluster has no articles of this kind", async () => {
     const { container } = await renderTranslated(
-      <ArticleList title="Review articles" articles={[]} />,
+      <ArticleList label="Review articles" articles={[]} />,
     );
 
     expect(container.textContent).toBe("");

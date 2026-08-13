@@ -12,22 +12,18 @@ import { I18nextProvider, initReactI18next } from "react-i18next";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { translations } from "../../i18n/translations.ts";
 import { CLUSTER_ROUTE_PATH } from "../routePath.ts";
+import { useViewedCluster, type ViewedCluster } from "../useViewedCluster.ts";
 import { ClusterPanel } from "./ClusterPanel.tsx";
 import { createViewedCluster } from "./test-utils/createViewedCluster.ts";
 
-let viewed = createViewedCluster();
-
-afterEach(() => {
-  cleanup();
-  viewed = createViewedCluster();
-});
+afterEach(cleanup);
 
 vi.mock("../../map/view/hooks.ts", () => ({
   useMapView: () => ({ centerOn: vi.fn() }),
 }));
 
 vi.mock("../useViewedCluster.ts", () => ({
-  useViewedCluster: () => viewed,
+  useViewedCluster: vi.fn(),
 }));
 
 vi.mock("../../map/mapStore.ts", () => ({
@@ -38,7 +34,9 @@ vi.mock("../../map/mapStore.ts", () => ({
     }),
 }));
 
-const renderPanel = async () => {
+const renderPanel = async (cluster: ViewedCluster = createViewedCluster()) => {
+  vi.mocked(useViewedCluster).mockReturnValue(cluster);
+
   const testRoot = createRootRoute({ component: () => <Outlet /> });
   const testClusterRoute = createRoute({
     getParentRoute: () => testRoot,
@@ -74,9 +72,8 @@ describe("ClusterPanel", () => {
       screen.getByText("sulfur batteries, high sulfur loading"),
     ).toBeTruthy();
     expect(screen.getByText("Key recent articles")).toBeTruthy();
-    expect(
-      screen.getByText("Chemical Engineering Journal, Small"),
-    ).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "Key journals" })).toBeTruthy();
+    expect(screen.getByText("Chemical Engineering Journal")).toBeTruthy();
     expect(screen.getByText("Related clusters")).toBeTruthy();
     expect(screen.getByText("Rating scale")).toBeTruthy();
   });
@@ -92,11 +89,9 @@ describe("ClusterPanel", () => {
   });
 
   it("should title the panel with the placeholder alone when the cluster has no name", async () => {
-    viewed = createViewedCluster({
-      name: null,
-      displayName: "Cluster #1085",
-    });
-    await renderPanel();
+    await renderPanel(
+      createViewedCluster({ name: null, displayName: "Cluster #1085" }),
+    );
 
     await waitFor(() => {
       expect(screen.getByRole("heading", { level: 2 }).textContent).toBe(
