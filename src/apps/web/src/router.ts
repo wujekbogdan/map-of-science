@@ -4,7 +4,7 @@ import {
   createRouter,
   createMemoryHistory,
 } from "@tanstack/react-router";
-import { ClusterPanel } from "./cluster/ClusterPanel.tsx";
+import { ClusterPanel } from "./cluster/ClusterPanel/ClusterPanel.tsx";
 import { CLUSTER_ROUTE_PATH } from "./cluster/routePath.ts";
 import App from "./components/App.tsx";
 import { searchParamsSchema } from "./components/Header/Search/searchParams.ts";

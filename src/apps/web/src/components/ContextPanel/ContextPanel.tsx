@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
+import { rhythm } from "../../typography.ts";
 import closeIcon from "../Header/close.svg";
 
 const CLOSE_BUTTON_SIZE_PX = 28;
@@ -52,9 +53,9 @@ const TopRow = styled.div`
 const Heading = styled.h2`
   flex: 1;
   margin: 0;
-  font-size: 1em;
-  font-weight: normal;
-  line-height: 1.5;
+  font-size: ${rhythm.panelTitle.fontSizePx}px;
+  line-height: ${rhythm.panelTitle.lineHeight};
+  font-weight: 700;
 `;
 
 const CloseButton = styled.button`
