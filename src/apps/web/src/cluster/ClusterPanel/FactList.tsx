@@ -22,7 +22,6 @@ const List = styled.dl`
   line-height: ${rhythm.body.lineHeight};
 `;
 
-// Each row repeats the same column template, so the values align down the list.
 const Row = styled.div`
   display: grid;
   grid-template-columns: 10em 1fr;
