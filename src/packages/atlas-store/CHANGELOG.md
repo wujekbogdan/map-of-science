@@ -1,5 +1,21 @@
 # @map-of-science/atlas-store
 
+## 0.4.0
+
+### Minor Changes
+
+- 59516c3: - Add `findByExternalIds`, to get clusters by their ETO id.
+- ceccd20: - Make each cluster's point id from its `externalId`. The caller no longer gives an id.
+  - Read and write the rich ETO cluster fields.
+  - Map `citationRating` and `patentRating` to the stored `citationRatingPercentile` and `patentRatingPercentile`.
+  - Map a related cluster's `externalId` to the stored `id`.
+
+### Patch Changes
+
+- Updated dependencies [ceccd20]
+- Updated dependencies [59516c3]
+  - @map-of-science/atlas@0.5.0
+
 ## 0.3.2
 
 ### Patch Changes

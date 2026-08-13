@@ -1,5 +1,22 @@
 # @map-of-science/cli
 
+## 1.2.0
+
+### Minor Changes
+
+- ceccd20: - Read the rich ETO fields out of each `eto.ndjson` record and into the cluster that `ingest:clusters` writes.
+  - Validate only the fields that `name` uses.
+
+### Patch Changes
+
+- 59516c3: - Follow the cluster repository interface in the ingest test fake.
+- Updated dependencies [ceccd20]
+- Updated dependencies [59516c3]
+- Updated dependencies [ceccd20]
+- Updated dependencies [59516c3]
+  - @map-of-science/atlas@0.5.0
+  - @map-of-science/atlas-store@0.4.0
+
 ## 1.1.0
 
 ### Minor Changes

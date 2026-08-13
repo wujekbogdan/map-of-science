@@ -1,5 +1,14 @@
 # @map-of-science/root
 
+## 0.8.2
+
+### Patch Changes
+
+- a7fbcce: - Build Docker images on native amd64 and arm64 runners instead of under QEMU emulation.
+  - Build both app images for both platforms on every pull request.
+  - Update GitHub Actions dependencies to their Node 24 releases.
+- 8fb398a: - Store local Qdrant snapshots in the `qdrant_data` volume so they survive `docker compose down`.
+
 ## 0.8.1
 
 ### Patch Changes
