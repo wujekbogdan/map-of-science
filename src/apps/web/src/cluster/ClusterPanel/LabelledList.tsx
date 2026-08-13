@@ -3,7 +3,6 @@ import styled from "styled-components";
 import { rhythm } from "../../typography.ts";
 
 type Props = {
-  /** Omit when the surrounding section heading already names the list. */
   label?: string;
   items: readonly { key: string; content: ReactNode }[];
 };
