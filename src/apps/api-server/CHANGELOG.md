@@ -1,5 +1,18 @@
 # @map-of-science/api
 
+## 0.2.5
+
+### Patch Changes
+
+- Updated dependencies [ceccd20]
+- Updated dependencies [59516c3]
+- Updated dependencies [59516c3]
+- Updated dependencies [ceccd20]
+- Updated dependencies [59516c3]
+  - @map-of-science/atlas@0.5.0
+  - @map-of-science/api@0.5.0
+  - @map-of-science/atlas-store@0.4.0
+
 ## 0.2.4
 
 ### Patch Changes

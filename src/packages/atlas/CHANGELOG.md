@@ -1,5 +1,16 @@
 # @map-of-science/atlas
 
+## 0.5.0
+
+### Minor Changes
+
+- ceccd20: - Remove `id` from `clusterInputSchema`.
+  - Add the rich ETO fields to `Cluster`: `averageArticleAgeYears`, `citationRating`, `patentRating`, `topJournals`, `topInstitutions`, `topCompanies`, `articles` and `relatedClusters`.
+  - Name a related cluster by `externalId`.
+  - Limit `growthRating`, `citationRating` and `patentRating` to 0-100.
+- 59516c3: - Add `rankRelatedClusters`. It joins a cluster's two citation lists into one list, the strongest link first.
+  - Add `findByExternalIds` to `ClusterRepository`.
+
 ## 0.4.0
 
 ### Minor Changes

@@ -1,5 +1,20 @@
 # @map-of-science/web
 
+## 1.24.0
+
+### Minor Changes
+
+- 4161b0c: - Replace the embedded ETO cluster page in the cluster panel with the cluster's own structured data: its facts, its articles, its top sources, its related clusters and the rating scale.
+  - Open a related cluster from its row, so a reader moves between clusters inside the map.
+  - Add `rhythm` in `typography.ts`, which holds the baseline grid and the type scale that the cluster panel and the context panel both follow.
+
+### Patch Changes
+
+- ceccd20: Build cluster test fixtures with the fields that `Cluster` now requires.
+- 59516c3: - Accept a cluster from `cluster.byId` next to clusters from `cluster.viewport` and from the search in the map helpers. The three no longer hold the same fields.
+- Updated dependencies [59516c3]
+  - @map-of-science/api@0.5.0
+
 ## 1.23.0
 
 ### Minor Changes
