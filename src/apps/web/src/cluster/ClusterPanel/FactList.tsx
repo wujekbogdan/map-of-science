@@ -5,10 +5,6 @@ type Props = {
   rows: readonly { label: string; value: string }[];
 };
 
-/*
- * A `div` around each pair is valid inside a `dl`, and it gives the pair an element to style.
- * The row carries the grid and the rule, not the list.
- */
 export const FactList = ({ rows }: Props) => (
   <List>
     {rows.map(({ label, value }) => (
