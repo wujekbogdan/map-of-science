@@ -18,6 +18,12 @@ Follows DDD:
 - `Area`
 - `ContentItem`
 
+**Field kinds** - what a `Cluster` field describes:
+
+- Attributes - one value each that describes the cluster
+- Associations - references to other entities
+- Provenance - how the data was made
+
 **Value objects** - small immutable pieces without identity:
 
 - `EntityRef`
@@ -31,5 +37,9 @@ Follows DDD:
 - `ClusterRepository`
 - `AreaRepository`
 - `ContentRepository`
+
+**Read ports** - reads that answer with part of an aggregate:
+
+- `ClusterAttributesReader`
 
 Each piece is documented where it's defined.

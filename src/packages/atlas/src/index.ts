@@ -9,7 +9,9 @@ export { rankRelatedClusters } from "./clusters/rankRelatedClusters.js";
 export type {
   BBox,
   Cluster,
+  ClusterAttributesReader,
   ClusterInput,
+  ClusterMapAttributes,
   ClusterMatch,
   ClusterRepository,
 } from "./clusters/clusters.js";

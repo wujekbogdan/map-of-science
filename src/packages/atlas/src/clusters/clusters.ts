@@ -26,111 +26,116 @@ const relatedClusterSchema = z
   })
   .describe("A citation link to another cluster.");
 
-const clusterAttributesSchema = z
-  .object({
-    externalId: z.number().describe("Cluster ID from ETO."),
-    position: z.object({
-      x: z.number().describe("Horizontal coordinate, increases rightward."),
-      y: z.number().describe("Vertical coordinate, increases upward."),
-    }),
-    name: z
-      .object({
-        en_US: z.string(),
-        pl_PL: z.string(),
-      })
-      .nullable()
-      .describe("Cluster name per language. Null when unnamed."),
-    nameSource: z
-      .enum(["curated", "llm"])
-      .nullable()
-      .describe(
-        'How the name was produced. "curated" = hand-picked, "llm" = generated. Null when unnamed.',
-      ),
-    articlesCount: z
-      .number()
-      .describe("Number of articles the cluster was built from."),
-    growthRating: z
-      .number()
-      .min(0)
-      .max(100)
-      .describe(
-        "Percentile 0-100 showing how fast the cluster grew over the last 3 years vs other clusters, per ETO.",
-      ),
-    embedding: z
-      .object({
-        model: z.string().describe("Which embedder produced it."),
-        source: z
-          .string()
-          .describe("What kind of content was used as input to the embedding."),
-      })
-      .describe("Info about the embedding."),
-    keyConcepts: z
-      .array(z.string())
-      .default([])
-      .describe("Keywords tagging the cluster's key concepts, per ETO."),
-    averageArticleAgeYears: z
-      .number()
-      .describe("Mean age of the cluster's articles, per ETO."),
-    citationRating: z
-      .number()
-      .min(0)
-      .max(100)
-      .describe(
-        "Percentile 0-100 showing how often other work cites the cluster vs other clusters, per ETO.",
-      ),
-    patentRating: z
-      .number()
-      .min(0)
-      .max(100)
-      .describe(
-        "Percentile 0-100 showing how often patents cite the cluster vs other clusters, per ETO.",
-      ),
-    topJournals: z
-      .array(z.string())
-      .describe(
-        "Journals that publish the cluster's articles. The most frequent journal is first.",
-      ),
-    topInstitutions: z
-      .array(z.string())
-      .describe(
-        "Institutions that wrote the cluster's articles. The most frequent institution is first.",
-      ),
-    topCompanies: z
-      .array(z.string())
-      .describe(
-        "Companies that wrote the cluster's articles. The most frequent company is first. Each entry ends with its country in brackets.",
-      ),
-    articles: z
-      .object({
-        core: z
-          .array(articleSchema)
-          .describe(
-            "Articles with the strongest links to the other articles in the cluster.",
-          ),
-        review: z
-          .array(articleSchema)
-          .describe(
-            "Articles that describe and systematize the work of others.",
-          ),
-        highlyCited: z
-          .array(articleSchema)
-          .describe("Articles with the most citations."),
-      })
-      .describe("Articles that ETO selects for the cluster."),
-    relatedClusters: z
-      .object({
-        topCiting: z
-          .array(relatedClusterSchema)
-          .describe("Clusters that cite the cluster."),
-        topCited: z
-          .array(relatedClusterSchema)
-          .describe("Clusters that the cluster cites."),
-      })
-      .describe("Citation links to other clusters."),
-  })
+const clusterAttributesSchema = z.object({
+  externalId: z.number().describe("Cluster ID from ETO."),
+  position: z.object({
+    x: z.number().describe("Horizontal coordinate, increases rightward."),
+    y: z.number().describe("Vertical coordinate, increases upward."),
+  }),
+  name: z
+    .object({
+      en_US: z.string(),
+      pl_PL: z.string(),
+    })
+    .nullable()
+    .describe("Cluster name per language. Null when unnamed."),
+  articlesCount: z
+    .number()
+    .describe("Number of articles the cluster was built from."),
+  growthRating: z
+    .number()
+    .min(0)
+    .max(100)
+    .describe(
+      "Percentile 0-100 showing how fast the cluster grew over the last 3 years vs other clusters, per ETO.",
+    ),
+  averageArticleAgeYears: z
+    .number()
+    .describe("Mean age of the cluster's articles, per ETO."),
+  citationRating: z
+    .number()
+    .min(0)
+    .max(100)
+    .describe(
+      "Percentile 0-100 showing how often other work cites the cluster vs other clusters, per ETO.",
+    ),
+  patentRating: z
+    .number()
+    .min(0)
+    .max(100)
+    .describe(
+      "Percentile 0-100 showing how often patents cite the cluster vs other clusters, per ETO.",
+    ),
+  keyConcepts: z
+    .array(z.string())
+    .default([])
+    .describe("Keywords tagging the cluster's key concepts, per ETO."),
+});
+
+const clusterAssociationsSchema = z.object({
+  topJournals: z
+    .array(z.string())
+    .describe(
+      "Journals that publish the cluster's articles. The most frequent journal is first.",
+    ),
+  topInstitutions: z
+    .array(z.string())
+    .describe(
+      "Institutions that wrote the cluster's articles. The most frequent institution is first.",
+    ),
+  topCompanies: z
+    .array(z.string())
+    .describe(
+      "Companies that wrote the cluster's articles. The most frequent company is first. Each entry ends with its country in brackets.",
+    ),
+  articles: z
+    .object({
+      core: z
+        .array(articleSchema)
+        .describe(
+          "Articles with the strongest links to the other articles in the cluster.",
+        ),
+      review: z
+        .array(articleSchema)
+        .describe("Articles that describe and systematize the work of others."),
+      highlyCited: z
+        .array(articleSchema)
+        .describe("Articles with the most citations."),
+    })
+    .describe("Articles that ETO selects for the cluster."),
+  relatedClusters: z
+    .object({
+      topCiting: z
+        .array(relatedClusterSchema)
+        .describe("Clusters that cite the cluster."),
+      topCited: z
+        .array(relatedClusterSchema)
+        .describe("Clusters that the cluster cites."),
+    })
+    .describe("Citation links to other clusters."),
+
+  /* Provenance: how the data was made. */
+  nameSource: z
+    .enum(["curated", "llm"])
+    .nullable()
+    .describe(
+      'How the name was produced. "curated" = hand-picked, "llm" = generated. Null when unnamed.',
+    ),
+  embedding: z
+    .object({
+      model: z.string().describe("Which embedder produced it."),
+      source: z
+        .string()
+        .describe("What kind of content was used as input to the embedding."),
+    })
+    .describe("Info about the embedding."),
+});
+
+const clusterFieldsSchema = clusterAttributesSchema
+  .extend(clusterAssociationsSchema.shape)
   .describe("Everything that describes a cluster, without its identity.");
 
-export const clusterSchema = clusterAttributesSchema
+export const clusterSchema = clusterFieldsSchema
   .extend({
     id: z.string().describe("Unique cluster identifier."),
   })
@@ -138,7 +143,7 @@ export const clusterSchema = clusterAttributesSchema
     "A group of scientific articles that share a topic. Clusters are the foundation - every other entity is positioned relative to them.",
   );
 
-export const clusterInputSchema = clusterAttributesSchema
+export const clusterInputSchema = clusterFieldsSchema
   .extend({
     vector: z.array(z.number()).describe("Embedding vector for the cluster."),
   })
@@ -164,8 +169,20 @@ export type Cluster = z.infer<typeof clusterSchema>;
 export type ClusterInput = z.infer<typeof clusterInputSchema>;
 export type BBox = z.infer<typeof bboxSchema>;
 
-/* Cluster paired with a similarity score from a vector search. */
-export type ClusterMatch = Cluster & { score: number };
+/* The attributes a caller gets when it asks for many clusters at once. */
+export type ClusterMapAttributes = Pick<
+  Cluster,
+  | "id"
+  | "externalId"
+  | "position"
+  | "name"
+  | "articlesCount"
+  | "growthRating"
+  | "keyConcepts"
+>;
+
+/* Cluster attributes paired with a similarity score from a vector search. */
+export type ClusterMatch = ClusterMapAttributes & { score: number };
 
 /* Storage interface for clusters. */
 export type ClusterRepository = {
@@ -175,12 +192,18 @@ export type ClusterRepository = {
   upsert(items: ClusterInput[]): Promise<void>;
   /* Get one cluster by id. Null if not found. */
   findById(id: string): Promise<Cluster | null>;
-  /* Get multiple clusters by id. */
-  findByIds(ids: string[]): Promise<Cluster[]>;
+};
+
+export type ClusterAttributesReader = {
   /* Get multiple clusters by their ETO id. An id with no cluster is left out. */
-  findByExternalIds(externalIds: number[]): Promise<Cluster[]>;
+  findByExternalIds(
+    externalIds: number[],
+  ): Promise<Pick<Cluster, "id" | "externalId" | "name">[]>;
   /* Get clusters whose position falls inside the bounding box. */
-  findInViewport(args: { bbox: BBox; limit: number }): Promise<Cluster[]>;
+  findInViewport(args: {
+    bbox: BBox;
+    limit: number;
+  }): Promise<ClusterMapAttributes[]>;
   /* Find clusters most similar to the given embedding. */
   findByVector(args: {
     vector: number[];
