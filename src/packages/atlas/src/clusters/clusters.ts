@@ -26,7 +26,7 @@ const relatedClusterSchema = z
   })
   .describe("A citation link to another cluster.");
 
-const clusterAttributesSchema = z.object({
+export const clusterAttributesSchema = z.object({
   externalId: z.number().describe("Cluster ID from ETO."),
   position: z.object({
     x: z.number().describe("Horizontal coordinate, increases rightward."),
@@ -72,7 +72,7 @@ const clusterAttributesSchema = z.object({
     .describe("Keywords tagging the cluster's key concepts, per ETO."),
 });
 
-const clusterAssociationsSchema = z.object({
+export const clusterAssociationsSchema = z.object({
   topJournals: z
     .array(z.string())
     .describe(

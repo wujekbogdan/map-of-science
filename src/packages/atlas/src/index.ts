@@ -2,6 +2,8 @@
 
 export {
   bboxSchema,
+  clusterAssociationsSchema,
+  clusterAttributesSchema,
   clusterInputSchema,
   clusterSchema,
 } from "./clusters/clusters.js";

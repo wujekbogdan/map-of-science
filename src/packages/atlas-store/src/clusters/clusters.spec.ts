@@ -35,13 +35,13 @@ const buildInput = (externalId: number): ClusterInput => ({
 
 describe("createClustersRepository", () => {
   describe("upsert", () => {
-    it("should address a point by the uuid derived from its external id", async () => {
+    it("should address the point in both collections by the uuid derived from its external id", async () => {
       const mocks = buildQdrantMocks();
       const repository = createClustersRepository({ qdrant: asClient(mocks) });
 
       await repository.upsert([buildInput(42)]);
 
-      expect(mocks.upsert).toHaveBeenCalledTimes(1);
+      expect(mocks.upsert).toHaveBeenCalledTimes(2);
       expect(mocks.upsert).toHaveBeenNthCalledWith(
         1,
         "clusters",
@@ -49,6 +49,18 @@ describe("createClustersRepository", () => {
           points: [
             expect.objectContaining({
               id: "7c411b5e-9d3f-50b5-9c28-62096e41c4ed",
+            }),
+          ],
+        }),
+      );
+      expect(mocks.upsert).toHaveBeenNthCalledWith(
+        2,
+        "cluster_associations",
+        expect.objectContaining({
+          points: [
+            expect.objectContaining({
+              id: "7c411b5e-9d3f-50b5-9c28-62096e41c4ed",
+              vector: {},
             }),
           ],
         }),
