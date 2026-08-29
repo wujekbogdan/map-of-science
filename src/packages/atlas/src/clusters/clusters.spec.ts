@@ -42,6 +42,33 @@ describe("clusterSchema", () => {
     expect(clusterSchema.parse(validCluster)).toEqual(validCluster);
   });
 
+  it("should compose the identity with every attribute and association field", () => {
+    const attributes = [
+      "externalId",
+      "position",
+      "name",
+      "articlesCount",
+      "growthRating",
+      "averageArticleAgeYears",
+      "citationRating",
+      "patentRating",
+      "keyConcepts",
+    ];
+    const associations = [
+      "topJournals",
+      "topInstitutions",
+      "topCompanies",
+      "articles",
+      "relatedClusters",
+      "nameSource",
+      "embedding",
+    ];
+
+    expect(Object.keys(clusterSchema.shape).toSorted()).toEqual(
+      ["id", ...attributes, ...associations].toSorted(),
+    );
+  });
+
   it("should accept null name and nameSource", () => {
     const parsed = clusterSchema.parse({
       ...validCluster,
@@ -113,5 +140,16 @@ describe("clusterInputSchema", () => {
 
   it("should reject missing vector", () => {
     expect(() => clusterInputSchema.parse(validCluster)).toThrow();
+  });
+
+  it("should carry every field clusterSchema carries, apart from id and vector", () => {
+    const stored = Object.keys(clusterSchema.shape).filter(
+      (key) => key !== "id",
+    );
+    const incoming = Object.keys(clusterInputSchema.shape).filter(
+      (key) => key !== "vector",
+    );
+
+    expect(incoming.toSorted()).toEqual(stored.toSorted());
   });
 });

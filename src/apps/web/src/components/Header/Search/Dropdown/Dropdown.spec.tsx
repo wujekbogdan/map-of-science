@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import i18next, { type i18n } from "i18next";
 import { I18nextProvider, initReactI18next } from "react-i18next";
 import { describe, expect, it, vi } from "vitest";
-import type { SelectedCluster } from "../../../../map/selectionStore.ts";
+import { createMapCluster } from "../../../../cluster/test-utils/createMapCluster.ts";
 import { Dropdown, type Option } from "./Dropdown.tsx";
 
 const setupI18n = async () => {
@@ -22,27 +22,7 @@ const withDropdown = (test: (i18n: i18n) => Promise<void>) => async () => {
   });
 };
 
-const cluster: SelectedCluster = {
-  id: "c-1",
-  externalId: 1,
-  position: { x: 0, y: 0 },
-  name: "Black Holes",
-  displayName: "Black Holes",
-  nameSource: "llm",
-  articlesCount: 100,
-  growthRating: 50,
-  embedding: { model: "test", source: "titles" },
-  keyConcepts: [],
-  averageArticleAgeYears: 0,
-  citationRating: 0,
-  patentRating: 0,
-  topJournals: [],
-  topInstitutions: [],
-  topCompanies: [],
-  articles: { core: [], review: [], highlyCited: [] },
-  relatedClusters: { topCiting: [], topCited: [] },
-  score: 0.9,
-};
+const cluster = createMapCluster({ id: "c-1", position: { x: 0, y: 0 } });
 
 const clusterOption: Option = {
   type: "cluster",

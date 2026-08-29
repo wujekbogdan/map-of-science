@@ -1,28 +1,7 @@
 import { cleanup, fireEvent, render } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { ClusterShapes, type MapCluster } from "./ClusterShapes.tsx";
-
-const makeCluster = (overrides: Partial<MapCluster> = {}): MapCluster => ({
-  id: "cluster-1",
-  externalId: 1,
-  position: { x: 10, y: 20 },
-  name: "Black Holes",
-  displayName: "Black Holes",
-  nameSource: "curated",
-  articlesCount: 100,
-  growthRating: 50,
-  embedding: { model: "test", source: "titles" },
-  keyConcepts: [],
-  averageArticleAgeYears: 0,
-  citationRating: 0,
-  patentRating: 0,
-  topJournals: [],
-  topInstitutions: [],
-  topCompanies: [],
-  articles: { core: [], review: [], highlyCited: [] },
-  relatedClusters: { topCiting: [], topCited: [] },
-  ...overrides,
-});
+import { createMapCluster } from "../../../cluster/test-utils/createMapCluster.ts";
+import { ClusterShapes } from "./ClusterShapes.tsx";
 
 const growthRatingColors = {
   start: { r: 0, g: 0, b: 0 },
@@ -44,8 +23,8 @@ afterEach(() => {
 describe("ClusterShapes", () => {
   it("should render an extra ripple circle only for clusters in ripplingIds", () => {
     const clusters = [
-      makeCluster({ id: "a" }),
-      makeCluster({ id: "b", position: { x: 30, y: 40 } }),
+      createMapCluster({ id: "a" }),
+      createMapCluster({ id: "b", position: { x: 30, y: 40 } }),
     ];
 
     const { container } = renderInSvg(
@@ -69,8 +48,8 @@ describe("ClusterShapes", () => {
 
   it("should render an extra halo circle only for the viewed cluster", () => {
     const clusters = [
-      makeCluster({ id: "a" }),
-      makeCluster({ id: "b", position: { x: 30, y: 40 } }),
+      createMapCluster({ id: "a" }),
+      createMapCluster({ id: "b", position: { x: 30, y: 40 } }),
     ];
 
     const { container } = renderInSvg(
@@ -94,8 +73,8 @@ describe("ClusterShapes", () => {
 
   it("should render no halo circle when there is no viewed cluster", () => {
     const clusters = [
-      makeCluster({ id: "a" }),
-      makeCluster({ id: "b", position: { x: 30, y: 40 } }),
+      createMapCluster({ id: "a" }),
+      createMapCluster({ id: "b", position: { x: 30, y: 40 } }),
     ];
 
     const { container } = renderInSvg(
@@ -121,8 +100,8 @@ describe("ClusterShapes", () => {
     const onHoveredClusterChange = vi.fn();
     const onClusterClick = vi.fn();
     const clusters = [
-      makeCluster({ id: "a" }),
-      makeCluster({ id: "b", position: { x: 30, y: 40 } }),
+      createMapCluster({ id: "a" }),
+      createMapCluster({ id: "b", position: { x: 30, y: 40 } }),
     ];
 
     const { container } = renderInSvg(
@@ -155,8 +134,8 @@ describe("ClusterShapes", () => {
   it("should capture the hovered cluster's element via onHoveredElChange", () => {
     const onHoveredElChange = vi.fn();
     const clusters = [
-      makeCluster({ id: "a" }),
-      makeCluster({ id: "b", position: { x: 30, y: 40 } }),
+      createMapCluster({ id: "a" }),
+      createMapCluster({ id: "b", position: { x: 30, y: 40 } }),
     ];
 
     const { container } = renderInSvg(
@@ -182,8 +161,8 @@ describe("ClusterShapes", () => {
   it("should clear the previous element and capture the new one when popoverAnchorId changes", () => {
     const onHoveredElChange = vi.fn();
     const clusters = [
-      makeCluster({ id: "a" }),
-      makeCluster({ id: "b", position: { x: 30, y: 40 } }),
+      createMapCluster({ id: "a" }),
+      createMapCluster({ id: "b", position: { x: 30, y: 40 } }),
     ];
     const baseProps = {
       clusters,

@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import type { ClusterInput } from "@map-of-science/atlas";
 import { withQdrantContainer } from "@map-of-science/test-utils";
 import { createCollectionSchema } from "../collection/create-collection-schema.js";
+import { createClusterAttributesReader } from "./clusterAttributesReader.js";
 import { createClustersRepository } from "./clusters.js";
 
 vi.mock("../collection/create-collection-schema.js", async () => {
@@ -17,6 +18,7 @@ vi.mock("../collection/create-collection-schema.js", async () => {
 
 type Deps = {
   repository: ReturnType<typeof createClustersRepository>;
+  reader: ReturnType<typeof createClusterAttributesReader>;
   client: QdrantClient;
 };
 
@@ -24,7 +26,8 @@ const withClusterRepository = (test: (deps: Deps) => Promise<void>) =>
   withQdrantContainer(async (qdrant) => {
     const client = new QdrantClient({ url: qdrant.url });
     const repository = createClustersRepository({ qdrant: client });
-    await test({ repository, client });
+    const reader = createClusterAttributesReader({ qdrant: client });
+    await test({ repository, reader, client });
   });
 
 const withReadyClusterRepository = (test: (deps: Deps) => Promise<void>) =>
@@ -83,13 +86,13 @@ const buildClusterInput = (
 
 describe("clusters repository", () => {
   it(
-    "should create the clusters schema",
-    withClusterRepository(async ({ repository }) => {
+    "should create a collection for the attributes and a vectorless one for the associations",
+    withClusterRepository(async ({ repository, client }) => {
       vi.mocked(createCollectionSchema).mockClear();
 
       await repository.createSchema();
 
-      expect(createCollectionSchema).toHaveBeenCalledTimes(1);
+      expect(createCollectionSchema).toHaveBeenCalledTimes(2);
       expect(createCollectionSchema).toHaveBeenNthCalledWith(
         1,
         expect.any(QdrantClient),
@@ -102,10 +105,65 @@ describe("clusters repository", () => {
             { field_name: "x", field_schema: "float" },
             { field_name: "y", field_schema: "float" },
             { field_name: "articlesCount", field_schema: "integer" },
-            { field_name: "growthRating", field_schema: "float" },
           ],
         },
       );
+      expect(createCollectionSchema).toHaveBeenNthCalledWith(
+        2,
+        expect.any(QdrantClient),
+        {
+          name: "cluster_associations",
+          vectors: {},
+          payloadIndexes: [],
+        },
+      );
+
+      const associations = await client.getCollection("cluster_associations");
+      expect(associations.config.params.vectors).toEqual({});
+    }),
+    60_000,
+  );
+
+  it(
+    "should write the attributes and the associations into their own collections under one point id",
+    withReadyClusterRepository(async ({ repository, client }) => {
+      await repository.upsert([buildClusterInput()]);
+
+      const attributes = await client.scroll("clusters", {
+        limit: 10,
+        with_payload: true,
+      });
+      const associations = await client.scroll("cluster_associations", {
+        limit: 10,
+        with_payload: true,
+      });
+
+      expect(
+        Object.keys(attributes.points[0]?.payload ?? {}).toSorted(),
+      ).toEqual([
+        "articlesCount",
+        "averageArticleAgeYears",
+        "citationRatingPercentile",
+        "externalId",
+        "growthRating",
+        "keyConcepts",
+        "name",
+        "patentRatingPercentile",
+        "x",
+        "y",
+      ]);
+      expect(
+        Object.keys(associations.points[0]?.payload ?? {}).toSorted(),
+      ).toEqual([
+        "articles",
+        "embedding",
+        "nameSource",
+        "relatedClusters",
+        "topCompanies",
+        "topInstitutions",
+        "topJournals",
+      ]);
+      expect(associations.points[0]?.id).toEqual(attributes.points[0]?.id);
     }),
     60_000,
   );
@@ -166,16 +224,27 @@ describe("clusters repository", () => {
               x: 0,
               y: 0,
               name: null,
-              nameSource: null,
               articlesCount: 1,
               growthRating: 0,
+              averageArticleAgeYears: 0,
+              citationRatingPercentile: 0,
+              patentRatingPercentile: 0,
+            },
+          },
+        ],
+      });
+      await client.upsert("cluster_associations", {
+        wait: true,
+        points: [
+          {
+            id,
+            vector: {},
+            payload: {
+              nameSource: null,
               embedding: {
                 model: "gemini-embedding-001",
                 source: "article-titles",
               },
-              averageArticleAgeYears: 0,
-              citationRatingPercentile: 0,
-              patentRatingPercentile: 0,
               topJournals: [],
               topInstitutions: [],
               topCompanies: [],
@@ -204,26 +273,24 @@ describe("clusters repository", () => {
   );
 
   it(
-    "should fetch many clusters in one call with findByIds",
+    "should return null when the cluster is stored in only one collection",
     withReadyClusterRepository(async ({ repository, client }) => {
-      await repository.upsert([
-        buildClusterInput({ externalId: 10 }),
-        buildClusterInput({ externalId: 11 }),
-      ]);
+      await repository.upsert([buildClusterInput()]);
+      const [id] = await storedPointIds(client);
 
-      const found = await repository.findByIds(await storedPointIds(client));
+      await client.delete("cluster_associations", {
+        wait: true,
+        points: [id],
+      });
 
-      expect(found).toHaveLength(2);
-      expect(found.map((cluster) => cluster.externalId).sort()).toEqual([
-        10, 11,
-      ]);
+      expect(await repository.findById(id)).toBeNull();
     }),
     60_000,
   );
 
   it(
-    "should return only clusters whose position falls inside the bbox",
-    withReadyClusterRepository(async ({ repository }) => {
+    "should return the map attributes of only the clusters inside the bbox",
+    withReadyClusterRepository(async ({ repository, reader }) => {
       const inside = buildClusterInput({
         externalId: 20,
         position: { x: 5, y: 5 },
@@ -238,20 +305,29 @@ describe("clusters repository", () => {
       });
       await repository.upsert([inside, outsideX, outsideY]);
 
-      const found = await repository.findInViewport({
+      const found = await reader.findInViewport({
         bbox: { x: { min: 0, max: 10 }, y: { min: 0, max: 10 } },
         limit: 10,
       });
 
       expect(found).toHaveLength(1);
       expect(found[0].externalId).toBe(20);
+      expect(Object.keys(found[0]).toSorted()).toEqual([
+        "articlesCount",
+        "externalId",
+        "growthRating",
+        "id",
+        "keyConcepts",
+        "name",
+        "position",
+      ]);
     }),
     60_000,
   );
 
   it(
     "should order clusters inside the viewport by articlesCount desc",
-    withReadyClusterRepository(async ({ repository }) => {
+    withReadyClusterRepository(async ({ repository, reader }) => {
       const small = buildClusterInput({
         externalId: 30,
         position: { x: 1, y: 1 },
@@ -269,7 +345,7 @@ describe("clusters repository", () => {
       });
       await repository.upsert([small, huge, medium]);
 
-      const found = await repository.findInViewport({
+      const found = await reader.findInViewport({
         bbox: { x: { min: 0, max: 10 }, y: { min: 0, max: 10 } },
         limit: 10,
       });
@@ -281,7 +357,7 @@ describe("clusters repository", () => {
 
   it(
     "should cap the viewport result at the requested limit",
-    withReadyClusterRepository(async ({ repository }) => {
+    withReadyClusterRepository(async ({ repository, reader }) => {
       const inputs = [100, 200, 300, 400].map((articlesCount, index) =>
         buildClusterInput({
           externalId: 40 + index,
@@ -291,7 +367,7 @@ describe("clusters repository", () => {
       );
       await repository.upsert(inputs);
 
-      const found = await repository.findInViewport({
+      const found = await reader.findInViewport({
         bbox: { x: { min: -1, max: 10 }, y: { min: -1, max: 10 } },
         limit: 2,
       });
@@ -304,7 +380,7 @@ describe("clusters repository", () => {
 
   it(
     "should rank the cluster whose vector matches the query higher than an unrelated one",
-    withReadyClusterRepository(async ({ repository }) => {
+    withReadyClusterRepository(async ({ repository, reader }) => {
       const queryVector = Array.from({ length: 768 }, (_, index) =>
         index === 0 ? 1 : 0,
       );
@@ -322,7 +398,7 @@ describe("clusters repository", () => {
       });
       await repository.upsert([matching, unrelated]);
 
-      const matches = await repository.findByVector({
+      const matches = await reader.findByVector({
         vector: queryVector,
         limit: 2,
         minScore: -1,
@@ -331,6 +407,16 @@ describe("clusters repository", () => {
       expect(matches).toHaveLength(2);
       expect(matches[0].externalId).toBe(50);
       expect(matches[0].score).toBeGreaterThan(matches[1].score);
+      expect(Object.keys(matches[0]).toSorted()).toEqual([
+        "articlesCount",
+        "externalId",
+        "growthRating",
+        "id",
+        "keyConcepts",
+        "name",
+        "position",
+        "score",
+      ]);
     }),
     60_000,
   );

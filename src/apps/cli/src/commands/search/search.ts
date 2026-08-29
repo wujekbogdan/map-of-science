@@ -50,7 +50,7 @@ const compose = (config: SearchConfig) => {
   const store = createAtlasStore({ qdrant });
 
   return createSearch({
-    clusters: store.clusters,
+    clusters: store.clusterAttributes,
     embedQuery: async (text: string) => {
       const { embedding } = await embedder.embed(text);
       return embedding;
