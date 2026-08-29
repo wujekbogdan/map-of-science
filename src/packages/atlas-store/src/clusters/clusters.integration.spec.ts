@@ -273,7 +273,7 @@ describe("clusters repository", () => {
   );
 
   it(
-    "should answer with null when the cluster is stored in only one collection",
+    "should return null when the cluster is stored in only one collection",
     withReadyClusterRepository(async ({ repository, client }) => {
       await repository.upsert([buildClusterInput()]);
       const [id] = await storedPointIds(client);
@@ -289,7 +289,7 @@ describe("clusters repository", () => {
   );
 
   it(
-    "should answer with the map attributes of only the clusters inside the bbox",
+    "should return the map attributes of only the clusters inside the bbox",
     withReadyClusterRepository(async ({ repository, reader }) => {
       const inside = buildClusterInput({
         externalId: 20,

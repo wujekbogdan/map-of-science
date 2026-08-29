@@ -38,7 +38,7 @@ Follows DDD:
 - `AreaRepository`
 - `ContentRepository`
 
-**Read ports** - reads that answer with part of an aggregate:
+**Read interfaces** - reads that return part of an aggregate:
 
 - `ClusterAttributesReader`
 

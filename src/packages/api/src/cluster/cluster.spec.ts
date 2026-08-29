@@ -33,7 +33,7 @@ const buildCluster = () => ({
   },
 });
 
-/* The reader answers with the attributes only, so its doubles must too. */
+/* The reader returns the attributes only, so the double must too. */
 const buildMapAttributes = () => ({
   id: "c-1",
   externalId: 1,
@@ -136,7 +136,7 @@ describe("cluster.byId", () => {
     expect(result?.position).toEqual({ x: 10, y: 5 });
   });
 
-  it("should answer with the panel fields and nothing else", async () => {
+  it("should return the panel fields and nothing else", async () => {
     const result = await callerFor("en_US").cluster.byId({ id: "c-1" });
 
     expect(Object.keys(result ?? {}).toSorted()).toEqual([
@@ -173,7 +173,7 @@ describe("cluster.byId", () => {
 
     const result = await callerFor("en_US", atlas).cluster.byId({ id: "c-1" });
 
-    /* 8 sorts first because its two directions add up to 32. */
+    /* 8 sorts first because topCiting and topCited add up to 32. */
     expect(result?.rankedRelatedClusters).toEqual([
       { externalId: 8, id: "c-8", displayName: "Cluster #8" },
       { externalId: 7, id: "c-7", displayName: "Optics" },
@@ -203,7 +203,7 @@ describe("cluster.byId", () => {
 describe("cluster.viewport", () => {
   const bbox = { x: { min: 0, max: 10 }, y: { min: 1, max: 10 } };
 
-  it("should answer with the map attributes and nothing else", async () => {
+  it("should return the map attributes and nothing else", async () => {
     const result = await callerFor("pl_PL").cluster.viewport({ bbox });
 
     expect(result[0]).toEqual({

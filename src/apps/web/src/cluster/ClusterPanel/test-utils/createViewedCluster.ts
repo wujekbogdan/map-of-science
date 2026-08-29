@@ -7,7 +7,7 @@ const article = {
   doi: "10.1002/aenm.201903937",
 };
 
-/** The cluster shape `cluster.byId` answers with. Override only the fields a spec is about. */
+/** The cluster shape `cluster.byId` returns. Override only the fields a spec is about. */
 export const createViewedCluster = (
   overrides: Partial<ViewedCluster> = {},
 ): ViewedCluster => ({

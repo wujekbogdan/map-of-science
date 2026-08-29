@@ -36,8 +36,8 @@ describe("search.query", () => {
     },
   );
 
-  /* cluster.viewport answers with the same shape. */
-  it("should answer with the map attributes and nothing else", async () => {
+  /* cluster.viewport returns the same shape. */
+  it("should return the map attributes and nothing else", async () => {
     const result = await callerFor("en_US").search.query({ text: "quantum" });
 
     expect(result[0]).toEqual({

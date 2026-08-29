@@ -107,7 +107,7 @@ export const toAssociationsPayload = (cluster: ClusterInput) => {
   } satisfies AssociationsPayload;
 };
 
-/* The write already validated these values. */
+/* `toAttributesPayload` validated these values on the way in. */
 export const toMapAttributes = (rawPoint: unknown) => {
   const { id, payload } = rawPointSchema.parse(rawPoint);
   const stored = mapAttributesPayloadSchema.parse(payload);

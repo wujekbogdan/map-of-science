@@ -169,7 +169,7 @@ export type Cluster = z.infer<typeof clusterSchema>;
 export type ClusterInput = z.infer<typeof clusterInputSchema>;
 export type BBox = z.infer<typeof bboxSchema>;
 
-/* The attributes a caller gets when it asks for many clusters at once. */
+/* The fields a read of many clusters returns. */
 export type ClusterMapAttributes = Pick<
   Cluster,
   | "id"
@@ -194,8 +194,9 @@ export type ClusterRepository = {
   findById(id: string): Promise<Cluster | null>;
 };
 
+/* Cluster queries that never write. Each one returns part of a cluster, not the whole aggregate. */
 export type ClusterAttributesReader = {
-  /* Get multiple clusters by their ETO id. An id with no cluster is left out. */
+  /* Get the id and name of multiple clusters by their ETO id. An id with no cluster is left out. */
   findByExternalIds(
     externalIds: number[],
   ): Promise<Pick<Cluster, "id" | "externalId" | "name">[]>;

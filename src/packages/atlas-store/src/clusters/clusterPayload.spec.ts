@@ -65,7 +65,7 @@ describe("clusterPayload", () => {
     expect(found).toEqual({ ...cluster, id });
   });
 
-  it("should send each domain field to exactly one collection", () => {
+  it("should write each domain field to exactly one collection", () => {
     const input = buildClusterInput();
 
     expect(Object.keys(toAttributesPayload(input)).toSorted()).toEqual([
@@ -91,7 +91,7 @@ describe("clusterPayload", () => {
     ]);
   });
 
-  it("should ask Qdrant only for the keys the map attributes need", () => {
+  it("should request only the payload keys the map attributes need", () => {
     expect(MAP_PAYLOAD_KEYS.toSorted()).toEqual([
       "articlesCount",
       "externalId",
@@ -105,7 +105,7 @@ describe("clusterPayload", () => {
 
   it.each([
     [
-      "the keys it asked for",
+      "the keys it requested",
       {
         externalId: 1,
         x: 12.5,
@@ -116,9 +116,9 @@ describe("clusterPayload", () => {
         keyConcepts: ["edible coatings", "shelf life"],
       },
     ],
-    ["more keys than it asked for", toAttributesPayload(buildClusterInput())],
+    ["more keys than it requested", toAttributesPayload(buildClusterInput())],
   ])(
-    "should answer with the map attributes and nothing else, given %s",
+    "should return the map attributes and nothing else, given %s",
     (_, payload) => {
       const id = "7c411b5e-9d3f-50b5-9c28-62096e41c4ed";
 
@@ -134,7 +134,7 @@ describe("clusterPayload", () => {
     },
   );
 
-  it("should answer with the link attributes and nothing else", () => {
+  it("should return the link attributes and nothing else", () => {
     const id = "7c411b5e-9d3f-50b5-9c28-62096e41c4ed";
 
     expect(LINK_PAYLOAD_KEYS.toSorted()).toEqual(["externalId", "name"]);

@@ -14,7 +14,7 @@ const asClient = (mocks: ReturnType<typeof buildQdrantMocks>) =>
 
 describe("createClusterAttributesReader", () => {
   describe("findInViewport", () => {
-    it("should ask for the map payload keys inside the bounding box, widest cluster first", async () => {
+    it("should request the map payload keys inside the bounding box, widest cluster first", async () => {
       const mocks = buildQdrantMocks();
       const reader = createClusterAttributesReader({
         qdrant: asClient(mocks),
@@ -42,7 +42,7 @@ describe("createClusterAttributesReader", () => {
   });
 
   describe("findByVector", () => {
-    it("should ask for the map payload keys on the titles vector", async () => {
+    it("should request the map payload keys on the titles vector", async () => {
       const mocks = buildQdrantMocks();
       const reader = createClusterAttributesReader({
         qdrant: asClient(mocks),
@@ -67,7 +67,7 @@ describe("createClusterAttributesReader", () => {
   });
 
   describe("findByExternalIds", () => {
-    it("should ask for the link payload keys at the points the external ids resolve to", async () => {
+    it("should request the link payload keys at the points the external ids resolve to", async () => {
       const mocks = buildQdrantMocks();
       const reader = createClusterAttributesReader({
         qdrant: asClient(mocks),
@@ -86,7 +86,7 @@ describe("createClusterAttributesReader", () => {
       });
     });
 
-    it("should answer with nothing without asking Qdrant when there are no external ids", async () => {
+    it("should return an empty list without calling Qdrant when there are no external ids", async () => {
       const mocks = buildQdrantMocks();
       const reader = createClusterAttributesReader({
         qdrant: asClient(mocks),

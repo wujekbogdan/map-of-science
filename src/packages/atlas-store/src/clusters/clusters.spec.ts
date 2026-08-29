@@ -69,20 +69,17 @@ describe("createClustersRepository", () => {
     it.each([
       ["the attributes record is missing", [] as unknown[], [{ id }]],
       ["the associations record is missing", [{ id }], [] as unknown[]],
-    ])(
-      "should answer with null when %s",
-      async (_, attributes, associations) => {
-        const mocks = buildQdrantMocks();
-        mocks.retrieve
-          .mockResolvedValueOnce(attributes)
-          .mockResolvedValueOnce(associations);
-        const repository = createClustersRepository({
-          qdrant: asClient(mocks),
-        });
+    ])("should return null when %s", async (_, attributes, associations) => {
+      const mocks = buildQdrantMocks();
+      mocks.retrieve
+        .mockResolvedValueOnce(attributes)
+        .mockResolvedValueOnce(associations);
+      const repository = createClustersRepository({
+        qdrant: asClient(mocks),
+      });
 
-        expect(await repository.findById(id)).toBeNull();
-      },
-    );
+      expect(await repository.findById(id)).toBeNull();
+    });
   });
 
   describe("upsert", () => {

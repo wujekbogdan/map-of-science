@@ -2,7 +2,7 @@ import type { RouterOutputs } from "../../api-client/index.ts";
 
 type MapCluster = RouterOutputs["cluster"]["viewport"][number];
 
-/** The cluster shape `cluster.viewport` and `search.query` answer with. Override only the fields a spec is about. */
+/** The cluster shape `cluster.viewport` and `search.query` return. Override only the fields a spec is about. */
 export const createMapCluster = (
   overrides: Partial<MapCluster> = {},
 ): MapCluster => ({

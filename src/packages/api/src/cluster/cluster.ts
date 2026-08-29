@@ -8,7 +8,7 @@ import {
 import type { Context, Lang } from "../context.js";
 import { publicProcedure, router } from "../trpc.js";
 
-/* cluster.viewport and search.query both answer with this. */
+/* cluster.viewport and search.query both return this. */
 export type MapCluster = {
   id: string;
   externalId: number;
@@ -26,7 +26,7 @@ export type RelatedCluster = {
   displayName: string;
 };
 
-/* cluster.byId answers with this. */
+/* cluster.byId returns this. */
 export type ClusterDetails = MapCluster & {
   name: string | null;
   averageArticleAgeYears: number;
