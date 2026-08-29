@@ -7,4 +7,4 @@
 - Stop sending `nameSource`, `embedding`, raw `relatedClusters`, `score` and `significantCitations`.
 - Delete the `cluster.byIds` procedure.
 - Add `MapCluster`, `ClusterDetails` and `RelatedCluster` for the three shapes above.
-- Name every field a procedure returns, so a new field on the cluster no longer reaches the browser on its own.
+- Name every field a procedure returns, so a new field on the cluster no longer reaches the client on its own.

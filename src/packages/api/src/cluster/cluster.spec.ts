@@ -136,7 +136,7 @@ describe("cluster.byId", () => {
     expect(result?.position).toEqual({ x: 10, y: 5 });
   });
 
-  it("should return the panel fields and nothing else", async () => {
+  it("should return the cluster details and nothing else", async () => {
     const result = await callerFor("en_US").cluster.byId({ id: "c-1" });
 
     expect(Object.keys(result ?? {}).toSorted()).toEqual([
