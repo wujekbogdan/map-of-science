@@ -21,7 +21,6 @@ type Link = ViewedCluster["rankedRelatedClusters"][number];
 
 const link = (externalId: number): Link => ({
   externalId,
-  significantCitations: 100 - externalId,
   displayName: `Cluster ${externalId.toString()}`,
   id: `id-${externalId.toString()}`,
 });
