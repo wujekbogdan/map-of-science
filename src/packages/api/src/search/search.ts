@@ -1,17 +1,10 @@
 import { z } from "zod";
+import { DEFAULT_SORT, sortValueSchema } from "@map-of-science/atlas";
 import {
-  type ClusterMatch,
-  DEFAULT_SORT,
-  sortValueSchema,
-} from "@map-of-science/atlas";
-import { present } from "../cluster/cluster.js";
-import type { Lang } from "../context.js";
+  type ClusterAttributesDto,
+  presentAttributes,
+} from "../cluster/cluster.js";
 import { publicProcedure, router } from "../trpc.js";
-
-const presentMatch = (match: ClusterMatch, lang: Lang) => ({
-  ...present(match, lang),
-  score: match.score,
-});
 
 export const searchRouter = router({
   query: publicProcedure
@@ -23,13 +16,13 @@ export const searchRouter = router({
         sort: sortValueSchema.default(DEFAULT_SORT),
       }),
     )
-    .query(async ({ input, ctx }) => {
+    .query(async ({ input, ctx }): Promise<ClusterAttributesDto[]> => {
       const matches = await ctx.search.query({
         text: input.text,
         ...(input.limit !== undefined ? { limit: input.limit } : {}),
         ...(input.minScore !== undefined ? { minScore: input.minScore } : {}),
         sort: input.sort,
       });
-      return matches.map((match) => presentMatch(match, ctx.lang));
+      return matches.map((match) => presentAttributes(match, ctx.lang));
     }),
 });

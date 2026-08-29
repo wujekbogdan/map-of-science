@@ -33,20 +33,38 @@ const buildCluster = () => ({
   },
 });
 
+/* The reader answers with the attributes only, so its doubles must too. */
+const buildMapAttributes = () => ({
+  id: "c-1",
+  externalId: 1,
+  position: { x: 10, y: -5 },
+  name: { en_US: "Machine Learning", pl_PL: "Uczenie Maszynowe" },
+  articlesCount: 1200,
+  growthRating: 75.5,
+  keyConcepts: ["machine learning", "neural networks"],
+});
+
 const buildRelated = (externalId: number, name: string | null) => ({
-  ...buildCluster(),
   id: `c-${externalId.toString()}`,
   externalId,
   name: name === null ? null : { en_US: name, pl_PL: name },
-  nameSource: name === null ? null : ("llm" as const),
 });
 
-const buildAtlas = (overrides?: Partial<AtlasStore["clusters"]>): AtlasStore =>
+const buildAtlas = (
+  overrides: {
+    clusters?: Partial<AtlasStore["clusters"]>;
+    clusterAttributes?: Partial<AtlasStore["clusterAttributes"]>;
+  } = {},
+): AtlasStore =>
   ({
     clusters: {
       findById: vi.fn().mockResolvedValue(buildCluster()),
+      ...overrides.clusters,
+    },
+    clusterAttributes: {
       findByExternalIds: vi.fn().mockResolvedValue([]),
-      ...overrides,
+      findInViewport: vi.fn().mockResolvedValue([buildMapAttributes()]),
+      ...overrides.clusterAttributes,
     },
   }) as unknown as AtlasStore;
 
@@ -69,9 +87,9 @@ describe("cluster.byId", () => {
 
   it("should return null name when the cluster has no name", async () => {
     const atlas = buildAtlas({
-      findById: vi
-        .fn()
-        .mockResolvedValue({ ...buildCluster(), name: null, nameSource: null }),
+      clusters: {
+        findById: vi.fn().mockResolvedValue({ ...buildCluster(), name: null }),
+      },
     });
 
     const result = await callerFor("en_US", atlas).cluster.byId({ id: "c-1" });
@@ -99,11 +117,12 @@ describe("cluster.byId", () => {
     "should display null-name cluster as a localized placeholder in %s",
     async (lang, expected) => {
       const atlas = buildAtlas({
-        findById: vi.fn().mockResolvedValue({
-          ...buildCluster(),
-          name: null,
-          nameSource: null,
-        }),
+        clusters: {
+          findById: vi.fn().mockResolvedValue({
+            ...buildCluster(),
+            name: null,
+          }),
+        },
       });
 
       const result = await callerFor(lang, atlas).cluster.byId({ id: "c-1" });
@@ -117,45 +136,61 @@ describe("cluster.byId", () => {
     expect(result?.position).toEqual({ x: 10, y: 5 });
   });
 
+  it("should answer with the panel fields and nothing else", async () => {
+    const result = await callerFor("en_US").cluster.byId({ id: "c-1" });
+
+    expect(Object.keys(result ?? {}).toSorted()).toEqual([
+      "articles",
+      "articlesCount",
+      "averageArticleAgeYears",
+      "citationRating",
+      "displayName",
+      "externalId",
+      "growthRating",
+      "id",
+      "keyConcepts",
+      "name",
+      "patentRating",
+      "position",
+      "rankedRelatedClusters",
+      "topCompanies",
+      "topInstitutions",
+      "topJournals",
+    ]);
+  });
+
   it("should rank related clusters and name each one, with no id for a cluster we do not hold", async () => {
     const atlas = buildAtlas({
-      findByExternalIds: vi
-        .fn()
-        .mockResolvedValue([buildRelated(7, "Optics"), buildRelated(8, null)]),
+      clusterAttributes: {
+        findByExternalIds: vi
+          .fn()
+          .mockResolvedValue([
+            buildRelated(7, "Optics"),
+            buildRelated(8, null),
+          ]),
+      },
     });
 
     const result = await callerFor("en_US", atlas).cluster.byId({ id: "c-1" });
 
+    /* 8 sorts first because its two directions add up to 32. */
     expect(result?.rankedRelatedClusters).toEqual([
-      {
-        externalId: 8,
-        significantCitations: 32,
-        id: "c-8",
-        displayName: "Cluster #8",
-      },
-      {
-        externalId: 7,
-        significantCitations: 30,
-        id: "c-7",
-        displayName: "Optics",
-      },
-      {
-        externalId: 9,
-        significantCitations: 25,
-        id: null,
-        displayName: "Cluster #9",
-      },
+      { externalId: 8, id: "c-8", displayName: "Cluster #8" },
+      { externalId: 7, id: "c-7", displayName: "Optics" },
+      { externalId: 9, id: null, displayName: "Cluster #9" },
     ]);
   });
 
   it("should look nothing up when the cluster has no citation links", async () => {
     const findByExternalIds = vi.fn().mockResolvedValue([]);
     const atlas = buildAtlas({
-      findById: vi.fn().mockResolvedValue({
-        ...buildCluster(),
-        relatedClusters: { topCiting: [], topCited: [] },
-      }),
-      findByExternalIds,
+      clusters: {
+        findById: vi.fn().mockResolvedValue({
+          ...buildCluster(),
+          relatedClusters: { topCiting: [], topCited: [] },
+        }),
+      },
+      clusterAttributes: { findByExternalIds },
     });
 
     const result = await callerFor("en_US", atlas).cluster.byId({ id: "c-1" });
@@ -165,45 +200,26 @@ describe("cluster.byId", () => {
   });
 });
 
-describe("cluster.byIds", () => {
-  it("should localize every cluster in the result", async () => {
-    const first = { ...buildCluster(), id: "c-1" };
-    const second = {
-      ...buildCluster(),
-      id: "c-2",
-      name: { en_US: "Physics", pl_PL: "Fizyka" },
-    };
-    const atlas = buildAtlas({
-      findByIds: vi.fn().mockResolvedValue([first, second]),
-    });
-
-    const result = await callerFor("pl_PL", atlas).cluster.byIds({
-      ids: ["c-1", "c-2"],
-    });
-
-    expect(result.map((cluster) => cluster.name)).toEqual([
-      "Uczenie Maszynowe",
-      "Fizyka",
-    ]);
-  });
-});
-
 describe("cluster.viewport", () => {
   const bbox = { x: { min: 0, max: 10 }, y: { min: 1, max: 10 } };
 
-  it("should localize every cluster in the viewport result", async () => {
-    const atlas = buildAtlas({
-      findInViewport: vi.fn().mockResolvedValue([buildCluster()]),
+  it("should answer with the map attributes and nothing else", async () => {
+    const result = await callerFor("pl_PL").cluster.viewport({ bbox });
+
+    expect(result[0]).toEqual({
+      id: "c-1",
+      externalId: 1,
+      position: { x: 10, y: 5 },
+      displayName: "Uczenie Maszynowe",
+      articlesCount: 1200,
+      growthRating: 75.5,
+      keyConcepts: ["machine learning", "neural networks"],
     });
-
-    const result = await callerFor("pl_PL", atlas).cluster.viewport({ bbox });
-
-    expect(result[0].name).toBe("Uczenie Maszynowe");
   });
 
   it("should flip bbox y from screen-space to natural before querying store", async () => {
     const findInViewport = vi.fn().mockResolvedValue([]);
-    const atlas = buildAtlas({ findInViewport });
+    const atlas = buildAtlas({ clusterAttributes: { findInViewport } });
     const screenBbox = { x: { min: 0, max: 10 }, y: { min: 2, max: 8 } };
 
     await callerFor("en_US", atlas).cluster.viewport({ bbox: screenBbox });
@@ -217,7 +233,7 @@ describe("cluster.viewport", () => {
 
   it("should forward a caller-provided limit", async () => {
     const findInViewport = vi.fn().mockResolvedValue([]);
-    const atlas = buildAtlas({ findInViewport });
+    const atlas = buildAtlas({ clusterAttributes: { findInViewport } });
 
     await callerFor("en_US", atlas).cluster.viewport({ bbox, limit: 25 });
 
