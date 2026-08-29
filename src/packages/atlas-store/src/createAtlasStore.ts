@@ -1,10 +1,12 @@
 import type { QdrantClient } from "@qdrant/js-client-rest";
 import { createAreasRepository } from "./areas/areas.js";
+import { createClusterAttributesReader } from "./clusters/clusterAttributesReader.js";
 import { createClustersRepository } from "./clusters/clusters.js";
 import { createContentRepository } from "./content/content.js";
 
 export const createAtlasStore = ({ qdrant }: { qdrant: QdrantClient }) => ({
   clusters: createClustersRepository({ qdrant }),
+  clusterAttributes: createClusterAttributesReader({ qdrant }),
   areas: createAreasRepository({ qdrant }),
   content: createContentRepository({ qdrant }),
 });

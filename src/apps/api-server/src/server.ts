@@ -18,7 +18,7 @@ const compose = (config: Config) => {
     "query",
   );
   const search = createSearch({
-    clusters: atlas.clusters,
+    clusters: atlas.clusterAttributes,
     embedQuery: async (text) => {
       const { embedding } = await embedder.embed(text);
       return embedding;
