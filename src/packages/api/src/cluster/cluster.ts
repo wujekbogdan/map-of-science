@@ -9,7 +9,7 @@ import type { Context, Lang } from "../context.js";
 import { publicProcedure, router } from "../trpc.js";
 
 /* cluster.viewport and search.query both answer with this. */
-export type ClusterAttributesDto = {
+export type MapCluster = {
   id: string;
   externalId: number;
   position: { x: number; y: number };
@@ -20,14 +20,14 @@ export type ClusterAttributesDto = {
 };
 
 /* One citation link. `id` is null when the cluster is not stored. */
-export type RelatedClusterDto = {
+export type RelatedCluster = {
   id: string | null;
   externalId: number;
   displayName: string;
 };
 
 /* cluster.byId answers with this. */
-export type ClusterDto = ClusterAttributesDto & {
+export type ClusterDetails = MapCluster & {
   name: string | null;
   averageArticleAgeYears: number;
   citationRating: number;
@@ -36,7 +36,7 @@ export type ClusterDto = ClusterAttributesDto & {
   topInstitutions: string[];
   topCompanies: string[];
   articles: Cluster["articles"];
-  rankedRelatedClusters: RelatedClusterDto[];
+  rankedRelatedClusters: RelatedCluster[];
 };
 
 const PLACEHOLDER_PREFIX: Record<Lang, string> = {
@@ -72,7 +72,7 @@ export const presentAttributes = (
     articlesCount: cluster.articlesCount,
     growthRating: cluster.growthRating,
     keyConcepts: cluster.keyConcepts,
-  } satisfies ClusterAttributesDto;
+  } satisfies MapCluster;
 };
 
 const presentCluster = ({
@@ -81,9 +81,9 @@ const presentCluster = ({
   lang,
 }: {
   cluster: Cluster;
-  rankedRelatedClusters: RelatedClusterDto[];
+  rankedRelatedClusters: RelatedCluster[];
   lang: Lang;
-}): ClusterDto => ({
+}): ClusterDetails => ({
   ...presentAttributes(cluster, lang),
   name: cluster.name?.[lang] ?? null,
   averageArticleAgeYears: cluster.averageArticleAgeYears,
@@ -121,7 +121,7 @@ const presentRelatedClusters = async (
         externalId,
         lang,
       ),
-    } satisfies RelatedClusterDto;
+    } satisfies RelatedCluster;
   });
 };
 
@@ -130,7 +130,7 @@ const DEFAULT_VIEWPORT_LIMIT = 500;
 export const clusterRouter = router({
   byId: publicProcedure
     .input(z.object({ id: z.string() }))
-    .query(async ({ input, ctx }): Promise<ClusterDto | null> => {
+    .query(async ({ input, ctx }): Promise<ClusterDetails | null> => {
       const cluster = await ctx.atlas.clusters.findById(input.id);
       if (!cluster) return null;
       return presentCluster({
@@ -142,7 +142,7 @@ export const clusterRouter = router({
 
   viewport: publicProcedure
     .input(z.object({ bbox: bboxSchema, limit: z.number().int().optional() }))
-    .query(async ({ input, ctx }): Promise<ClusterAttributesDto[]> => {
+    .query(async ({ input, ctx }): Promise<MapCluster[]> => {
       const { bbox } = input;
       const clusters = await ctx.atlas.clusterAttributes.findInViewport({
         bbox: {

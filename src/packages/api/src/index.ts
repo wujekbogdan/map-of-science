@@ -1,7 +1,7 @@
 export type {
-  ClusterAttributesDto,
-  ClusterDto,
-  RelatedClusterDto,
+  ClusterDetails,
+  MapCluster,
+  RelatedCluster,
 } from "./cluster/cluster.js";
 export { createContext, createInnerContext } from "./context.js";
 export type { Context, HttpRequest, Lang } from "./context.js";

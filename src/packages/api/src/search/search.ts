@@ -1,9 +1,6 @@
 import { z } from "zod";
 import { DEFAULT_SORT, sortValueSchema } from "@map-of-science/atlas";
-import {
-  type ClusterAttributesDto,
-  presentAttributes,
-} from "../cluster/cluster.js";
+import { type MapCluster, presentAttributes } from "../cluster/cluster.js";
 import { publicProcedure, router } from "../trpc.js";
 
 export const searchRouter = router({
@@ -16,7 +13,7 @@ export const searchRouter = router({
         sort: sortValueSchema.default(DEFAULT_SORT),
       }),
     )
-    .query(async ({ input, ctx }): Promise<ClusterAttributesDto[]> => {
+    .query(async ({ input, ctx }): Promise<MapCluster[]> => {
       const matches = await ctx.search.query({
         text: input.text,
         ...(input.limit !== undefined ? { limit: input.limit } : {}),
