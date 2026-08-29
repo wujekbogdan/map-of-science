@@ -2,6 +2,8 @@
 
 export {
   bboxSchema,
+  clusterAssociationsSchema,
+  clusterAttributesSchema,
   clusterInputSchema,
   clusterSchema,
 } from "./clusters/clusters.js";
@@ -9,7 +11,9 @@ export { rankRelatedClusters } from "./clusters/rankRelatedClusters.js";
 export type {
   BBox,
   Cluster,
+  ClusterAttributesReader,
   ClusterInput,
+  ClusterMapAttributes,
   ClusterMatch,
   ClusterRepository,
 } from "./clusters/clusters.js";

@@ -16,7 +16,9 @@ import { I18nextProvider, initReactI18next } from "react-i18next";
 import { describe, expect, it, vi } from "vitest";
 import type { Router, RouterOutputs } from "@map-of-science/api";
 import { TRPCProvider } from "../../../api-client/index.ts";
+import { createViewedCluster } from "../../../cluster/ClusterPanel/test-utils/createViewedCluster.ts";
 import { CLUSTER_ROUTE_PATH } from "../../../cluster/routePath.ts";
+import { createMapCluster } from "../../../cluster/test-utils/createMapCluster.ts";
 import { useSelectionStore } from "../../../map/selectionStore.ts";
 import { MapView, type MapViewConfig } from "../../../map/view/MapView.tsx";
 import { createFakeDebouncer } from "../../../map/view/test-utils/createFakeDebouncer.ts";
@@ -31,28 +33,12 @@ import { useSearchStore } from "./searchStore.ts";
 
 type Match = RouterOutputs["search"]["query"][number];
 
-const makeCluster = (overrides: Partial<Match> = {}): Match => ({
-  id: "cluster-1",
-  externalId: 1,
-  position: { x: 10, y: 20 },
-  name: "Black Holes",
-  displayName: "Black Holes",
-  nameSource: "llm",
-  articlesCount: 100,
-  growthRating: 50,
-  embedding: { model: "test", source: "titles" },
-  keyConcepts: [],
-  averageArticleAgeYears: 0,
-  citationRating: 0,
-  patentRating: 0,
-  topJournals: [],
-  topInstitutions: [],
-  topCompanies: [],
-  articles: { core: [], review: [], highlyCited: [] },
-  relatedClusters: { topCiting: [], topCited: [] },
-  score: 0.9,
-  ...overrides,
-});
+const makeCluster = (overrides: Partial<Match> = {}): Match =>
+  createMapCluster(overrides);
+
+/* The mock handler is untyped, so each procedure's shape is chosen by hand. */
+const panelFor = (cluster: Match) =>
+  createViewedCluster({ id: cluster.id, displayName: cluster.displayName });
 
 const mockLink =
   (handler: (path: string, input: unknown) => unknown): TRPCLink<Router> =>
@@ -252,7 +238,9 @@ describe("Search", () => {
       });
       const { container, findByText } = render(
         <TestProviders
-          handler={() => [makeCluster({ id: "c1", name: "Black Holes" })]}
+          handler={() => [
+            makeCluster({ id: "c1", displayName: "Black Holes" }),
+          ]}
           router={router}
         />,
       );
@@ -334,12 +322,11 @@ describe("Search", () => {
       });
       const cluster = makeCluster({
         id: "c1",
-        name: "Black Holes",
         displayName: "Black Holes",
         position: { x: 100, y: 200 },
       });
       const handler = (path: string) =>
-        path === "cluster.byId" ? cluster : [cluster];
+        path === "cluster.byId" ? panelFor(cluster) : [cluster];
 
       const { container, findByRole } = render(
         <TestProviders handler={handler} router={router} />,
@@ -377,10 +364,10 @@ describe("Search", () => {
       const { container, findByRole } = render(
         <TestProviders
           handler={() => [
-            makeCluster({ id: "c1", name: "First" }),
+            makeCluster({ id: "c1", displayName: "First" }),
             makeCluster({
               id: "c2",
-              name: "Second",
+              displayName: "Second",
               position: { x: 50, y: 50 },
             }),
           ]}
@@ -431,12 +418,12 @@ describe("Search", () => {
       const handler = vi.fn().mockReturnValue([
         makeCluster({
           id: "c1",
-          name: "First",
+          displayName: "First",
           position: { x: 100, y: 200 },
         }),
         makeCluster({
           id: "c2",
-          name: "Second",
+          displayName: "Second",
           position: { x: 200, y: 100 },
         }),
       ]);
@@ -471,16 +458,15 @@ describe("Search", () => {
         children: <Search />,
       });
       const clusters = [
-        makeCluster({ id: "c1", name: "First", displayName: "First" }),
+        makeCluster({ id: "c1", displayName: "First" }),
         makeCluster({
           id: "c2",
-          name: "Second",
           displayName: "Second",
           position: { x: 50, y: 50 },
         }),
       ];
       const handler = (path: string) =>
-        path === "cluster.byId" ? clusters[0] : clusters;
+        path === "cluster.byId" ? panelFor(clusters[0]) : clusters;
 
       const { container, findByRole } = render(
         <TestProviders handler={handler} router={router} />,
@@ -528,11 +514,10 @@ describe("Search", () => {
       });
       const cluster = makeCluster({
         id: "c1",
-        name: "Black Holes",
         displayName: "Black Holes",
       });
       const handler = (path: string) =>
-        path === "cluster.byId" ? cluster : [cluster];
+        path === "cluster.byId" ? panelFor(cluster) : [cluster];
 
       const { container, findByRole, queryByRole } = render(
         <TestProviders handler={handler} router={router} />,
@@ -617,11 +602,10 @@ describe("Search", () => {
       });
       const cluster = makeCluster({
         id: "c1",
-        name: "Black Holes",
         displayName: "Black Holes",
       });
       const handler = (path: string) =>
-        path === "cluster.byId" ? cluster : [cluster];
+        path === "cluster.byId" ? panelFor(cluster) : [cluster];
 
       const { container, findByLabelText } = render(
         <TestProviders handler={handler} router={router} />,
@@ -700,10 +684,9 @@ describe("Search", () => {
         .mockReturnValueOnce([
           makeCluster({
             id: "c1",
-            name: "Black Holes",
             displayName: "Black Holes",
           }),
-          makeCluster({ id: "c2", name: "Quasars", displayName: "Quasars" }),
+          makeCluster({ id: "c2", displayName: "Quasars" }),
         ])
         .mockReturnValueOnce(secondCall);
 
@@ -726,9 +709,7 @@ describe("Search", () => {
       expect(querySpinner()).toBeTruthy();
 
       act(() => {
-        resolveSecond([
-          makeCluster({ id: "c3", name: "Pulsars", displayName: "Pulsars" }),
-        ]);
+        resolveSecond([makeCluster({ id: "c3", displayName: "Pulsars" })]);
       });
 
       await findAllByText("Pulsars");
@@ -745,11 +726,10 @@ describe("Search", () => {
       const { config } = baseConfig();
       const cluster = makeCluster({
         id: "c1",
-        name: "Black Holes",
         displayName: "Black Holes",
       });
       const handler = (path: string) =>
-        path === "cluster.byId" ? cluster : [cluster];
+        path === "cluster.byId" ? panelFor(cluster) : [cluster];
       const router = buildTestRouter({
         i18n,
         config,
@@ -801,11 +781,10 @@ describe("Search", () => {
       const { fake, config } = baseConfig();
       const cluster = makeCluster({
         id: "c1",
-        name: "Black Holes",
         displayName: "Black Holes",
       });
       const handler = (path: string) =>
-        path === "cluster.byId" ? cluster : [cluster];
+        path === "cluster.byId" ? panelFor(cluster) : [cluster];
       const router = buildTestRouter({
         i18n,
         config,

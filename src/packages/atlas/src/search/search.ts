@@ -1,4 +1,7 @@
-import type { ClusterMatch, ClusterRepository } from "../clusters/clusters.js";
+import type {
+  ClusterAttributesReader,
+  ClusterMatch,
+} from "../clusters/clusters.js";
 import { DEFAULT_SORT, type SortValue } from "./sort.js";
 
 /* Converts text into an embedding vector. */
@@ -17,7 +20,7 @@ const reRank = (matches: ClusterMatch[], sort: SortValue): ClusterMatch[] => {
 
 /* Creates the search service from its dependencies. */
 export const createSearch = (deps: {
-  clusters: Pick<ClusterRepository, "findByVector">;
+  clusters: Pick<ClusterAttributesReader, "findByVector">;
   embedQuery: EmbedQuery;
 }) => ({
   /* Finds clusters most similar to the given text. */

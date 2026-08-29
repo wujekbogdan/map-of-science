@@ -119,12 +119,26 @@ describe("ingest:clusters e2e", () => {
           x: 10.5,
           y: -5.25,
           name: { en_US: "Quantum computing", pl_PL: "Obliczenia kwantowe" },
-          nameSource: "llm",
           articlesCount: 1000,
           growthRating: 42.5,
           averageArticleAgeYears: 5.8,
           citationRatingPercentile: 75.47,
           patentRatingPercentile: 99.78,
+        });
+        const vector = (cluster1?.vector as Record<string, number[]>).titles;
+        expect(vector).toHaveLength(768);
+
+        const associations = await client.count("cluster_associations", {
+          exact: true,
+        });
+        expect(associations.count).toBe(2);
+
+        const [related] = await client.retrieve("cluster_associations", {
+          ids: [cluster1?.id ?? ""],
+          with_payload: true,
+        });
+        expect(related?.payload).toMatchObject({
+          nameSource: "llm",
           topJournals: ["Journal of Tests"],
           topInstitutions: ["Test University"],
           topCompanies: [],
@@ -134,11 +148,8 @@ describe("ingest:clusters e2e", () => {
           },
         });
         expect(
-          (cluster1?.payload as { articles: { core: unknown[] } }).articles
-            .core,
+          (related?.payload as { articles: { core: unknown[] } }).articles.core,
         ).toHaveLength(2);
-        const vector = (cluster1?.vector as Record<string, number[]>).titles;
-        expect(vector).toHaveLength(768);
       });
     }),
     60_000,

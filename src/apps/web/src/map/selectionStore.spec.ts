@@ -1,30 +1,14 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { type SelectedCluster, useSelectionStore } from "./selectionStore.ts";
+import { createMapCluster } from "../cluster/test-utils/createMapCluster.ts";
+import { useSelectionStore } from "./selectionStore.ts";
 
-const makeCluster = (
-  overrides: Partial<SelectedCluster> = {},
-): SelectedCluster => ({
-  id: "c-1",
-  externalId: 1,
-  position: { x: 0, y: 0 },
-  name: "Test",
-  displayName: "Test",
-  nameSource: "llm",
-  articlesCount: 100,
-  growthRating: 50,
-  embedding: { model: "test", source: "titles" },
-  keyConcepts: [],
-  averageArticleAgeYears: 0,
-  citationRating: 0,
-  patentRating: 0,
-  topJournals: [],
-  topInstitutions: [],
-  topCompanies: [],
-  articles: { core: [], review: [], highlyCited: [] },
-  relatedClusters: { topCiting: [], topCited: [] },
-  score: 0.9,
-  ...overrides,
-});
+const makeCluster = (overrides: Parameters<typeof createMapCluster>[0] = {}) =>
+  createMapCluster({
+    id: "c-1",
+    displayName: "Test",
+    position: { x: 0, y: 0 },
+    ...overrides,
+  });
 
 describe("selectionStore", () => {
   beforeEach(() => {

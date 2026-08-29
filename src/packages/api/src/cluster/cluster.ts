@@ -2,10 +2,42 @@ import { z } from "zod";
 import {
   bboxSchema,
   type Cluster,
+  type ClusterMapAttributes,
   rankRelatedClusters,
 } from "@map-of-science/atlas";
 import type { Context, Lang } from "../context.js";
 import { publicProcedure, router } from "../trpc.js";
+
+/* cluster.viewport and search.query both return this. */
+export type MapCluster = {
+  id: string;
+  externalId: number;
+  position: { x: number; y: number };
+  displayName: string;
+  articlesCount: number;
+  growthRating: number;
+  keyConcepts: string[];
+};
+
+/* One citation link. `id` is null when the cluster is not stored. */
+export type RelatedCluster = {
+  id: string | null;
+  externalId: number;
+  displayName: string;
+};
+
+/* cluster.byId returns this. */
+export type ClusterDetails = MapCluster & {
+  name: string | null;
+  averageArticleAgeYears: number;
+  citationRating: number;
+  patentRating: number;
+  topJournals: string[];
+  topInstitutions: string[];
+  topCompanies: string[];
+  articles: Cluster["articles"];
+  rankedRelatedClusters: RelatedCluster[];
+};
 
 const PLACEHOLDER_PREFIX: Record<Lang, string> = {
   en_US: "Cluster",
@@ -21,28 +53,50 @@ const resolveDisplayName = (
   return `${PLACEHOLDER_PREFIX[lang]} #${externalId.toString()}`;
 };
 
-/*
- * Maps a domain Cluster into its API DTO. Resolves name to the requested
- * language, outputs y in screen-space (y-down), and computes a localized
- * "Cluster #N" / "Klaster #N" placeholder when the cluster has no name.
- *
- * Every Cluster leaving the API goes through this.
- */
-export const present = (cluster: Cluster, lang: Lang) => {
+/* The y axis points down on the wire, and up in the domain. */
+const toScreenPosition = (position: Cluster["position"]) => ({
+  x: position.x,
+  y: -position.y,
+});
+
+export const presentAttributes = (
+  cluster: ClusterMapAttributes,
+  lang: Lang,
+) => {
   const name = cluster.name?.[lang] ?? null;
   return {
-    ...cluster,
-    position: { x: cluster.position.x, y: -cluster.position.y },
-    name,
+    id: cluster.id,
+    externalId: cluster.externalId,
+    position: toScreenPosition(cluster.position),
     displayName: resolveDisplayName(name, cluster.externalId, lang),
-  };
+    articlesCount: cluster.articlesCount,
+    growthRating: cluster.growthRating,
+    keyConcepts: cluster.keyConcepts,
+  } satisfies MapCluster;
 };
 
-/*
- * Ranks a cluster's citation links, the strongest first, and gives each one a name.
- *
- * `id` is null when the cluster is not stored.
- */
+const presentCluster = ({
+  cluster,
+  rankedRelatedClusters,
+  lang,
+}: {
+  cluster: Cluster;
+  rankedRelatedClusters: RelatedCluster[];
+  lang: Lang;
+}): ClusterDetails => ({
+  ...presentAttributes(cluster, lang),
+  name: cluster.name?.[lang] ?? null,
+  averageArticleAgeYears: cluster.averageArticleAgeYears,
+  citationRating: cluster.citationRating,
+  patentRating: cluster.patentRating,
+  topJournals: cluster.topJournals,
+  topInstitutions: cluster.topInstitutions,
+  topCompanies: cluster.topCompanies,
+  articles: cluster.articles,
+  rankedRelatedClusters,
+});
+
+/* Ranks a cluster's citation links, the strongest first, and gives each one a name. */
 const presentRelatedClusters = async (
   cluster: Cluster,
   { atlas, lang }: Pick<Context, "atlas" | "lang">,
@@ -50,25 +104,24 @@ const presentRelatedClusters = async (
   const ranked = rankRelatedClusters(cluster.relatedClusters);
   if (ranked.length === 0) return [];
 
-  const found = await atlas.clusters.findByExternalIds(
+  const found = await atlas.clusterAttributes.findByExternalIds(
     ranked.map(({ externalId }) => externalId),
   );
   const byExternalId = new Map(
     found.map((related) => [related.externalId, related]),
   );
 
-  return ranked.map(({ externalId, significantCitations }) => {
+  return ranked.map(({ externalId }) => {
     const related = byExternalId.get(externalId);
     return {
-      externalId,
-      significantCitations,
       id: related?.id ?? null,
+      externalId,
       displayName: resolveDisplayName(
         related?.name?.[lang] ?? null,
         externalId,
         lang,
       ),
-    };
+    } satisfies RelatedCluster;
   });
 };
 
@@ -77,34 +130,27 @@ const DEFAULT_VIEWPORT_LIMIT = 500;
 export const clusterRouter = router({
   byId: publicProcedure
     .input(z.object({ id: z.string() }))
-    .query(async ({ input, ctx }) => {
+    .query(async ({ input, ctx }): Promise<ClusterDetails | null> => {
       const cluster = await ctx.atlas.clusters.findById(input.id);
       if (!cluster) return null;
-      return {
-        // The ranked links are a second field, so that `relatedClusters` holds the same shape in every procedure.
-        ...present(cluster, ctx.lang),
+      return presentCluster({
+        cluster,
         rankedRelatedClusters: await presentRelatedClusters(cluster, ctx),
-      };
-    }),
-
-  byIds: publicProcedure
-    .input(z.object({ ids: z.array(z.string()) }))
-    .query(async ({ input, ctx }) => {
-      const clusters = await ctx.atlas.clusters.findByIds(input.ids);
-      return clusters.map((cluster) => present(cluster, ctx.lang));
+        lang: ctx.lang,
+      });
     }),
 
   viewport: publicProcedure
     .input(z.object({ bbox: bboxSchema, limit: z.number().int().optional() }))
-    .query(async ({ input, ctx }) => {
+    .query(async ({ input, ctx }): Promise<MapCluster[]> => {
       const { bbox } = input;
-      const clusters = await ctx.atlas.clusters.findInViewport({
+      const clusters = await ctx.atlas.clusterAttributes.findInViewport({
         bbox: {
           x: bbox.x,
           y: { min: -bbox.y.max, max: -bbox.y.min },
         },
         limit: input.limit ?? DEFAULT_VIEWPORT_LIMIT,
       });
-      return clusters.map((cluster) => present(cluster, ctx.lang));
+      return clusters.map((cluster) => presentAttributes(cluster, ctx.lang));
     }),
 });

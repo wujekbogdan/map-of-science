@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import type { Cluster } from "../clusters/clusters.js";
+import type { ClusterMatch } from "../clusters/clusters.js";
 import { createSearch } from "./search.js";
 
 const buildMatch = (id: string, score: number, articlesCount = 0) =>
@@ -8,21 +8,11 @@ const buildMatch = (id: string, score: number, articlesCount = 0) =>
     externalId: 0,
     position: { x: 0, y: 0 },
     name: null,
-    nameSource: null,
     articlesCount,
     growthRating: 0,
-    embedding: { model: "gemini-embedding-001", source: "article-titles" },
     keyConcepts: [],
-    averageArticleAgeYears: 0,
-    citationRating: 0,
-    patentRating: 0,
-    topJournals: [],
-    topInstitutions: [],
-    topCompanies: [],
-    articles: { core: [], review: [], highlyCited: [] },
-    relatedClusters: { topCiting: [], topCited: [] },
     score,
-  }) satisfies Cluster & { score: number };
+  }) satisfies ClusterMatch;
 
 describe("createSearch", () => {
   it("should embed the query and forward the vector to findByVector", async () => {

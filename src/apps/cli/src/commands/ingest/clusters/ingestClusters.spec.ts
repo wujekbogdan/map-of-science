@@ -41,10 +41,6 @@ const buildDeps = (
     createSchema,
     upsert: vi.fn().mockResolvedValue(undefined),
     findById: vi.fn(),
-    findByIds: vi.fn(),
-    findByExternalIds: vi.fn(),
-    findInViewport: vi.fn(),
-    findByVector: vi.fn(),
   } satisfies AtlasStore["clusters"];
   return {
     clustersRepo,

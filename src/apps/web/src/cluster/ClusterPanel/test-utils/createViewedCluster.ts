@@ -7,7 +7,7 @@ const article = {
   doi: "10.1002/aenm.201903937",
 };
 
-/** A cluster as `cluster.byId` returns it. Override only the fields a spec is about. */
+/** The cluster shape `cluster.byId` returns. Override only the fields a spec is about. */
 export const createViewedCluster = (
   overrides: Partial<ViewedCluster> = {},
 ): ViewedCluster => ({
@@ -15,7 +15,6 @@ export const createViewedCluster = (
   externalId: 1085,
   name: "Lithium-sulfur batteries",
   displayName: "Lithium-sulfur batteries",
-  nameSource: "curated",
   position: { x: 1, y: 2 },
   articlesCount: 6701,
   keyConcepts: ["sulfur batteries", "high sulfur loading"],
@@ -23,16 +22,13 @@ export const createViewedCluster = (
   growthRating: 65.6,
   citationRating: 75.47,
   patentRating: 99.78,
-  embedding: { model: "test-model", source: "test-source" },
   topJournals: ["Chemical Engineering Journal", "Small"],
   topInstitutions: ["Chinese Academy of Sciences – China"],
   topCompanies: ["Samsung (South Korea)"],
   articles: { core: [article], review: [], highlyCited: [article] },
-  relatedClusters: { topCiting: [], topCited: [] },
   rankedRelatedClusters: [
     {
       externalId: 13708,
-      significantCitations: 40,
       displayName: "Electrolytes and interfaces in lithium metal batteries",
       id: "def-456",
     },

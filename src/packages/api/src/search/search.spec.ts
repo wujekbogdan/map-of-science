@@ -9,10 +9,8 @@ const buildMatch = () => ({
   externalId: 1,
   position: { x: 10, y: -5 },
   name: { en_US: "Machine Learning", pl_PL: "Uczenie Maszynowe" },
-  nameSource: "llm" as const,
   articlesCount: 1200,
   growthRating: 75.5,
-  embedding: { model: "gemini-embedding-001", source: "article-titles" },
   keyConcepts: ["machine learning", "neural networks"],
   score: 0.95,
 });
@@ -34,21 +32,23 @@ describe("search.query", () => {
     "should flatten each match's name to %s",
     async (lang, expected) => {
       const result = await callerFor(lang).search.query({ text: "quantum" });
-      expect(result[0].name).toBe(expected);
+      expect(result[0].displayName).toBe(expected);
     },
   );
 
-  it("should include displayName on each match", async () => {
+  /* cluster.viewport returns the same shape. */
+  it("should return the map attributes and nothing else", async () => {
     const result = await callerFor("en_US").search.query({ text: "quantum" });
-    expect(result[0].displayName).toBe("Machine Learning");
-  });
 
-  it("should include keyConcepts on each match", async () => {
-    const result = await callerFor("en_US").search.query({ text: "quantum" });
-    expect(result[0].keyConcepts).toEqual([
-      "machine learning",
-      "neural networks",
-    ]);
+    expect(result[0]).toEqual({
+      id: "c-1",
+      externalId: 1,
+      position: { x: 10, y: 5 },
+      displayName: "Machine Learning",
+      articlesCount: 1200,
+      growthRating: 75.5,
+      keyConcepts: ["machine learning", "neural networks"],
+    });
   });
 
   it("should forward the text, limit, minScore, and sort to search.query", async () => {
