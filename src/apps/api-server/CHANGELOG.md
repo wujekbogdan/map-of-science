@@ -1,5 +1,17 @@
 # @map-of-science/api
 
+## 0.2.6
+
+### Patch Changes
+
+- d5299dc: - Build the search service from `store.clusterAttributes` instead of `store.clusters`, which no longer holds `findByVector`.
+- Updated dependencies [d5299dc]
+- Updated dependencies [d5299dc]
+- Updated dependencies [d5299dc]
+  - @map-of-science/atlas@0.6.0
+  - @map-of-science/atlas-store@0.5.0
+  - @map-of-science/api@0.6.0
+
 ## 0.2.5
 
 ### Patch Changes

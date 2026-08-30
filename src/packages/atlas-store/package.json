@@ -1,6 +1,6 @@
 {
   "name": "@map-of-science/atlas-store",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Qdrant-backed implementations of atlas repository interfaces",
   "type": "module",
   "private": true,
