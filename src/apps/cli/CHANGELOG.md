@@ -1,5 +1,15 @@
 # @map-of-science/cli
 
+## 1.2.1
+
+### Patch Changes
+
+- d5299dc: - Build the search service from `store.clusterAttributes` instead of `store.clusters`, which no longer holds `findByVector`. The `search` and `ingest` commands behave as before.
+- Updated dependencies [d5299dc]
+- Updated dependencies [d5299dc]
+  - @map-of-science/atlas@0.6.0
+  - @map-of-science/atlas-store@0.5.0
+
 ## 1.2.0
 
 ### Minor Changes

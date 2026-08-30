@@ -1,5 +1,23 @@
 # @map-of-science/api
 
+## 0.6.0
+
+### Minor Changes
+
+- d5299dc: - Return `id`, `externalId`, `position`, `displayName`, `articlesCount`, `growthRating` and `keyConcepts` from `cluster.viewport` and `search.query`.
+  - Return the same fields from `cluster.byId`, plus `name`, `averageArticleAgeYears`, `citationRating`, `patentRating`, `topJournals`, `topInstitutions`, `topCompanies`, `articles` and `rankedRelatedClusters`.
+  - Stop sending `nameSource`, `embedding`, raw `relatedClusters`, `score` and `significantCitations`.
+  - Delete the `cluster.byIds` procedure.
+  - Add `MapCluster`, `ClusterDetails` and `RelatedCluster` for the three shapes above.
+  - Name every field a procedure returns, so a new field on the cluster no longer reaches the client on its own.
+
+### Patch Changes
+
+- Updated dependencies [d5299dc]
+- Updated dependencies [d5299dc]
+  - @map-of-science/atlas@0.6.0
+  - @map-of-science/atlas-store@0.5.0
+
 ## 0.5.0
 
 ### Minor Changes

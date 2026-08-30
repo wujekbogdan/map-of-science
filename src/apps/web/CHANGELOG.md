@@ -1,5 +1,15 @@
 # @map-of-science/web
 
+## 1.24.1
+
+### Patch Changes
+
+- d5299dc: - Share one cluster test fixture across the map and search specs, in place of six copies.
+  - Drop the cluster fields the API no longer sends from the test fixtures. No component changed.
+- f170e2b: - Give every search dropdown option an `order` to skip Headless UI's DOM-position sort. A large result set renders faster.
+- Updated dependencies [d5299dc]
+  - @map-of-science/api@0.6.0
+
 ## 1.24.0
 
 ### Minor Changes
