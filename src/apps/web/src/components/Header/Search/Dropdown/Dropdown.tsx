@@ -274,7 +274,10 @@ export const Dropdown = (props: DropdownProps) => {
                   )}
                   {props.isQuerySubmittable && (
                     <>
-                      <ComboboxOptionHeadless value={submitOption.id}>
+                      {/* Headless UI keeps its own option registry to drive keyboard navigation, and it rebuilds that registry on every option mount and unmount.
+                          The `order` prop makes Headless UI rely on the provided order and skip the DOM-based comparison, which speeds up rendering a lot.
+                        */}
+                      <ComboboxOptionHeadless value={submitOption.id} order={0}>
                         {({ focus, selected }) => (
                           <ComboboxOption $focus={focus} $selected={selected}>
                             <SubmitRow
@@ -294,12 +297,13 @@ export const Dropdown = (props: DropdownProps) => {
                           </HeaderName>
                         </ColumnHeader>
                       )}
-                      {options.map((option) => {
+                      {options.map((option, index) => {
                         if (option.type !== "cluster") return null;
                         return (
                           <ComboboxOptionHeadless
                             key={option.id}
                             value={option.id}
+                            order={index + 1}
                           >
                             {({ focus, selected }) => (
                               <ComboboxOption

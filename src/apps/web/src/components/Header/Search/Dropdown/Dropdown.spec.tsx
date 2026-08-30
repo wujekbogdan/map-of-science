@@ -24,6 +24,14 @@ const withDropdown = (test: (i18n: i18n) => Promise<void>) => async () => {
 
 const cluster = createMapCluster({ id: "c-1", position: { x: 0, y: 0 } });
 
+const toClusterOption = (id: string, label: string): Option => ({
+  type: "cluster",
+  id,
+  label,
+  keyword: label,
+  cluster: createMapCluster({ id, position: { x: 0, y: 0 } }),
+});
+
 const clusterOption: Option = {
   type: "cluster",
   id: cluster.id,
@@ -37,6 +45,7 @@ const renderDropdown = (
   props: {
     value: string;
     query: string;
+    options?: Option[];
     onItemHover?: (id: string | null) => void;
   },
 ) =>
@@ -45,9 +54,9 @@ const renderDropdown = (
       <Dropdown
         value={props.value}
         query={props.query}
-        options={[clusterOption]}
+        options={props.options ?? [clusterOption]}
         selectedOptionId={null}
-        matchCount={1}
+        matchCount={(props.options ?? [clusterOption]).length}
         isQuerySubmittable
         isFetching={false}
         onSelect={vi.fn()}
@@ -121,6 +130,35 @@ describe("Dropdown", () => {
       await user.keyboard("{ArrowDown}{ArrowDown}");
 
       expect(onItemHover).toHaveBeenCalledWith(cluster.id);
+    }),
+  );
+
+  it(
+    "should move focus through the cluster rows in result order",
+    withDropdown(async (instance) => {
+      const onItemHover = vi.fn<(clusterId: string | null) => void>();
+      const options = [
+        toClusterOption("c-1", "Black Holes"),
+        toClusterOption("c-2", "Black Hole Thermodynamics"),
+        toClusterOption("c-3", "Black Hole Mergers"),
+      ];
+      const { container } = renderDropdown(instance, {
+        value: "Black",
+        query: "Black",
+        options,
+        onItemHover,
+      });
+
+      const input = container.querySelector("input");
+      if (!input) throw new Error("input not found");
+      const user = userEvent.setup();
+      await user.click(input);
+
+      // The list opens with the submit option already active, so the first press moves to the first cluster.
+      for (const option of options) {
+        await user.keyboard("{ArrowDown}");
+        expect(onItemHover.mock.lastCall?.[0]).toBe(option.id);
+      }
     }),
   );
 });
