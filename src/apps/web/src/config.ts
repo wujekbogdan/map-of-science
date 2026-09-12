@@ -11,8 +11,14 @@ declare global {
   }
 }
 
+// `startsWith("/")` also accepts `//host`, which the browser resolves against a different origin.
+const rootRelativeUrl = z
+  .string()
+  .startsWith("/")
+  .refine((value) => !value.startsWith("//"));
+
 const configSchema = z.object({
-  apiUrl: z.string().url(),
+  apiUrl: z.union([z.string().url(), rootRelativeUrl]),
   devTool: z.coerce.boolean().default(false),
   namespace: z.string().default("10b3c450-44d5-42f0-9fda-31000717d0fb"),
   LANG: z.string().default("pl-PL"), // TODO: make dynamic based on user language preference
