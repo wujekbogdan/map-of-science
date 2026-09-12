@@ -8,12 +8,12 @@ on:
         required: true
         type: string
       push:
-        description: "Push the image to GHCR and tag it with the version"
+        description: "Push the image to GHCR and tag it"
         required: false
         type: boolean
         default: false
       version:
-        description: "Image version tag, required when push is true"
+        description: "Release version. Set it to add the version and `stable` tags"
         required: false
         type: string
       ref:
@@ -115,13 +115,25 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Collect tags
+        id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: ${{ env.IMAGE }}
+          tags: |
+            type=sha
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=${{ inputs.version }},enable=${{ inputs.version != '' }}
+            type=raw,value=stable,enable=${{ inputs.version != '' }}
+
       - name: Create manifest list and push
         working-directory: /tmp/digests
+        env:
+          TAGS: ${{ steps.meta.outputs.tags }}
         run: |
           docker buildx imagetools create \
-            -t "$IMAGE:${{ inputs.version }}" \
-            -t "$IMAGE:latest" \
+            $(printf -- "-t %s " $TAGS) \
             $(printf "$IMAGE@sha256:%s " *)
 
       - name: Inspect image
-        run: docker buildx imagetools inspect "$IMAGE:${{ inputs.version }}"
+        run: docker buildx imagetools inspect "$IMAGE:${{ steps.meta.outputs.version }}"

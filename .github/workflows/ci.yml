@@ -68,9 +68,24 @@ jobs:
       - run: pnpm turbo build
 
   docker-build:
+    if: github.event_name == 'pull_request'
     strategy:
       matrix:
         app: [web, api-server]
     uses: ./.github/workflows/docker-image.yml
     with:
       app: ${{ matrix.app }}
+
+  publish:
+    if: github.ref == 'refs/heads/main'
+    needs: [lint, typecheck, test, build]
+    strategy:
+      matrix:
+        app: [web, api-server]
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/docker-image.yml
+    with:
+      app: ${{ matrix.app }}
+      push: true
