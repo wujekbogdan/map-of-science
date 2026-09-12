@@ -38,10 +38,11 @@ jobs:
         run: echo "RELEASE_DATE=$(date '+%Y-%m-%d')" >> $GITHUB_ENV
 
       - name: Create Release Pull Request
-        uses: changesets/action@v1
+        uses: changesets/action@v2
         with:
-          commit: "chore(release): apply changesets"
-          title: "Release: ${{ env.RELEASE_DATE }}"
-          publish: pnpm changeset tag
-        env:
-          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          commit-message: "chore(release): apply changesets"
+          pr-title: "Release: ${{ env.RELEASE_DATE }}"
+          # `git-tag` skips private packages, so only the deployable apps get a tag.
+          publish-script: pnpm changeset git-tag
+          create-github-releases: true
+          github-token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
