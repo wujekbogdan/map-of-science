@@ -1,5 +1,18 @@
 # @map-of-science/root
 
+## 0.8.3
+
+### Patch Changes
+
+- 50d83a6: - Publish the `map-of-science-web` and `map-of-science-api-server` images to GHCR on every commit to `main` that passes the checks, tagged `sha-<short>` and `latest`.
+  - Add the `stable` tag to the images that a release publishes.
+  - Take image tags from `docker/metadata-action` in place of hardcoded tag flags.
+  - Upgrade to `@changesets/cli` 3 and `changesets/action` v2.
+- c8fe43e: - Add the `map-of-science-api` service, which pulls the `map-of-science-api-server` image from GHCR.
+  - Drop the two development services. Development moves off Render.
+  - Stop production web from deploying on every commit to `main`. A release deploys it.
+  - Build only `@map-of-science/web` for the static site, in place of every package in the workspace.
+
 ## 0.8.2
 
 ### Patch Changes
