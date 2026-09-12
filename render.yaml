@@ -6,7 +6,7 @@ services:
     runtime: static
     repo: https://github.com/wujekbogdan/map-of-science
     branch: main
-    buildCommand: pnpm i --frozen-lockfile && pnpm build
+    buildCommand: pnpm i --frozen-lockfile && pnpm turbo build --filter=@map-of-science/web
     staticPublishPath: ./src/apps/web/dist/
     envVars:
       - fromGroup: prod
@@ -14,36 +14,18 @@ services:
       - type: rewrite
         source: /*
         destination: /index.html
-    autoDeployTrigger: checksPass
+    autoDeployTrigger: off
     previews:
       generation: off
   - type: web
-    name: dev-map-of-science
-    runtime: static
-    repo: https://github.com/wujekbogdan/map-of-science
-    branch: develop
-    buildCommand: pnpm i --frozen-lockfile && pnpm build
-    staticPublishPath: ./src/apps/web/dist/
-    envVars:
-      - fromGroup: dev
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
-    autoDeployTrigger: commit
-    previews:
-      generation: off
-  - type: web
-    name: dev-map-of-science-api
-    runtime: docker
+    name: map-of-science-api
+    runtime: image
     plan: free
     region: frankfurt
-    repo: https://github.com/wujekbogdan/map-of-science
-    branch: develop
-    dockerfilePath: ./src/apps/api-server/Dockerfile
-    dockerContext: .
+    image:
+      url: ghcr.io/wujekbogdan/map-of-science-api-server:stable
     envVars:
-      - fromGroup: dev
-    autoDeployTrigger: commit
+      - fromGroup: prod
+    healthCheckPath: /health
     previews:
       generation: off
