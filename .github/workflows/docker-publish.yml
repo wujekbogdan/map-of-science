@@ -42,3 +42,27 @@ jobs:
       version: ${{ needs.tag.outputs.version }}
       ref: ${{ inputs.tag || github.ref_name }}
       push: true
+
+  deploy:
+    name: Deploy to Render
+    needs: [tag, publish]
+    # A dispatch repairs an image in the registry. It also reports the head of the default
+    # branch as `github.sha`, which would deploy `main` under an older version's name.
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Deploy the API
+        if: needs.tag.outputs.app == 'api-server'
+        env:
+          HOOK: ${{ secrets.RENDER_API_DEPLOY_HOOK }}
+          IMAGE: ghcr.io/${{ github.repository_owner }}/map-of-science-api-server:${{ needs.tag.outputs.version }}
+        # `--get` lets curl encode the image reference and append it to the key the hook URL already carries.
+        run: curl --fail --silent --show-error --get "$HOOK" --data-urlencode "imgURL=$IMAGE"
+
+      - name: Deploy the web app
+        if: needs.tag.outputs.app == 'web'
+        env:
+          HOOK: ${{ secrets.RENDER_WEB_DEPLOY_HOOK }}
+          COMMIT: ${{ github.sha }}
+        # Render builds the newest commit on the tracked branch unless a deploy names one, and `main` moves while a release runs.
+        run: curl --fail --silent --show-error --get "$HOOK" --data-urlencode "ref=$COMMIT"
