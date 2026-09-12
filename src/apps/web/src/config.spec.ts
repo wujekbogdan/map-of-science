@@ -10,14 +10,14 @@ const withConfig = async (
     runtime?: Window["__APP_CONFIG__"];
     env?: Record<string, string>;
   },
-  assert: (config: typeof import("./config.ts").config) => void,
+  assert?: (config: typeof import("./config.ts").config) => void,
 ) => {
   vi.resetModules();
   Object.entries(env).forEach(([key, value]) => vi.stubEnv(key, value));
   window.__APP_CONFIG__ = runtime;
   try {
     const { config } = await import("./config.ts");
-    assert(config);
+    assert?.(config);
   } finally {
     vi.unstubAllEnvs();
     delete window.__APP_CONFIG__;
@@ -52,14 +52,17 @@ describe("config", () => {
       },
     ));
 
-  it("should reject an empty runtime apiUrl instead of falling back", () =>
+  it("should accept a root-relative apiUrl", () =>
+    withConfig({ runtime: { apiUrl: "/api" } }, (config) => {
+      expect(config.apiUrl).toBe("/api");
+    }));
+
+  it.each(["", "//evil.example"])("should reject the apiUrl %j", (apiUrl) =>
     expect(
-      withConfig(
-        {
-          runtime: { apiUrl: "" },
-          env: { VITE_API_URL: "http://build-time.example" },
-        },
-        () => expect.unreachable("config parsing should have thrown"),
-      ),
-    ).rejects.toThrow());
+      withConfig({
+        runtime: { apiUrl },
+        env: { VITE_API_URL: "http://build-time.example" },
+      }),
+    ).rejects.toThrow(),
+  );
 });

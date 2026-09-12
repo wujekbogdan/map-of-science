@@ -1,4 +1,11 @@
+.git
+.claude
+.turbo
+
 **/node_modules
 **/dist
-**/.turbo
-.git
+**/bin
+**/*.tsbuildinfo
+
+**/.env
+**/.env.*
