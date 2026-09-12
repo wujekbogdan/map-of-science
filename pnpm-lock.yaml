@@ -62,6 +62,9 @@ importers:
       '@map-of-science/embeddings':
         specifier: workspace:*
         version: link:../../packages/embeddings
+      '@map-of-science/logger':
+        specifier: workspace:*
+        version: link:../../packages/logger
       '@qdrant/js-client-rest':
         specifier: ^1.16.2
         version: 1.17.0(typescript@6.0.3)

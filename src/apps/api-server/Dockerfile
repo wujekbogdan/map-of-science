@@ -33,4 +33,8 @@ USER app
 
 COPY --from=builder --chown=app:app /app/${APP_PATH}/dist/ ./
 
-CMD ["node", "index.mjs"]
+HEALTHCHECK --interval=15s --timeout=5s --start-period=10s --retries=4 \
+  CMD node -e "fetch('http://127.0.0.1:'+process.env.SERVER_PORT+'/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+
+# No ENV default for the port: the one default lives in the app config.
+CMD ["sh", "-c", ": \"${SERVER_PORT:?SERVER_PORT must be set}\"; exec node index.mjs"]
